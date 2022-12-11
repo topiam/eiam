@@ -1,0 +1,162 @@
+#
+# eiam-console - Employee Identity and Access Management Program
+# Copyright © 2020-2022 TopIAM (support@topiam.cn)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# spring
+spring:
+  application:
+    name: TopIAM 企业数字身份管控平台管理端
+  jackson:
+    #日期格式化
+    date-format: "yyyy-MM-dd HH:mm:ss"
+    #设置空如何序列化
+    default-property-inclusion: NON_NULL
+    deserialization:
+      #允许对象忽略json中不存在的属性
+      fail_on_unknown_properties: false
+    parser:
+      #允许出现单引号
+      allow_single_quotes: true
+      #允许出现特殊字符和转义符
+      allow_unquoted_control_chars: true
+    serialization:
+      #忽略无法转换的对象
+      fail_on_empty_beans: false
+      #格式化输出
+      indent_output: true
+  cache:
+    type: redis
+    redis:
+      key-prefix: 'topiam'
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  session:
+    redis:
+      namespace: ${spring.cache.redis.key-prefix}:session
+      flush-mode: immediate
+    store-type: redis
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/eiam_develop?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
+    username: 'eiam'
+    password: ''
+    hikari:
+      auto-commit: true
+      connection-test-query: SELECT 1
+      connection-timeout: 30000
+      idle-timeout: 30000
+      max-lifetime: 1800000
+      maximum-pool-size: 15
+      minimum-idle: 5
+      pool-name: eiam
+  #reids
+  redis:
+    host: localhost
+    port: 6379
+    password: ''
+    database: 9
+    lettuce:
+      pool:
+        max-idle: 7
+        min-idle: 2
+        max-active: 7
+        max-wait: -1ms
+      shutdown-timeout: 200ms
+    timeout: 5000ms
+  #elasticsearch
+  elasticsearch:
+    uris: "http://localhost:9200"
+    username: "elastic"
+    password: ""
+    socket-timeout: 30000s
+    connection-timeout: 10000s
+  data:
+    jpa:
+      repositories:
+        bootstrap-mode: deferred
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 500
+          batch_versioned_data: true
+        order_inserts: true
+        types:
+          print:
+            banner: false
+  main:
+    banner-mode: off
+#日志配置
+logging:
+  config: classpath:config/logback-spring.xml
+server:
+  port: 1898
+  shutdown: graceful
+  #开启压缩 提高响应速度 减少带宽压力
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,application/javascript,application/json,image/svg+xml
+    min-response-size: 1024
+  servlet:
+    session:
+      cookie:
+        #dev环境secure=false
+        secure: false
+        #dev环境same-site=lax
+        same-site: lax
+        name: topiam-employee-console-cookie
+        http-only: true
+    encoding:
+      charset: UTF-8
+  #错误处理
+  error:
+    include-stacktrace: always
+    include-exception: true
+    include-message: always
+    include-binding-errors: always
+  # undertow
+  undertow:
+    threads:
+      io: 32
+      worker: 256
+    buffer-size: 1024
+# springdoc
+springdoc:
+  swagger-ui:
+    csrf:
+      enabled: true
+      cookie-name: 'topiam-csrf-cookie'
+      header-name: 'topiam-csrf'
+  cache:
+    disabled: true
+  writer-with-default-pretty-printer: true
+#TopIAM
+topiam:
+  server:
+    console-public-base-url:
+    portal-public-base-url:
+    openapi-public-base-url:
+    synchronizer-public-base-url:
