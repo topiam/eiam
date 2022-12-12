@@ -139,11 +139,11 @@ public interface IdentitySourceSyncConverter {
             identitySourceSyncHistoryListResult.setStatus(entity.getStatus().getCode());
         }
         if (entity.getEndTime() != null) {
-            identitySourceSyncHistoryListResult.setSpendTime(String
-                .valueOf(
+            identitySourceSyncHistoryListResult.setSpendTime(
+                String.valueOf(
                     entity.getEndTime().toInstant(java.time.ZoneOffset.of("+8")).getEpochSecond()
-                         - entity.getStartTime().toInstant(java.time.ZoneOffset.of("+8"))
-                             .getEpochSecond()));
+                               - entity.getStartTime().toInstant(java.time.ZoneOffset.of("+8"))
+                                   .getEpochSecond()));
         }
         return identitySourceSyncHistoryListResult;
     }
