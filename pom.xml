@@ -74,8 +74,8 @@
         <bouncycastle.version>1.70</bouncycastle.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <qiniu-java-sdk.version>7.12.1</qiniu-java-sdk.version>
-        <tencentcloud-sdk-java.version>3.1.649</tencentcloud-sdk-java.version>
-        <dingtalk-sdk.version>1.4.91</dingtalk-sdk.version>
+        <tencentcloud-sdk-java.version>3.1.650</tencentcloud-sdk-java.version>
+        <dingtalk-sdk.version>1.4.92</dingtalk-sdk.version>
         <alibaba-dingtalk-service-sdk.version>2.0.0</alibaba-dingtalk-service-sdk.version>
         <tea-openapi.version>0.2.8</tea-openapi.version>
         <aliyun-sdk.version>2.0.23</aliyun-sdk.version>
