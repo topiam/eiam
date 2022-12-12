@@ -105,13 +105,17 @@
 
 ## 联系我们
 
-如果你想加入我们的开源交流群， 或在关于 `TopIAM` 产品上的任何想法、意见建议，商务上的合作需求，请扫码添加下方微信进一步沟通。
+如果您在 `TopIAM` 产品上的任何想法、意见建议，商务上的合作需求，请扫码添加下方微信进一步沟通。
 
 ![](https://user-images.githubusercontent.com/30397655/205442835-cfcfbf2e-eefb-4e9f-8f36-72d91c240896.jpg)
 
 欢迎关注 TopIAM 微信公众号，接收产品最新动态。
 
 ![](https://user-images.githubusercontent.com/30397655/206887629-faf77f3e-1681-4918-99bf-773ef434f088.png)
+
+## 加入社群
+
+![67821670851274](https://user-images.githubusercontent.com/30397655/207069116-6fc9215e-af60-4638-a948-4fdfaae5fc22.jpg)
 
 ## 参与贡献
 
