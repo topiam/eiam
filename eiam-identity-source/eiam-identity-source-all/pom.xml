@@ -38,12 +38,6 @@
             <artifactId>eiam-identity-source-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!--ad -->
-        <dependency>
-            <groupId>cn.topiam</groupId>
-            <artifactId>eiam-identity-source-ad</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!--dingtalk -->
         <dependency>
             <groupId>cn.topiam</groupId>
@@ -56,22 +50,10 @@
             <artifactId>eiam-identity-source-feishu</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!--ldap -->
-        <dependency>
-            <groupId>cn.topiam</groupId>
-            <artifactId>eiam-identity-source-ldap</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!--wechatwork -->
         <dependency>
             <groupId>cn.topiam</groupId>
             <artifactId>eiam-identity-source-wechatwork</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <!--welink -->
-        <dependency>
-            <groupId>cn.topiam</groupId>
-            <artifactId>eiam-identity-source-welink</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

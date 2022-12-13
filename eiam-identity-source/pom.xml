@@ -38,9 +38,6 @@
         <module>eiam-identity-source-dingtalk</module>
         <module>eiam-identity-source-wechatwork</module>
         <module>eiam-identity-source-feishu</module>
-        <module>eiam-identity-source-ad</module>
-        <module>eiam-identity-source-welink</module>
-        <module>eiam-identity-source-ldap</module>
     </modules>
 
     <dependencies>
