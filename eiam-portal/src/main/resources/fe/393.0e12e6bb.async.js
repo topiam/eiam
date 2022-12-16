@@ -1,20 +1,3 @@
-/*
- * eiam-portal - Employee Identity and Access Management Program
- * Copyright © 2020-2022 TopIAM (support@topiam.cn)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 "use strict";(self.webpackChunktopiam_portal=self.webpackChunktopiam_portal||[]).push([[393],{4393:function(Ia,$,g){g.d($,{Z:function(){return ya}});var d=g(4942),c=g(87462),X=g(97685),J=g(94184),z=g.n(J),Q=g(98423),l=g(67294),B=g(53124),U=g(97647),V=g(21687),Y=g(67875),q=function(e,a){var t={};for(var r in e)Object.prototype.hasOwnProperty.call(e,r)&&a.indexOf(r)<0&&(t[r]=e[r]);if(e!=null&&typeof Object.getOwnPropertySymbols=="function")for(var i=0,r=Object.getOwnPropertySymbols(e);i<r.length;i++)a.indexOf(r[i])<0&&Object.prototype.propertyIsEnumerable.call(e,r[i])&&(t[r[i]]=e[r[i]]);return t},_=function(a){var t=a.prefixCls,r=a.className,i=a.hoverable,o=i===void 0?!0:i,n=q(a,["prefixCls","className","hoverable"]);return l.createElement(B.C,null,function(v){var f=v.getPrefixCls,m=f("card",t),p=z()(m+"-grid",r,(0,d.Z)({},m+"-grid-hoverable",o));return l.createElement("div",(0,c.Z)({},n,{className:p}))})},O=_,k=g(67968),aa=g(45503),y=g(14747),ea=function(a){var t=a.antCls,r=a.componentCls,i=a.cardHeadHeight,o=a.cardHeadPadding,n=a.cardPaddingBase,v=a.cardHeadTabsMarginBottom;return(0,c.Z)((0,c.Z)({minHeight:i,marginBottom:-1,padding:"0 "+n+"px",color:a.colorTextHeading,fontWeight:a.fontWeightStrong,fontSize:a.fontSizeLG,background:"transparent",borderBottom:a.lineWidth+"px "+a.lineType+" "+a.colorBorderSecondary,borderRadius:a.borderRadiusLG+"px "+a.borderRadiusLG+"px 0 0"},(0,y.dF)()),(0,d.Z)({"&-wrapper":{display:"flex",alignItems:"center"},"&-title":(0,c.Z)((0,c.Z)({display:"inline-block",flex:1,padding:o+"px 0"},y.vS),(0,d.Z)({},`
           > `+r+`-typography,
           > `+r+`-typography-edit-content

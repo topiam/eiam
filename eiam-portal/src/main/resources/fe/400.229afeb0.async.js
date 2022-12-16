@@ -1,20 +1,3 @@
-/*
- * eiam-portal - Employee Identity and Access Management Program
- * Copyright © 2020-2022 TopIAM (support@topiam.cn)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 "use strict";(self.webpackChunktopiam_portal=self.webpackChunktopiam_portal||[]).push([[400],{2788:function(Te,ne,r){r.d(ne,{Z:function(){return Re}});var o=r(97685),i=r(67294),d=r(73935),l=r(98924),V=r(42550),y=i.createContext(null),O=y,I=r(74902),R=r(8410),b=[];function z(X,F){var G=i.useState(function(){if(!(0,l.Z)())return null;var D=document.createElement("div");return D}),te=(0,o.Z)(G,1),K=te[0],fe=i.useContext(O),xe=i.useState(b),a=(0,o.Z)(xe,2),g=a[0],m=a[1],A=fe||function(D){m(function(Y){var oe=[D].concat((0,I.Z)(Y));return oe})};function W(){K.parentElement||document.body.appendChild(K)}function M(){var D;(D=K.parentElement)===null||D===void 0||D.removeChild(K)}return(0,R.Z)(function(){return X?fe?fe(W):W():M(),M},[X]),(0,R.Z)(function(){g.length&&(g.forEach(function(D){return D()}),m(b))},[g]),[K,A]}var L=r(44958),U=r(74204);function C(){return document.body.scrollHeight>(window.innerHeight||document.documentElement.clientHeight)&&window.innerWidth>document.body.offsetWidth}var e="rc-util-locker-".concat(Date.now()),f=0;function h(X){var F=!!X,G=i.useState(function(){return f+=1,"".concat(e,"_").concat(f)}),te=(0,o.Z)(G,1),K=te[0];(0,R.Z)(function(){if(F){var fe=(0,U.Z)(),xe=C();(0,L.hq)(`
 html body {
   overflow-y: hidden;
