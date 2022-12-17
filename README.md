@@ -220,7 +220,7 @@ application.yml文件依次修改以下配置
 ![](https://user-images.githubusercontent.com/30397655/205442840-1b54a95c-3d11-4542-ae51-040f849b26aa.jpg)
 
 
-### 常见错误
+## 常见错误
 
 1、项目启动：java.lang.IllegalArgumentException: topiam.server.console-public-base-url must be configured!
    
