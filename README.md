@@ -2,7 +2,7 @@
 
 <img src="https://user-images.githubusercontent.com/30397655/205442696-ccd32d07-2f7b-4335-8083-cac1d740b824.jpg" alt="logo" width="60%"/>
 
-[![](https://img.shields.io/badge/JDK-11+-orange)](https://www.oracle.com/au/java/technologies/javase/jdk11-archive-downloads.html)
+[![](https://img.shields.io/badge/JDK-17+-orange)](https://www.oracle.com/au/java/technologies/javase/jdk17-archive-downloads.html)
 [![](https://img.shields.io/badge/MySQL-8.0%2B-brightgreen)](https://www.mysql.com/downloads/)
 [![](https://img.shields.io/badge/License-AGPL%203.0-orange)](https://github.com/topaim/eiam/blob/master/LICENSE)
 [![](https://img.shields.io/badge/Maven-3.5.0+-brightgreen.svg)](https://maven.apache.org)
@@ -40,6 +40,7 @@
 + 完善的安全审计，详尽记录每一次用户行为，使每一步操作有据可循，实时记录企业信息安全状况，精准识别企业异常访问和潜在威胁的源头。
 + 提供标准`REST`和`SCIM2.0`接口轻松完成机构用户同步，实现企业对于账号生命周期的精细化管理。
 + 开源、安全、自主可控。
+
 
 ## 页面展示
 
@@ -102,6 +103,86 @@
 
 后端技术栈：`JDK11`、`Spring Boot`、`Spring Data`、`Spring Security`、`Elasticsearch`、`Redis`、`MySQL`；
 
+## 模块说明
+
+``` 
+eiam
+├── eiam-alert -- 报警模块
+├── eiam-application -- 应用模块
+├    ├── eiam-application-all --   应用聚合模块
+├    ├── eiam-application-core --  应用核心模块
+├    ├── eiam-application-cas --   cas应用模块
+├    ├── eiam-application-form --  form应用模块
+├    ├── eiam-application-jwt --   jwt应用模块
+├    ├── eiam-application-oidc --  oidc应用模块
+├    ├── eiam-application-saml2 -- saml2应用模块
+├── eiam-audit -- 日志审计模块
+├── eiam-authentication -- 身份认证模块
+├    ├── eiam-authentication-all -- 身份认证聚合模块
+├    ├── eiam-authentication-core -- 身份认证核心模块
+├    ├── eiam-authentication-dingtalk -- 钉钉身份认证模块
+├    ├── eiam-authentication-feishu -- 飞书身份认证模块
+├    ├── eiam-authentication-qq -- qq身份认证模块
+├    ├── eiam-authentication-wechat -- 微信身份认证模块
+├    ├── eiam-authentication-wechatwork -- 企业微信身份认证模块
+├    ├── eiam-authentication-sms -- 短信身份认证模块
+├    ├── eiam-authentication-mfa -- MFA身份认证模块
+├── eiam-common -- 公共模块
+├── eiam-console -- 控制台服务
+├── eiam-core -- 核心模块
+├── eiam-identity-source -- 身份源模块
+├    ├── eiam-identity-source-all -- 身份源聚合模块模块
+├    ├── eiam-identity-source-core -- 身份源对接核心模块
+├    ├── eiam-identity-source-dingtalk -- 钉钉身份源模块
+├    ├── eiam-identity-source-wechatwork -- 企业微信身份源模块
+├    ├── eiam-identity-source-feishu -- 飞书身份源模块
+├── eiam-openapi -- OpenAPI服务
+├── eiam-portal -- 门户端服务
+├── eiam-protocol -- 协议模块
+├    ├── eiam-protocol-all -- 协议聚合模块
+├    ├── eiam-protocol-core-- 协议核心模块
+├    ├── eiam-protocol-cas -- cas协议模块
+├    ├── eiam-protocol-form -- form协议模块
+├    ├── eiam-protocol-jwt -- jwt协议模块
+├    ├── eiam-protocol-oidc -- oidc协议模块
+├    ├── eiam-protocol-smal2 -- smal2协议模块
+├── eiam-support -- support模块
+└── eiam-synchronizer -- 同步服务
+```
+
+## 快速启动
+
+### 下载项目
+
+``` shell
+git clone https://gitee.com/topiam/eiam.git
+```
+
+### 配置参数
+
+application.yml文件依次修改以下配置
+ * database 配置
+ * redis 配置
+ * elasticsearch 配置
+
+>项目使用`liqiubase`管理数据库，新建`eiam_develop`数据库 不需要手动创建表结构，服务启动后，会自动创建表结构。
+
+### 启动项目
+
+ * eiam-openapi (必选)
+ * eiam-console (必选)
+ * eiam-protal  (必选)
+ * eiam-synchronizer（可选）
+
+> 项目启动没有依赖顺序
+   
+项目启动完毕后，控制台会打印出访问地址
+
+`eiam-console` 服务启动后，控制台会打印出控制台端管理员的初始化密码，及初始化密码内容文件存储位置。
+
+![](https://user-images.githubusercontent.com/30397655/208237130-5655a8a4-b528-45d3-ad7c-4295b9f7d42d.png)
+
+
 ## 联系我们
 
 如果您在 `TopIAM` 产品上的任何想法、意见建议，商务上的合作需求，请扫码添加下方微信进一步沟通。
@@ -137,3 +218,14 @@
 用于提高开发基础设施环境及在线演示系统体验。
 
 ![](https://user-images.githubusercontent.com/30397655/205442840-1b54a95c-3d11-4542-ae51-040f849b26aa.jpg)
+
+
+### 常见错误
+
+1、项目启动：java.lang.IllegalArgumentException: topiam.server.console-public-base-url must be configured!
+   
+ 解决方案：application.yml 配置文件中需要对报错的信息地址进行完善
+ - console-public-base-url (后台前端服务域名，可配置IP+端口）
+ - portal-public-base-url (门户前台服务域名，可配置IP+端口）
+ - openapi-public-base-url  (后台服务域名，可配置IP+端口）
+ - synchronizer-public-base-url  (同步认证源服务域名，可配置IP+端口）
