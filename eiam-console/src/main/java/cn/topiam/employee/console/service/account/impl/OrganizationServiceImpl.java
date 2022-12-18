@@ -19,7 +19,6 @@ package cn.topiam.employee.console.service.account.impl;
 
 import java.util.*;
 
-import liquibase.pro.packaged.L;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -276,7 +275,8 @@ public class OrganizationServiceImpl implements OrganizationService {
             // 判断旧的父节点下是否还存在子节点，不存在更改此节点为叶子节点
             List<OrganizationEntity> childList = organizationRepository.findByParentId(oldParentId);
             if (CollectionUtils.isEmpty(childList)) {
-                Optional<OrganizationEntity> oldParentOrganization = organizationRepository.findById(oldParentId);
+                Optional<OrganizationEntity> oldParentOrganization = organizationRepository
+                    .findById(oldParentId);
                 if (oldParentOrganization.isPresent()) {
                     oldParentOrganization.get().setLeaf(true);
                     organizationRepository.save(oldParentOrganization.get());
