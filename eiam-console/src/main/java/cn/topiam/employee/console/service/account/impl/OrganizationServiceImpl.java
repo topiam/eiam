@@ -19,6 +19,7 @@ package cn.topiam.employee.console.service.account.impl;
 
 import java.util.*;
 
+import liquibase.pro.packaged.L;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -256,6 +257,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         Optional<OrganizationEntity> organization = organizationRepository.findById(id);
         if (organization.isPresent()) {
             OrganizationEntity entity = organization.get();
+            String oldParentId = entity.getParentId();
             Optional<OrganizationEntity> parent = organizationRepository.findById(parentId);
             if (parent.isPresent()) {
                 if (parent.get().getLeaf()) {
@@ -270,12 +272,16 @@ public class OrganizationServiceImpl implements OrganizationService {
                 entity.setDisplayPath(StringUtils.defaultString(parent.get().getDisplayPath())
                                       + SEPARATE + entity.getName());
             }
-            // 判断当前节点下是否还存在子节点，不存在更改此节点为叶子节点
-            List<OrganizationEntity> childList = organizationRepository.findByParentId(id);
-            if (CollectionUtils.isEmpty(childList)) {
-                entity.setLeaf(true);
-            }
             organizationRepository.save(entity);
+            // 判断旧的父节点下是否还存在子节点，不存在更改此节点为叶子节点
+            List<OrganizationEntity> childList = organizationRepository.findByParentId(oldParentId);
+            if (CollectionUtils.isEmpty(childList)) {
+                Optional<OrganizationEntity> oldParentOrganization = organizationRepository.findById(oldParentId);
+                if (oldParentOrganization.isPresent()) {
+                    oldParentOrganization.get().setLeaf(true);
+                    organizationRepository.save(oldParentOrganization.get());
+                }
+            }
             //存在子组织，递归更改子组织 path 和 displayPath
             recursiveUpdateChildNodePathAndDisplayPath(entity.getId());
             return true;
