@@ -101,7 +101,7 @@
 
 前端技术栈：`ES6`、`React`、`TypeScript`、`UmiJS`、`Axios`、`Ant Design`；
 
-后端技术栈：`JDK11`、`Spring Boot`、`Spring Data`、`Spring Security`、`Elasticsearch`、`Redis`、`MySQL`；
+后端技术栈：`JDK17`、`Spring Boot`、`Spring Data`、`Spring Security`、`Elasticsearch`、`Redis`、`MySQL`；
 
 ## 模块说明
 
@@ -165,7 +165,7 @@ application.yml文件依次修改以下配置
  * redis 配置
  * elasticsearch 配置
 
->项目使用`liqiubase`管理数据库，新建`eiam_develop`数据库 不需要手动创建表结构，服务启动后，会自动创建表结构。
+>项目使用 [liquibase](https://www.liquibase.org/) 管理数据库，新建`eiam_develop`数据库 不需要手动创建表结构，服务启动后，会自动创建表结构。
 
 ### 启动项目
 
