@@ -145,7 +145,7 @@ eiam
 ├    ├── eiam-protocol-form -- form协议模块
 ├    ├── eiam-protocol-jwt -- jwt协议模块
 ├    ├── eiam-protocol-oidc -- oidc协议模块
-├    ├── eiam-protocol-smal2 -- smal2协议模块
+├    ├── eiam-protocol-saml2 -- saml2协议模块
 ├── eiam-support -- support模块
 └── eiam-synchronizer -- 同步服务
 ```
@@ -161,21 +161,21 @@ git clone https://gitee.com/topiam/eiam.git
 ### 配置参数
 
 application.yml文件依次修改以下配置
- * database 配置
- * redis 配置
- * elasticsearch 配置
+* database 配置
+* redis 配置
+* elasticsearch 配置
 
 >项目使用 [liquibase](https://www.liquibase.org/) 管理数据库，新建`eiam_develop`数据库 不需要手动创建表结构，服务启动后，会自动创建表结构。
 
 ### 启动项目
 
- * eiam-openapi (必选)
- * eiam-console (必选)
- * eiam-protal  (必选)
- * eiam-synchronizer（可选）
+* eiam-openapi (必选)
+* eiam-console (必选)
+* eiam-protal  (必选)
+* eiam-synchronizer（可选）
 
 > 项目启动没有依赖顺序
-   
+
 项目启动完毕后，控制台会打印出访问地址
 
 `eiam-console` 服务启动后，控制台会打印出控制台端管理员的初始化密码，及初始化密码内容文件存储位置。
@@ -223,9 +223,9 @@ application.yml文件依次修改以下配置
 ## 常见错误
 
 1、项目启动：java.lang.IllegalArgumentException: topiam.server.console-public-base-url must be configured!
-   
- 解决方案：application.yml 配置文件中需要对报错的信息地址进行完善
- - console-public-base-url (后台前端服务域名，可配置IP+端口）
- - portal-public-base-url (门户前台服务域名，可配置IP+端口）
- - openapi-public-base-url  (后台服务域名，可配置IP+端口）
- - synchronizer-public-base-url  (同步认证源服务域名，可配置IP+端口）
+
+解决方案：application.yml 配置文件中需要对报错的信息地址进行完善
+- console-public-base-url (后台前端服务域名，可配置IP+端口）
+- portal-public-base-url (门户前台服务域名，可配置IP+端口）
+- openapi-public-base-url  (后台服务域名，可配置IP+端口）
+- synchronizer-public-base-url  (同步认证源服务域名，可配置IP+端口）
