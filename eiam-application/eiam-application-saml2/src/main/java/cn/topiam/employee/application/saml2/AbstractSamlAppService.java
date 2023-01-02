@@ -26,9 +26,7 @@ import org.mapstruct.Mapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.AlternativeJdkIdGenerator;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.IdGenerator;
 
 import cn.topiam.employee.application.AbstractApplicationService;
 import cn.topiam.employee.application.Saml2ApplicationService;
@@ -136,11 +134,6 @@ public abstract class AbstractSamlAppService extends AbstractApplicationService
      */
     protected final AppSaml2ConfigRepository appSaml2ConfigRepository;
 
-    /**
-     * IdGenerator
-     */
-    protected final IdGenerator              idGenerator;
-
     protected AbstractSamlAppService(AppCertRepository appCertRepository,
                                      AppAccountRepository appAccountRepository,
                                      AppAccessPolicyRepository appAccessPolicyRepository,
@@ -148,7 +141,6 @@ public abstract class AbstractSamlAppService extends AbstractApplicationService
                                      AppSaml2ConfigRepository appSaml2ConfigRepository) {
         super(appCertRepository, appAccountRepository, appAccessPolicyRepository, appRepository);
         this.appSaml2ConfigRepository = appSaml2ConfigRepository;
-        this.idGenerator = new AlternativeJdkIdGenerator();
     }
 
     @Mapper(componentModel = "spring")

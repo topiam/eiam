@@ -35,6 +35,7 @@ public final class ConfigBeanNameConstants {
     public static final String SOCIAL_SECURITY_FILTER_CHAIN         = "socialSecurityFilterChain";
     public static final String SAML2_PROTOCOL_SECURITY_FILTER_CHAIN = "saml2ProtocolSecurityFilterChain";
     public static final String OIDC_PROTOCOL_SECURITY_FILTER_CHAIN  = "oidcProtocolSecurityFilterChain";
+    public static final String CAS_PROTOCOL_SECURITY_FILTER_CHAIN   = "casProtocolSecurityFilterChain";
 
     /**
      * 默认密码策略管理器
