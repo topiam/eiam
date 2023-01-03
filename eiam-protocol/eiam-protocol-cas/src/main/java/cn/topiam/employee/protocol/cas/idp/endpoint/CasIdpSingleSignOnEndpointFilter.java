@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.filter.OrderedFilter;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.CollectionUtils;
@@ -76,15 +75,11 @@ public class CasIdpSingleSignOnEndpointFilter extends OncePerRequestFilter
      */
     private final ApplicationServiceLoader     applicationServiceLoader;
 
-    private final SessionRegistry              sessionRegistry;
-
     private final CentralAuthenticationService centralAuthenticationService;
 
     public CasIdpSingleSignOnEndpointFilter(ApplicationServiceLoader applicationServiceLoader,
-                                            SessionRegistry sessionRegistry,
                                             CentralAuthenticationService centralAuthenticationService) {
         this.applicationServiceLoader = applicationServiceLoader;
-        this.sessionRegistry = sessionRegistry;
         this.centralAuthenticationService = centralAuthenticationService;
     }
 

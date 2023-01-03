@@ -57,8 +57,7 @@ public class CasIdpConfigurer<B extends HttpSecurityBuilder<B>>
         DocumentBuilder documentBuilder = getDocumentBuilder(http);
         //CAS 登陆过滤器
         http.addFilterAfter(new CasIdpSingleSignOnEndpointFilter(applicationServiceLoader,
-            sessionRegistry, centralAuthenticationService),
-            UsernamePasswordAuthenticationFilter.class);
+            centralAuthenticationService), UsernamePasswordAuthenticationFilter.class);
 
         //cas 验证过滤器
         http.addFilterBefore(
