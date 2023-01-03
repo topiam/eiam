@@ -18,19 +18,18 @@
 package cn.topiam.employee.protocol.cas.idp.endpoint;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.filter.OrderedFilter;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -48,12 +47,10 @@ import cn.topiam.employee.core.context.ServerContextHelp;
 import cn.topiam.employee.core.protocol.CasSsoModel;
 import cn.topiam.employee.core.security.savedredirect.HttpSessionRedirectCache;
 import cn.topiam.employee.core.security.savedredirect.RedirectCache;
-import cn.topiam.employee.core.security.userdetails.UserDetails;
 import cn.topiam.employee.core.security.util.SecurityUtils;
 import cn.topiam.employee.protocol.cas.idp.auth.CentralAuthenticationService;
 import cn.topiam.employee.protocol.cas.idp.tickets.ServiceTicket;
 import cn.topiam.employee.protocol.cas.idp.tickets.TicketGrantingTicket;
-import cn.topiam.employee.support.exception.TopIamException;
 import static cn.topiam.employee.common.constants.AuthorizeConstants.FE_LOGIN;
 import static cn.topiam.employee.core.security.util.SecurityUtils.isAuthenticated;
 import static cn.topiam.employee.protocol.cas.idp.constant.ProtocolConstants.SERVICE;
@@ -97,8 +94,10 @@ public class CasIdpSingleSignOnEndpointFilter extends OncePerRequestFilter
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NotNull HttpServletRequest request,
+                                    @NotNull HttpServletResponse response,
+                                    @NotNull FilterChain filterChain) throws ServletException,
+                                                                      IOException {
         if (CAS_SSO_REQUEST_MATCHER.matches(request)) {
             if (!isAuthenticated()) {
                 //Saved Redirect
@@ -110,13 +109,7 @@ public class CasIdpSingleSignOnEndpointFilter extends OncePerRequestFilter
                 response.sendRedirect(ServerContextHelp.getPortalPublicBaseUrl() + FE_LOGIN);
                 return;
             }
-            UserDetails userDetails = SecurityUtils.getCurrentUser();
-            List<SessionInformation> sessionInformations = sessionRegistry
-                .getAllSessions(userDetails.getUsername(), false);
-            if (sessionInformations.size() != 1) {
-                throw new TopIamException("用户身份出现异常");
-            }
-            String sessionId = sessionInformations.get(0).getSessionId();
+            String sessionId = request.getSession(false).getId();
             //获取应用配置
             ApplicationContext applicationContext = ApplicationContextHolder
                 .getApplicationContext();
@@ -132,7 +125,7 @@ public class CasIdpSingleSignOnEndpointFilter extends OncePerRequestFilter
 
             if (ticketGrantingTicket == null) {
                 ticketGrantingTicket = centralAuthenticationService
-                    .createTicketGrantingTicket(userDetails, sessionId);
+                    .createTicketGrantingTicket(SecurityUtils.getCurrentUser(), sessionId);
             }
             ServiceTicket serviceTicket = centralAuthenticationService
                 .grantServiceTicket(ticketGrantingTicket.getId(), service);
