@@ -28,8 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import cn.topiam.employee.application.exception.AppNotExistException;
 import cn.topiam.employee.application.saml2.converter.AppSaml2StandardConfigConverter;
 import cn.topiam.employee.application.saml2.model.AppSaml2StandardSaveConfigParam;

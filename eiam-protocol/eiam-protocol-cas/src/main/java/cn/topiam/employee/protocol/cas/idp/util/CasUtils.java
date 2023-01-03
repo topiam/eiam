@@ -17,14 +17,15 @@
  */
 package cn.topiam.employee.protocol.cas.idp.util;
 
-import cn.topiam.employee.application.ApplicationServiceLoader;
-import cn.topiam.employee.common.repository.app.AppCasConfigRepository;
-import cn.topiam.employee.protocol.cas.idp.auth.CentralAuthenticationService;
+import javax.xml.parsers.DocumentBuilder;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.core.session.SessionRegistry;
 
-import javax.xml.parsers.DocumentBuilder;
+import cn.topiam.employee.application.ApplicationServiceLoader;
+import cn.topiam.employee.common.repository.app.AppCasConfigRepository;
+import cn.topiam.employee.protocol.cas.idp.auth.CentralAuthenticationService;
 
 /**
  * @author TopIAM

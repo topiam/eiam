@@ -1,4 +1,42 @@
+/*
+ * eiam-protocol-cas - Employee Identity and Access Management Program
+ * Copyright © 2020-2022 TopIAM (support@topiam.cn)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package cn.topiam.employee.protocol.cas.idp.endpoint;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.web.servlet.filter.OrderedFilter;
+import org.springframework.core.Ordered;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import cn.topiam.employee.application.ApplicationService;
 import cn.topiam.employee.application.ApplicationServiceLoader;
@@ -16,26 +54,6 @@ import cn.topiam.employee.protocol.cas.idp.auth.CentralAuthenticationService;
 import cn.topiam.employee.protocol.cas.idp.tickets.ServiceTicket;
 import cn.topiam.employee.protocol.cas.idp.tickets.TicketGrantingTicket;
 import cn.topiam.employee.support.exception.TopIamException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.web.servlet.filter.OrderedFilter;
-import org.springframework.core.Ordered;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.core.session.SessionInformation;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
-
 import static cn.topiam.employee.common.constants.AuthorizeConstants.FE_LOGIN;
 import static cn.topiam.employee.core.security.util.SecurityUtils.isAuthenticated;
 import static cn.topiam.employee.protocol.cas.idp.constant.ProtocolConstants.SERVICE;

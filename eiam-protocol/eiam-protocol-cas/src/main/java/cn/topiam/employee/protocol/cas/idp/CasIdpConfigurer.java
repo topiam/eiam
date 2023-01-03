@@ -17,13 +17,11 @@
  */
 package cn.topiam.employee.protocol.cas.idp;
 
-import cn.topiam.employee.application.ApplicationServiceLoader;
-import cn.topiam.employee.common.repository.app.AppCasConfigRepository;
-import cn.topiam.employee.protocol.cas.idp.auth.CentralAuthenticationService;
-import cn.topiam.employee.protocol.cas.idp.endpoint.CasIdpSingleSignOnEndpointFilter;
-import cn.topiam.employee.protocol.cas.idp.endpoint.CasIdpValidateEndpointFilter;
-import cn.topiam.employee.protocol.cas.idp.filter.CasAuthorizationServerContextFilter;
-import cn.topiam.employee.protocol.cas.idp.util.CasUtils;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.session.SessionRegistry;
@@ -31,10 +29,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
-import javax.xml.parsers.DocumentBuilder;
-import java.util.ArrayList;
-import java.util.List;
-
+import cn.topiam.employee.application.ApplicationServiceLoader;
+import cn.topiam.employee.common.repository.app.AppCasConfigRepository;
+import cn.topiam.employee.protocol.cas.idp.auth.CentralAuthenticationService;
+import cn.topiam.employee.protocol.cas.idp.endpoint.CasIdpSingleSignOnEndpointFilter;
+import cn.topiam.employee.protocol.cas.idp.endpoint.CasIdpValidateEndpointFilter;
+import cn.topiam.employee.protocol.cas.idp.filter.CasAuthorizationServerContextFilter;
+import cn.topiam.employee.protocol.cas.idp.util.CasUtils;
 import static cn.topiam.employee.protocol.cas.idp.util.CasUtils.*;
 
 /**

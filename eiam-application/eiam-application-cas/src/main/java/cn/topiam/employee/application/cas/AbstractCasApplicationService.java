@@ -17,14 +17,15 @@
  */
 package cn.topiam.employee.application.cas;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
+
 import cn.topiam.employee.application.AbstractApplicationService;
 import cn.topiam.employee.application.CasApplicationService;
 import cn.topiam.employee.common.entity.app.po.AppCasConfigPO;
 import cn.topiam.employee.common.repository.app.*;
 import cn.topiam.employee.core.protocol.CasSsoModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * CAS 应用配置
