@@ -18,10 +18,10 @@
 package cn.topiam.employee.common.constants;
 
 import lombok.Data;
+import static com.nimbusds.openid.connect.sdk.op.OIDCProviderConfigurationRequest.OPENID_PROVIDER_WELL_KNOWN_PATH;
 
 import static cn.topiam.employee.common.constants.AppConstants.APP_CACHE_NAME_PREFIX;
 import static cn.topiam.employee.common.constants.AuthorizeConstants.AUTHORIZE_PATH;
-import static com.nimbusds.openid.connect.sdk.op.OIDCProviderConfigurationRequest.OPENID_PROVIDER_WELL_KNOWN_PATH;
 
 /**
  * Saml 常量
