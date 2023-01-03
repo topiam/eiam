@@ -18,10 +18,10 @@
 package cn.topiam.employee.common.constants;
 
 import lombok.Data;
-import static com.nimbusds.openid.connect.sdk.op.OIDCProviderConfigurationRequest.OPENID_PROVIDER_WELL_KNOWN_PATH;
 
 import static cn.topiam.employee.common.constants.AppConstants.APP_CACHE_NAME_PREFIX;
 import static cn.topiam.employee.common.constants.AuthorizeConstants.AUTHORIZE_PATH;
+import static com.nimbusds.openid.connect.sdk.op.OIDCProviderConfigurationRequest.OPENID_PROVIDER_WELL_KNOWN_PATH;
 
 /**
  * Saml 常量
@@ -50,6 +50,11 @@ public final class ProtocolConstants {
     public static final String SAML2_CONFIG_CACHE_NAME = APP_CACHE_NAME_PREFIX + "saml";
 
     /**
+     * CAS 配置缓存名称
+     */
+    public static final String CAS_CONFIG_CACHE_NAME   = APP_CACHE_NAME_PREFIX + "cas";
+
+    /**
      * OIDC 配置缓存名称
      */
     public static final String OIDC_CONFIG_CACHE_NAME  = APP_CACHE_NAME_PREFIX + "oidc";
@@ -70,19 +75,19 @@ public final class ProtocolConstants {
          */
         public final static String OIDC_AUTHORIZE_BASE_PATH = AUTHORIZE_PATH + "/" + APP_CODE_VARIABLE;
 
-        public final static String OIDC_AUTHORIZE_PATH = OIDC_AUTHORIZE_BASE_PATH +"/oidc";
+        public final static String OIDC_AUTHORIZE_PATH = OIDC_AUTHORIZE_BASE_PATH + "/oidc";
 
-        public final static String OAUTH2_AUTHORIZE_PATH = OIDC_AUTHORIZE_BASE_PATH +"/oauth2";
+        public final static String OAUTH2_AUTHORIZE_PATH = OIDC_AUTHORIZE_BASE_PATH + "/oauth2";
 
         /**
          * OpenID Provider metadata.
          */
-        public static final String WELL_KNOWN_OPENID_CONFIGURATION   = OIDC_AUTHORIZE_PATH +OPENID_PROVIDER_WELL_KNOWN_PATH;
+        public static final String WELL_KNOWN_OPENID_CONFIGURATION = OIDC_AUTHORIZE_PATH + OPENID_PROVIDER_WELL_KNOWN_PATH;
 
         /**
          * Jwk Set Endpoint
          */
-        public static final String JWK_SET_ENDPOINT                  = OIDC_AUTHORIZE_PATH + "/jwks";
+        public static final String JWK_SET_ENDPOINT = OIDC_AUTHORIZE_PATH + "/jwks";
 
         /**
          * OIDC Client Registration Endpoint
@@ -92,27 +97,27 @@ public final class ProtocolConstants {
         /**
          * Authorization Endpoint
          */
-        public static final String AUTHORIZATION_ENDPOINT            = OAUTH2_AUTHORIZE_PATH + "/auth";
+        public static final String AUTHORIZATION_ENDPOINT = OAUTH2_AUTHORIZE_PATH + "/auth";
 
         /**
          * Token Endpoint
          */
-        public static final String TOKEN_ENDPOINT                    = OAUTH2_AUTHORIZE_PATH + "/token";
+        public static final String TOKEN_ENDPOINT = OAUTH2_AUTHORIZE_PATH + "/token";
 
         /**
          * Jwk Revocation Endpoint
          */
-        public static final String TOKEN_REVOCATION_ENDPOINT         = OAUTH2_AUTHORIZE_PATH + "/revoke";
+        public static final String TOKEN_REVOCATION_ENDPOINT = OAUTH2_AUTHORIZE_PATH + "/revoke";
 
         /**
          * Token Introspection Endpoint
          */
-        public static final String TOKEN_INTROSPECTION_ENDPOINT      = OAUTH2_AUTHORIZE_PATH + "/introspect";
+        public static final String TOKEN_INTROSPECTION_ENDPOINT = OAUTH2_AUTHORIZE_PATH + "/introspect";
 
         /**
          * OIDC User Info Endpoint
          */
-        public static final String OIDC_USER_INFO_ENDPOINT           = OAUTH2_AUTHORIZE_PATH + "/userinfo";
+        public static final String OIDC_USER_INFO_ENDPOINT = OAUTH2_AUTHORIZE_PATH + "/userinfo";
 
         //@formatter:on
     }
@@ -142,6 +147,29 @@ public final class ProtocolConstants {
          * SAML_SSO_PATH
          */
         public static final String SAML_SSO_PATH             = SAML2_AUTHORIZE_BASE_PATH + "/sso";
+    }
+
+    @Data
+    public static class CasEndpointConstants {
+        /**
+         * cas  根路径
+         */
+        public final static String CAS_AUTHORIZE_BASE_PATH = AUTHORIZE_PATH + "/cas/"
+                                                             + APP_CODE_VARIABLE;
+        /*
+         * cas 登陆地址
+         */
+        public final static String CAS_LOGIN_PATH          = CAS_AUTHORIZE_BASE_PATH + "/login";
+        /*
+         * cas ticket校验地址
+         */
+        public final static String CAS_VALIDATE_PATH       = CAS_AUTHORIZE_BASE_PATH + "/validate";
+
+        public final static String CAS_VALIDATE_V2_PATH    = CAS_AUTHORIZE_BASE_PATH
+                                                             + "/serviceValidate";
+
+        public final static String CAS_VALIDATE_V3_PATH    = CAS_AUTHORIZE_BASE_PATH
+                                                             + "/p3/serviceValidate";
     }
 
 }

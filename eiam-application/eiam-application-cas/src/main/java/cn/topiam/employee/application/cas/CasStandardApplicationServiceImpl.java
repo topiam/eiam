@@ -17,15 +17,34 @@
  */
 package cn.topiam.employee.application.cas;
 
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.stereotype.Component;
-
+import cn.topiam.employee.application.cas.model.AppCasStandardConfigGetResult;
+import cn.topiam.employee.application.cas.model.AppCasStandardSaveConfigParam;
+import cn.topiam.employee.application.exception.AppNotExistException;
+import cn.topiam.employee.audit.context.AuditContext;
+import cn.topiam.employee.common.constants.ProtocolConstants;
+import cn.topiam.employee.common.entity.app.AppCasConfigEntity;
+import cn.topiam.employee.common.entity.app.AppEntity;
+import cn.topiam.employee.common.entity.app.po.AppCasConfigPO;
 import cn.topiam.employee.common.enums.app.AppProtocol;
 import cn.topiam.employee.common.enums.app.AppType;
-import cn.topiam.employee.common.repository.app.AppCertRepository;
-import cn.topiam.employee.common.repository.app.AppRepository;
+import cn.topiam.employee.common.enums.app.AuthorizationType;
+import cn.topiam.employee.common.enums.app.InitLoginType;
+import cn.topiam.employee.common.repository.app.*;
+import cn.topiam.employee.core.context.ServerContextHelp;
+import cn.topiam.employee.support.exception.TopIamException;
+import cn.topiam.employee.support.validation.ValidationHelp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import javax.validation.ConstraintViolationException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static cn.topiam.employee.common.constants.ProtocolConstants.APP_CODE_VARIABLE;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 
 /**
  * Cas 用户应用
@@ -35,15 +54,72 @@ import cn.topiam.employee.common.repository.app.AppRepository;
  */
 @Component
 public class CasStandardApplicationServiceImpl extends AbstractCasApplicationService {
+    private final Logger                   logger = LoggerFactory
+        .getLogger(CasStandardApplicationServiceImpl.class);
+
+    /**
+     * AppCasConfigRepository
+     */
+    protected final AppCasConfigRepository appCasConfigRepository;
+
+    public CasStandardApplicationServiceImpl(AppCertRepository appCertRepository,
+                                             AppAccountRepository appAccountRepository,
+                                             AppAccessPolicyRepository appAccessPolicyRepository,
+                                             AppRepository appRepository,
+                                             AppCasConfigRepository appCasConfigRepository) {
+        super(appCertRepository, appAccountRepository, appAccessPolicyRepository, appRepository,
+            appCasConfigRepository);
+        this.appCasConfigRepository = appCasConfigRepository;
+    }
 
     /**
      * 更新应用配置
      *
-     * @param appId {@link String}
+     * @param appId  {@link String}
      * @param config {@link Map}
      */
     @Override
     public void saveConfig(String appId, Map<String, Object> config) {
+        AppCasStandardSaveConfigParam model;
+        try {
+            String value = mapper.writeValueAsString(config);
+            // 指定序列化输入的类型
+            mapper.configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
+            model = mapper.readValue(value, AppCasStandardSaveConfigParam.class);
+        } catch (Exception e) {
+            throw new TopIamException(e.getMessage());
+        }
+
+        ValidationHelp.ValidationResult<AppCasStandardSaveConfigParam> validationResult = ValidationHelp
+            .validateEntity(model);
+        if (validationResult.isHasErrors()) {
+            throw new ConstraintViolationException(validationResult.getConstraintViolations());
+        }
+
+        //1、修改基本信息
+        Optional<AppEntity> optional = appRepository.findById(Long.valueOf(appId));
+        if (optional.isEmpty()) {
+            AuditContext.setContent("保存配置失败，应用 [" + appId + "] 不存在！");
+            logger.error(AuditContext.getContent());
+            throw new AppNotExistException();
+        }
+        AppEntity appEntity = optional.get();
+        appEntity.setAuthorizationType(model.getAuthorizationType());
+        appEntity.setInitLoginUrl(model.getInitLoginUrl());
+        appEntity.setInitLoginType(model.getInitLoginType());
+        appRepository.save(appEntity);
+
+        //2、修改cas配置
+        Optional<AppCasConfigEntity> cas = appCasConfigRepository.findByAppId(Long.valueOf(appId));
+        if (cas.isEmpty()) {
+            AuditContext.setContent("保存配置失败，应用 [" + appId + "] 不存在！");
+            logger.error(AuditContext.getContent());
+            throw new AppNotExistException();
+        }
+        AppCasConfigEntity entity = cas.get();
+        entity.setSpCallbackUrl(model.getSpCallbackUrl());
+        appCasConfigRepository.save(entity);
+
     }
 
     /**
@@ -54,7 +130,19 @@ public class CasStandardApplicationServiceImpl extends AbstractCasApplicationSer
      */
     @Override
     public Object getConfig(String appId) {
-        return null;
+        AppCasConfigPO po = appCasConfigRepository.getByAppId(Long.valueOf(appId));
+        AppCasStandardConfigGetResult result = new AppCasStandardConfigGetResult();
+        result.setAuthorizationType(po.getAuthorizationType());
+        result.setInitLoginType(po.getInitLoginType());
+        result.setInitLoginUrl(po.getInitLoginUrl());
+        result.setSpCallbackUrl(po.getSpCallbackUrl());
+
+        String baseUrl = ServerContextHelp.getPortalPublicBaseUrl();
+        // 服务端URL配置前缀
+        result.setServerUrlPrefix(
+            baseUrl + ProtocolConstants.CasEndpointConstants.CAS_AUTHORIZE_BASE_PATH
+                .replace(APP_CODE_VARIABLE, po.getAppCode()));
+        return result;
     }
 
     /**
@@ -114,7 +202,7 @@ public class CasStandardApplicationServiceImpl extends AbstractCasApplicationSer
      */
     @Override
     public List<Map> getFormSchema() {
-        return null;
+        return new ArrayList<>();
     }
 
     /**
@@ -135,21 +223,27 @@ public class CasStandardApplicationServiceImpl extends AbstractCasApplicationSer
      */
     @Override
     public String create(String name, String remark) {
-        return "";
+        //1、创建基础信息
+        AppEntity appEntity = new AppEntity();
+        appEntity.setName(name);
+        appEntity.setCode(
+            org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric(32).toLowerCase());
+        appEntity.setTemplate(getCode());
+        appEntity.setType(AppType.STANDARD);
+        appEntity.setEnabled(true);
+        appEntity.setProtocol(getProtocol());
+        appEntity.setClientId(idGenerator.generateId().toString().replace("-", ""));
+        appEntity.setClientSecret(idGenerator.generateId().toString().replace("-", ""));
+        appEntity.setInitLoginType(InitLoginType.PORTAL_OR_APP);
+        appEntity.setAuthorizationType(AuthorizationType.AUTHORIZATION);
+        appEntity.setRemark(remark);
+        appRepository.save(appEntity);
+
+        AppCasConfigEntity casEntity = new AppCasConfigEntity();
+        casEntity.setAppId(appEntity.getId());
+        casEntity.setSpCallbackUrl("");
+        appCasConfigRepository.save(casEntity);
+        return appEntity.getId().toString();
     }
 
-    /**
-     * 删除应用
-     *
-     * @param appId {@link String} 应用ID
-     */
-    @Override
-    public void delete(String appId) {
-
-    }
-
-    protected CasStandardApplicationServiceImpl(AppCertRepository appCertRepository,
-                                                AppRepository appRepository) {
-        super(appCertRepository, appRepository);
-    }
 }

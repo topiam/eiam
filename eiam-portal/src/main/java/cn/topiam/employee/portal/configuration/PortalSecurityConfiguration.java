@@ -105,6 +105,7 @@ import cn.topiam.employee.portal.listener.PortalAuthenticationSuccessEventListen
 import cn.topiam.employee.portal.listener.PortalLogoutSuccessEventListener;
 import cn.topiam.employee.portal.listener.PortalSessionInformationExpiredStrategy;
 import cn.topiam.employee.portal.mfa.MfaAuthenticationConfigurer;
+import cn.topiam.employee.protocol.cas.idp.CasIdpConfigurer;
 import cn.topiam.employee.protocol.oidc.authentication.EiamOAuth2AuthorizationService;
 import cn.topiam.employee.protocol.oidc.repository.OidcConfigRegisteredClientRepository;
 import cn.topiam.employee.protocol.oidc.token.ApplicationOpaqueTokenIntrospector;
@@ -227,6 +228,36 @@ public class PortalSecurityConfiguration {
             //会话管理器
             .sessionManagement(withSessionManagementConfigurerDefaults(settingRepository))
             .apply(authorizationServerConfigurer);
+        return http.build();
+    }
+
+    /**
+     * CAS 协议
+     *
+     * @param http {@link HttpSecurity}
+     * @return {@link SecurityFilterChain}
+     * @throws Exception Exception
+     */
+    @Order(3)
+    @Bean(value = CAS_PROTOCOL_SECURITY_FILTER_CHAIN)
+    @RefreshScope
+    public SecurityFilterChain casProtocolSecurityFilterChain(HttpSecurity http) throws Exception {
+        CasIdpConfigurer<HttpSecurity> configurer = new CasIdpConfigurer<>();
+        RequestMatcher endpointsMatcher = configurer.getEndpointsMatcher();
+        http.requestMatcher(endpointsMatcher)
+            .authorizeHttpRequests(
+                authorizeRequests -> authorizeRequests.anyRequest().authenticated())
+            //异常处理
+            .exceptionHandling(withExceptionConfigurerDefaults())
+            //CSRF
+            .csrf(withCsrfConfigurerDefaults(endpointsMatcher))
+            //headers
+            .headers(withHeadersConfigurerDefaults())
+            //cors
+            .cors(withCorsConfigurerDefaults())
+            //会话管理器
+            .sessionManagement(withSessionManagementConfigurerDefaults(settingRepository))
+            .apply(configurer);
         return http.build();
     }
 

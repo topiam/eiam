@@ -17,9 +17,14 @@
  */
 package cn.topiam.employee.application.cas;
 
-import cn.topiam.employee.application.ApplicationService;
-import cn.topiam.employee.common.repository.app.AppCertRepository;
-import cn.topiam.employee.common.repository.app.AppRepository;
+import cn.topiam.employee.application.AbstractApplicationService;
+import cn.topiam.employee.application.CasApplicationService;
+import cn.topiam.employee.common.entity.app.po.AppCasConfigPO;
+import cn.topiam.employee.common.repository.app.*;
+import cn.topiam.employee.core.protocol.CasSsoModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * CAS 应用配置
@@ -27,20 +32,52 @@ import cn.topiam.employee.common.repository.app.AppRepository;
  * @author TopIAM
  * Created by support@topiam.cn on  2022/8/23 20:58
  */
-public abstract class AbstractCasApplicationService implements ApplicationService {
+public abstract class AbstractCasApplicationService extends AbstractApplicationService
+                                                    implements CasApplicationService {
 
-    /**
-     * AppCertRepository
-     */
-    protected final AppCertRepository appCertRepository;
+    private static final Logger            logger = LoggerFactory
+        .getLogger(AbstractCasApplicationService.class);
+
     /**
      * ApplicationRepository
      */
-    protected final AppRepository     appRepository;
+    protected final AppRepository          appRepository;
+
+    protected final AppCasConfigRepository appCasConfigRepository;
 
     protected AbstractCasApplicationService(AppCertRepository appCertRepository,
-                                            AppRepository appRepository) {
-        this.appCertRepository = appCertRepository;
+                                            AppAccountRepository appAccountRepository,
+                                            AppAccessPolicyRepository appAccessPolicyRepository,
+                                            AppRepository appRepository,
+                                            AppCasConfigRepository appCasConfigRepository) {
+        super(appCertRepository, appAccountRepository, appAccessPolicyRepository, appRepository);
         this.appRepository = appRepository;
+        this.appCasConfigRepository = appCasConfigRepository;
+    }
+
+    @Override
+    public CasSsoModel getSsoModel(Long appId) {
+        AppCasConfigPO appCasConfigPO = appCasConfigRepository.getByAppId(appId);
+        return CasSsoModel.builder().ssoCallbackUrl(appCasConfigPO.getSpCallbackUrl()).build();
+    }
+
+    /**
+     * 删除应用
+     *
+     * @param appId {@link String} 应用ID
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(String appId) {
+        //删除应用
+        appRepository.deleteById(Long.valueOf(appId));
+        //删除证书
+        appCertRepository.deleteByAppId(Long.valueOf(appId));
+        //删除应用账户
+        appAccountRepository.deleteAllByAppId(Long.valueOf(appId));
+        //删除应用权限策略
+        appAccessPolicyRepository.deleteAllByAppId(Long.valueOf(appId));
+        //删除配置
+        appCasConfigRepository.deleteByAppId(Long.valueOf(appId));
     }
 }

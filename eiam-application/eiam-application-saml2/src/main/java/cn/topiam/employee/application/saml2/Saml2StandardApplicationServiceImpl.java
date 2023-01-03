@@ -71,7 +71,6 @@ public class Saml2StandardApplicationServiceImpl extends AbstractSamlAppService 
     public void saveConfig(String appId, Map<String, Object> config) {
         AppSaml2StandardSaveConfigParam model;
         try {
-            ObjectMapper mapper = new ObjectMapper();
             String value = mapper.writeValueAsString(config);
             // 指定序列化输入的类型
             mapper.configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
