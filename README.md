@@ -195,7 +195,7 @@ application.yml文件依次修改以下配置
 
 ## 加入社群
 
-![](https://user-images.githubusercontent.com/30397655/210370108-832077b0-c3bb-462b-a15b-8d7d690eb9f0.png)
+![](https://user-images.githubusercontent.com/30397655/211584380-314cba3b-a323-4a5a-9b14-8697a842de7f.jpg)
 
 ## 参与贡献
 
