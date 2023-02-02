@@ -44,15 +44,16 @@ import static cn.topiam.employee.protocol.cas.idp.constant.ProtocolConstants.*;
  * @author TopIAM
  * Created by support@topiam.cn on  2023/1/2 20:23
  */
-public class ResponseGeneratorImpl implements ResponseGenerator {
+public class Response20GeneratorImpl implements ResponseGenerator {
 
-    private final static Logger       logger = LoggerFactory.getLogger(ResponseGeneratorImpl.class);
+    private final static Logger       logger = LoggerFactory
+        .getLogger(Response20GeneratorImpl.class);
 
     private final HttpServletResponse response;
     private final DocumentBuilder     documentBuilder;
     private String                    message;
 
-    public ResponseGeneratorImpl(DocumentBuilder documentBuilder, HttpServletResponse response) {
+    public Response20GeneratorImpl(DocumentBuilder documentBuilder, HttpServletResponse response) {
         this.response = response;
         this.documentBuilder = documentBuilder;
     }
@@ -73,6 +74,19 @@ public class ResponseGeneratorImpl implements ResponseGenerator {
 
     @Override
     public void genSucceedMessage(String casUser, Map<String, Object> attributes) {
+        buildDocument(casUser, attributes, false);
+    }
+
+    @Override
+    public void sendMessage() throws IOException {
+        response.setContentType("text/xml;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        out.println(message);
+        out.flush();
+    }
+
+    protected void buildDocument(String casUser, Map<String, Object> attributes,
+                                 boolean appendAttributes) {
         Document document = documentBuilder.newDocument();
         OutputFormat outputFormat = OutputFormat.createCompactFormat();
         outputFormat.setExpandEmptyElements(true);
@@ -83,7 +97,7 @@ public class ResponseGeneratorImpl implements ResponseGenerator {
         Element userElement = document.createElement(CAS_USER);
         userElement.setTextContent(casUser);
         successElement.appendChild(userElement);
-        if (attributes.size() > 0) {
+        if (appendAttributes && attributes.size() > 0) {
             Element attributeElement = document.createElement(CAS_ATTRIBUTES);
             for (Map.Entry<String, Object> entry : attributes.entrySet()) {
                 Object value = entry.getValue();
@@ -103,14 +117,6 @@ public class ResponseGeneratorImpl implements ResponseGenerator {
         }
         document.appendChild(serviceResponse);
         this.message = parseDocumentToString(serviceResponse);
-    }
-
-    @Override
-    public void sendMessage() throws IOException {
-        response.setContentType("text/xml;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        out.println(message);
-        out.flush();
     }
 
     private String parseDocumentToString(Element node) {
