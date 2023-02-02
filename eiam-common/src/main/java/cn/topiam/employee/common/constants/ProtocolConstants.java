@@ -156,11 +156,11 @@ public final class ProtocolConstants {
          */
         public final static String CAS_AUTHORIZE_BASE_PATH = AUTHORIZE_PATH + "/cas/"
                                                              + APP_CODE_VARIABLE;
-        /*
+        /**
          * cas 登陆地址
          */
         public final static String CAS_LOGIN_PATH          = CAS_AUTHORIZE_BASE_PATH + "/login";
-        /*
+        /**
          * cas ticket校验地址
          */
         public final static String CAS_VALIDATE_V1_PATH    = CAS_AUTHORIZE_BASE_PATH + "/validate";
