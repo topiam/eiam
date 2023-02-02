@@ -32,8 +32,9 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import cn.topiam.employee.application.ApplicationServiceLoader;
 import cn.topiam.employee.common.repository.app.AppCasConfigRepository;
 import cn.topiam.employee.protocol.cas.idp.auth.CentralAuthenticationService;
+import cn.topiam.employee.protocol.cas.idp.endpoint.Cas10IdpValidateEndpointFilter;
+import cn.topiam.employee.protocol.cas.idp.endpoint.Cas30IdpValidateEndpointFilter;
 import cn.topiam.employee.protocol.cas.idp.endpoint.CasIdpSingleSignOnEndpointFilter;
-import cn.topiam.employee.protocol.cas.idp.endpoint.CasIdpValidateEndpointFilter;
 import cn.topiam.employee.protocol.cas.idp.filter.CasAuthorizationServerContextFilter;
 import cn.topiam.employee.protocol.cas.idp.util.CasUtils;
 import static cn.topiam.employee.protocol.cas.idp.util.CasUtils.*;
@@ -59,22 +60,29 @@ public class CasIdpConfigurer<B extends HttpSecurityBuilder<B>>
         http.addFilterAfter(new CasIdpSingleSignOnEndpointFilter(applicationServiceLoader,
             centralAuthenticationService), UsernamePasswordAuthenticationFilter.class);
 
-        //cas 验证过滤器
+        //cas 1.0 验证过滤器
         http.addFilterBefore(
-            new CasIdpValidateEndpointFilter(applicationServiceLoader, sessionRegistry,
+            new Cas10IdpValidateEndpointFilter(applicationServiceLoader, sessionRegistry,
                 centralAuthenticationService, documentBuilder),
             CasIdpSingleSignOnEndpointFilter.class);
+
+        //cas 3.0 & 2.0验证过滤器
+        http.addFilterBefore(
+            new Cas30IdpValidateEndpointFilter(applicationServiceLoader, sessionRegistry,
+                centralAuthenticationService, documentBuilder),
+            Cas10IdpValidateEndpointFilter.class);
 
         //CAS 授权服务器应用上下文过滤器
         http.addFilterBefore(
             new CasAuthorizationServerContextFilter(getEndpointsMatcher(), appCasConfigRepository),
-            CasIdpValidateEndpointFilter.class);
+            Cas30IdpValidateEndpointFilter.class);
     }
 
     public RequestMatcher getEndpointsMatcher() {
         List<RequestMatcher> requestMatchers = new ArrayList<>();
         requestMatchers.add(CasIdpSingleSignOnEndpointFilter.getRequestMatcher());
-        requestMatchers.add(CasIdpValidateEndpointFilter.getRequestMatcher());
+        requestMatchers.add(Cas30IdpValidateEndpointFilter.getRequestMatcher());
+        requestMatchers.add(Cas10IdpValidateEndpointFilter.getRequestMatcher());
         return new OrRequestMatcher(requestMatchers);
     }
 }

@@ -163,7 +163,7 @@ public final class ProtocolConstants {
         /*
          * cas ticket校验地址
          */
-        public final static String CAS_VALIDATE_PATH       = CAS_AUTHORIZE_BASE_PATH + "/validate";
+        public final static String CAS_VALIDATE_V1_PATH    = CAS_AUTHORIZE_BASE_PATH + "/validate";
 
         public final static String CAS_VALIDATE_V2_PATH    = CAS_AUTHORIZE_BASE_PATH
                                                              + "/serviceValidate";
