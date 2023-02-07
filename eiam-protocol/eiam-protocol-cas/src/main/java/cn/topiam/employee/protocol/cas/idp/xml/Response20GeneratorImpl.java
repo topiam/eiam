@@ -124,7 +124,8 @@ public class Response20GeneratorImpl implements ResponseGenerator {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             TransformerFactory transFactory = TransformerFactory.newInstance();
             Transformer transformer = transFactory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");//序列化不保留标头
+            //序列化不保留标头
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             DOMSource domSource = new DOMSource(node);
             transformer.transform(domSource, new StreamResult(bos));
             return bos.toString(StandardCharsets.UTF_8);
