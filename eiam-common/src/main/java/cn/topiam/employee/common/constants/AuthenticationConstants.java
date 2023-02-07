@@ -26,7 +26,7 @@ import cn.topiam.employee.support.constant.EiamConstants;
  * Created by support@topiam.cn on 2020/7/26 19:07
  */
 public final class AuthenticationConstants {
-    public final static String AUTHENTICATION_PATH       = EiamConstants.API_PATH
+    public static final String AUTHENTICATION_PATH       = EiamConstants.API_PATH
                                                            + "/authentication";
 
     /**

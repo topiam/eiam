@@ -26,7 +26,7 @@ import cn.topiam.employee.support.constant.EiamConstants;
  * Created by support@topiam.cn on  2022/6/8 20:12
  */
 public final class SessionConstants {
-    public final static String SESSION_PATH   = EiamConstants.API_PATH + "/session";
+    public static final String SESSION_PATH   = EiamConstants.API_PATH + "/session";
 
     /**
      * CURRENT_USER

@@ -180,7 +180,7 @@ public class OtpContextHelp {
     /**
      * 发送验证码频繁，请稍候重试
      */
-    private final static String       SEND_FREQUENTLY             = "发送验证码频繁，请稍候重试";
+    private static final String       SEND_FREQUENTLY             = "发送验证码频繁，请稍候重试";
 
     /**
      * 验证码 code 值前缀

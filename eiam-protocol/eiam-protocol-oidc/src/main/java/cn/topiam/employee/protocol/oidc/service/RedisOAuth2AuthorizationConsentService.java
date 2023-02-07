@@ -38,7 +38,7 @@ public class RedisOAuth2AuthorizationConsentService implements OAuth2Authorizati
 
     private final RedisTemplate<Object, Object> redisTemplate;
 
-    private final static Long                   TIMEOUT = 10L;
+    private static final Long                   TIMEOUT = 10L;
 
     @Override
     public void save(OAuth2AuthorizationConsent authorizationConsent) {

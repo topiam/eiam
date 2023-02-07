@@ -25,14 +25,14 @@ package cn.topiam.employee.identitysource.wechatwork.util;
  */
 public class AesException extends Exception {
 
-    public final static int VALIDATE_SIGNATURE_ERROR = -40001;
-    public final static int PARSE_XML_ERROR          = -40002;
-    public final static int COMPUTE_SIGNATURE_ERROR  = -40003;
-    public final static int ILLEGAL_AES_KEY          = -40004;
-    public final static int VALIDATE_CORP_ID_ERROR   = -40005;
-    public final static int ENCRYPT_AES_ERROR        = -40006;
-    public final static int DECRYPT_AES_ERROR        = -40007;
-    public final static int ILLEGAL_BUFFER           = -40008;
+    public static final int VALIDATE_SIGNATURE_ERROR = -40001;
+    public static final int PARSE_XML_ERROR          = -40002;
+    public static final int COMPUTE_SIGNATURE_ERROR  = -40003;
+    public static final int ILLEGAL_AES_KEY          = -40004;
+    public static final int VALIDATE_CORP_ID_ERROR   = -40005;
+    public static final int ENCRYPT_AES_ERROR        = -40006;
+    public static final int DECRYPT_AES_ERROR        = -40007;
+    public static final int ILLEGAL_BUFFER           = -40008;
 
     private final int       code;
 

@@ -68,6 +68,7 @@ public enum AuthenticationType implements BaseEnum {
         throw new NullPointerException("未获取到对应平台");
     }
 
+    @Override
     public String getCode() {
         return code;
     }
@@ -76,6 +77,7 @@ public enum AuthenticationType implements BaseEnum {
         this.code = code;
     }
 
+    @Override
     public String getDesc() {
         return desc;
     }

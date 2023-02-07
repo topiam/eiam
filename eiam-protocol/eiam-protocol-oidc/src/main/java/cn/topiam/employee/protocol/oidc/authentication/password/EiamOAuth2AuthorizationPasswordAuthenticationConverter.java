@@ -47,7 +47,7 @@ import static cn.topiam.employee.protocol.oidc.util.EiamOAuth2Utils.getParameter
 @SuppressWarnings({ "AlibabaClassNamingShouldBeCamel" })
 public class EiamOAuth2AuthorizationPasswordAuthenticationConverter implements
                                                                     AuthenticationConverter {
-    public final static String DEFAULT_ERROR_URI = "https://datatracker.ietf.org/doc/html/rfc6749#section-5.2";
+    public static final String DEFAULT_ERROR_URI = "https://datatracker.ietf.org/doc/html/rfc6749#section-5.2";
 
     @Override
     public Authentication convert(HttpServletRequest request) {

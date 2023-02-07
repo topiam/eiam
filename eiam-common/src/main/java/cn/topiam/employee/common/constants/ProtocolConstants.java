@@ -73,11 +73,11 @@ public final class ProtocolConstants {
         /**
          * OIDC BASE 认证路径
          */
-        public final static String OIDC_AUTHORIZE_BASE_PATH = AUTHORIZE_PATH + "/" + APP_CODE_VARIABLE;
+        public static final String OIDC_AUTHORIZE_BASE_PATH = AUTHORIZE_PATH + "/" + APP_CODE_VARIABLE;
 
-        public final static String OIDC_AUTHORIZE_PATH = OIDC_AUTHORIZE_BASE_PATH + "/oidc";
+        public static final String OIDC_AUTHORIZE_PATH = OIDC_AUTHORIZE_BASE_PATH + "/oidc";
 
-        public final static String OAUTH2_AUTHORIZE_PATH = OIDC_AUTHORIZE_BASE_PATH + "/oauth2";
+        public static final String OAUTH2_AUTHORIZE_PATH = OIDC_AUTHORIZE_BASE_PATH + "/oauth2";
 
         /**
          * OpenID Provider metadata.
@@ -130,7 +130,7 @@ public final class ProtocolConstants {
         /**
          * SAML2  认证路径
          */
-        public final static String SAML2_AUTHORIZE_BASE_PATH = AUTHORIZE_PATH + "/saml2/"
+        public static final String SAML2_AUTHORIZE_BASE_PATH = AUTHORIZE_PATH + "/saml2/"
                                                                + APP_CODE_VARIABLE;
 
         /**
@@ -154,21 +154,21 @@ public final class ProtocolConstants {
         /**
          * cas  根路径
          */
-        public final static String CAS_AUTHORIZE_BASE_PATH = AUTHORIZE_PATH + "/cas/"
+        public static final String CAS_AUTHORIZE_BASE_PATH = AUTHORIZE_PATH + "/cas/"
                                                              + APP_CODE_VARIABLE;
         /**
          * cas 登陆地址
          */
-        public final static String CAS_LOGIN_PATH          = CAS_AUTHORIZE_BASE_PATH + "/login";
-        /**
+        public static final String CAS_LOGIN_PATH          = CAS_AUTHORIZE_BASE_PATH + "/login";
+        /*
          * cas ticket校验地址
          */
-        public final static String CAS_VALIDATE_V1_PATH    = CAS_AUTHORIZE_BASE_PATH + "/validate";
+        public static final String CAS_VALIDATE_V1_PATH    = CAS_AUTHORIZE_BASE_PATH + "/validate";
 
-        public final static String CAS_VALIDATE_V2_PATH    = CAS_AUTHORIZE_BASE_PATH
+        public static final String CAS_VALIDATE_V2_PATH    = CAS_AUTHORIZE_BASE_PATH
                                                              + "/serviceValidate";
 
-        public final static String CAS_VALIDATE_V3_PATH    = CAS_AUTHORIZE_BASE_PATH
+        public static final String CAS_VALIDATE_V3_PATH    = CAS_AUTHORIZE_BASE_PATH
                                                              + "/p3/serviceValidate";
     }
 

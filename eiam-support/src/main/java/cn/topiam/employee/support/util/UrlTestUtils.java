@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class UrlTestUtils {
 
-    private final static Logger logger = LoggerFactory.getLogger(UrlTestUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(UrlTestUtils.class);
 
     public static boolean testUrlWithTimeOut(String urlString, int timeOutMillSeconds) {
         try {

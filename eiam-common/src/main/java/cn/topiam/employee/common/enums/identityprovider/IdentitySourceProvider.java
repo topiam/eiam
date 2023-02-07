@@ -80,6 +80,7 @@ public enum IdentitySourceProvider implements BaseEnum {
         return null;
     }
 
+    @Override
     public String getCode() {
         return code;
     }
@@ -88,6 +89,7 @@ public enum IdentitySourceProvider implements BaseEnum {
         return name;
     }
 
+    @Override
     public String getDesc() {
         return desc;
     }

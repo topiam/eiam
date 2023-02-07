@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Response10GeneratorImpl implements ResponseGenerator {
 
-    private final static Logger       logger = LoggerFactory
+    private static final Logger       logger = LoggerFactory
         .getLogger(Response20GeneratorImpl.class);
 
     private final HttpServletResponse response;

@@ -67,7 +67,7 @@ import static cn.topiam.employee.portal.idp.qq.constant.QqAuthenticationConstant
 @SuppressWarnings({ "AlibabaClassNamingShouldBeCamel", "DuplicatedCode" })
 public class QqOAuth2LoginAuthenticationFilter extends AbstractIdpAuthenticationProcessingFilter {
     final String                              ERROR_CODE                   = "error";
-    public final static String                DEFAULT_FILTER_PROCESSES_URI = QQ.getLoginPathPrefix()
+    public static final String                DEFAULT_FILTER_PROCESSES_URI = QQ.getLoginPathPrefix()
                                                                              + "/*";
     public static final AntPathRequestMatcher REQUEST_MATCHER              = new AntPathRequestMatcher(
         QQ.getLoginPathPrefix() + "/" + "{" + PROVIDER_ID + "}", HttpMethod.GET.name());

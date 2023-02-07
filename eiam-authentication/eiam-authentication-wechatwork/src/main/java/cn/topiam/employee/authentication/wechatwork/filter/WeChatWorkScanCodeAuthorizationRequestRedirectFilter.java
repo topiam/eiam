@@ -149,13 +149,13 @@ public class WeChatWorkScanCodeAuthorizationRequestRedirectFilter extends OncePe
             authorizationRequest.getAuthorizationRequestUri());
     }
 
-    private final static String STYLE        = ""
+    private static final String STYLE        = ""
                                                + ".impowerBox .qrcode {width: 280px;border: none;margin-top:10px;}\n"
                                                + ".impowerBox .title {display: none;}\n"
                                                + ".impowerBox .info {display: none;}\n"
                                                + ".status_icon {display: none}\n"
                                                + ".impowerBox .status {text-align: center;} ";
-    private final static String STYLE_BASE64 = "data:text/css;base64," + Base64.getEncoder()
+    private static final String STYLE_BASE64 = "data:text/css;base64," + Base64.getEncoder()
         .encodeToString(STYLE.getBytes(StandardCharsets.UTF_8));
 
     public static RequestMatcher getRequestMatcher() {

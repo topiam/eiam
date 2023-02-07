@@ -73,7 +73,7 @@ public class Saml2IdpSingleSignOutEndpointFilter extends OncePerRequestFilter
 
     private final Logger                logger          = LoggerFactory
         .getLogger(Saml2IdpSingleSignOutEndpointFilter.class);
-    private final static RequestMatcher REQUEST_MATCHER = new AntPathRequestMatcher(
+    private static final RequestMatcher REQUEST_MATCHER = new AntPathRequestMatcher(
         ProtocolConstants.Saml2EndpointConstants.SAML_LOGOUT_PATH);
 
     public static RequestMatcher getRequestMatcher() {

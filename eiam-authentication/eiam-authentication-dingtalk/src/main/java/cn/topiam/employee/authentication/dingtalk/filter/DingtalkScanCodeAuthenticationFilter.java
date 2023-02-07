@@ -65,7 +65,9 @@ import cn.topiam.employee.core.context.ServerContextHelp;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.support.util.HttpUrlUtils;
-import static cn.topiam.employee.authentication.dingtalk.constant.DingTalkAuthenticationConstants.*;
+import static cn.topiam.employee.authentication.dingtalk.constant.DingTalkAuthenticationConstants.GET_USERINFO_BY_CODE;
+import static cn.topiam.employee.authentication.dingtalk.constant.DingTalkAuthenticationConstants.GET_USERINFO_BY_USERID;
+import static cn.topiam.employee.authentication.dingtalk.constant.DingTalkAuthenticationConstants.GET_USERID_BY_UNIONID;
 import static cn.topiam.employee.authentication.dingtalk.filter.DingtalkScanCodeAuthorizationRequestGetFilter.PROVIDER_ID;
 import static cn.topiam.employee.common.enums.IdentityProviderType.DINGTALK_SCAN_CODE;
 
@@ -80,7 +82,7 @@ import static cn.topiam.employee.common.enums.IdentityProviderType.DINGTALK_SCAN
 @SuppressWarnings("DuplicatedCode")
 public class DingtalkScanCodeAuthenticationFilter extends
                                                   AbstractIdpAuthenticationProcessingFilter {
-    public final static String                DEFAULT_FILTER_PROCESSES_URI = DINGTALK_SCAN_CODE
+    public static final String                DEFAULT_FILTER_PROCESSES_URI = DINGTALK_SCAN_CODE
         .getLoginPathPrefix() + "/*";
     /**
      * AntPathRequestMatcher

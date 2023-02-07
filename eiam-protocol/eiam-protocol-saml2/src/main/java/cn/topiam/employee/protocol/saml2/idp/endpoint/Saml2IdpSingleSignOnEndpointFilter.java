@@ -99,7 +99,7 @@ public class Saml2IdpSingleSignOnEndpointFilter extends OncePerRequestFilter
                                                 implements OrderedFilter {
     private static final Logger         logger          = LoggerFactory
         .getLogger(Saml2IdpSingleSignOnEndpointFilter.class);
-    private final static RequestMatcher REQUEST_MATCHER = new AntPathRequestMatcher(
+    private static final RequestMatcher REQUEST_MATCHER = new AntPathRequestMatcher(
         Saml2EndpointConstants.SAML_SSO_PATH);
     private final RedirectCache         redirectCache   = new HttpSessionRedirectCache();
 
@@ -257,7 +257,7 @@ public class Saml2IdpSingleSignOnEndpointFilter extends OncePerRequestFilter
     /**
      * Velocity 引擎
      */
-    public final static VelocityEngine VELOCITY_ENGINE;
+    public static final VelocityEngine VELOCITY_ENGINE;
 
     static {
         VELOCITY_ENGINE = new VelocityEngine();

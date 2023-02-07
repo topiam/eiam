@@ -73,7 +73,7 @@ import static cn.topiam.employee.support.constant.EiamConstants.TOPIAM_BIND_MFA_
  */
 @Slf4j
 public class IdpBindUserAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
-    public final static String         DEFAULT_FILTER_PROCESSES_URI = USER_BIND_IDP;
+    public static final String         DEFAULT_FILTER_PROCESSES_URI = USER_BIND_IDP;
     public static final RequestMatcher IDP_BIND_USER_MATCHER        = new AntPathRequestMatcher(
         DEFAULT_FILTER_PROCESSES_URI, HttpMethod.POST.name());
 

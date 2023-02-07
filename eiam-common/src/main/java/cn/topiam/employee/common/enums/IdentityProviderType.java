@@ -94,6 +94,7 @@ public enum IdentityProviderType implements BaseEnum {
         this.desc = desc;
     }
 
+    @Override
     public String getCode() {
         return code;
     }
@@ -102,6 +103,7 @@ public enum IdentityProviderType implements BaseEnum {
         return name;
     }
 
+    @Override
     public String getDesc() {
         return desc;
     }

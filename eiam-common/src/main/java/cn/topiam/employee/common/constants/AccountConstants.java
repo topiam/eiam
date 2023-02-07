@@ -30,19 +30,19 @@ public final class AccountConstants {
     /**
      * 用户API
      */
-    public final static String   USER_PATH                  = API_PATH + "/user";
+    public static final String   USER_PATH                  = API_PATH + "/user";
     /**
      * 组织机构API
      */
-    public final static String   ORGANIZATION_PATH          = API_PATH + "/organization";
+    public static final String   ORGANIZATION_PATH          = API_PATH + "/organization";
     /**
      * 用户组API
      */
-    public final static String   USER_GROUP_PATH            = API_PATH + "/user_group";
+    public static final String   USER_GROUP_PATH            = API_PATH + "/user_group";
     /**
      * 身份源API
      */
-    public final static String   IDENTITY_SOURCE_PATH       = API_PATH + "/identity_source";
+    public static final String   IDENTITY_SOURCE_PATH       = API_PATH + "/identity_source";
 
     /**
      * 组名称

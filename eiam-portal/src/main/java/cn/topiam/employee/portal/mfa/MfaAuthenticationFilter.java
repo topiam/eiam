@@ -60,7 +60,7 @@ public class MfaAuthenticationFilter extends AbstractAuthenticationProcessingFil
     public static final String         SPRING_SECURITY_FORM_TOTP_KEY = "totp";
 
     public static final String         SPRING_SECURITY_FORM_TYPE_KEY = "type";
-    public final static String         DEFAULT_FILTER_PROCESSES_URI  = MFA_VALIDATE;
+    public static final String         DEFAULT_FILTER_PROCESSES_URI  = MFA_VALIDATE;
 
     public static final RequestMatcher MFA_LOGIN_MATCHER             = new AntPathRequestMatcher(
         DEFAULT_FILTER_PROCESSES_URI, HttpMethod.POST.name());

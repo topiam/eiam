@@ -38,7 +38,7 @@ import cn.topiam.employee.support.context.ServletContextHelp;
  * Created by support@topiam.cn on  2022/6/1 22:52
  */
 public class AuthnStatementGenerator {
-    private final static Logger            logger = LoggerFactory
+    private static final Logger            logger = LoggerFactory
         .getLogger(AuthnStatementGenerator.class);
     private final AuthnContextClassRefType authnContextClassRefType;
 

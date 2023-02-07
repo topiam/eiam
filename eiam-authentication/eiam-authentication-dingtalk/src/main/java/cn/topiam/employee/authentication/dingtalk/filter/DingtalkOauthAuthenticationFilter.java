@@ -72,7 +72,7 @@ import static cn.topiam.employee.common.enums.IdentityProviderType.DINGTALK_OAUT
  */
 @SuppressWarnings("DuplicatedCode")
 public class DingtalkOauthAuthenticationFilter extends AbstractIdpAuthenticationProcessingFilter {
-    public final static String                DEFAULT_FILTER_PROCESSES_URI = DINGTALK_OAUTH
+    public static final String                DEFAULT_FILTER_PROCESSES_URI = DINGTALK_OAUTH
         .getLoginPathPrefix() + "/*";
     /**
      * AntPathRequestMatcher

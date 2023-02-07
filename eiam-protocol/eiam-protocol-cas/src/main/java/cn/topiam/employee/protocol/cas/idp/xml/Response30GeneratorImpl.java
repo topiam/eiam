@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Response30GeneratorImpl extends Response20GeneratorImpl {
 
-    private final static Logger logger = LoggerFactory.getLogger(Response20GeneratorImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(Response20GeneratorImpl.class);
 
     public Response30GeneratorImpl(DocumentBuilder documentBuilder, HttpServletResponse response) {
         super(documentBuilder, response);

@@ -51,7 +51,10 @@ import com.google.common.collect.Sets;
 import cn.topiam.employee.authentication.wechat.WeChatIdpScanCodeConfig;
 import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
-import static cn.topiam.employee.authentication.wechat.constant.WeChatAuthenticationConstants.*;
+import static cn.topiam.employee.authentication.wechat.constant.WeChatAuthenticationConstants.APP_ID;
+import static cn.topiam.employee.authentication.wechat.constant.WeChatAuthenticationConstants.AUTHORIZATION_REQUEST;
+import static cn.topiam.employee.authentication.wechat.constant.WeChatAuthenticationConstants.HREF;
+import static cn.topiam.employee.authentication.wechat.constant.WeChatAuthenticationConstants.SNSAPI_LOGIN;
 import static cn.topiam.employee.common.enums.IdentityProviderType.WECHAT_SCAN_CODE;
 
 /**
@@ -160,13 +163,13 @@ public class WeChatScanCodeAuthorizationRequestRedirectFilter extends OncePerReq
             authorizationRequest.getAuthorizationRequestUri());
     }
 
-    private final static String STYLE        = ""
+    private static final String STYLE        = ""
                                                + ".impowerBox .qrcode {width: 280px;border: none;margin-top:10px;}\n"
                                                + ".impowerBox .title {display: none;}\n"
                                                + ".impowerBox .info {display: none;}\n"
                                                + ".status_icon {display: none}\n"
                                                + ".impowerBox .status {text-align: center;} ";
-    private final static String STYLE_BASE64 = "data:text/css;base64," + Base64.getEncoder()
+    private static final String STYLE_BASE64 = "data:text/css;base64," + Base64.getEncoder()
         .encodeToString(STYLE.getBytes(StandardCharsets.UTF_8));
 
     public static RequestMatcher getRequestMatcher() {

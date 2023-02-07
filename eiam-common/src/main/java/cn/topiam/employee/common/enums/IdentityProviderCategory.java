@@ -62,10 +62,12 @@ public enum IdentityProviderCategory implements BaseEnum {
         this.providers = providers;
     }
 
+    @Override
     public String getCode() {
         return code;
     }
 
+    @Override
     public String getDesc() {
         return desc;
     }

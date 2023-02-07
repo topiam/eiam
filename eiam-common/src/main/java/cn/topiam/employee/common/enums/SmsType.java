@@ -33,8 +33,8 @@ public enum SmsType implements BaseEnum {
                                           */
                                          BIND_PHONE("bind_phone", "绑定手机号", MessageCategory.CODE),
                                          /**
-                                           * 绑定，修改手机号成功
-                                           */
+                                          * 绑定，修改手机号成功
+                                          */
                                          BIND_PHONE_SUCCESS("bind_phone_success", "绑定手机号成功",
                                                             MessageCategory.CODE),
                                          /**
@@ -110,10 +110,12 @@ public enum SmsType implements BaseEnum {
         this.category = category;
     }
 
+    @Override
     public String getCode() {
         return code;
     }
 
+    @Override
     public String getDesc() {
         return desc;
     }

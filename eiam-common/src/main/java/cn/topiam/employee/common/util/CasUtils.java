@@ -25,6 +25,6 @@ import org.slf4j.LoggerFactory;
  * Created by support@topiam.cn on  2022/12/30 01:06
  */
 public class CasUtils {
-    private final static Logger logger = LoggerFactory.getLogger(CasUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(CasUtils.class);
 
 }

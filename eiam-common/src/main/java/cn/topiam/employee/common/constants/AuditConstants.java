@@ -29,7 +29,7 @@ public final class AuditConstants {
     /**
      * 系统审计API路径
      */
-    public final static String  AUDIT_PATH         = API_PATH + "/audit";
+    public static final String  AUDIT_PATH         = API_PATH + "/audit";
 
     /**
      * 组名称

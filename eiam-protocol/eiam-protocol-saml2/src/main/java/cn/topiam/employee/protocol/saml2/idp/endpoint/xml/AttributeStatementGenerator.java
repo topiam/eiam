@@ -43,7 +43,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public class AttributeStatementGenerator {
-    private final static Logger                          logger = LoggerFactory
+    private static final Logger                          logger = LoggerFactory
         .getLogger(AttributeStatementGenerator.class);
     /**
      * 断言属性

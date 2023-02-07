@@ -46,7 +46,7 @@ public final class MessageSettingConstants {
     /**
      * 邮件内容路径
      */
-    public final static String MAIL_CONTENT_PATH                 = CLASSPATH_URL_PREFIX
+    public static final String MAIL_CONTENT_PATH                 = CLASSPATH_URL_PREFIX
                                                                    + "mail/content/";
 
     /**

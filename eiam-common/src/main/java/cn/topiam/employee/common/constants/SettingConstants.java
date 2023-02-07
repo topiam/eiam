@@ -31,7 +31,7 @@ public final class SettingConstants {
     /**
      * 系统设置API路径
      */
-    public final static String SETTING_PATH       = EiamConstants.API_PATH + "/setting";
+    public static final String SETTING_PATH       = EiamConstants.API_PATH + "/setting";
 
     /**
      * 组名称

@@ -67,7 +67,7 @@ public class WeChatWorkScanCodeLoginAuthenticationFilter extends
                                                          AbstractIdpAuthenticationProcessingFilter {
     final String                              ERROR_CODE                   = "errcode";
     final String                              SUCCESS                      = "0";
-    public final static String                DEFAULT_FILTER_PROCESSES_URI = WECHATWORK_SCAN_CODE
+    public static final String                DEFAULT_FILTER_PROCESSES_URI = WECHATWORK_SCAN_CODE
         .getLoginPathPrefix() + "/*";
     public static final AntPathRequestMatcher REQUEST_MATCHER              = new AntPathRequestMatcher(
         WECHATWORK_SCAN_CODE.getLoginPathPrefix() + "/" + "{" + PROVIDER_ID + "}",

@@ -59,7 +59,7 @@ public class SmsAuthenticationFilter extends AbstractAuthenticationProcessingFil
      */
     private boolean                    postOnly                     = true;
 
-    public final static String         DEFAULT_FILTER_PROCESSES_URI = SMS_LOGIN;
+    public static final String         DEFAULT_FILTER_PROCESSES_URI = SMS_LOGIN;
 
     public static final RequestMatcher SMS_LOGIN_MATCHER            = new AntPathRequestMatcher(
         DEFAULT_FILTER_PROCESSES_URI, HttpMethod.POST.name());

@@ -49,6 +49,7 @@ public class TicketGrantingTicketImpl implements TicketGrantingTicket {
         return false;
     }
 
+    @Override
     public UserDetails getUserDetails() {
         return this.userDetails;
     }

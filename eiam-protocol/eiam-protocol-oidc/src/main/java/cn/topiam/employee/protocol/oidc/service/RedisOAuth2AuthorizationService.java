@@ -47,7 +47,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationService {
 
-    private final static Long                   TIMEOUT       = 10L;
+    private static final Long                   TIMEOUT       = 10L;
 
     private static final String                 AUTHORIZATION = "token";
 

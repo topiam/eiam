@@ -60,7 +60,7 @@ import static cn.topiam.employee.common.util.SamlUtils.generateSecureRandomId;
 @RequiredArgsConstructor
 @Getter
 public class AssertionGenerator {
-    private final static Logger                          logger = LoggerFactory
+    private static final Logger                          logger = LoggerFactory
         .getLogger(AssertionGenerator.class);
 
     /**

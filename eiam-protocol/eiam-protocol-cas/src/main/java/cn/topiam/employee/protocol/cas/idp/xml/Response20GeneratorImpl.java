@@ -46,7 +46,7 @@ import static cn.topiam.employee.protocol.cas.idp.constant.ProtocolConstants.*;
  */
 public class Response20GeneratorImpl implements ResponseGenerator {
 
-    private final static Logger       logger = LoggerFactory
+    private static final Logger       logger = LoggerFactory
         .getLogger(Response20GeneratorImpl.class);
 
     private final HttpServletResponse response;

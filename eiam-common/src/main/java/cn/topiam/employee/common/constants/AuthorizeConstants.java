@@ -30,7 +30,7 @@ public final class AuthorizeConstants {
      * LOGIN
      */
     public static final String LOGIN_PATH                = EiamConstants.API_PATH + "/login";
-    public final static String AUTHORIZE_PATH            = EiamConstants.API_PATH + "/authorize";
+    public static final String AUTHORIZE_PATH            = EiamConstants.API_PATH + "/authorize";
     public static final String AUTHORIZATION_REQUEST_URI = EiamConstants.API_PATH
                                                            + "/authorization";
     /**
