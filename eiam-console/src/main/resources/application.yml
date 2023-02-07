@@ -156,7 +156,7 @@ springdoc:
 #TopIAM
 topiam:
   server:
-    console-public-base-url: https://localhost:1898
-    portal-public-base-url:  https://localhost:1989
-    openapi-public-base-url: https://localhost:1988
-    synchronizer-public-base-url: https://localhost:1986
+    console-public-base-url: ${CONSOLE_PUBLIC_BASE_URL:https://localhost:1898}
+    portal-public-base-url:  ${PORTAL_PUBLIC_BASE_URL:https://localhost:1989}
+    openapi-public-base-url: ${OPENAPI_PUBLIC_BASE_URL:https://localhost:1988}
+    synchronizer-public-base-url: ${SYNCHRONIZER_PUBLIC_BASE_URL:https://localhost:1986}

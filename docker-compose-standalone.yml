@@ -1,0 +1,66 @@
+version: '3'
+x-public-common: &public-config
+    environment:
+        MYSQL_HOST: 192.168.56.107 # 配置数据库的信息
+        MYSQL_USER: root
+        MYSQL_PASSWORD: admin
+        ES_HOST: 192.168.56.107 # 配置ES信息
+        REDIS_HOST: 192.168.56.107 # 配置REDIS的信息
+        REDIS_PASSWORD: 12345678
+        CONSOLE_PUBLIC_BASE_URL: http://192.168.56.104:1898
+        PORTAL_PUBLIC_BASE_URL: https://192.168.56.104:1989
+        OPENAPI_PUBLIC_BASE_URL: http://192.168.56.104:1988
+        SYNCHRONIZER_PUBLIC_BASE_URL: http://192.168.56.104:1986
+services:
+    eiam-console:
+        build:
+            context: .
+            dockerfile: docker/eiam-console/Dockerfile
+        <<: *public-config
+        container_name: eiam-console
+        ports:
+            - 1898:1898
+        image: eiam-console
+        restart: always
+        networks:
+            - eiam-network
+    eiam-openapi:
+        build:
+            context: .
+            dockerfile: docker/eiam-openapi/Dockerfile
+        <<: *public-config
+        container_name: eiam-openapi
+        image: eiam-openapi
+        restart: always
+        ports:
+            - 1988:1988
+        networks:
+            - eiam-network
+    eiam-portal:
+        build:
+            context: .
+            dockerfile: docker/eiam-portal/Dockerfile
+        <<: *public-config
+        container_name: eiam-portal
+        image: eiam-portal
+        restart: always
+        ports:
+            - 1989:1989
+        networks:
+            - eiam-network
+    eiam-synchronizer:
+        build:
+            context: .
+            dockerfile: docker/eiam-synchronizer/Dockerfile
+        <<: *public-config
+        container_name: eiam-synchronizer
+        image: eiam-synchronizer
+        restart: always
+        ports:
+            - 1986:1986
+        networks:
+            - eiam-network
+networks:
+    eiam-network:
+        external: false
+        name: eiam-network
