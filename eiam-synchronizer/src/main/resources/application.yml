@@ -54,9 +54,9 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/eiam_develop?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
-    username: 'eiam'
-    password: ''
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/eiam_develop?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
+    username: ${MYSQL_USER:'eiam'}
+    password: ${MYSQL_PASSWORD:''}
     hikari:
       auto-commit: true
       connection-test-query: SELECT 1
@@ -68,9 +68,9 @@ spring:
       pool-name: eiam
   #reids
   redis:
-    host: localhost
-    port: 6379
-    password: ''
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:''}
     database: 9
     lettuce:
       pool:
@@ -156,7 +156,7 @@ springdoc:
 #TopIAM
 topiam:
   server:
-    console-public-base-url:
-    portal-public-base-url:
-    openapi-public-base-url:
-    synchronizer-public-base-url:
+    console-public-base-url: https://localhost:1898
+    portal-public-base-url: https://localhost:1989
+    openapi-public-base-url: https://localhost:1988
+    synchronizer-public-base-url: https://localhost:1986

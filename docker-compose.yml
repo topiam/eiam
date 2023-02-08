@@ -1,0 +1,62 @@
+version: '3'
+services:
+    eiam-console:
+        build:
+            context: ./eiam-console/
+            dockerfile: Dockerfile
+        environment:
+            MYSQL_HOST: 192.168.56.107
+            MYSQL_USER: root
+            MYSQL_PASSWORD: admin
+            ES_HOST: 192.168.56.107
+            REDIS_HOST: 192.168.56.107
+            REDIS_PASSWORD: 12345678
+        ports:
+            - 1898:1898
+        image: eiam-console
+        restart: always
+    eiam-openapi:
+        build:
+            context: ./eiam-openapi/
+            dockerfile: Dockerfile
+        environment:
+            MYSQL_HOST: 192.168.56.107
+            MYSQL_USER: root
+            MYSQL_PASSWORD: admin
+            ES_HOST: 192.168.56.107
+            REDIS_HOST: 192.168.56.107
+            REDIS_PASSWORD: 12345678
+        image: eiam-openapi
+        restart: always
+        ports:
+            - 1988:1988
+    eiam-portal:
+        build:
+            context: ./eiam-portal/
+            dockerfile: Dockerfile
+        environment:
+            MYSQL_HOST: 192.168.56.107
+            MYSQL_USER: root
+            MYSQL_PASSWORD: admin
+            ES_HOST: 192.168.56.107
+            REDIS_HOST: 192.168.56.107
+            REDIS_PASSWORD: 12345678
+        image: eiam-portal
+        restart: always
+        ports:
+            - 1989:1989
+    eiam-synchronizer:
+        build:
+            context: ./eiam-synchronizer/
+            dockerfile: Dockerfile
+        environment:
+            MYSQL_HOST: 192.168.56.107
+            MYSQL_USER: root
+            MYSQL_PASSWORD: admin
+            ES_HOST: 192.168.56.107
+            REDIS_HOST: 192.168.56.107
+            REDIS_PASSWORD: 12345678
+        image: eiam-synchronizer
+        restart: always
+        ports:
+            - 1986:1986
