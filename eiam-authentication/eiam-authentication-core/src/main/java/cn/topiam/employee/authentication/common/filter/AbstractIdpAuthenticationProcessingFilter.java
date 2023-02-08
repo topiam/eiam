@@ -35,10 +35,11 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.alibaba.fastjson2.JSONObject;
 
+import cn.topiam.employee.authentication.common.IdentityProviderType;
+import cn.topiam.employee.authentication.common.exception.IdentityProviderNotExistException;
 import cn.topiam.employee.authentication.common.modal.IdpUser;
 import cn.topiam.employee.authentication.common.service.UserIdpService;
 import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
-import cn.topiam.employee.common.enums.IdentityProviderType;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 import cn.topiam.employee.core.security.authentication.IdpAuthentication;
 import cn.topiam.employee.core.security.userdetails.UserDetails;
@@ -65,14 +66,18 @@ public abstract class AbstractIdpAuthenticationProcessingFilter extends
      * @param request    {@link  HttpServletRequest}
      * @param response   {@link  HttpServletResponse}
      * @param provider   {@link  IdentityProviderType}
-     * @param providerId {@link  String}
+     * @param providerCode {@link  String}
      * @param info       {@link  JSONObject}
      * @return {@link  Authentication}
      */
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response,
-                                                IdentityProviderType provider, String providerId,
+                                                IdentityProviderType provider, String providerCode,
                                                 IdpUser info) throws IOException {
+        IdentityProviderEntity identityProvider = identityProviderRepository
+            .findByCodeAndEnabledIsTrue(providerCode)
+            .orElseThrow(IdentityProviderNotExistException::new);
+        String providerId = String.valueOf(identityProvider.getId());
         info.setProviderId(providerId);
         info.setProviderType(provider);
         //调用接口查询是否已绑定
@@ -81,7 +86,7 @@ public abstract class AbstractIdpAuthenticationProcessingFilter extends
             //是否自动绑定
             if (!userIdpService.isAutoBindUserIdp(providerId)) {
                 setUserBindSessionContent(request, info);
-                return new IdpAuthentication(provider.getCode(), providerId);
+                return new IdpAuthentication(provider.value(), providerId);
             }
             //调用接口进行绑定操作
             info.setProviderId(providerId);
@@ -136,16 +141,16 @@ public abstract class AbstractIdpAuthenticationProcessingFilter extends
                                        String providerId, HttpServletRequest request) {
         //认证
         UserDetails userDetails = userIdpService.getUserDetails(openId, providerId);
-        IdpAuthentication token = new IdpAuthentication(userDetails, provider.getCode(), providerId,
+        IdpAuthentication token = new IdpAuthentication(userDetails, provider.value(), providerId,
             true, userDetails.getAuthorities());
         // Allow subclasses to set the "details" property
         token.setDetails(this.authenticationDetailsSource.buildDetails(request));
         return token;
     }
 
-    public IdentityProviderEntity getIdentityProviderEntity(String providerId) {
+    public IdentityProviderEntity getIdentityProviderEntity(String code) {
         Optional<IdentityProviderEntity> optional = getIdentityProviderRepository()
-            .findByIdAndEnabledIsTrue(Long.valueOf(providerId));
+            .findByCodeAndEnabledIsTrue(code);
         if (optional.isEmpty()) {
             //无效身份提供商
             OAuth2Error oauth2Error = new OAuth2Error(INVALID_IDP);

@@ -28,9 +28,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import cn.topiam.employee.application.exception.AppNotExistException;
 import cn.topiam.employee.application.saml2.converter.AppSaml2StandardConfigConverter;
-import cn.topiam.employee.application.saml2.model.AppSaml2StandardSaveConfigParam;
+import cn.topiam.employee.application.saml2.pojo.AppSaml2StandardSaveConfigParam;
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.AppSaml2ConfigEntity;
@@ -69,6 +71,7 @@ public class Saml2StandardApplicationServiceImpl extends AbstractSamlAppService 
     public void saveConfig(String appId, Map<String, Object> config) {
         AppSaml2StandardSaveConfigParam model;
         try {
+            ObjectMapper mapper = new ObjectMapper();
             String value = mapper.writeValueAsString(config);
             // 指定序列化输入的类型
             mapper.configure(FAIL_ON_UNKNOWN_PROPERTIES, false);

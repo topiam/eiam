@@ -17,13 +17,11 @@
  */
 package cn.topiam.employee.console.pojo.update.app;
 
-import java.io.Serializable;
-
-import javax.validation.constraints.NotNull;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
  * 应用修改入参

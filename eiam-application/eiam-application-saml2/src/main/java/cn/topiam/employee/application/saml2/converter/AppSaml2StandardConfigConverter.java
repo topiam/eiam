@@ -22,9 +22,9 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import cn.topiam.employee.application.saml2.model.AppSaml2StandardConfigGetResult;
-import cn.topiam.employee.application.saml2.model.AppSaml2StandardSaveConfigParam;
-import cn.topiam.employee.application.saml2.model.Saml2ConverterUtils;
+import cn.topiam.employee.application.saml2.pojo.AppSaml2StandardConfigGetResult;
+import cn.topiam.employee.application.saml2.pojo.AppSaml2StandardSaveConfigParam;
+import cn.topiam.employee.application.saml2.pojo.Saml2ConverterUtils;
 import cn.topiam.employee.common.entity.app.AppSaml2ConfigEntity;
 import cn.topiam.employee.common.entity.app.po.AppSaml2ConfigPO;
 

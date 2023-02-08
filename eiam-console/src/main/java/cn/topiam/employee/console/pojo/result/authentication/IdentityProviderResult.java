@@ -17,16 +17,13 @@
  */
 package cn.topiam.employee.console.pojo.result.authentication;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 import cn.topiam.employee.authentication.common.config.IdentityProviderConfig;
-import cn.topiam.employee.common.enums.IdentityProviderType;
-
-import lombok.Data;
-
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * 认证源详情
@@ -56,7 +53,7 @@ public class IdentityProviderResult implements Serializable {
      * 提供商类型
      */
     @Parameter(description = "提供商类型")
-    private IdentityProviderType   type;
+    private String                 type;
 
     /**
      * 配置

@@ -17,9 +17,18 @@
  */
 package cn.topiam.employee.console.configuration;
 
-import java.util.Objects;
-import java.util.stream.Collectors;
-
+import cn.topiam.employee.common.constants.AuthorizeConstants;
+import cn.topiam.employee.common.entity.setting.SettingEntity;
+import cn.topiam.employee.common.geo.GeoLocationService;
+import cn.topiam.employee.common.repository.setting.SettingRepository;
+import cn.topiam.employee.console.security.handler.*;
+import cn.topiam.employee.console.security.listener.ConsoleAuthenticationFailureEventListener;
+import cn.topiam.employee.console.security.listener.ConsoleAuthenticationSuccessEventListener;
+import cn.topiam.employee.console.security.listener.ConsoleLogoutSuccessEventListener;
+import cn.topiam.employee.console.security.listener.ConsoleSessionInformationExpiredStrategy;
+import cn.topiam.employee.core.endpoint.security.PublicSecretEndpoint;
+import cn.topiam.employee.core.security.form.FormLoginSecretFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -37,21 +46,8 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.session.security.web.authentication.SpringSessionRememberMeServices;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import cn.topiam.employee.common.constants.AuthorizeConstants;
-import cn.topiam.employee.common.entity.setting.SettingEntity;
-import cn.topiam.employee.common.geo.GeoLocationService;
-import cn.topiam.employee.common.repository.setting.SettingRepository;
-import cn.topiam.employee.console.security.handler.*;
-import cn.topiam.employee.console.security.listener.ConsoleAuthenticationFailureEventListener;
-import cn.topiam.employee.console.security.listener.ConsoleAuthenticationSuccessEventListener;
-import cn.topiam.employee.console.security.listener.ConsoleLogoutSuccessEventListener;
-import cn.topiam.employee.console.security.listener.ConsoleSessionInformationExpiredStrategy;
-import cn.topiam.employee.core.endpoint.security.PublicSecretEndpoint;
-import cn.topiam.employee.core.security.form.FormLoginSecretFilter;
-
-import lombok.RequiredArgsConstructor;
-import static org.springframework.boot.autoconfigure.security.StaticResourceLocation.*;
-import static org.springframework.security.config.Customizer.withDefaults;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static cn.topiam.employee.common.constants.AuthorizeConstants.FE_LOGIN;
 import static cn.topiam.employee.common.constants.AuthorizeConstants.LOGIN_PATH;
@@ -59,6 +55,8 @@ import static cn.topiam.employee.common.constants.ConfigBeanNameConstants.DEFAUL
 import static cn.topiam.employee.common.constants.SessionConstants.CURRENT_STATUS;
 import static cn.topiam.employee.core.setting.constant.SecuritySettingConstants.*;
 import static cn.topiam.employee.support.constant.EiamConstants.*;
+import static org.springframework.boot.autoconfigure.security.StaticResourceLocation.*;
+import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
  * ConsoleSecurityConfiguration
@@ -84,7 +82,7 @@ public class ConsoleSecurityConfiguration {
         http
                 //认证请求
                 .authorizeHttpRequests(authorizeRequests())
-                // 表单登录配置
+                //表单登录配置
                 .formLogin(withFormLoginConfigurerDefaults())
                 //x509
                 .x509(withDefaults())
@@ -179,12 +177,12 @@ public class ConsoleSecurityConfiguration {
             configurer.xssProtection(xssProtection -> xssProtection.block(false));
             configurer.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin);
             configurer.contentSecurityPolicy(
-                    "default-src 'self'; " +
-                            "frame-src 'self' data:; " +
+                    "default-src 'self' data:; " +
+                            "frame-src 'self' login.dingtalk.com open.weixin.qq.com open.work.weixin.qq.com passport.feishu.cn data:; " +
                             "frame-ancestors 'self' https://eiam.topiam.cn data:; " +
-                            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; " +
+                            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com sf3-cn.feishucdn.com;" +
                             "style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net 'unsafe-inline'; " +
-                            "img-src 'self' https://img.alicdn.com https://static-legacy.dingtalk.com  https://joeschmoe.io data:; " +
+                            "img-src 'self' https://img.alicdn.com https://static-legacy.dingtalk.com  https://joeschmoe.io https://api.multiavatar.com data:; " +
                             "font-src 'self' https://fonts.gstatic.com data:; "+
                             "worker-src 'self' https://storage.googleapis.com blob:;");
             configurer.referrerPolicy(

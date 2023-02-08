@@ -17,16 +17,14 @@
  */
 package cn.topiam.employee.console.pojo.result.setting;
 
-import java.io.Serializable;
-import java.util.List;
-
 import cn.topiam.employee.common.enums.MfaFactor;
 import cn.topiam.employee.common.enums.MfaMode;
-
-import lombok.Data;
-
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * 安全MFA配置结果

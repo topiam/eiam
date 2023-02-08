@@ -17,18 +17,6 @@
  */
 package cn.topiam.employee.console.converter.app;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
-
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
-
 import cn.topiam.employee.common.entity.app.AppPermissionResourceEntity;
 import cn.topiam.employee.common.entity.app.QAppPermissionResourceEntity;
 import cn.topiam.employee.console.pojo.query.app.AppResourceListQuery;
@@ -37,6 +25,16 @@ import cn.topiam.employee.console.pojo.result.app.AppPermissionResourceListResul
 import cn.topiam.employee.console.pojo.save.app.AppPermissionResourceCreateParam;
 import cn.topiam.employee.console.pojo.update.app.AppPermissionResourceUpdateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
+import org.apache.commons.lang3.StringUtils;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 资源映射
@@ -55,7 +53,8 @@ public interface AppPermissionResourceConverter {
      */
     default Predicate resourcePaginationParamConvertToPredicate(AppResourceListQuery query) {
         QAppPermissionResourceEntity resource = QAppPermissionResourceEntity.appPermissionResourceEntity;
-        Predicate predicate = resource.isNotNull();
+        Predicate predicate = ExpressionUtils.and(resource.isNotNull(),
+            resource.isDeleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         // 资源名称

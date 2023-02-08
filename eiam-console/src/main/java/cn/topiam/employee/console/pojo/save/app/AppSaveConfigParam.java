@@ -17,14 +17,12 @@
  */
 package cn.topiam.employee.console.pojo.save.app;
 
-import java.io.Serializable;
-import java.util.Map;
-
-import javax.validation.constraints.NotNull;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.util.Map;
 
 /**
  * 更新应用配置入参

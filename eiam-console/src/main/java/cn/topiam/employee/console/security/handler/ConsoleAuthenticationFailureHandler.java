@@ -17,18 +17,18 @@
  */
 package cn.topiam.employee.console.security.handler;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import cn.topiam.employee.common.enums.SecretType;
+import cn.topiam.employee.support.exception.enums.ExceptionStatus;
+import cn.topiam.employee.support.result.ApiRestResult;
+import cn.topiam.employee.support.util.HttpResponseUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
-import cn.topiam.employee.common.enums.SecretType;
-import cn.topiam.employee.support.exception.enums.ExceptionStatus;
-import cn.topiam.employee.support.result.ApiRestResult;
-import cn.topiam.employee.support.util.HttpResponseUtils;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import static cn.topiam.employee.support.constant.EiamConstants.CAPTCHA_CODE_SESSION;
 
 /**

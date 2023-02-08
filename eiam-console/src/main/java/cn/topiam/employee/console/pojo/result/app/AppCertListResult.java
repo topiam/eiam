@@ -18,12 +18,10 @@
 package cn.topiam.employee.console.pojo.result.app;
 
 import cn.topiam.employee.common.enums.app.AppCertUsingType;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 /**
  * 获取应用证书列表结果

@@ -37,7 +37,11 @@ import lombok.SneakyThrows;
 */
 public class AesUtils {
     private static final String ALGORITHM = "AES";
-    private static final String KEY       = "fDx/JA3Aw9BIQClUSOddjA==";
+    private final String        KEY;
+
+    public AesUtils(String key) {
+        this.KEY = key;
+    }
 
     /**
      * 生成秘钥
@@ -63,7 +67,7 @@ public class AesUtils {
      * 加密
      */
     @SneakyThrows
-    public static String encrypt(String content) {
+    public String encrypt(String content) {
         if (StringUtils.hasText(content)) {
             return encrypt(content, KEY);
         }
@@ -88,7 +92,7 @@ public class AesUtils {
      * 解密
      */
     @SneakyThrows
-    public static String decrypt(String content) {
+    public String decrypt(String content) {
         if (StringUtils.hasText(content)) {
             return decrypt(content, KEY);
         }

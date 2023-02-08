@@ -39,7 +39,23 @@ import static cn.topiam.employee.common.constants.ProtocolConstants.OIDC_CONFIG_
 @AllArgsConstructor
 @CacheConfig(cacheNames = { OIDC_CONFIG_CACHE_NAME })
 public class AppOidcConfigRepositoryCustomizedImpl implements AppOidcConfigRepositoryCustomized {
-    private final String SELECT_SQL = "SELECT aoc.*,app.init_login_url,app.init_login_type,app.authorization_type,app.template_,app.code_,app.is_enabled,app.client_id,app.client_secret from app left join app_oidc_config aoc on app.id_ = aoc.app_id where 1=1";
+    private static final String SELECT_SQL = """
+            SELECT
+                aoc.*,
+                app.init_login_url,
+                app.init_login_type,
+                app.authorization_type,
+                app.template_,
+                app.code_,
+                app.is_enabled,
+                app.client_id,
+                app.client_secret
+            FROM
+                app
+                LEFT JOIN app_oidc_config aoc ON app.id_ = aoc.app_id and aoc.is_deleted = '0'
+            WHERE
+                app.is_deleted = '0'
+            """;
 
     /**
      * 根据应用ID获取

@@ -17,29 +17,10 @@
  */
 package cn.topiam.employee.console.converter.identitysource;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import javax.validation.ConstraintViolationException;
-
-import org.apache.commons.lang3.StringUtils;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.springframework.data.domain.Page;
-import org.springframework.data.querydsl.QPageRequest;
-import org.springframework.util.CollectionUtils;
-
-import com.alibaba.fastjson2.JSONObject;
-import com.alibaba.fastjson2.JSONWriter;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
-
 import cn.topiam.employee.common.constants.CommonConstants;
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceEntity;
 import cn.topiam.employee.common.entity.identitysource.QIdentitySourceEntity;
-import cn.topiam.employee.common.enums.identityprovider.IdentitySourceProvider;
+import cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider;
 import cn.topiam.employee.console.pojo.query.identity.IdentitySourceListQuery;
 import cn.topiam.employee.console.pojo.result.identitysource.IdentitySourceConfigGetResult;
 import cn.topiam.employee.console.pojo.result.identitysource.IdentitySourceGetResult;
@@ -50,12 +31,28 @@ import cn.topiam.employee.console.pojo.update.identity.IdentitySourceUpdateParam
 import cn.topiam.employee.core.context.ServerContextHelp;
 import cn.topiam.employee.identitysource.core.IdentitySourceConfig;
 import cn.topiam.employee.identitysource.dingtalk.DingTalkConfig;
-import cn.topiam.employee.identitysource.feishu.FeiShuConfig;
+import cn.topiam.employee.identitysource.ldap.LdapConfig;
 import cn.topiam.employee.identitysource.wechatwork.WeChatWorkConfig;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.repository.page.domain.QueryDslRequest;
 import cn.topiam.employee.support.validation.ValidationHelp;
+import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.JSONWriter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
+import org.apache.commons.lang3.StringUtils;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.data.domain.Page;
+import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.util.CollectionUtils;
+
+import javax.validation.ConstraintViolationException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * 身份源转换器
@@ -207,7 +204,7 @@ public interface IdentitySourceConverter {
         }
         //飞书
         if (Objects.equals(provider, IdentitySourceProvider.FEISHU)) {
-            clientConfig = param.getBasicConfig().to(FeiShuConfig.class);
+            clientConfig = param.getBasicConfig().to(LdapConfig.class);
         }
         //放置参数，并验证参数
         if (!Objects.nonNull(clientConfig)) {
@@ -236,7 +233,8 @@ public interface IdentitySourceConverter {
                                                                            PageModel pageModel) {
         QueryDslRequest request = new QueryDslRequest();
         QIdentitySourceEntity queryEntity = QIdentitySourceEntity.identitySourceEntity;
-        Predicate predicate = queryEntity.isNotNull();
+        Predicate predicate = ExpressionUtils.and(queryEntity.isNotNull(),
+            queryEntity.isDeleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = StringUtils.isBlank(query.getName()) ? predicate : ExpressionUtils.and(predicate, queryEntity.name.like("%" + query.getName() + "%"));

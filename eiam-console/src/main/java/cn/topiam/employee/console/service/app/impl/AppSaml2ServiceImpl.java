@@ -17,15 +17,21 @@
  */
 package cn.topiam.employee.console.service.app.impl;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.cert.X509Certificate;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletResponse;
-
+import cn.topiam.employee.application.ApplicationService;
+import cn.topiam.employee.application.ApplicationServiceLoader;
+import cn.topiam.employee.application.exception.AppNotExistException;
+import cn.topiam.employee.application.exception.ParseSaml2MetadataException;
+import cn.topiam.employee.application.saml2.Saml2ApplicationService;
+import cn.topiam.employee.application.saml2.model.Saml2ProtocolConfig;
+import cn.topiam.employee.common.entity.app.AppEntity;
+import cn.topiam.employee.common.repository.app.AppRepository;
+import cn.topiam.employee.common.repository.app.AppSaml2ConfigRepository;
+import cn.topiam.employee.console.pojo.result.app.ParseSaml2MetadataResult;
+import cn.topiam.employee.console.service.app.AppSaml2Service;
+import cn.topiam.employee.protocol.saml2.idp.util.Saml2Utils;
+import cn.topiam.employee.support.context.ServletContextHelp;
+import cn.topiam.employee.support.util.CertUtils;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -38,28 +44,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import cn.topiam.employee.application.ApplicationService;
-import cn.topiam.employee.application.ApplicationServiceLoader;
-import cn.topiam.employee.application.Saml2ApplicationService;
-import cn.topiam.employee.application.exception.AppNotExistException;
-import cn.topiam.employee.application.exception.ParseSaml2MetadataException;
-import cn.topiam.employee.common.entity.app.AppEntity;
-import cn.topiam.employee.common.repository.app.AppRepository;
-import cn.topiam.employee.common.repository.app.AppSaml2ConfigRepository;
-import cn.topiam.employee.console.pojo.result.app.ParseSaml2MetadataResult;
-import cn.topiam.employee.console.service.app.AppSaml2Service;
-import cn.topiam.employee.core.protocol.Saml2ProtocolConfig;
-import cn.topiam.employee.protocol.saml2.idp.util.Saml2Utils;
-import cn.topiam.employee.support.context.ServletContextHelp;
-import cn.topiam.employee.support.util.CertUtils;
-
-import lombok.AllArgsConstructor;
-import static org.opensaml.saml.common.xml.SAMLConstants.SAML20P_NS;
-import static org.opensaml.security.credential.UsageType.SIGNING;
-import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.cert.X509Certificate;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import static cn.topiam.employee.common.util.SamlKeyStoreProvider.getEntityDescriptors;
 import static cn.topiam.employee.common.util.SamlUtils.transformSamlObject2String;
+import static org.opensaml.saml.common.xml.SAMLConstants.SAML20P_NS;
+import static org.opensaml.security.credential.UsageType.SIGNING;
+import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 
 /**
  * 应用SAML详情

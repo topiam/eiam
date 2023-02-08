@@ -27,6 +27,8 @@ import cn.topiam.employee.console.pojo.update.setting.AdministratorUpdateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 
+import java.time.LocalDateTime;
+
 /**
  * 管理员
  *
@@ -103,4 +105,13 @@ public interface AdministratorService {
      * @return {@link Boolean}
      */
     Boolean administratorParamCheck(CheckValidityType type, String value, Long id);
+
+    /**
+     * 更新认证成功信息
+     *
+     * @param id {@link String}
+     * @param ip {@link String}
+     * @param loginTime {@link LocalDateTime}
+     */
+    Boolean updateAuthSucceedInfo(String id, String ip, LocalDateTime loginTime);
 }

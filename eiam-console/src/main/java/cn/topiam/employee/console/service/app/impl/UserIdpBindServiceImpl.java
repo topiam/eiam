@@ -17,12 +17,6 @@
  */
 package cn.topiam.employee.console.service.app.impl;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
@@ -33,9 +27,13 @@ import cn.topiam.employee.console.pojo.result.app.UserIdpBindListResult;
 import cn.topiam.employee.console.service.app.UserIdpBindService;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.repository.page.domain.Page;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * 用户身份提供商绑定

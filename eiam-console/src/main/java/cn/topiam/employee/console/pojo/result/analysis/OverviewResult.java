@@ -17,11 +17,10 @@
  */
 package cn.topiam.employee.console.pojo.result.analysis;
 
-import java.io.Serializable;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serializable;
 
 /**
  * 概述总计结果

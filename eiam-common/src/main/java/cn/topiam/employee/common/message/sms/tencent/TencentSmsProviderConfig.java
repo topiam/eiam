@@ -19,6 +19,7 @@ package cn.topiam.employee.common.message.sms.tencent;
 
 import javax.validation.constraints.NotEmpty;
 
+import cn.topiam.employee.common.crypto.Encrypt;
 import cn.topiam.employee.common.message.sms.SmsProviderConfig;
 
 import lombok.Data;
@@ -45,6 +46,7 @@ public class TencentSmsProviderConfig extends SmsProviderConfig {
     /**
      * secretKey
      */
+    @Encrypt
     @NotEmpty(message = "SecretKey不能为空")
     private String secretKey;
 

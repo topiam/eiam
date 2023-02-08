@@ -17,17 +17,15 @@
  */
 package cn.topiam.employee.console.pojo.result.setting;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 import cn.topiam.employee.common.storage.StorageConfig;
 import cn.topiam.employee.common.storage.enums.StorageProvider;
-
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * 存储配置查询结果
@@ -41,21 +39,21 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public class StorageProviderConfigResult implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = -2667374916357438335L;
+    private static final long    serialVersionUID = -2667374916357438335L;
     /**
      * 服务商
      */
     @Parameter(description = "服务商")
-    private StorageProvider   provider;
+    private StorageProvider      provider;
     /**
      * 启用
      */
     @Parameter(description = "是否启用")
-    private Boolean           enabled;
+    private Boolean              enabled;
     /**
      * 配置信息
      */
     @Parameter(description = "配置信息")
-    private StorageConfig     config;
+    private StorageConfig.Config config;
 
 }

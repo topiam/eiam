@@ -17,21 +17,19 @@
  */
 package cn.topiam.employee.portal.converter;
 
-import java.time.LocalDateTime;
-
+import cn.topiam.employee.authentication.common.modal.IdpUser;
+import cn.topiam.employee.common.entity.account.UserDetailEntity;
+import cn.topiam.employee.common.entity.account.UserEntity;
+import cn.topiam.employee.common.entity.account.UserIdpBindEntity;
+import cn.topiam.employee.portal.pojo.request.UpdateUserInfoRequest;
+import com.alibaba.fastjson2.JSONObject;
 import org.apache.commons.collections4.MapUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.alibaba.fastjson2.JSONObject;
-
-import cn.topiam.employee.authentication.common.modal.IdpUser;
-import cn.topiam.employee.common.entity.account.UserDetailEntity;
-import cn.topiam.employee.common.entity.account.UserEntity;
-import cn.topiam.employee.common.entity.account.UserIdpBindEntity;
-import cn.topiam.employee.portal.pojo.request.UpdateUserInfoRequest;
+import java.time.LocalDateTime;
 
 /**
  * AccountConverter
@@ -111,7 +109,7 @@ public interface AccountConverter {
         entity.setUserId(Long.valueOf(userId));
         entity.setOpenId(idpUser.getOpenId());
         entity.setIdpId(idpUser.getProviderId());
-        entity.setIdpType(idpUser.getProviderType());
+        entity.setIdpType(idpUser.getProviderType().value());
         if (MapUtils.isNotEmpty(idpUser.getAdditionalInfo())) {
             entity.setAdditionInfo(JSONObject.toJSONString(idpUser.getAdditionalInfo()));
         }

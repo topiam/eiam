@@ -17,8 +17,13 @@
  */
 package cn.topiam.employee.console.controller.app;
 
-import java.util.List;
-
+import cn.topiam.employee.console.pojo.query.app.AppPermissionActionListQuery;
+import cn.topiam.employee.console.pojo.result.app.AppPermissionActionListResult;
+import cn.topiam.employee.console.service.app.AppPermissionActionService;
+import cn.topiam.employee.support.result.ApiRestResult;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -28,15 +33,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cn.topiam.employee.console.pojo.query.app.AppPermissionActionListQuery;
-import cn.topiam.employee.console.pojo.result.app.AppPermissionActionListResult;
-import cn.topiam.employee.console.service.app.AppPermissionActionService;
-import cn.topiam.employee.support.result.ApiRestResult;
+import java.util.List;
 
-import lombok.RequiredArgsConstructor;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import static cn.topiam.employee.common.constants.AppConstants.APP_PATH;
 
 /**

@@ -31,6 +31,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.topiam.employee.common.constants.SettingConstants;
+import cn.topiam.employee.common.crypto.EncryptionModule;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.geo.GeoLocationProviderConfig;
 import cn.topiam.employee.common.geo.GeoLocationService;
@@ -57,7 +58,7 @@ public class EiamGeoLocationConfiguration {
     public GeoLocationService geoLocation(SettingRepository settingRepository,
                                           RestTemplate restTemplate) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectMapper objectMapper = EncryptionModule.deserializerDecrypt();
             // 指定序列化输入的类型
             objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
                 ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);

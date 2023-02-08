@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import org.springframework.jdbc.core.RowMapper;
 
 import cn.topiam.employee.common.entity.app.po.AppCasConfigPO;
+import cn.topiam.employee.common.enums.app.CasUserIdentityType;
 import cn.topiam.employee.common.enums.app.InitLoginType;
 
 /**
@@ -36,21 +37,23 @@ public class AppCasConfigPoMapper implements RowMapper<AppCasConfigPO> {
 
     @Override
     public AppCasConfigPO mapRow(ResultSet rs, int rowNum) throws SQLException {
-        AppCasConfigPO configPO = new AppCasConfigPO();
-        configPO.setAppId(rs.getLong("id_"));
-        configPO.setAppId(rs.getLong("app_id"));
-        configPO.setAppCode(rs.getString("code_"));
-        configPO.setClientId(rs.getString("client_id"));
-        configPO.setClientSecret(rs.getString("client_secret"));
-        configPO.setInitLoginType(InitLoginType.getType(rs.getString("init_login_type")));
-        configPO.setInitLoginUrl(rs.getString("init_login_url"));
-        configPO.setAppTemplate(rs.getString("template_"));
-        configPO.setCreateBy(rs.getString("create_by"));
-        configPO.setCreateTime(rs.getObject("create_time", LocalDateTime.class));
-        configPO.setUpdateBy(rs.getString("update_by"));
-        configPO.setCreateTime(rs.getObject("update_time", LocalDateTime.class));
-        configPO.setRemark(rs.getString("remark_"));
-        configPO.setSpCallbackUrl(rs.getString("sp_callback_url"));
-        return configPO;
+        AppCasConfigPO configPo = new AppCasConfigPO();
+        configPo.setAppId(rs.getLong("id_"));
+        configPo.setAppId(rs.getLong("app_id"));
+        configPo.setAppCode(rs.getString("code_"));
+        configPo.setClientId(rs.getString("client_id"));
+        configPo.setClientSecret(rs.getString("client_secret"));
+        configPo.setInitLoginType(InitLoginType.getType(rs.getString("init_login_type")));
+        configPo.setInitLoginUrl(rs.getString("init_login_url"));
+        configPo.setAppTemplate(rs.getString("template_"));
+        configPo.setCreateBy(rs.getString("create_by"));
+        configPo.setCreateTime(rs.getObject("create_time", LocalDateTime.class));
+        configPo.setUpdateBy(rs.getString("update_by"));
+        configPo.setCreateTime(rs.getObject("update_time", LocalDateTime.class));
+        configPo.setRemark(rs.getString("remark_"));
+        configPo.setClientServiceUrl(rs.getString("client_service_url"));
+        configPo
+            .setUserIdentityType(CasUserIdentityType.getType(rs.getString("user_identity_type")));
+        return configPo;
     }
 }

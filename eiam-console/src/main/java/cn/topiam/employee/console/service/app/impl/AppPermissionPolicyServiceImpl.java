@@ -17,10 +17,6 @@
  */
 package cn.topiam.employee.console.service.app.impl;
 
-import org.springframework.data.querydsl.QPageRequest;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import cn.topiam.employee.common.entity.app.AppPermissionPolicyEntity;
 import cn.topiam.employee.common.entity.app.po.AppPermissionPolicyPO;
 import cn.topiam.employee.common.entity.app.query.AppPolicyQuery;
@@ -34,8 +30,10 @@ import cn.topiam.employee.console.pojo.update.app.AppPermissionPolicyUpdateParam
 import cn.topiam.employee.console.service.app.AppPermissionPolicyService;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>

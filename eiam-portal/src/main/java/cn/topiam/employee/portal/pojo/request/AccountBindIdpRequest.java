@@ -17,20 +17,20 @@
  */
 package cn.topiam.employee.portal.pojo.request;
 
-import java.io.Serial;
-import java.io.Serializable;
-
-import javax.validation.constraints.NotBlank;
-
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import javax.validation.constraints.NotBlank;
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * @author TopIAM
  * Created by support@topiam.cn on  2022/4/3 22:22
  */
 @Data
+@AllArgsConstructor
 @Schema(description = "账户绑定IDP入参")
 public class AccountBindIdpRequest implements Serializable {
 

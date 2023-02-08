@@ -17,16 +17,15 @@
  */
 package cn.topiam.employee.portal.pojo.result;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 import cn.topiam.employee.common.enums.app.AppProtocol;
 import cn.topiam.employee.common.enums.app.AppType;
-
-import lombok.Data;
-
+import cn.topiam.employee.common.enums.app.InitLoginType;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * 获取应用列表
@@ -82,16 +81,16 @@ public class GetAppListResult implements Serializable {
     private String            icon;
 
     /**
-     * IDP发起
+     * Sso 发起方
      */
-    @Parameter(description = "IDP发起")
-    private Boolean           idpInit;
+    @Parameter(description = "SSO 发起方")
+    private InitLoginType     initLoginType;
 
     /**
-     * IDP发起URL
+     * SSO 发起URL
      */
-    @Parameter(description = "IDP发起URL")
-    private String            idpInitUrl;
+    @Parameter(description = "SSO 发起URL")
+    private String            initLoginUrl;
 
     /**
      * 应用描述

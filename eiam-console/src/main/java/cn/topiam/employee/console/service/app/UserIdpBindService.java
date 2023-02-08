@@ -17,9 +17,9 @@
  */
 package cn.topiam.employee.console.service.app;
 
-import java.util.List;
-
 import cn.topiam.employee.console.pojo.result.app.UserIdpBindListResult;
+
+import java.util.List;
 
 /**
  * 用户身份提供商绑定

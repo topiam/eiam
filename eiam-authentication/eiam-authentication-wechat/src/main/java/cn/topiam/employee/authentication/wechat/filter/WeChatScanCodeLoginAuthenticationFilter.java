@@ -44,21 +44,17 @@ import cn.topiam.employee.authentication.common.filter.AbstractIdpAuthentication
 import cn.topiam.employee.authentication.common.modal.IdpUser;
 import cn.topiam.employee.authentication.common.service.UserIdpService;
 import cn.topiam.employee.authentication.wechat.WeChatIdpScanCodeConfig;
+import cn.topiam.employee.authentication.wechat.constant.WeChatAuthenticationConstants;
 import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
-import cn.topiam.employee.common.enums.IdentityProviderType;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 import cn.topiam.employee.core.context.ServerContextHelp;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.util.HttpClientUtils;
 import static org.springframework.security.oauth2.core.AuthorizationGrantType.AUTHORIZATION_CODE;
 
-import static cn.topiam.employee.authentication.wechat.constant.WeChatAuthenticationConstants.ACCESS_TOKEN;
-import static cn.topiam.employee.authentication.wechat.constant.WeChatAuthenticationConstants.APP_ID;
-import static cn.topiam.employee.authentication.wechat.constant.WeChatAuthenticationConstants.ERROR_CODE;
-import static cn.topiam.employee.authentication.wechat.constant.WeChatAuthenticationConstants.SECRET;
-import static cn.topiam.employee.authentication.wechat.constant.WeChatAuthenticationConstants.USER_INFO;
-import static cn.topiam.employee.authentication.wechat.filter.WeChatScanCodeAuthorizationRequestRedirectFilter.PROVIDER_ID;
-import static cn.topiam.employee.common.enums.IdentityProviderType.WECHAT_SCAN_CODE;
+import static cn.topiam.employee.authentication.common.IdentityProviderType.WECHAT_QR;
+import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.PROVIDER_CODE;
+import static cn.topiam.employee.authentication.wechat.constant.WeChatAuthenticationConstants.*;
 
 /**
  * 微信扫码登录过滤器
@@ -69,11 +65,10 @@ import static cn.topiam.employee.common.enums.IdentityProviderType.WECHAT_SCAN_C
 public class WeChatScanCodeLoginAuthenticationFilter extends
                                                      AbstractIdpAuthenticationProcessingFilter {
 
-    public static final String                DEFAULT_FILTER_PROCESSES_URI = WECHAT_SCAN_CODE
+    public final static String                DEFAULT_FILTER_PROCESSES_URI = WECHAT_QR
         .getLoginPathPrefix() + "/*";
     public static final AntPathRequestMatcher REQUEST_MATCHER              = new AntPathRequestMatcher(
-        WECHAT_SCAN_CODE.getLoginPathPrefix() + "/" + "{" + PROVIDER_ID + "}",
-        HttpMethod.GET.name());
+        WECHAT_QR.getLoginPathPrefix() + "/" + "{" + PROVIDER_CODE + "}", HttpMethod.GET.name());
 
     /**
      * Creates a new instance
@@ -102,7 +97,7 @@ public class WeChatScanCodeLoginAuthenticationFilter extends
             response);
         RequestMatcher.MatchResult matcher = REQUEST_MATCHER.matcher(request);
         Map<String, String> variables = matcher.getVariables();
-        String providerId = variables.get(PROVIDER_ID);
+        String providerId = variables.get(PROVIDER_CODE);
         //code
         String code = request.getParameter(OAuth2ParameterNames.CODE);
         if (StringUtils.isEmpty(code)) {
@@ -136,7 +131,8 @@ public class WeChatScanCodeLoginAuthenticationFilter extends
         param.put(SECRET, config.getAppSecret());
         param.put(OAuth2ParameterNames.CODE, code);
         param.put(OAuth2ParameterNames.GRANT_TYPE, AUTHORIZATION_CODE.getValue());
-        JSONObject result = JSON.parseObject(HttpClientUtils.get(ACCESS_TOKEN, param));
+        JSONObject result = JSON
+            .parseObject(HttpClientUtils.get(WeChatAuthenticationConstants.ACCESS_TOKEN, param));
         if (result.containsKey(ERROR_CODE)) {
             logger.error("获取access_token发生错误:  " + result.toJSONString());
             throw new TopIamException("获取access_token发生错误:  " + result.toJSONString());
@@ -146,20 +142,20 @@ public class WeChatScanCodeLoginAuthenticationFilter extends
         param.put(OAuth2ParameterNames.ACCESS_TOKEN,
             result.getString(OAuth2ParameterNames.ACCESS_TOKEN));
         param.put(OidcScopes.OPENID, result.getString(OidcScopes.OPENID));
-        result = JSON.parseObject(HttpClientUtils.get(USER_INFO, param));
+        result = JSON
+            .parseObject(HttpClientUtils.get(WeChatAuthenticationConstants.USER_INFO, param));
         if (result.containsKey(ERROR_CODE)) {
             logger.error("获取微信用户个人信息发生错误:  " + result.toJSONString());
             throw new TopIamException("获取微信用户个人信息发生错误:  " + result.toJSONString());
         }
         // 返回
         IdpUser idpUser = IdpUser.builder().openId(param.get(OidcScopes.OPENID)).build();
-        return attemptAuthentication(request, response, IdentityProviderType.WECHAT_SCAN_CODE,
-            providerId, idpUser);
+        return attemptAuthentication(request, response, WECHAT_QR, providerId, idpUser);
     }
 
     public static String getLoginUrl(String providerId) {
-        String url = ServerContextHelp.getPortalPublicBaseUrl()
-                     + WECHAT_SCAN_CODE.getLoginPathPrefix() + "/" + providerId;
+        String url = ServerContextHelp.getPortalPublicBaseUrl() + WECHAT_QR.getLoginPathPrefix()
+                     + "/" + providerId;
         return url.replaceAll("(?<!(http:|https:))/+", "/");
     }
 

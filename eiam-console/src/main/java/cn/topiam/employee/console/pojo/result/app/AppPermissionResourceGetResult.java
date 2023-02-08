@@ -17,16 +17,14 @@
  */
 package cn.topiam.employee.console.pojo.result.app;
 
+import cn.topiam.employee.common.enums.PermissionActionType;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
-
-import cn.topiam.employee.common.enums.PermissionActionType;
-
-import lombok.Data;
-
-import io.swagger.v3.oas.annotations.Hidden;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 获取资源

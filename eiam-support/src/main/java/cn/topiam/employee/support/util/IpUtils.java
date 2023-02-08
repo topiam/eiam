@@ -24,12 +24,15 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.google.common.net.InetAddresses;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * IpUtil
  *
  * @author TopIAM
  * Created by support@topiam.cn on  2019-01-10 19:50
  */
+@Slf4j
 public class IpUtils {
 
     private static final String UNKNOWN = "Unknown";

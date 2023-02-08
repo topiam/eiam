@@ -19,7 +19,7 @@ package cn.topiam.employee.authentication.common.modal;
 
 import java.util.Map;
 
-import cn.topiam.employee.common.enums.IdentityProviderType;
+import cn.topiam.employee.authentication.common.IdentityProviderType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -21,7 +21,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import cn.topiam.employee.common.enums.identityprovider.IdentitySourceProvider;
+import cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider;
 import cn.topiam.employee.identitysource.core.enums.IdentitySourceEventReceiveType;
 
 import lombok.AllArgsConstructor;

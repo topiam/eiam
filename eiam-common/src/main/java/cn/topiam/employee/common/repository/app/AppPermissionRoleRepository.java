@@ -17,17 +17,20 @@
  */
 package cn.topiam.employee.common.repository.app;
 
+import java.util.Optional;
+
+import org.jetbrains.annotations.NotNull;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.app.AppPermissionRoleEntity;
 import cn.topiam.employee.common.repository.authorization.RoleRepositoryCustomized;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
 
 /**
  * <p>
@@ -38,9 +41,8 @@ import cn.topiam.employee.common.repository.authorization.RoleRepositoryCustomiz
  * Created by support@topiam.cn on  2020-08-10
  */
 @Repository
-public interface AppPermissionRoleRepository extends CrudRepository<AppPermissionRoleEntity, Long>,
-                                             RoleRepositoryCustomized,
-                                             PagingAndSortingRepository<AppPermissionRoleEntity, Long>,
+public interface AppPermissionRoleRepository extends RoleRepositoryCustomized,
+                                             LogicDeleteRepository<AppPermissionRoleEntity, Long>,
                                              QuerydslPredicateExecutor<AppPermissionRoleEntity> {
     /**
      * 更新角色状态
@@ -52,4 +54,15 @@ public interface AppPermissionRoleRepository extends CrudRepository<AppPermissio
     @Modifying
     @Query(value = "update app_permission_role set is_enabled = ?2 where id_ = ?1", nativeQuery = true)
     void updateStatus(@Param(value = "id") String id, @Param(value = "enabled") Boolean enabled);
+
+    /**
+     * findByIdContainsDeleted
+     *
+     * @param id must not be {@literal null}.
+     * @return {@link AppPermissionRoleEntity}
+     */
+    @NotNull
+    @Cacheable
+    @Query(value = "SELECT * FROM app_permission_role WHERE id_ = :id", nativeQuery = true)
+    Optional<AppPermissionRoleEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") Long id);
 }

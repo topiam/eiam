@@ -17,15 +17,12 @@
  */
 package cn.topiam.employee.console.pojo.result.authentication;
 
-import java.io.Serializable;
-
-import cn.topiam.employee.common.enums.IdentityProviderType;
-
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serializable;
 
 /**
  * 身份源创建返回
@@ -42,11 +39,11 @@ public class IdentityProviderCreateResult implements Serializable {
      * ID
      */
     @Parameter(description = "ID")
-    private String               id;
+    private String id;
 
     /**
      * 提供商类型
      */
     @Parameter(description = "提供商类型")
-    private IdentityProviderType type;
+    private String type;
 }

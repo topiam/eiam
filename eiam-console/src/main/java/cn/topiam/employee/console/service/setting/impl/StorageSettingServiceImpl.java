@@ -17,8 +17,6 @@
  */
 package cn.topiam.employee.console.service.setting.impl;
 
-import org.springframework.stereotype.Service;
-
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
 import cn.topiam.employee.console.converter.setting.StorageSettingConverter;
@@ -26,6 +24,8 @@ import cn.topiam.employee.console.pojo.result.setting.StorageProviderConfigResul
 import cn.topiam.employee.console.pojo.save.setting.StorageConfigSaveParam;
 import cn.topiam.employee.console.service.setting.StorageSettingService;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
+import org.springframework.stereotype.Service;
+
 import static cn.topiam.employee.core.setting.constant.StorageProviderSettingConstants.STORAGE_BEAN_NAME;
 import static cn.topiam.employee.core.setting.constant.StorageProviderSettingConstants.STORAGE_PROVIDER_KEY;
 

@@ -42,6 +42,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.beust.jcommander.internal.Maps;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.topiam.employee.support.util.IpUtils;
 import cn.topiam.employee.support.web.useragent.UserAgent;
@@ -106,6 +107,7 @@ public class LogAspect implements Ordered {
             log.setIp(IpUtils.getIpAddr(request));
         }
         log.setMethod(signature.getDeclaringTypeName() + "." + signature.getName());
+        ObjectMapper mapper = new ObjectMapper();
         try {
             for (int i = 0; i < parameters.length; i++) {
                 if (args[i] instanceof BindingResult || args[i] instanceof ServletRequest
@@ -114,7 +116,7 @@ public class LogAspect implements Ordered {
                 }
                 parameterMap.put(parameters[i], args[i]);
             }
-            log.setParameter(replaceBlank(JSONObject.toJSONString(parameterMap)));
+            log.setParameter(replaceBlank(mapper.writeValueAsString(parameterMap)));
         } catch (Exception e) {
             log.setParameter(parameterMap);
         }
@@ -126,7 +128,7 @@ public class LogAspect implements Ordered {
                 returnValue = "";
             }
             try {
-                log.setResult(replaceBlank(JSONObject.toJSONString(returnValue)));
+                log.setResult(replaceBlank(mapper.writeValueAsString(returnValue)));
             } catch (Exception e) {
                 log.setResult(returnValue);
             }

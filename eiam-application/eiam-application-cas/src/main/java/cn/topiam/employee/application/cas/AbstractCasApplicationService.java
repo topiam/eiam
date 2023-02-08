@@ -22,10 +22,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.application.AbstractApplicationService;
-import cn.topiam.employee.application.CasApplicationService;
+import cn.topiam.employee.application.cas.model.CasSsoModel;
 import cn.topiam.employee.common.entity.app.po.AppCasConfigPO;
 import cn.topiam.employee.common.repository.app.*;
-import cn.topiam.employee.core.protocol.CasSsoModel;
 
 /**
  * CAS 应用配置
@@ -58,8 +57,8 @@ public abstract class AbstractCasApplicationService extends AbstractApplicationS
 
     @Override
     public CasSsoModel getSsoModel(Long appId) {
-        AppCasConfigPO appCasConfigPO = appCasConfigRepository.getByAppId(appId);
-        return CasSsoModel.builder().ssoCallbackUrl(appCasConfigPO.getSpCallbackUrl()).build();
+        AppCasConfigPO appCasConfigPo = appCasConfigRepository.getByAppId(appId);
+        return CasSsoModel.builder().clientServiceUrl(appCasConfigPo.getClientServiceUrl()).build();
     }
 
     /**

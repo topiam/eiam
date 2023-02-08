@@ -55,10 +55,11 @@ import cn.topiam.employee.support.util.HttpResponseUtils;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.CODE;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.RESPONSE_TYPE;
 
+import static cn.topiam.employee.authentication.common.IdentityProviderType.DINGTALK_QR;
+import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.PROVIDER_CODE;
 import static cn.topiam.employee.authentication.dingtalk.constant.DingTalkAuthenticationConstants.APP_ID;
 import static cn.topiam.employee.authentication.dingtalk.constant.DingTalkAuthenticationConstants.SCAN_CODE_URL_AUTHORIZE;
 import static cn.topiam.employee.authentication.dingtalk.filter.DingtalkScanCodeAuthenticationFilter.getLoginUrl;
-import static cn.topiam.employee.common.enums.IdentityProviderType.DINGTALK_SCAN_CODE;
 
 /**
  * 微信扫码登录请求重定向过滤器
@@ -73,15 +74,10 @@ public class DingtalkScanCodeAuthorizationRequestGetFilter extends OncePerReques
         .getLogger(DingtalkScanCodeAuthorizationRequestGetFilter.class);
 
     /**
-     * 提供商ID
-     */
-    public static final String                                               PROVIDER_ID                        = "providerId";
-
-    /**
      * AntPathRequestMatcher
      */
     public static final AntPathRequestMatcher                                DINGTALK_SCAN_CODE_REQUEST_MATCHER = new AntPathRequestMatcher(
-        DINGTALK_SCAN_CODE.getAuthorizationPathPrefix() + "/" + "{" + PROVIDER_ID + "}",
+        DINGTALK_QR.getAuthorizationPathPrefix() + "/" + "{" + PROVIDER_CODE + "}",
         HttpMethod.GET.name());
 
     /**
@@ -109,9 +105,9 @@ public class DingtalkScanCodeAuthorizationRequestGetFilter extends OncePerReques
         }
         Map<String, String> variables = matcher.getVariables();
         //校验身份提供商
-        String providerId = variables.get(PROVIDER_ID);
+        String providerCode = variables.get(PROVIDER_CODE);
         Optional<IdentityProviderEntity> optional = identityProviderRepository
-            .findByIdAndEnabledIsTrue(Long.valueOf(providerId));
+            .findByCodeAndEnabledIsTrue(providerCode);
         if (optional.isEmpty()) {
             logger.error("身份提供商不存在");
             throw new NullPointerException("身份提供商不存在");
@@ -131,7 +127,7 @@ public class DingtalkScanCodeAuthorizationRequestGetFilter extends OncePerReques
                 .clientId(config.getAppKey())
                 .scopes(Sets.newHashSet("snsapi_login"))
                 .authorizationUri(SCAN_CODE_URL_AUTHORIZE)
-                .redirectUri(getLoginUrl(providerId))
+                .redirectUri(getLoginUrl(optional.get().getCode()))
                 .state(DEFAULT_STATE_GENERATOR.generateKey())
                 .attributes(attributes);
         builder.parameters(parameters -> {

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -62,9 +63,13 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Integer updateAppStatus(Long id, Boolean enabled) {
-        StringBuilder builder = new StringBuilder("UPDATE app SET is_enabled=？where id_=?");
+        StringBuffer builder = new StringBuffer("UPDATE app SET is_enabled=？where id_=?");
         //@formatter:on
-        return jdbcTemplate.queryForObject(builder.toString(), Integer.class, enabled, id);
+        try {
+            return jdbcTemplate.queryForObject(builder.toString(), Integer.class, enabled, id);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     /**
@@ -90,7 +95,23 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
         Map<String, Object> paramMap = new HashMap<>(16);
         paramMap.put("subjectIds", paramList);
         //@formatter:off
-        StringBuilder builder = new StringBuilder("SELECT distinct app.* from app LEFT JOIN app_access_policy app_acce ON app.id_ = app_acce.app_id WHERE app_acce.subject_id in (:subjectIds) ");
+        StringBuilder builder = new StringBuilder("""
+                SELECT DISTINCT
+                	app.*
+                FROM
+                	app
+                	LEFT JOIN app_access_policy app_acce ON app.id_ = app_acce.app_id AND app_acce.is_deleted = '0'
+                WHERE
+                	app.is_enabled = 1
+                	AND app.is_deleted = '0'
+                	AND app_acce.subject_id IN (:subjectIds)
+                """);
+        //用户名
+        if (StringUtils.isNoneBlank(name)) {
+            builder.append(" AND app.name_ like '%").append(name).append("%'");
+        }
+        //或者是全员可访问的应用
+        builder.append(" OR app.authorization_type = '").append("all_access'");
         //用户名
         if (StringUtils.isNoneBlank(name)) {
             builder.append(" AND app.name_ like '%").append(name).append("%'");

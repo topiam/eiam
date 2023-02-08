@@ -36,7 +36,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cn.topiam.employee.common.enums.identityprovider.IdentitySourceProvider;
+import cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider;
 import cn.topiam.employee.common.util.RequestUtils;
 import cn.topiam.employee.identitysource.core.AbstractDefaultIdentitySource;
 import cn.topiam.employee.identitysource.core.client.IdentitySourceClient;
@@ -77,7 +77,7 @@ public class DingTalkIdentitySource extends AbstractDefaultIdentitySource<DingTa
     @Override
     public Object event(HttpServletRequest request, HttpServletResponse response) {
         LocalDateTime eventTime = LocalDateTime.now();
-        Map<String, String> params = RequestUtils.getParams(request);
+        Map<String, Object> params = RequestUtils.getParams(request);
         String json = RequestUtils.getBody(request);
         if (StringUtils.isNoneBlank(json)) {
             String encrypt = JSON.parseObject(json).getString(ENCRYPT);
@@ -99,13 +99,13 @@ public class DingTalkIdentitySource extends AbstractDefaultIdentitySource<DingTa
      * @param syncMap {@link  Map}
      * @return {@link  Map}
      */
-    private Object eventCallBack(LocalDateTime eventTime, Map<String, String> syncMap,
+    private Object eventCallBack(LocalDateTime eventTime, Map<String, Object> syncMap,
                                  String encrypt) {
         try {
             DingTalkConfig config = getConfig();
-            String msgSignature = syncMap.get(MSG_SIGNATURE);
-            String timeStamp = syncMap.get(TIMESTAMP);
-            String nonce = syncMap.get(NONCE);
+            String msgSignature = (String) syncMap.get(MSG_SIGNATURE);
+            String timeStamp = (String) syncMap.get(TIMESTAMP);
+            String nonce = (String) syncMap.get(NONCE);
             DingTalkEventCryptoUtils eventCryptoUtils = new DingTalkEventCryptoUtils(
                 config.getToken(), config.getAesKey(), config.getAppKey());
             String decryptMsg = eventCryptoUtils.getDecryptMsg(msgSignature, timeStamp, nonce,

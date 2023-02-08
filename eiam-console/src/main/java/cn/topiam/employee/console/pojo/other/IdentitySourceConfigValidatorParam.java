@@ -17,21 +17,16 @@
  */
 package cn.topiam.employee.console.pojo.other;
 
-import java.io.Serial;
-import java.io.Serializable;
-
-import javax.validation.constraints.NotNull;
-
-import org.springdoc.api.annotations.ParameterObject;
-
+import cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider;
 import com.alibaba.fastjson2.JSONObject;
-
-import cn.topiam.employee.common.enums.identityprovider.IdentitySourceProvider;
-
-import lombok.Data;
-
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import org.springdoc.api.annotations.ParameterObject;
+
+import javax.validation.constraints.NotNull;
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * 身份源配置验证器入参

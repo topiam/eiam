@@ -17,19 +17,17 @@
  */
 package cn.topiam.employee.console.pojo.query.analysis;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.Getter;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.Period;
 
-import javax.validation.constraints.NotNull;
-
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import lombok.Data;
-import lombok.Getter;
-
-import io.swagger.v3.oas.annotations.media.Schema;
 import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIME_FORMATTER_PATTERN;
 
 /**
@@ -67,11 +65,17 @@ public class AnalysisQuery implements Serializable {
 
     @Getter
     public enum Interval {
-
+                          /**
+                           * HOUR
+                           */
                           HOUR(DateHistogramInterval.HOUR, "HH时"),
-
+                          /**
+                           * DAY
+                           */
                           DAY(DateHistogramInterval.DAY, "dd日"),
-
+                          /**
+                           * MONTH
+                           */
                           MONTH(DateHistogramInterval.MONTH, "MM月");
 
         private final DateHistogramInterval type;

@@ -17,25 +17,6 @@
  */
 package cn.topiam.employee.console.service.setting.impl;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.Executor;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.querydsl.QPageRequest;
-import org.springframework.scheduling.annotation.AsyncConfigurer;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.session.Session;
-import org.springframework.session.security.SpringSessionBackedSessionRegistry;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
-
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
@@ -59,8 +40,26 @@ import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.util.BeanUtils;
-
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.scheduling.annotation.AsyncConfigurer;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.session.Session;
+import org.springframework.session.security.SpringSessionBackedSessionRegistry;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.util.Base64;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.Executor;
+
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
 
@@ -118,8 +117,9 @@ public class AdministratorServiceImpl implements AdministratorService {
         AdministratorEntity entity = administratorConverter
             .administratorCreateParamConvertToEntity(param);
         administratorRepository.save(entity);
-        AuditContext.setTarget(
-            Target.builder().id(entity.getId().toString()).type(TargetType.ADMINISTRATOR).build());
+        AuditContext.setTarget(Target.builder().id(entity.getId().toString())
+            .name(entity.getUsername()).type(TargetType.ADMINISTRATOR)
+            .typeName(TargetType.ADMINISTRATOR.getDesc()).build());
         return true;
     }
 
@@ -138,8 +138,9 @@ public class AdministratorServiceImpl implements AdministratorService {
         AuditContext.setContent(source.getUsername());
         BeanUtils.merge(source, target, LAST_MODIFIED_TIME, LAST_MODIFIED_BY);
         administratorRepository.save(target);
-        AuditContext.setTarget(
-            Target.builder().id(target.getId().toString()).type(TargetType.ADMINISTRATOR).build());
+        AuditContext.setTarget(Target.builder().id(target.getId().toString())
+            .name(target.getUsername()).type(TargetType.ADMINISTRATOR)
+            .typeName(TargetType.ADMINISTRATOR.getDesc()).build());
         return true;
     }
 
@@ -203,6 +204,13 @@ public class AdministratorServiceImpl implements AdministratorService {
      */
     @Override
     public Boolean resetAdministratorPassword(String id, String password) {
+        Optional<AdministratorEntity> optional = administratorRepository.findById(Long.valueOf(id));
+        //管理员不存在
+        if (optional.isEmpty()) {
+            AuditContext.setContent("删除失败，管理员不存在");
+            log.warn(AuditContext.getContent());
+            throw new TopIamException("操作失败");
+        }
         password = new String(
             Base64.getUrlDecoder().decode(password.getBytes(StandardCharsets.UTF_8)),
             StandardCharsets.UTF_8);
@@ -269,6 +277,19 @@ public class AdministratorServiceImpl implements AdministratorService {
         return result;
     }
 
+
+    /**
+     * 更新认证成功信息
+     *
+     * @param id {@link String}
+     * @param ip {@link String}
+     * @param loginTime {@link LocalDateTime}
+     */
+    public Boolean updateAuthSucceedInfo(String id, String ip, LocalDateTime loginTime) {
+        administratorRepository.updateAuthSucceedInfo(id,ip,loginTime);
+        return true;
+    }
+
     /**
      * 查询管理员详情
      *
@@ -278,7 +299,7 @@ public class AdministratorServiceImpl implements AdministratorService {
     @Override
     public AdministratorResult getAdministrator(String id) {
         AdministratorEntity entity = administratorRepository.findById(Long.valueOf(id))
-            .orElse(null);
+                .orElse(null);
         return administratorConverter.entityConvertToAdministratorDetailsResult(entity);
     }
 
@@ -291,7 +312,7 @@ public class AdministratorServiceImpl implements AdministratorService {
     /**
      * AdministratorConverter
      */
-    private final AdministratorConverter  administratorConverter;
+    private final AdministratorConverter administratorConverter;
 
     /**
      * AdministratorRepository
@@ -301,7 +322,7 @@ public class AdministratorServiceImpl implements AdministratorService {
     /**
      * PasswordEncoder
      */
-    private final PasswordEncoder         passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * SessionRegistry

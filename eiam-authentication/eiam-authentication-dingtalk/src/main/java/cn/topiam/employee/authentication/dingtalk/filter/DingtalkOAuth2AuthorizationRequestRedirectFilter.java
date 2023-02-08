@@ -51,9 +51,10 @@ import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.RESPONSE_TYPE;
 
+import static cn.topiam.employee.authentication.common.IdentityProviderType.DINGTALK_OAUTH;
+import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.PROVIDER_CODE;
 import static cn.topiam.employee.authentication.dingtalk.constant.DingTalkAuthenticationConstants.URL_AUTHORIZE;
 import static cn.topiam.employee.authentication.dingtalk.filter.DingtalkOauthAuthenticationFilter.getLoginUrl;
-import static cn.topiam.employee.common.enums.IdentityProviderType.DINGTALK_OAUTH;
 
 /**
  * 微信扫码登录请求重定向过滤器
@@ -68,15 +69,10 @@ public class DingtalkOAuth2AuthorizationRequestRedirectFilter extends OncePerReq
         .getLogger(DingtalkOAuth2AuthorizationRequestRedirectFilter.class);
 
     /**
-     * 提供商ID
-     */
-    public static final String                                               PROVIDER_ID                     = "providerId";
-
-    /**
      * AntPathRequestMatcher
      */
     public static final AntPathRequestMatcher                                DINGTALK_OAUTH2_REQUEST_MATCHER = new AntPathRequestMatcher(
-        DINGTALK_OAUTH.getAuthorizationPathPrefix() + "/" + "{" + PROVIDER_ID + "}",
+        DINGTALK_OAUTH.getAuthorizationPathPrefix() + "/" + "{" + PROVIDER_CODE + "}",
         HttpMethod.GET.name());
 
     /**
@@ -108,9 +104,9 @@ public class DingtalkOAuth2AuthorizationRequestRedirectFilter extends OncePerReq
             return;
         }
         Map<String, String> variables = matcher.getVariables();
-        String providerId = variables.get(PROVIDER_ID);
+        String providerCode = variables.get(PROVIDER_CODE);
         Optional<IdentityProviderEntity> optional = identityProviderRepository
-            .findByIdAndEnabledIsTrue(Long.valueOf(providerId));
+            .findByCodeAndEnabledIsTrue(providerCode);
         if (optional.isEmpty()) {
             throw new NullPointerException("未查询到身份提供商信息");
         }
@@ -121,7 +117,8 @@ public class DingtalkOAuth2AuthorizationRequestRedirectFilter extends OncePerReq
         //构建授权请求
         OAuth2AuthorizationRequest.Builder builder = OAuth2AuthorizationRequest.authorizationCode()
             .clientId(config.getAppKey()).authorizationUri(URL_AUTHORIZE)
-            .redirectUri(getLoginUrl(providerId)).state(DEFAULT_STATE_GENERATOR.generateKey());
+            .redirectUri(getLoginUrl(optional.get().getCode()))
+            .state(DEFAULT_STATE_GENERATOR.generateKey());
         builder.parameters(parameters -> {
             parameters.put(RESPONSE_TYPE, OAuth2ParameterNames.CODE);
             parameters.put("prompt", "consent");

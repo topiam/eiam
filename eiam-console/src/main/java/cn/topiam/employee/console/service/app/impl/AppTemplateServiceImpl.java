@@ -17,19 +17,17 @@
  */
 package cn.topiam.employee.console.service.app.impl;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-
 import cn.topiam.employee.application.ApplicationService;
 import cn.topiam.employee.application.ApplicationServiceLoader;
 import cn.topiam.employee.common.enums.app.AppType;
 import cn.topiam.employee.console.pojo.result.app.AppTemplateResult;
 import cn.topiam.employee.console.service.app.AppTemplateService;
-
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * ApplicationTemplateServiceImpl

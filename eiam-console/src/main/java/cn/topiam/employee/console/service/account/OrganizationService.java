@@ -17,8 +17,6 @@
  */
 package cn.topiam.employee.console.service.account;
 
-import java.util.List;
-
 import cn.topiam.employee.common.entity.account.OrganizationEntity;
 import cn.topiam.employee.common.enums.DataOrigin;
 import cn.topiam.employee.console.pojo.result.account.OrganizationChildResult;
@@ -27,6 +25,8 @@ import cn.topiam.employee.console.pojo.result.account.OrganizationRootResult;
 import cn.topiam.employee.console.pojo.result.account.OrganizationTreeResult;
 import cn.topiam.employee.console.pojo.save.account.OrganizationCreateParam;
 import cn.topiam.employee.console.pojo.update.account.OrganizationUpdateParam;
+
+import java.util.List;
 
 /**
  * <p>
@@ -146,4 +146,12 @@ public interface OrganizationService {
      * @return {@link Boolean}
      */
     Boolean batchDeleteOrg(String[] ids);
+
+    /**
+     * 查询组织成员数量
+     *
+     * @param orgId {@link  String}
+     * @return {@link  Long}
+     */
+    Long getOrgMemberCount(String orgId);
 }

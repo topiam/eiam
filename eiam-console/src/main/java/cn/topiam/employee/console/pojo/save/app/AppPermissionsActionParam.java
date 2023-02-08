@@ -17,16 +17,14 @@
  */
 package cn.topiam.employee.console.pojo.save.app;
 
-import java.io.Serial;
-import java.io.Serializable;
+import cn.topiam.employee.common.enums.PermissionActionType;
+import lombok.Data;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-
-import cn.topiam.employee.common.enums.PermissionActionType;
-
-import lombok.Data;
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * AppPermissionsActionParam

@@ -17,22 +17,18 @@
  */
 package cn.topiam.employee.console.pojo.save.identitysource;
 
-import java.io.Serial;
-import java.io.Serializable;
+import cn.topiam.employee.common.entity.identitysource.config.JobConfig;
+import cn.topiam.employee.common.entity.identitysource.config.StrategyConfig;
+import com.alibaba.fastjson2.JSONObject;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-
-import com.alibaba.fastjson2.JSONObject;
-
-import cn.topiam.employee.common.entity.identitysource.config.JobConfig;
-import cn.topiam.employee.common.entity.identitysource.config.StrategyConfig;
-
-import lombok.Data;
-
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * 身份源保存配置入参

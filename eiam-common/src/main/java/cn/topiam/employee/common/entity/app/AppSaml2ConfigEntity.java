@@ -26,20 +26,21 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.*;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 
 import cn.topiam.employee.common.enums.app.*;
-import cn.topiam.employee.support.repository.domain.BaseEntity;
+import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
 
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
 /**
  * APP SAML 配置
@@ -53,8 +54,11 @@ import lombok.experimental.Accessors;
 @Entity
 @Accessors(chain = true)
 @Table(name = "app_saml2_config")
+@SQLDelete(sql = "update app_saml2_config set " + SOFT_DELETE_SET + " where id_ = ?")
+@SQLDeleteAll(sql = "update app_saml2_config set " + SOFT_DELETE_SET + " where id_ = ?")
 @TypeDef(name = "json", typeClass = JsonStringType.class)
-public class AppSaml2ConfigEntity extends BaseEntity<Long> {
+@Where(clause = SOFT_DELETE_WHERE)
+public class AppSaml2ConfigEntity extends LogicDeleteEntity<Long> {
     /**
      * APP ID
      */

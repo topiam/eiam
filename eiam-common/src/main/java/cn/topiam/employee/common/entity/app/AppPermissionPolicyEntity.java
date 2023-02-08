@@ -21,15 +21,21 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLDeleteAll;
+import org.hibernate.annotations.Where;
+
 import cn.topiam.employee.common.enums.PolicyEffect;
 import cn.topiam.employee.common.enums.PolicyObjectType;
 import cn.topiam.employee.common.enums.PolicySubjectType;
-import cn.topiam.employee.support.repository.domain.BaseEntity;
+import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
 /**
  * 应用策略
@@ -42,8 +48,11 @@ import lombok.experimental.Accessors;
 @ToString
 @Entity
 @Accessors(chain = true)
-@Table(name = "`app_permission_policy`")
-public class AppPermissionPolicyEntity extends BaseEntity<Long> {
+@Table(name = "app_permission_policy")
+@SQLDelete(sql = "update app_permission_policy set " + SOFT_DELETE_SET + " where id_ = ?")
+@SQLDeleteAll(sql = "update app_permission_policy set " + SOFT_DELETE_SET + " where id_ = ?")
+@Where(clause = SOFT_DELETE_WHERE)
+public class AppPermissionPolicyEntity extends LogicDeleteEntity<Long> {
 
     /**
      * 应用id

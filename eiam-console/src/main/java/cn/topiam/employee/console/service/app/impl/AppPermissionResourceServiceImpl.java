@@ -17,20 +17,6 @@
  */
 package cn.topiam.employee.console.service.app.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.querydsl.QPageRequest;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
-
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
@@ -54,8 +40,20 @@ import cn.topiam.employee.support.exception.BadParamsException;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.util.BeanUtils;
-
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
 
@@ -231,8 +229,7 @@ public class AppPermissionResourceServiceImpl implements AppPermissionResourceSe
             if (StringUtils.equals(entity.getName(), value)) {
                 return true;
             }
-            BooleanExpression eq = role.name.eq(value);
-            eq.and(role.appId.eq(appId));
+            BooleanExpression eq = role.name.eq(value).and(role.appId.eq(appId));
             result = !appResourceRepository.exists(eq);
         }
         //资源编码
@@ -240,8 +237,7 @@ public class AppPermissionResourceServiceImpl implements AppPermissionResourceSe
             if (StringUtils.equals(entity.getCode(), value)) {
                 return true;
             }
-            BooleanExpression eq = role.code.eq(value);
-            eq.and(role.appId.eq(appId));
+            BooleanExpression eq = role.code.eq(value).and(role.appId.eq(appId));
             result = !appResourceRepository.exists(eq);
         }
         return result;

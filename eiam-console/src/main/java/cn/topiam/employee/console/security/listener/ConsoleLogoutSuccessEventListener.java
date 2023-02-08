@@ -17,20 +17,19 @@
  */
 package cn.topiam.employee.console.security.listener;
 
-import java.util.List;
-
-import org.springframework.context.ApplicationListener;
-import org.springframework.lang.NonNull;
-import org.springframework.security.authentication.event.LogoutSuccessEvent;
-
-import com.google.common.collect.Lists;
-
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.EventStatus;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.audit.event.AuditEventPublish;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
-import static cn.topiam.employee.audit.enums.EventType.*;
+import com.google.common.collect.Lists;
+import org.springframework.context.ApplicationListener;
+import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.event.LogoutSuccessEvent;
+
+import java.util.List;
+
+import static cn.topiam.employee.audit.enums.EventType.LOGOUT_CONSOLE;
 
 /**
  * 退出成功

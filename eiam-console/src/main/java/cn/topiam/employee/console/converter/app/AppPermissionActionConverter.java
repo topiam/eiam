@@ -17,23 +17,21 @@
  */
 package cn.topiam.employee.console.converter.app;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.springframework.util.ObjectUtils;
-
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
-
 import cn.topiam.employee.common.entity.app.AppPermissionActionEntity;
 import cn.topiam.employee.common.entity.app.AppPermissionResourceEntity;
 import cn.topiam.employee.common.entity.app.QAppPermissionResourceEntity;
 import cn.topiam.employee.common.enums.PermissionActionType;
 import cn.topiam.employee.console.pojo.query.app.AppPermissionActionListQuery;
 import cn.topiam.employee.console.pojo.result.app.AppPermissionActionListResult;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
+import org.apache.commons.lang3.StringUtils;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.util.ObjectUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 权限映射
@@ -51,7 +49,8 @@ public interface AppPermissionActionConverter {
      */
     default Predicate appPermissionActionListQueryConvertToPredicate(AppPermissionActionListQuery query) {
         QAppPermissionResourceEntity resource = QAppPermissionResourceEntity.appPermissionResourceEntity;
-        Predicate predicate = resource.isNotNull();
+        Predicate predicate = ExpressionUtils.and(resource.isNotNull(),
+            resource.isDeleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         // 资源名称

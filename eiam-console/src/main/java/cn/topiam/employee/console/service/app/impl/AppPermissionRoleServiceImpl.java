@@ -17,19 +17,6 @@
  */
 package cn.topiam.employee.console.service.app.impl;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.querydsl.QPageRequest;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
-
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
@@ -49,8 +36,19 @@ import cn.topiam.employee.console.service.app.AppPermissionRoleService;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.util.BeanUtils;
-
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
 

@@ -39,7 +39,7 @@ import com.google.common.collect.Sets;
 
 import cn.topiam.employee.application.exception.AppNotExistException;
 import cn.topiam.employee.application.oidc.converter.AppOidcStandardConfigConverter;
-import cn.topiam.employee.application.oidc.model.AppOidcStandardSaveConfigParam;
+import cn.topiam.employee.application.oidc.pojo.AppOidcStandardSaveConfigParam;
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.AppOidcConfigEntity;

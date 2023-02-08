@@ -29,7 +29,7 @@ public final class StorageConstants {
     /**
      * 存储API路径
      */
-    public static final String STORAGE_PATH       = EiamConstants.API_PATH + "/storage";
+    public final static String STORAGE_PATH       = EiamConstants.API_PATH + "/storage";
 
     /**
      * 文件存储

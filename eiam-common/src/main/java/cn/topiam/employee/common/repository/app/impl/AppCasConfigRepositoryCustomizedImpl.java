@@ -19,6 +19,7 @@ package cn.topiam.employee.common.repository.app.impl;
 
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -50,17 +51,25 @@ public class AppCasConfigRepositoryCustomizedImpl implements AppCasConfigReposit
     @Override
     @Cacheable(key = "#p0", unless = "#result==null")
     public AppCasConfigPO getByAppId(Long appId) {
-        String sql = "select acc.*,app.init_login_url,app.init_login_type,app.authorization_type,app.template_,app.code_,client_id,client_secret from app left join app_cas_config acc on app.id_ = acc.app_id where 1=1"
+        String sql = "select acc.*,app.init_login_url,app.init_login_type,app.authorization_type,app.template_,app.code_,client_id,client_secret from app left join app_cas_config acc on app.id_ = acc.app_id where acc.is_deleted=0"
                      + " AND app_id = " + appId;
-        return jdbcTemplate.queryForObject(sql, new AppCasConfigPoMapper());
+        try {
+            return jdbcTemplate.queryForObject(sql, new AppCasConfigPoMapper());
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     @Override
     @Cacheable(key = "#p0", unless = "#result==null")
     public AppCasConfigPO findByAppCode(String appCode) {
-        String sql = "select acc.*,app.init_login_url,app.init_login_type,app.authorization_type,app.template_,app.code_,client_id,client_secret from app left join app_cas_config acc on app.id_ = acc.app_id where 1=1"
+        String sql = "select acc.*,app.init_login_url,app.init_login_type,app.authorization_type,app.template_,app.code_,client_id,client_secret from app left join app_cas_config acc on app.id_ = acc.app_id where acc.is_deleted=0"
                      + " AND code_ = " + "'" + appCode + "'";
-        return jdbcTemplate.queryForObject(sql, new AppCasConfigPoMapper());
+        try {
+            return jdbcTemplate.queryForObject(sql, new AppCasConfigPoMapper());
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     /**

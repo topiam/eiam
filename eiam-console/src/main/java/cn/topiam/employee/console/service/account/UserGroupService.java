@@ -17,8 +17,6 @@
  */
 package cn.topiam.employee.console.service.account;
 
-import java.util.List;
-
 import cn.topiam.employee.common.entity.account.UserGroupEntity;
 import cn.topiam.employee.common.entity.account.query.UserGroupMemberListQuery;
 import cn.topiam.employee.console.pojo.query.account.UserGroupListQuery;
@@ -28,6 +26,8 @@ import cn.topiam.employee.console.pojo.save.account.UserGroupCreateParam;
 import cn.topiam.employee.console.pojo.update.account.UserGroupUpdateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
+
+import java.util.List;
 
 /**
  * 用户组service
@@ -113,4 +113,12 @@ public interface UserGroupService {
      * @return {@link Boolean}
      */
     Boolean batchRemoveMember(String id, List<String> userIds);
+
+    /**
+     * 查询用户组成员数量
+     *
+     * @param groupId {@link  String}
+     * @return {@link  Long}
+     */
+    Long getUserGroupMemberCount(String groupId);
 }

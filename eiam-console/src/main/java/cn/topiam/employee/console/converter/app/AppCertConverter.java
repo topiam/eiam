@@ -17,20 +17,18 @@
  */
 package cn.topiam.employee.console.converter.app;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import org.apache.commons.lang3.StringUtils;
-import org.mapstruct.Mapper;
-
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
-
 import cn.topiam.employee.common.entity.app.AppCertEntity;
 import cn.topiam.employee.common.entity.app.QAppCertEntity;
 import cn.topiam.employee.console.pojo.query.app.AppCertQuery;
 import cn.topiam.employee.console.pojo.result.app.AppCertListResult;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
+import org.apache.commons.lang3.StringUtils;
+import org.mapstruct.Mapper;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * 应用证书Converter
@@ -48,7 +46,8 @@ public interface AppCertConverter {
      */
     default Predicate queryAppCertListParamConvertToPredicate(AppCertQuery query) {
         QAppCertEntity cert = QAppCertEntity.appCertEntity;
-        Predicate predicate = cert.isNotNull();
+        Predicate predicate = ExpressionUtils.and(cert.isNotNull(),
+            cert.isDeleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = StringUtils.isBlank(query.getAppId()) ? predicate : ExpressionUtils.and(predicate, cert.appId.eq(Long.valueOf(query.getAppId())));

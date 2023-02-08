@@ -17,15 +17,12 @@
  */
 package cn.topiam.employee.console.pojo.save.app;
 
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-
 import cn.topiam.employee.common.enums.PolicySubjectType;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * 应用访问授权策略添加参数

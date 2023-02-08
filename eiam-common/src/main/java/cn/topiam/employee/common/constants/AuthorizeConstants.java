@@ -30,27 +30,18 @@ public final class AuthorizeConstants {
      * LOGIN
      */
     public static final String LOGIN_PATH                = EiamConstants.API_PATH + "/login";
-    public static final String AUTHORIZE_PATH            = EiamConstants.API_PATH + "/authorize";
+    public final static String AUTHORIZE_PATH            = EiamConstants.API_PATH + "/authorize";
     public static final String AUTHORIZATION_REQUEST_URI = EiamConstants.API_PATH
                                                            + "/authorization";
     /**
      * form 表单登录
      */
     public static final String FORM_LOGIN                = LOGIN_PATH;
+
     /**
      * sms login 路径
      */
     public static final String SMS_LOGIN                 = LOGIN_PATH + "/sms";
-
-    /**
-     * maf 验证
-     */
-    public static final String MFA_VALIDATE              = LOGIN_PATH + "/mfa/validate";
-
-    /**
-     * mfa 登录提供者
-     */
-    public static final String LOGIN_MFA_FACTORS         = LOGIN_PATH + "/mfa/factors";
 
     /**
      * 登录配置

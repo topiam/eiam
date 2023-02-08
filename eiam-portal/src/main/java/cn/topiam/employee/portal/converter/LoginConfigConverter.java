@@ -17,13 +17,12 @@
  */
 package cn.topiam.employee.portal.converter;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.mapstruct.Mapper;
-
 import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
 import cn.topiam.employee.portal.pojo.result.LoginConfigResult;
+import org.mapstruct.Mapper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * AuthenticationConverter
@@ -44,7 +43,7 @@ public interface LoginConfigConverter {
         List<LoginConfigResult.Idps> result = new ArrayList<>();
         for (IdentityProviderEntity entity : list) {
             LoginConfigResult.Idps idp = new LoginConfigResult.Idps();
-            idp.setId(String.valueOf(entity.getId()));
+            idp.setCode(entity.getCode());
             idp.setName(entity.getName());
             idp.setType(entity.getType());
             idp.setCategory(entity.getCategory());

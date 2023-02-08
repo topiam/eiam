@@ -68,7 +68,7 @@ public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
     @Override
     public Page<UserPO> getUserList(UserListQuery query, Pageable pageable) {
         //@formatter:off
-        StringBuilder builder = new StringBuilder("SELECT `user`.id_, `user`.username_,`user`.password_, `user`.email_, `user`.phone_,`user`.phone_area_code, `user`.full_name ,`user`.nick_name, `user`.avatar_ , `user`.status_, `user`.data_origin, `user`.email_verified, `user`.phone_verified, `user`.shared_secret, `user`.totp_bind , `user`.auth_total, `user`.last_auth_ip, `user`.last_auth_time, `user`.expand_, `user`.external_id , `user`.expire_date,`user`.create_by, `user`.create_time, `user`.update_by , `user`.update_time, `user`.remark_, group_concat(organization_.display_path) AS org_display_path FROM `user` INNER JOIN `organization_member` ON (`user`.id_ = organization_member.user_id) INNER JOIN `organization` organization_ ON (organization_.id_ = organization_member.org_id) WHERE 1=1");
+        StringBuilder builder = new StringBuilder("SELECT `user`.id_, `user`.username_,`user`.password_, `user`.email_, `user`.phone_,`user`.phone_area_code, `user`.full_name ,`user`.nick_name, `user`.avatar_ , `user`.status_, `user`.data_origin, `user`.email_verified, `user`.phone_verified, `user`.shared_secret, `user`.totp_bind , `user`.auth_total, `user`.last_auth_ip, `user`.last_auth_time, `user`.expand_, `user`.external_id , `user`.expire_date,`user`.create_by, `user`.create_time, `user`.update_by , `user`.update_time, `user`.remark_, group_concat(organization_.display_path) AS org_display_path FROM `user` INNER JOIN `organization_member` ON (`user`.id_ = organization_member.user_id) INNER JOIN `organization` organization_ ON (organization_.id_ = organization_member.org_id) WHERE `user`.is_deleted = 0");
         //组织条件
         if (StringUtils.isNoneBlank(query.getOrganizationId())) {
             //包含子节点
@@ -118,7 +118,7 @@ public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
     }
 
     /**
-     * 获取用户组成员列表
+     * 获取用户组不存在成员列表
      *
      * @param query    {@link UserListNotInGroupQuery}
      * @param pageable {@link Pageable}
@@ -127,48 +127,52 @@ public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
     @Override
     public Page<UserPO> getUserListNotInGroupId(UserListNotInGroupQuery query, Pageable pageable) {
         //@formatter:off
-        StringBuilder builder = new StringBuilder("SELECT\n" +
-                "                \t`user`.id_,\n" +
-                "                \t`user`.username_,\n" +
-                "                \t`user`.password_,\n" +
-                "                \t`user`.email_,\n" +
-                "                \t`user`.phone_,\n" +
-                "                \t`user`.phone_area_code,\n" +
-                "                \t`user`.full_name,\n" +
-                "                \t`user`.nick_name,\n" +
-                "                \t`user`.avatar_,\n" +
-                "                \t`user`.status_,\n" +
-                "                \t`user`.data_origin,\n" +
-                "                \t`user`.email_verified,\n" +
-                "                \t`user`.phone_verified,\n" +
-                "                \t`user`.shared_secret,\n" +
-                "                \t`user`.totp_bind,\n" +
-                "                \t`user`.auth_total,\n" +
-                "                \t`user`.last_auth_ip,\n" +
-                "                \t`user`.last_auth_time,\n" +
-                "                \t`user`.expand_,\n" +
-                "                \t`user`.external_id,\n" +
-                "                \t`user`.expire_date,\n" +
-                "                \t`user`.create_by,\n" +
-                "                \t`user`.create_time,\n" +
-                "                \t`user`.update_by,\n" +
-                "                \t`user`.update_time,\n" +
-                "                \t`user`.remark_,\n" +
-                "                \tgroup_concat( organization_.display_path ) AS org_display_path \n" +
-                "                FROM\n" +
-                "                `user` \n" +
-                "                LEFT JOIN `organization_member` ON ( `user`.id_ = organization_member.user_id )\n" +
-                "                LEFT JOIN `organization` organization_ ON ( organization_.id_ = organization_member.org_id ) \n" +
-                "                WHERE\n" +
-                "                \tuser.id_ NOT IN (\n" +
-                "                \tSELECT\n" +
-                "                \t\tu.id_ \n" +
-                "                \tFROM\n" +
-                "                \t\tuser u\n" +
-                "                \t\tINNER JOIN user_group_member ugm ON ugm.user_id = u.id_\n" +
-                "                \t\tINNER JOIN user_group ug ON ug.id_ = ugm.group_id \n" +
-                "                \tWHERE\n" +
-                "                \tug.id_ = '%s' AND ugm.group_id = '%s')".formatted(query.getId(), query.getId()));
+        StringBuilder builder = new StringBuilder(
+            """
+                    SELECT
+                                    	`user`.id_,
+                                    	`user`.username_,
+                                    	`user`.password_,
+                                    	`user`.email_,
+                                    	`user`.phone_,
+                                    	`user`.phone_area_code,
+                                    	`user`.full_name,
+                                    	`user`.nick_name,
+                                    	`user`.avatar_,
+                                    	`user`.status_,
+                                    	`user`.data_origin,
+                                    	`user`.email_verified,
+                                    	`user`.phone_verified,
+                                    	`user`.shared_secret,
+                                    	`user`.totp_bind,
+                                    	`user`.auth_total,
+                                    	`user`.last_auth_ip,
+                                    	`user`.last_auth_time,
+                                    	`user`.expand_,
+                                    	`user`.external_id,
+                                    	`user`.expire_date,
+                                    	`user`.create_by,
+                                    	`user`.create_time,
+                                    	`user`.update_by,
+                                    	`user`.update_time,
+                                    	`user`.remark_,
+                                    	group_concat( organization_.display_path ) AS org_display_path
+                                    FROM `user`
+                                    LEFT JOIN `organization_member` ON ( `user`.id_ = organization_member.user_id AND organization_member.is_deleted = '0' )
+                                    LEFT JOIN `organization` organization_ ON ( organization_.id_ = organization_member.org_id AND organization_.is_deleted = '0' )
+                                    WHERE
+                                        user.is_deleted = 0 AND
+                                    	user.id_ NOT IN (
+                                    	SELECT
+                                    		u.id_
+                                    	FROM
+                                    		user u
+                                    		INNER JOIN user_group_member ugm ON ugm.user_id = u.id_
+                                    		INNER JOIN user_group ug ON ug.id_ = ugm.group_id
+                                    	WHERE
+                                    	u.is_deleted = '0'
+                                    	AND ug.id_ = '%s' AND ugm.group_id = '%s')
+                    """.formatted(query.getId(), query.getId()));
         if (StringUtils.isNoneBlank(query.getKeyword())) {
             builder.append(" AND  user.username_ LIKE '%").append(query.getKeyword()).append("%'");
             builder.append(" OR  user.full_name LIKE '%").append(query.getKeyword()).append("%'");

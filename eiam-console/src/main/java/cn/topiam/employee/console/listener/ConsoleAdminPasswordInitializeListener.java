@@ -17,13 +17,10 @@
  */
 package cn.topiam.employee.console.listener;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-
+import cn.topiam.employee.common.entity.setting.AdministratorEntity;
+import cn.topiam.employee.common.enums.UserStatus;
+import cn.topiam.employee.common.repository.setting.AdministratorRepository;
+import cn.topiam.employee.support.trace.TraceUtils;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
@@ -37,10 +34,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.JdkIdGenerator;
 
-import cn.topiam.employee.common.entity.setting.AdministratorEntity;
-import cn.topiam.employee.common.enums.UserStatus;
-import cn.topiam.employee.common.repository.setting.AdministratorRepository;
-import cn.topiam.employee.support.trace.TraceUtils;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
 import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_ADMIN_USERNAME;
 import static cn.topiam.employee.support.lock.LockAspect.getTopiamLockKeyPrefix;
 import static cn.topiam.employee.support.util.CreateFileUtil.createFile;

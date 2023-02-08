@@ -17,17 +17,17 @@
  */
 package cn.topiam.employee.console.converter.setting;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.mapstruct.Mapper;
-
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.console.pojo.result.setting.PasswordPolicyConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.PasswordPolicySaveParam;
 import cn.topiam.employee.core.security.password.enums.PasswordComplexityRule;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.mapstruct.Mapper;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
 import static cn.topiam.employee.core.setting.constant.PasswordPolicySettingConstants.*;
 
 /**

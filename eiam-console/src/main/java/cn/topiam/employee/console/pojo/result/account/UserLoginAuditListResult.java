@@ -17,14 +17,12 @@
  */
 package cn.topiam.employee.console.pojo.result.account;
 
-import java.time.LocalDateTime;
-
 import cn.topiam.employee.audit.enums.EventStatus;
-
-import lombok.Data;
-
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+import java.time.LocalDateTime;
 
 /**
  * 用户登录日志返回结果

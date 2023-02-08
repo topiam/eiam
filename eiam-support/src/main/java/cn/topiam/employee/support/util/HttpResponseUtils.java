@@ -30,6 +30,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.alibaba.fastjson2.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * HttpResponseUtils
@@ -38,7 +39,9 @@ import com.alibaba.fastjson2.JSON;
  * Created by support@topiam.cn on 2020/9/3 21:25
  */
 public class HttpResponseUtils {
-    private static final String NULL = "null";
+    private static final String       NULL          = "null";
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     /**
      * 将数据刷新写回web端
@@ -79,7 +82,9 @@ public class HttpResponseUtils {
             response.setStatus(status);
             PrintWriter writer = response.getWriter();
             if (ObjectUtils.isNotEmpty(data)) {
-                writer.write(JSON.toJSONString(data));
+                String value = OBJECT_MAPPER.writeValueAsString(data);
+                // 指定序列化输入的类型
+                writer.write(value);
             } else {
                 writer.write("");
             }

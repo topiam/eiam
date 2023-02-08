@@ -17,17 +17,6 @@
  */
 package cn.topiam.employee.console.service.app.impl;
 
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Optional;
-
-import org.springframework.data.querydsl.QPageRequest;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Predicate;
-
 import cn.topiam.employee.application.ApplicationService;
 import cn.topiam.employee.application.ApplicationServiceLoader;
 import cn.topiam.employee.application.exception.AppNotExistException;
@@ -53,9 +42,18 @@ import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.util.BeanUtils;
-
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Optional;
+
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
 
@@ -175,6 +173,12 @@ public class AppServiceImpl implements AppService {
      */
     @Override
     public Boolean enableApp(String id) {
+        Optional<AppEntity> optional = appRepository.findById(Long.valueOf(id));
+        if (optional.isEmpty()) {
+            AuditContext.setContent("操作失败，应用不存在");
+            log.warn(AuditContext.getContent());
+            throw new TopIamException(AuditContext.getContent());
+        }
         Integer count = appRepository.updateAppStatus(Long.valueOf(id), Boolean.TRUE);
         AuditContext.setTarget(Target.builder().id(id).type(TargetType.APPLICATION).build());
         return count > 0;
@@ -188,6 +192,12 @@ public class AppServiceImpl implements AppService {
      */
     @Override
     public Boolean disableApp(String id) {
+        Optional<AppEntity> optional = appRepository.findById(Long.valueOf(id));
+        if (optional.isEmpty()) {
+            AuditContext.setContent("操作失败，应用不存在");
+            log.warn(AuditContext.getContent());
+            throw new TopIamException(AuditContext.getContent());
+        }
         Integer count = appRepository.updateAppStatus(Long.valueOf(id), Boolean.FALSE);
         AuditContext.setTarget(Target.builder().id(id).type(TargetType.APPLICATION).build());
         return count > 0;

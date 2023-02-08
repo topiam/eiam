@@ -17,13 +17,12 @@
  */
 package cn.topiam.employee.console.pojo.save.identitysource;
 
-import java.io.Serializable;
-
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serializable;
 
 /**
  * 身份源创建返回结果

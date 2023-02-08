@@ -17,18 +17,6 @@
  */
 package cn.topiam.employee.console.converter.identitysource;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import org.apache.commons.lang3.StringUtils;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.springframework.util.CollectionUtils;
-
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
-
 import cn.topiam.employee.common.entity.account.UserGroupEntity;
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceSyncHistoryEntity;
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceSyncRecordEntity;
@@ -40,6 +28,16 @@ import cn.topiam.employee.console.pojo.result.account.UserGroupListResult;
 import cn.topiam.employee.console.pojo.result.identitysource.IdentitySourceSyncHistoryListResult;
 import cn.topiam.employee.console.pojo.result.identitysource.IdentitySourceSyncRecordListResult;
 import cn.topiam.employee.support.repository.page.domain.Page;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
+import org.apache.commons.lang3.StringUtils;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * 身份源转换器
@@ -58,7 +56,8 @@ public interface IdentitySourceSyncConverter {
      */
     default Predicate queryIdentitySourceSyncHistoryListQueryConvertToPredicate(IdentitySourceSyncHistoryListQuery query) {
         QIdentitySourceSyncHistoryEntity queryEntity = QIdentitySourceSyncHistoryEntity.identitySourceSyncHistoryEntity;
-        Predicate predicate = queryEntity.isNotNull();
+        Predicate predicate = ExpressionUtils.and(queryEntity.isNotNull(),
+            queryEntity.isDeleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = StringUtils.isBlank(query.getIdentitySourceId()) ? predicate : ExpressionUtils.and(predicate, queryEntity.identitySourceId.eq(Long.valueOf(query.getIdentitySourceId())));
@@ -156,7 +155,8 @@ public interface IdentitySourceSyncConverter {
      */
     default Predicate queryIdentitySourceSyncRecordListQueryConvertToPredicate(IdentitySourceSyncRecordListQuery query) {
         QIdentitySourceSyncRecordEntity entity = QIdentitySourceSyncRecordEntity.identitySourceSyncRecordEntity;
-        Predicate predicate = entity.isNotNull();
+        Predicate predicate = ExpressionUtils.and(entity.isNotNull(),
+            entity.isDeleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = StringUtils.isBlank(query.getSyncHistoryId()) ? predicate : ExpressionUtils.and(predicate, entity.syncHistoryId.eq(Long.valueOf(query.getSyncHistoryId())));

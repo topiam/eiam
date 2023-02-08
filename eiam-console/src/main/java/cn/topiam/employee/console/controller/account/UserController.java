@@ -17,24 +17,13 @@
  */
 package cn.topiam.employee.console.controller.account;
 
-import java.io.Serializable;
-import java.util.List;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
 import cn.topiam.employee.audit.annotation.Audit;
 import cn.topiam.employee.audit.enums.EventType;
 import cn.topiam.employee.common.entity.account.query.UserListNotInGroupQuery;
 import cn.topiam.employee.common.entity.account.query.UserListQuery;
-import cn.topiam.employee.common.enums.*;
+import cn.topiam.employee.common.enums.CheckValidityType;
+import cn.topiam.employee.common.enums.MessageNoticeChannel;
+import cn.topiam.employee.common.enums.UserStatus;
 import cn.topiam.employee.console.pojo.result.account.UserListResult;
 import cn.topiam.employee.console.pojo.result.account.UserLoginAuditListResult;
 import cn.topiam.employee.console.pojo.result.account.UserResult;
@@ -50,13 +39,23 @@ import cn.topiam.employee.support.preview.Preview;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.result.ApiRestResult;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.util.List;
+
 import static cn.topiam.employee.common.constants.AccountConstants.USER_PATH;
 
 /**

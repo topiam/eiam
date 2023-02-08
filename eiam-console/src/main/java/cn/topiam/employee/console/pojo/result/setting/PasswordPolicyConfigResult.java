@@ -17,13 +17,11 @@
  */
 package cn.topiam.employee.console.pojo.result.setting;
 
-import java.io.Serializable;
-
 import cn.topiam.employee.core.security.password.enums.PasswordComplexityRule;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serializable;
 
 /**
  * 设置密码策略配置结果

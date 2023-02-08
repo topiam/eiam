@@ -19,7 +19,6 @@ package cn.topiam.employee.common.repository.account;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -28,6 +27,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.account.UserGroupMemberEntity;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 
 /**
  * 用户组成员
@@ -36,7 +37,8 @@ import cn.topiam.employee.common.entity.account.UserGroupMemberEntity;
  * Created by support@topiam.cn on  2021/11/30 03:04
  */
 @Repository
-public interface UserGroupMemberRepository extends JpaRepository<UserGroupMemberEntity, Long>,
+public interface UserGroupMemberRepository extends
+                                           LogicDeleteRepository<UserGroupMemberEntity, Long>,
                                            QuerydslPredicateExecutor<UserGroupMemberEntity>,
                                            UserGroupMemberRepositoryCustomized {
 
@@ -46,7 +48,10 @@ public interface UserGroupMemberRepository extends JpaRepository<UserGroupMember
      * @param groupId {@link String}
      * @param userId  {@link String}
      */
+    @Modifying
     @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE user_group_member SET " + SOFT_DELETE_SET
+                   + " WHERE user_id = :userId and group_id = :groupId", nativeQuery = true)
     void deleteByGroupIdAndUserId(@Param("groupId") Long groupId, @Param("userId") Long userId);
 
     /**
@@ -64,7 +69,9 @@ public interface UserGroupMemberRepository extends JpaRepository<UserGroupMember
      * @param userIds {@link String}
      */
     @Modifying
-    @Query(value = "DELETE  FROM user_group_member WHERE user_id IN :userIds", nativeQuery = true)
+    @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE user_group_member SET " + SOFT_DELETE_SET
+                   + " WHERE user_id IN (:userIds)", nativeQuery = true)
     void deleteAllByUserId(@Param("userIds") Iterable<Long> userIds);
 
     /**
@@ -73,6 +80,8 @@ public interface UserGroupMemberRepository extends JpaRepository<UserGroupMember
      * @param id {@link Long}
      */
     @Modifying
-    @Query(value = "DELETE  FROM user_group_member WHERE user_id = :id", nativeQuery = true)
+    @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE user_group_member SET " + SOFT_DELETE_SET
+                   + " WHERE user_id = :id", nativeQuery = true)
     void deleteByUserId(@Param("id") Long id);
 }

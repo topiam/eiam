@@ -23,12 +23,13 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.account.UserDetailEntity;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_HQL_SET;
 
 /**
  * <p>
@@ -39,8 +40,7 @@ import cn.topiam.employee.common.entity.account.UserDetailEntity;
  * Created by support@topiam.cn on  2020-08-07
  */
 @Repository
-public interface UserDetailRepository extends PagingAndSortingRepository<UserDetailEntity, Long>,
-                                      CrudRepository<UserDetailEntity, Long>,
+public interface UserDetailRepository extends LogicDeleteRepository<UserDetailEntity, Long>,
                                       QuerydslPredicateExecutor<UserDetailEntity>,
                                       UserDetailRepositoryCustomized {
     /**
@@ -56,16 +56,21 @@ public interface UserDetailRepository extends PagingAndSortingRepository<UserDet
      *
      * @param userId {@link  Long}
      */
-    void deleteByUserId(Long userId);
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE UserDetailEntity SET " + SOFT_DELETE_HQL_SET + " WHERE userId = :userId")
+    void deleteByUserId(@Param("userId") Long userId);
 
     /**
      * 根据用户ID批量删除用户
      *
-     * @param userIds {@link String}
+     * @param userIds {@link List}
      */
     @Modifying
-    @Query(value = "DELETE  FROM UserDetailEntity WHERE userId IN (:userIds)")
-    void deleteAllByUserId(@Param("userIds") Iterable<Long> userIds);
+    @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE UserDetailEntity SET " + SOFT_DELETE_HQL_SET
+                   + " WHERE userId IN (:userIds)")
+    void deleteAllByUserIds(@Param("userIds") Iterable<Long> userIds);
 
     /**
      * 根据用户ID查询用户详情
@@ -73,7 +78,5 @@ public interface UserDetailRepository extends PagingAndSortingRepository<UserDet
      * @param userIds  {@link List}
      * @return {@link List}
      */
-    @Modifying
-    @Query(value = "SELECT *  FROM user_detail WHERE user_detail.user_id IN :userIds", nativeQuery = true)
-    List<UserDetailEntity> findAllByUserIds(@Param("userIds") Iterable<Long> userIds);
+    List<UserDetailEntity> findAllByUserIdIn(List<Long> userIds);
 }

@@ -31,7 +31,7 @@ public final class AppConstants {
     /**
      * 应用管理API路径
      */
-    public static final String APP_PATH              = API_PATH + "/app";
+    public final static String APP_PATH              = API_PATH + "/app";
 
     /**
      * 组名称

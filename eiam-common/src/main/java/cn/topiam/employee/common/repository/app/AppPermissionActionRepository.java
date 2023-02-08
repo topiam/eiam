@@ -20,12 +20,11 @@ package cn.topiam.employee.common.repository.app;
 import java.util.List;
 
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.common.entity.app.AppPermissionActionEntity;
 import cn.topiam.employee.common.entity.app.AppPermissionResourceEntity;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
 
 /**
  * @author TopIAM
@@ -33,8 +32,7 @@ import cn.topiam.employee.common.entity.app.AppPermissionResourceEntity;
  */
 @Repository
 public interface AppPermissionActionRepository extends
-                                               CrudRepository<AppPermissionActionEntity, Long>,
-                                               PagingAndSortingRepository<AppPermissionActionEntity, Long>,
+                                               LogicDeleteRepository<AppPermissionActionEntity, Long>,
                                                QuerydslPredicateExecutor<AppPermissionActionEntity> {
     /**
      * findAllByResource

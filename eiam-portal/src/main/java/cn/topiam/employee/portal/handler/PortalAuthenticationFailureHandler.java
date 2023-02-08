@@ -17,12 +17,12 @@
  */
 package cn.topiam.employee.portal.handler;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import cn.topiam.employee.common.enums.SecretType;
+import cn.topiam.employee.common.repository.account.UserRepository;
+import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.exception.enums.ExceptionStatus;
+import cn.topiam.employee.support.result.ApiRestResult;
+import cn.topiam.employee.support.util.HttpResponseUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,18 +31,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.WebAttributes;
 
-import cn.topiam.employee.common.enums.SecretType;
-import cn.topiam.employee.common.repository.account.UserRepository;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
-import cn.topiam.employee.support.exception.enums.ExceptionStatus;
-import cn.topiam.employee.support.result.ApiRestResult;
-import cn.topiam.employee.support.util.HttpResponseUtils;
-import static javax.servlet.RequestDispatcher.*;
-
-import static org.springframework.boot.web.servlet.support.ErrorPageFilter.ERROR_REQUEST_URI;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 import static cn.topiam.employee.support.constant.EiamConstants.CAPTCHA_CODE_SESSION;
 import static cn.topiam.employee.support.context.ServletContextHelp.acceptIncludeTextHtml;
+import static javax.servlet.RequestDispatcher.*;
+import static org.springframework.boot.web.servlet.support.ErrorPageFilter.ERROR_REQUEST_URI;
 
 /**
  * 认证失败

@@ -17,16 +17,6 @@
  */
 package cn.topiam.employee.console.service.identitysource.impl;
 
-import java.time.LocalDateTime;
-import java.util.Objects;
-
-import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.data.querydsl.QPageRequest;
-import org.springframework.stereotype.Service;
-
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Predicate;
-
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceEntity;
@@ -46,9 +36,17 @@ import cn.topiam.employee.identitysource.core.event.IdentitySourceEventUtils;
 import cn.topiam.employee.identitysource.core.exception.IdentitySourceNotExistException;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
-
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.Objects;
+
 import static cn.topiam.employee.audit.enums.TargetType.IDENTITY_SOURCE;
 
 /**
@@ -113,8 +111,8 @@ public class IdentitySourceSyncServiceImpl implements IdentitySourceSyncService 
      */
     @Override
     public void executeIdentitySourceSync(String id) {
-        AuditContext.setTarget(Target.builder().id(id).type(IDENTITY_SOURCE).build());
         IdentitySourceEntity entity = identitySourceService.getIdentitySource(id);
+        AuditContext.setTarget(Target.builder().id(id).type(IDENTITY_SOURCE).build());
         if (!ObjectUtils.isEmpty(entity)) {
             if (Objects.isNull(entity.getBasicConfig())) {
                 throw new NullPointerException("请完善参数配置");

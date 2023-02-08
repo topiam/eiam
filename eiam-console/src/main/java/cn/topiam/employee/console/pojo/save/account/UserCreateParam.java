@@ -17,22 +17,18 @@
  */
 package cn.topiam.employee.console.pojo.save.account;
 
+import cn.topiam.employee.common.enums.ListEnumDeserializer;
+import cn.topiam.employee.common.enums.MessageNoticeChannel;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
-import cn.topiam.employee.common.enums.ListEnumDeserializer;
-import cn.topiam.employee.common.enums.MessageNoticeChannel;
-
-import lombok.Data;
-
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 用户创建请求入参

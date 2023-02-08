@@ -75,6 +75,11 @@ public class UserDetails extends User {
     private LocalDateTime     loginTime;
 
     /**
+     * 身份验证类型
+     */
+    private String            authType;
+
+    /**
      * 用户类型
      */
     private final UserType    userType;

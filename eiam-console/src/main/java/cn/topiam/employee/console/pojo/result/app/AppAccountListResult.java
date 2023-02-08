@@ -17,11 +17,10 @@
  */
 package cn.topiam.employee.console.pojo.result.app;
 
-import java.time.LocalDateTime;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 
 /**
  * AppAccountCreateParam 应用账户查询结果

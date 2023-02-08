@@ -30,7 +30,7 @@ public final class AnalysisConstants {
     /**
      * 统计分析API路径
      */
-    public static final String ANALYSIS_PATH       = API_PATH + "/analysis";
+    public final static String ANALYSIS_PATH       = API_PATH + "/analysis";
 
     /**
      * 组名称

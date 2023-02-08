@@ -17,31 +17,6 @@
  */
 package cn.topiam.employee.console.converter.account;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.sort.FieldSortBuilder;
-import org.elasticsearch.search.sort.SortBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
-import org.elasticsearch.search.sort.SortOrder;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
 import cn.topiam.employee.audit.entity.AuditElasticSearchEntity;
 import cn.topiam.employee.audit.entity.Event;
 import cn.topiam.employee.audit.enums.EventType;
@@ -60,6 +35,30 @@ import cn.topiam.employee.console.pojo.update.account.UserUpdateParam;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.sort.FieldSortBuilder;
+import org.elasticsearch.search.sort.SortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
 import static cn.topiam.employee.audit.entity.Actor.ACTOR_ID;
 import static cn.topiam.employee.audit.entity.Event.EVENT_TIME;
 import static cn.topiam.employee.audit.entity.Event.EVENT_TYPE;
@@ -122,9 +121,15 @@ public interface UserConverter {
         UserEntity userEntity = new UserEntity();
         userEntity.setRemark(param.getRemark());
         userEntity.setUsername(param.getUsername());
-        userEntity.setEmail(param.getEmail());
+        //邮箱
+        if (StringUtils.hasText(param.getEmail())) {
+            userEntity.setEmail(param.getEmail());
+            userEntity.setEmailVerified(Boolean.TRUE);
+        }
+        //手机号
         if (StringUtils.hasText(param.getPhone())) {
             userEntity.setPhone(getPhoneNumber(param.getPhone()));
+            userEntity.setPhoneVerified(Boolean.TRUE);
             userEntity.setPhoneAreaCode(getPhoneAreaCode(param.getPhone()));
         }
         userEntity.setFullName(param.getFullName());
@@ -133,7 +138,6 @@ public interface UserConverter {
         userEntity.setStatus(cn.topiam.employee.common.enums.UserStatus.ENABLE);
         userEntity.setAvatar("https://joeschmoe.io/api/v1/random");
         userEntity.setDataOrigin(cn.topiam.employee.common.enums.DataOrigin.INPUT);
-        userEntity.setEmailVerified(Boolean.FALSE);
         userEntity.setExpireDate(
             java.util.Objects.isNull(param.getExpireDate()) ? java.time.LocalDate.of(2116, 12, 31)
                 : param.getExpireDate());

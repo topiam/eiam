@@ -17,15 +17,6 @@
  */
 package cn.topiam.employee.console.service.identitysource.impl;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.alibaba.fastjson2.JSONObject;
-
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
@@ -52,9 +43,16 @@ import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.repository.page.domain.QueryDslRequest;
 import cn.topiam.employee.support.util.BeanUtils;
-
+import com.alibaba.fastjson2.JSONObject;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
 
@@ -228,6 +226,13 @@ public class IdentitySourceServiceImpl implements IdentitySourceService {
      */
     @Override
     public void updateStrategyConfig(Long id, String strategyConfig) {
+        Optional<IdentitySourceEntity> optional = identitySourceRepository.findById(id);
+        //用户不存在
+        if (optional.isEmpty()) {
+            AuditContext.setContent("操作失败，身份源不存在");
+            log.warn(AuditContext.getContent());
+            throw new TopIamException(AuditContext.getContent());
+        }
         identitySourceRepository.updateStrategyConfig(id, strategyConfig);
         AuditContext
             .setTarget(Target.builder().id(id.toString()).type(TargetType.IDENTITY_SOURCE).build());

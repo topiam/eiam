@@ -17,13 +17,12 @@
  */
 package cn.topiam.employee.console.pojo.result.setting;
 
-import java.io.Serializable;
-
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serializable;
 
 /**
  * 弱密码列表查询结果

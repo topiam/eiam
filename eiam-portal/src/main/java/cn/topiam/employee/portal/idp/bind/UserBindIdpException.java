@@ -17,9 +17,8 @@
  */
 package cn.topiam.employee.portal.idp.bind;
 
-import org.springframework.http.HttpStatus;
-
 import cn.topiam.employee.support.exception.TopIamException;
+import org.springframework.http.HttpStatus;
 
 /**
  *

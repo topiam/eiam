@@ -17,14 +17,13 @@
  */
 package cn.topiam.employee.console.pojo.result.setting;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-
-import lombok.Data;
-
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 管理员详情

@@ -49,8 +49,9 @@ import com.alibaba.fastjson2.JSONObject;
 import cn.topiam.employee.authentication.qq.QqIdpOauthConfig;
 import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
+import static cn.topiam.employee.authentication.common.IdentityProviderType.QQ;
+import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.PROVIDER_CODE;
 import static cn.topiam.employee.authentication.qq.filter.QqOAuth2LoginAuthenticationFilter.getLoginUrl;
-import static cn.topiam.employee.common.enums.IdentityProviderType.QQ;
 import static cn.topiam.employee.portal.idp.qq.constant.QqAuthenticationConstants.URL_AUTHORIZE;
 
 /**
@@ -64,16 +65,12 @@ public class QqOAuth2AuthorizationRequestRedirectFilter extends OncePerRequestFi
 
     private final Logger                                                     logger                         = LoggerFactory
         .getLogger(QqOAuth2AuthorizationRequestRedirectFilter.class);
-    /**
-     * 提供商ID
-     */
-    public static final String                                               PROVIDER_ID                    = "providerId";
 
     /**
      * AntPathRequestMatcher
      */
     public static final AntPathRequestMatcher                                QQ_REQUEST_MATCHER             = new AntPathRequestMatcher(
-        QQ.getAuthorizationPathPrefix() + "/" + "{" + PROVIDER_ID + "}", HttpMethod.GET.name());
+        QQ.getAuthorizationPathPrefix() + "/" + "{" + PROVIDER_CODE + "}", HttpMethod.GET.name());
 
     /**
      * 重定向策略
@@ -104,9 +101,9 @@ public class QqOAuth2AuthorizationRequestRedirectFilter extends OncePerRequestFi
             return;
         }
         Map<String, String> variables = matcher.getVariables();
-        String providerId = variables.get(PROVIDER_ID);
+        String providerCode = variables.get(PROVIDER_CODE);
         Optional<IdentityProviderEntity> optional = identityProviderRepository
-            .findByIdAndEnabledIsTrue(Long.valueOf(providerId));
+            .findByCodeAndEnabledIsTrue(providerCode);
         if (optional.isEmpty()) {
             throw new NullPointerException("未查询到身份提供商信息");
         }
@@ -117,7 +114,8 @@ public class QqOAuth2AuthorizationRequestRedirectFilter extends OncePerRequestFi
         //构建授权请求
         OAuth2AuthorizationRequest.Builder builder = OAuth2AuthorizationRequest.authorizationCode()
             .clientId(config.getAppId()).authorizationUri(URL_AUTHORIZE)
-            .redirectUri(getLoginUrl(providerId)).state(DEFAULT_STATE_GENERATOR.generateKey());
+            .redirectUri(getLoginUrl(optional.get().getCode()))
+            .state(DEFAULT_STATE_GENERATOR.generateKey());
         builder.parameters(parameters -> {
             parameters.put(OAuth2ParameterNames.RESPONSE_TYPE, OAuth2ParameterNames.CODE);
         });

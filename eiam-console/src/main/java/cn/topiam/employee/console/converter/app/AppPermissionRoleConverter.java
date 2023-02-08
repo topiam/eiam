@@ -17,18 +17,6 @@
  */
 package cn.topiam.employee.console.converter.app;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
-
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
-
 import cn.topiam.employee.common.entity.app.AppPermissionRoleEntity;
 import cn.topiam.employee.common.entity.app.QAppPermissionRoleEntity;
 import cn.topiam.employee.console.pojo.query.app.AppPermissionRoleListQuery;
@@ -37,6 +25,16 @@ import cn.topiam.employee.console.pojo.result.app.AppPermissionRoleResult;
 import cn.topiam.employee.console.pojo.save.app.AppPermissionRoleCreateParam;
 import cn.topiam.employee.console.pojo.update.app.PermissionRoleUpdateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
+import org.apache.commons.lang3.StringUtils;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 角色映射
@@ -124,7 +122,8 @@ public interface AppPermissionRoleConverter {
      */
     default Predicate rolePaginationParamConvertToPredicate(AppPermissionRoleListQuery query) {
         QAppPermissionRoleEntity role = QAppPermissionRoleEntity.appPermissionRoleEntity;
-        Predicate predicate = role.isNotNull();
+        Predicate predicate = ExpressionUtils.and(role.isNotNull(),
+            role.isDeleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         // 角色名称

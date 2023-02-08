@@ -23,12 +23,17 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.app.AppAccountEntity;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
 import static cn.topiam.employee.common.constants.ProtocolConstants.APP_ACCOUNT_CACHE_NAME;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 
 /**
  * 应用账户
@@ -38,7 +43,7 @@ import static cn.topiam.employee.common.constants.ProtocolConstants.APP_ACCOUNT_
  */
 @Repository
 @CacheConfig(cacheNames = { APP_ACCOUNT_CACHE_NAME })
-public interface AppAccountRepository extends JpaRepository<AppAccountEntity, Long>,
+public interface AppAccountRepository extends LogicDeleteRepository<AppAccountEntity, Long>,
                                       QuerydslPredicateExecutor<AppAccountEntity>,
                                       AppAccountRepositoryCustomized {
     /**
@@ -78,7 +83,11 @@ public interface AppAccountRepository extends JpaRepository<AppAccountEntity, Lo
      * @param appId {@link Long}
      */
     @CacheEvict(allEntries = true)
-    void deleteAllByAppId(Long appId);
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE app_account SET " + SOFT_DELETE_SET
+                   + " WHERE app_id = :appId", nativeQuery = true)
+    void deleteAllByAppId(@Param("appId") Long appId);
 
     /**
      * 根据userId 删除用户数据
@@ -86,5 +95,9 @@ public interface AppAccountRepository extends JpaRepository<AppAccountEntity, Lo
      * @param userId {@link Long}
      */
     @CacheEvict(allEntries = true)
-    void deleteByUserId(Long userId);
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE app_account SET " + SOFT_DELETE_SET
+                   + " WHERE user_id = :userId", nativeQuery = true)
+    void deleteByUserId(@Param("userId") Long userId);
 }

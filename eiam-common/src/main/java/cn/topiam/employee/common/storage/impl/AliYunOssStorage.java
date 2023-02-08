@@ -32,6 +32,7 @@ import com.aliyun.oss.model.CreateBucketRequest;
 import com.aliyun.oss.model.GeneratePresignedUrlRequest;
 import com.aliyun.oss.model.PutObjectRequest;
 
+import cn.topiam.employee.common.crypto.Encrypt;
 import cn.topiam.employee.common.storage.AbstractStorage;
 import cn.topiam.employee.common.storage.StorageConfig;
 import cn.topiam.employee.common.storage.StorageProviderException;
@@ -92,22 +93,22 @@ public class AliYunOssStorage extends AbstractStorage {
         }
     }
 
+    /**
+     * 所有OSS支持的请求和各种Header参数，在URL中进行签名的算法和在Header中包含签名的算法基本一样。
+     * 生成URL中的签名字符串时，除了将Date参数替换为Expires参数外，仍然包含CONTENT-TYPE、CONTENT-MD5、CanonicalizedOSSHeaders等在Header中包含签名中定义的Header（请求中虽然仍有Date请求Header，但无需将Date加入签名字符串中）。
+     * 在URL中包含签名时必须对URL进行urlencode。如果在URL中多次传入Signature、Expires或OSSAccessKeyId，则以第一次传入的值为准。
+     * 使用URL签名时，OSS会先验证请求时间是否晚于Expires时间，然后再验证签名。
+     * urlencode(base64(hmac-sha1(AccessKeySecret,
+     *           VERB + "\n"
+     *           + CONTENT-MD5 + "\n"
+     *           + CONTENT-TYPE + "\n"
+     *           + EXPIRES + "\n"
+     *           + CanonicalizedOSSHeaders
+     *           + CanonicalizedResource)))
+     */
     @Override
     public String download(String path) throws StorageProviderException {
         super.download(path);
-        /**
-         * 所有OSS支持的请求和各种Header参数，在URL中进行签名的算法和在Header中包含签名的算法基本一样。
-         * 生成URL中的签名字符串时，除了将Date参数替换为Expires参数外，仍然包含CONTENT-TYPE、CONTENT-MD5、CanonicalizedOSSHeaders等在Header中包含签名中定义的Header（请求中虽然仍有Date请求Header，但无需将Date加入签名字符串中）。
-         * 在URL中包含签名时必须对URL进行urlencode。如果在URL中多次传入Signature、Expires或OSSAccessKeyId，则以第一次传入的值为准。
-         * 使用URL签名时，OSS会先验证请求时间是否晚于Expires时间，然后再验证签名。
-         * urlencode(base64(hmac-sha1(AccessKeySecret,
-         *           VERB + "\n"
-         *           + CONTENT-MD5 + "\n"
-         *           + CONTENT-TYPE + "\n"
-         *           + EXPIRES + "\n"
-         *           + CanonicalizedOSSHeaders
-         *           + CanonicalizedResource)))
-         */
         GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(
             aliYunConfig.getBucket(), path, HttpMethod.GET);
         request.setExpiration(DateUtils.addSeconds(new Date(), EXPIRY_SECONDS));
@@ -129,6 +130,7 @@ public class AliYunOssStorage extends AbstractStorage {
         /**
          * accessKeySecret
          */
+        @Encrypt
         @NotEmpty(message = "AccessKeySecret不能为空")
         private String accessKeySecret;
         /**

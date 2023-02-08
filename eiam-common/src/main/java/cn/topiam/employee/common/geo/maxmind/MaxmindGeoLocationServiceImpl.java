@@ -34,6 +34,7 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.ResourceAccessException;
@@ -54,6 +55,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import dev.failsafe.Failsafe;
 import dev.failsafe.RetryPolicy;
+import static cn.topiam.employee.common.geo.District.CITY_DISTRICT;
+import static cn.topiam.employee.common.geo.District.PROVINCE_DISTRICT;
 import static cn.topiam.employee.common.geo.maxmind.enums.GeoLocationProvider.MAXMIND;
 
 /**
@@ -116,9 +119,9 @@ public class MaxmindGeoLocationServiceImpl implements GeoLocationService {
                 .setCountryName(country.getName())
                 .setCountryCode(country.getGeoNameId().toString())
                 .setCityName(city.getName())
-                .setCityCode(String.valueOf(city.getGeoNameId()))
+                .setCityCode(StringUtils.defaultString(CITY_DISTRICT.get(city.getName()), String.valueOf(city.getGeoNameId())))
                 .setProvinceName(subdivision.getName())
-                .setProvinceCode(subdivision.getIsoCode())
+                .setProvinceCode(StringUtils.defaultString(PROVINCE_DISTRICT.get(subdivision.getName()), subdivision.getIsoCode()))
                 .setLongitude(location.getLongitude())
                 .setLatitude(location.getLatitude())
                 .setProvider(MAXMIND);

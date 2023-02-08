@@ -54,7 +54,6 @@ public enum AppCertUsingType implements BaseEnum {
         this.desc = desc;
     }
 
-    @Override
     public String getCode() {
         return code;
     }

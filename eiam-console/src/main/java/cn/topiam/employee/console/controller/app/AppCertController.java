@@ -17,8 +17,14 @@
  */
 package cn.topiam.employee.console.controller.app;
 
-import java.util.List;
-
+import cn.topiam.employee.application.saml2.pojo.AppSaml2StandardConfigGetResult;
+import cn.topiam.employee.console.pojo.query.app.AppCertQuery;
+import cn.topiam.employee.console.pojo.result.app.AppCertListResult;
+import cn.topiam.employee.console.service.app.AppCertService;
+import cn.topiam.employee.support.result.ApiRestResult;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -26,16 +32,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cn.topiam.employee.application.saml2.model.AppSaml2StandardConfigGetResult;
-import cn.topiam.employee.console.pojo.query.app.AppCertQuery;
-import cn.topiam.employee.console.pojo.result.app.AppCertListResult;
-import cn.topiam.employee.console.service.app.AppCertService;
-import cn.topiam.employee.support.result.ApiRestResult;
+import java.util.List;
 
-import lombok.AllArgsConstructor;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import static cn.topiam.employee.common.constants.AppConstants.APP_PATH;
 
 /**

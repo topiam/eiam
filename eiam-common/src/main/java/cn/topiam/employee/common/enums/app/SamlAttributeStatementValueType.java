@@ -84,7 +84,6 @@ public enum SamlAttributeStatementValueType implements BaseEnum {
         return null;
     }
 
-    @Override
     public String getCode() {
         return code;
     }

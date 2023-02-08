@@ -38,7 +38,7 @@ public class LoginRedirectParameterFilter extends OncePerRequestFilter {
     /**
      * RedirectCache
      */
-    private final cn.topiam.employee.core.security.savedredirect.RedirectCache redirectCache = new HttpSessionRedirectCache();
+    private final RedirectCache redirectCache = new HttpSessionRedirectCache();
     private final RequestMatcher                                               requestMatcher;
 
     public LoginRedirectParameterFilter(RequestMatcher requestMatcher) {

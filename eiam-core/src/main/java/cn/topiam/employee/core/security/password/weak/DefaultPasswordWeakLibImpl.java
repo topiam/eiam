@@ -107,7 +107,6 @@ public class DefaultPasswordWeakLibImpl implements PasswordWeakLib {
         }
     }
 
-    @Override
     public Boolean wordExists(String word) {
         synchronized (dictionary) {
             return Boolean.TRUE.equals(dictionary.get(word));

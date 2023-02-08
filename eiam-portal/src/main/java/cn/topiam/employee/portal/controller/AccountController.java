@@ -17,18 +17,16 @@
  */
 package cn.topiam.employee.portal.controller;
 
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
 import cn.topiam.employee.core.security.decrypt.DecryptRequestBody;
 import cn.topiam.employee.portal.pojo.request.*;
 import cn.topiam.employee.portal.pojo.result.PrepareBindMfaResult;
 import cn.topiam.employee.portal.service.AccountService;
 import cn.topiam.employee.support.result.ApiRestResult;
-
-import lombok.AllArgsConstructor;
-
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.AllArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
 import static cn.topiam.employee.support.constant.EiamConstants.API_PATH;
 
 /**
@@ -66,6 +64,17 @@ public class AccountController {
     }
 
     /**
+     * 准备修改手机
+     *
+     * @return {@link  ApiRestResult}
+     */
+    @Operation(summary = "准备修改手机")
+    @PostMapping("/prepare_change_phone")
+    public ApiRestResult<Boolean> prepareChangePhone(@DecryptRequestBody @RequestBody @Validated PrepareChangePhoneRequest param) {
+        return ApiRestResult.ok(accountService.prepareChangePhone(param));
+    }
+
+    /**
      * 修改手机
      *
      * @return {@link  ApiRestResult}
@@ -74,6 +83,17 @@ public class AccountController {
     @PutMapping("/change_phone")
     public ApiRestResult<Boolean> changePhone(@RequestBody @Validated ChangePhoneRequest param) {
         return ApiRestResult.ok(accountService.changePhone(param));
+    }
+
+    /**
+     * 准备修改邮箱
+     *
+     * @return {@link  ApiRestResult}
+     */
+    @Operation(summary = "准备修改邮箱")
+    @PostMapping("/prepare_change_email")
+    public ApiRestResult<Boolean> prepareChangeEmail(@DecryptRequestBody @RequestBody @Validated PrepareChangeEmailRequest param) {
+        return ApiRestResult.ok(accountService.prepareChangeEmail(param));
     }
 
     /**

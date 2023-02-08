@@ -17,17 +17,6 @@
  */
 package cn.topiam.employee.console.converter.setting;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.springframework.util.CollectionUtils;
-
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
-
 import cn.topiam.employee.common.entity.account.query.UserListQuery;
 import cn.topiam.employee.common.entity.setting.AdministratorEntity;
 import cn.topiam.employee.common.entity.setting.QAdministratorEntity;
@@ -37,6 +26,15 @@ import cn.topiam.employee.console.pojo.result.setting.AdministratorResult;
 import cn.topiam.employee.console.pojo.save.setting.AdministratorCreateParam;
 import cn.topiam.employee.console.pojo.update.setting.AdministratorUpdateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
+import org.apache.commons.lang3.StringUtils;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 管理员映射
@@ -139,7 +137,8 @@ public interface AdministratorConverter {
      */
     default Predicate queryAdministratorListParamConvertToPredicate(AdministratorListQuery query) {
         QAdministratorEntity user = QAdministratorEntity.administratorEntity;
-        Predicate predicate = user.isNotNull();
+        Predicate predicate = ExpressionUtils.and(user.isNotNull(),
+            user.isDeleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = StringUtils.isBlank(query.getUsername()) ? predicate : ExpressionUtils.and(predicate, user.username.eq(query.getUsername()));

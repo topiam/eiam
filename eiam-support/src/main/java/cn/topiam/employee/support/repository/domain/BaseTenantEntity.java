@@ -37,7 +37,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @MappedSuperclass
-public abstract class BaseTenantEntity<PK extends Serializable> extends BaseEntity<PK> {
+public abstract class BaseTenantEntity<PK extends Serializable> extends LogicDeleteEntity<PK> {
     @Serial
     private static final long  serialVersionUID = 4720107236271252583L;
     /**

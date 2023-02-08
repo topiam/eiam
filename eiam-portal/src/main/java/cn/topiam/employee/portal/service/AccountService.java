@@ -47,10 +47,26 @@ public interface AccountService {
     /**
      * 修改手机
      *
+     * @param param      {@link PrepareChangePhoneRequest}
+     * @return {@link Boolean}
+     */
+    Boolean prepareChangePhone(PrepareChangePhoneRequest param);
+
+    /**
+     * 修改手机
+     *
      * @param param {@link ChangePhoneRequest}
      * @return {@link Boolean}
      */
     Boolean changePhone(ChangePhoneRequest param);
+
+    /**
+     * 准备修改邮箱
+     *
+     * @param param {@link PrepareChangeEmailRequest}
+     * @return {@link Boolean}
+     */
+    Boolean prepareChangeEmail(PrepareChangeEmailRequest param);
 
     /**
      * 修改邮箱

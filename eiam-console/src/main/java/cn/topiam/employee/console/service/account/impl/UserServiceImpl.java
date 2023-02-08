@@ -17,34 +17,6 @@
  */
 package cn.topiam.employee.console.service.account.impl;
 
-import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.*;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
-import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
-
-import com.google.i18n.phonenumbers.NumberParseException;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import com.google.i18n.phonenumbers.Phonenumber;
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.AuditElasticSearchEntity;
 import cn.topiam.employee.audit.entity.Target;
@@ -74,10 +46,32 @@ import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.util.BeanUtils;
 import cn.topiam.employee.support.validation.annotation.ValidationPhone;
-
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import static cn.topiam.employee.audit.enums.TargetType.*;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
+
+import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+
+import static cn.topiam.employee.audit.enums.TargetType.USER;
+import static cn.topiam.employee.audit.enums.TargetType.USER_DETAIL;
 import static cn.topiam.employee.common.constants.AuditConstants.getAuditIndexPrefix;
 import static cn.topiam.employee.core.message.sms.SmsMsgEventPublish.PASSWORD;
 import static cn.topiam.employee.core.message.sms.SmsMsgEventPublish.USERNAME;
@@ -398,13 +392,14 @@ public class UserServiceImpl implements UserService {
      * @return {@link Boolean}
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean batchDeleteUser(String[] ids) {
         //删除用户
         userRepository
             .deleteAllById(Arrays.stream(ids).map(s -> Long.parseLong(s.trim())).toList());
         //删除用户详情
         userDetailsRepository
-            .deleteAllByUserId(Arrays.stream(ids).map(s -> Long.parseLong(s.trim())).toList());
+            .deleteAllByUserIds(Arrays.stream(ids).map(s -> Long.parseLong(s.trim())).toList());
         //删除组织用户关系
         organizationMemberRepository
             .deleteAllByUserId(Arrays.stream(ids).map(s -> Long.parseLong(s.trim())).toList());
@@ -469,33 +464,6 @@ public class UserServiceImpl implements UserService {
             result = !userRepository.exists(eq);
         }
         return result;
-    }
-
-    /**
-     * 查询组织成员数量
-     *
-     * @param orgId {@link  String}
-     * @return {@link  Long}
-     */
-    @Override
-    public Long getOrgMemberCount(String orgId) {
-        //条件
-        QUserEntity user = QUserEntity.userEntity;
-        QOrganizationEntity qOrganization = QOrganizationEntity.organizationEntity;
-        Predicate predicate = user.isNotNull();
-        //FIND_IN_SET函数
-        BooleanExpression template = Expressions.booleanTemplate(
-            "FIND_IN_SET({0}, replace({1}, '/', ','))> 0", orgId, qOrganization.path);
-        predicate = StringUtils.isBlank(orgId) ? predicate
-            : ExpressionUtils.and(predicate, qOrganization.id.eq(orgId).or(template));
-        //构造查询
-        JPAQuery<Long> jpaQuery = jpaQueryFactory.selectFrom(user).select(user.count())
-            .innerJoin(QOrganizationMemberEntity.organizationMemberEntity)
-            .on(user.id.eq(QOrganizationMemberEntity.organizationMemberEntity.userId))
-            .innerJoin(qOrganization)
-            .on(qOrganization.id.eq(QOrganizationMemberEntity.organizationMemberEntity.orgId))
-            .where(predicate);
-        return jpaQuery.fetch().get(0);
     }
 
     @Override
@@ -571,11 +539,6 @@ public class UserServiceImpl implements UserService {
      * 用户详情Repository
      */
     private final UserDetailRepository          userDetailsRepository;
-
-    /**
-     * JPAQueryFactory
-     */
-    private final JPAQueryFactory               jpaQueryFactory;
 
     /**
      * 修改密码历史Repository

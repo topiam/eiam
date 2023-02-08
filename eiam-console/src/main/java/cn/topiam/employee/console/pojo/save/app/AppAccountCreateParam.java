@@ -17,12 +17,11 @@
  */
 package cn.topiam.employee.console.pojo.save.app;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * AppAccountCreateParam 应用账户新增入参
@@ -54,4 +53,10 @@ public class AppAccountCreateParam {
     @Schema(description = "账户名称")
     @NotBlank(message = "账户名称不能为空")
     private String account;
+
+    /**
+     * 账户密码
+     */
+    @Schema(description = "账户密码")
+    private String password;
 }

@@ -17,17 +17,10 @@
  */
 package cn.topiam.employee.console.service.authentication.impl;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
-import cn.topiam.employee.common.enums.IdentityProviderType;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 import cn.topiam.employee.console.converter.authentication.IdentityProviderConverter;
 import cn.topiam.employee.console.pojo.query.authentication.IdentityProviderListQuery;
@@ -43,9 +36,14 @@ import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.repository.page.domain.QueryDslRequest;
 import cn.topiam.employee.support.util.BeanUtils;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+
 import static cn.topiam.employee.common.constants.ConfigBeanNameConstants.DEFAULT_SECURITY_FILTER_CHAIN;
 
 /**
@@ -77,11 +75,11 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
     /**
      * 通过平台类型获取
      *
-     * @param provider {@link IdentityProviderType}
+     * @param provider {@link String}
      * @return {@link IdentityProviderEntity}
      */
     @Override
-    public List<IdentityProviderEntity> getByIdentityProvider(IdentityProviderType provider) {
+    public List<IdentityProviderEntity> getByIdentityProvider(String provider) {
         return identityProviderRepository.findByType(provider);
     }
 
@@ -158,7 +156,8 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
             identityProviderRepository.save(entity);
             ApplicationContextHelp.refresh(DEFAULT_SECURITY_FILTER_CHAIN);
             AuditContext.setTarget(Target.builder().id(entity.getId().toString())
-                .type(TargetType.IDENTITY_PROVIDER).build());
+                .name(entity.getName()).type(TargetType.IDENTITY_PROVIDER)
+                .typeName(TargetType.IDENTITY_PROVIDER.getDesc()).build());
             return true;
         }
         throw new NullPointerException("系统不存在该身份源");
@@ -195,6 +194,14 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
      */
     @Override
     public Boolean updateIdentityProviderStatus(String id, Boolean enabled) {
+        Optional<IdentityProviderEntity> optional = identityProviderRepository
+            .findById(Long.valueOf(id));
+        //管理员不存在
+        if (optional.isEmpty()) {
+            AuditContext.setContent("删除失败，认证源不存在");
+            log.warn(AuditContext.getContent());
+            throw new TopIamException(AuditContext.getContent());
+        }
         boolean result = identityProviderRepository.updateIdentityProviderStatus(Long.valueOf(id),
             enabled) > 0;
         ApplicationContextHelp.refresh(DEFAULT_SECURITY_FILTER_CHAIN);

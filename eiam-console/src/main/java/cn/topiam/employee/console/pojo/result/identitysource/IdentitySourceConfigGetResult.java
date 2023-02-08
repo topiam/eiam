@@ -17,16 +17,14 @@
  */
 package cn.topiam.employee.console.pojo.result.identitysource;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 import cn.topiam.employee.common.entity.identitysource.config.JobConfig;
 import cn.topiam.employee.common.entity.identitysource.config.StrategyConfig;
-
-import lombok.Data;
-
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * 获取身份源配置

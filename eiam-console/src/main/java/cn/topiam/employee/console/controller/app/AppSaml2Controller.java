@@ -17,27 +17,24 @@
  */
 package cn.topiam.employee.console.controller.app;
 
-import java.io.IOException;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-
+import cn.topiam.employee.console.pojo.result.app.ParseSaml2MetadataResult;
+import cn.topiam.employee.console.service.app.AppSaml2Service;
+import cn.topiam.employee.support.lock.Lock;
+import cn.topiam.employee.support.result.ApiRestResult;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import cn.topiam.employee.console.pojo.result.app.ParseSaml2MetadataResult;
-import cn.topiam.employee.console.service.app.AppSaml2Service;
-import cn.topiam.employee.support.lock.Lock;
-import cn.topiam.employee.support.result.ApiRestResult;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import java.io.IOException;
 
-import lombok.AllArgsConstructor;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import static cn.topiam.employee.common.constants.AppConstants.APP_PATH;
 
 /**

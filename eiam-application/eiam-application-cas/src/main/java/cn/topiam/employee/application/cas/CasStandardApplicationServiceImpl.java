@@ -28,25 +28,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import cn.topiam.employee.application.cas.model.AppCasStandardConfigGetResult;
-import cn.topiam.employee.application.cas.model.AppCasStandardSaveConfigParam;
+import cn.topiam.employee.application.cas.converter.AppCasStandardConfigConverter;
+import cn.topiam.employee.application.cas.pojo.AppCasStandardSaveConfigParam;
 import cn.topiam.employee.application.exception.AppNotExistException;
 import cn.topiam.employee.audit.context.AuditContext;
-import cn.topiam.employee.common.constants.ProtocolConstants;
 import cn.topiam.employee.common.entity.app.AppCasConfigEntity;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.po.AppCasConfigPO;
-import cn.topiam.employee.common.enums.app.AppProtocol;
-import cn.topiam.employee.common.enums.app.AppType;
-import cn.topiam.employee.common.enums.app.AuthorizationType;
-import cn.topiam.employee.common.enums.app.InitLoginType;
+import cn.topiam.employee.common.enums.app.*;
 import cn.topiam.employee.common.repository.app.*;
-import cn.topiam.employee.core.context.ServerContextHelp;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.validation.ValidationHelp;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
-
-import static cn.topiam.employee.common.constants.ProtocolConstants.APP_CODE_VARIABLE;
 
 /**
  * Cas 用户应用
@@ -68,10 +61,12 @@ public class CasStandardApplicationServiceImpl extends AbstractCasApplicationSer
                                              AppAccountRepository appAccountRepository,
                                              AppAccessPolicyRepository appAccessPolicyRepository,
                                              AppRepository appRepository,
-                                             AppCasConfigRepository appCasConfigRepository) {
+                                             AppCasConfigRepository appCasConfigRepository,
+                                             AppCasStandardConfigConverter casStandardConfigConverter) {
         super(appCertRepository, appAccountRepository, appAccessPolicyRepository, appRepository,
             appCasConfigRepository);
         this.appCasConfigRepository = appCasConfigRepository;
+        this.casStandardConfigConverter = casStandardConfigConverter;
     }
 
     /**
@@ -119,7 +114,8 @@ public class CasStandardApplicationServiceImpl extends AbstractCasApplicationSer
             throw new AppNotExistException();
         }
         AppCasConfigEntity entity = cas.get();
-        entity.setSpCallbackUrl(model.getSpCallbackUrl());
+        entity.setClientServiceUrl(model.getClientServerUrl());
+        entity.setUserIdentityType(model.getUserIdentityType());
         appCasConfigRepository.save(entity);
 
     }
@@ -133,18 +129,7 @@ public class CasStandardApplicationServiceImpl extends AbstractCasApplicationSer
     @Override
     public Object getConfig(String appId) {
         AppCasConfigPO po = appCasConfigRepository.getByAppId(Long.valueOf(appId));
-        AppCasStandardConfigGetResult result = new AppCasStandardConfigGetResult();
-        result.setAuthorizationType(po.getAuthorizationType());
-        result.setInitLoginType(po.getInitLoginType());
-        result.setInitLoginUrl(po.getInitLoginUrl());
-        result.setSpCallbackUrl(po.getSpCallbackUrl());
-
-        String baseUrl = ServerContextHelp.getPortalPublicBaseUrl();
-        // 服务端URL配置前缀
-        result.setServerUrlPrefix(
-            baseUrl + ProtocolConstants.CasEndpointConstants.CAS_AUTHORIZE_BASE_PATH
-                .replace(APP_CODE_VARIABLE, po.getAppCode()));
-        return result;
+        return casStandardConfigConverter.entityConverterToCasConfigResult(po);
     }
 
     /**
@@ -236,16 +221,18 @@ public class CasStandardApplicationServiceImpl extends AbstractCasApplicationSer
         appEntity.setProtocol(getProtocol());
         appEntity.setClientId(idGenerator.generateId().toString().replace("-", ""));
         appEntity.setClientSecret(idGenerator.generateId().toString().replace("-", ""));
-        appEntity.setInitLoginType(InitLoginType.PORTAL_OR_APP);
+        appEntity.setInitLoginType(InitLoginType.APP);
         appEntity.setAuthorizationType(AuthorizationType.AUTHORIZATION);
         appEntity.setRemark(remark);
         appRepository.save(appEntity);
 
         AppCasConfigEntity casEntity = new AppCasConfigEntity();
         casEntity.setAppId(appEntity.getId());
-        casEntity.setSpCallbackUrl("");
+        casEntity.setUserIdentityType(CasUserIdentityType.USER_USERNAME);
         appCasConfigRepository.save(casEntity);
         return appEntity.getId().toString();
     }
+
+    private final AppCasStandardConfigConverter casStandardConfigConverter;
 
 }

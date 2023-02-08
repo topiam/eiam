@@ -17,18 +17,15 @@
  */
 package cn.topiam.employee.console.pojo.save.account;
 
-import java.io.Serial;
-import java.io.Serializable;
+import cn.topiam.employee.common.enums.OrganizationType;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-
-import cn.topiam.employee.common.enums.OrganizationType;
-
-import lombok.Data;
-
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * 创建组织架构入参

@@ -18,10 +18,10 @@
 package cn.topiam.employee.common.repository.account;
 
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.common.entity.account.UserIdpBindEntity;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
 
 /**
  * 用户身份绑定表
@@ -30,7 +30,7 @@ import cn.topiam.employee.common.entity.account.UserIdpBindEntity;
  * Created by support@topiam.cn on  2022/4/3 22:18
  */
 @Repository
-public interface UserIdpRepository extends CrudRepository<UserIdpBindEntity, Long>,
+public interface UserIdpRepository extends LogicDeleteRepository<UserIdpBindEntity, Long>,
                                    QuerydslPredicateExecutor<UserIdpBindEntity>,
                                    UserIdpRepositoryCustomized {
 

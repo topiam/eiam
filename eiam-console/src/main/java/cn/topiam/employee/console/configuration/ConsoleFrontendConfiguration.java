@@ -17,14 +17,14 @@
  */
 package cn.topiam.employee.console.configuration;
 
-import java.io.IOException;
-
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.resource.PathResourceResolver;
+
+import java.io.IOException;
 
 /**
  * 控制台前端配置

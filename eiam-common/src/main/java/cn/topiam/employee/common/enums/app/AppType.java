@@ -42,7 +42,11 @@ public enum AppType implements BaseEnum {
                                          /**
                                           * 自研
                                           */
-                                         SELF_DEVELOPED("self_developed", "自研应用");
+                                         SELF_DEVELOPED("self_developed", "自研应用"),
+                                         /**
+                                           * TSA
+                                           */
+                                         TSA("tsa", "TSA"),;
 
     /**
      * code
@@ -59,12 +63,10 @@ public enum AppType implements BaseEnum {
         this.desc = desc;
     }
 
-    @Override
     public String getCode() {
         return code;
     }
 
-    @Override
     public String getDesc() {
         return desc;
     }

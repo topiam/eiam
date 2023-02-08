@@ -40,7 +40,7 @@ public abstract class AbstractOidcApplicationService extends AbstractApplication
         appAccountRepository.deleteAllByAppId(Long.valueOf(appId));
         //删除应用权限策略
         appAccessPolicyRepository.deleteAllByAppId(Long.valueOf(appId));
-        //删除SAML2配置
+        //删除OIDC配置
         appOidcConfigRepository.deleteByAppId(Long.valueOf(appId));
     }
 

@@ -84,4 +84,9 @@ public class SessionDetails implements Serializable {
      */
     private UserType          userType;
 
+    /**
+     * 认证类型
+     */
+    private String            authType;
+
 }

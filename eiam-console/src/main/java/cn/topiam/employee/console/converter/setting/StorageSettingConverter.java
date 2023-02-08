@@ -17,16 +17,7 @@
  */
 package cn.topiam.employee.console.converter.setting;
 
-import java.util.Objects;
-
-import javax.validation.ValidationException;
-
-import org.mapstruct.Mapper;
-
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import cn.topiam.employee.common.crypto.EncryptionModule;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.storage.StorageConfig;
 import cn.topiam.employee.common.storage.enums.StorageProvider;
@@ -37,6 +28,14 @@ import cn.topiam.employee.common.storage.impl.QiNiuKodoStorage;
 import cn.topiam.employee.console.pojo.result.setting.StorageProviderConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.StorageConfigSaveParam;
 import cn.topiam.employee.support.validation.ValidationHelp;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.mapstruct.Mapper;
+
+import javax.validation.ValidationException;
+import java.util.Objects;
+
 import static cn.topiam.employee.core.setting.constant.StorageProviderSettingConstants.STORAGE_PROVIDER_KEY;
 
 /**
@@ -59,7 +58,7 @@ public interface StorageSettingConverter {
         ValidationHelp.ValidationResult<?> validationResult = null;
         StorageConfig.StorageConfigBuilder builder = StorageConfig.builder();
         builder.provider(provider);
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = EncryptionModule.deserializerEncrypt();
         try {
             //阿里云
             if (provider.equals(StorageProvider.ALIYUN_OSS)) {
@@ -121,7 +120,7 @@ public interface StorageSettingConverter {
         if (Objects.isNull(entity)) {
             return StorageProviderConfigResult.builder().enabled(false).build();
         }
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = EncryptionModule.deserializerDecrypt();
         // 指定序列化输入的类型
         objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
             ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
@@ -133,7 +132,7 @@ public interface StorageSettingConverter {
             return StorageProviderConfigResult.builder()
                     .provider(storageConfig.getProvider())
                     .enabled(true)
-                    .config(storageConfig).build();
+                    .config(storageConfig.getConfig()).build();
             //@formatter:on
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

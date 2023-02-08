@@ -17,21 +17,7 @@
  */
 package cn.topiam.employee.console.converter.setting;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import javax.validation.ValidationException;
-
-import org.apache.commons.lang3.ObjectUtils;
-import org.mapstruct.Mapper;
-
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import cn.topiam.employee.authentication.captcha.geetest.GeeTestCaptchaProviderConfig;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.enums.CaptchaProviderType;
 import cn.topiam.employee.common.enums.MfaFactor;
@@ -43,11 +29,22 @@ import cn.topiam.employee.console.pojo.save.setting.SecurityBasicSaveParam;
 import cn.topiam.employee.console.pojo.save.setting.SecurityCaptchaSaveParam;
 import cn.topiam.employee.console.pojo.save.setting.SecurityMfaSaveParam;
 import cn.topiam.employee.core.security.captcha.CaptchaProviderConfig;
-import cn.topiam.employee.core.security.captcha.geetest.GeeTestCaptchaProviderConfig;
 import cn.topiam.employee.support.validation.ValidationHelp;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.ObjectUtils;
+import org.mapstruct.Mapper;
+
+import javax.validation.ValidationException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import static cn.topiam.employee.core.setting.constant.MfaSettingConstants.*;
 import static cn.topiam.employee.core.setting.constant.SecuritySettingConstants.*;
-
 import static liquibase.sqlgenerator.core.MarkChangeSetRanGenerator.COMMA;
 
 /**

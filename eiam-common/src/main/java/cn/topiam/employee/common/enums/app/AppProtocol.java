@@ -52,7 +52,12 @@ public enum AppProtocol implements BaseEnum {
                                              /**
                                               * FORM表单
                                               */
-                                             FORM("form", "表单代填");
+                                             FORM("form", "表单代填"),
+
+                                             /**
+                                              * TSA
+                                              */
+                                             TSA("tsa", "TSA");
 
     @JsonValue
     private final String code;
@@ -66,7 +71,6 @@ public enum AppProtocol implements BaseEnum {
         this.desc = desc;
     }
 
-    @Override
     public String getCode() {
         return code;
     }

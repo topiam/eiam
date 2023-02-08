@@ -56,8 +56,46 @@ public class AppAccessPolicyRepositoryCustomizedImpl implements
     @Override
     public Page<AppAccessPolicyPO> getAppPolicyList(AppAccessPolicyQuery query, Pageable pageable) {
         //@formatter:off
-        StringBuilder builder = new StringBuilder("SELECT a.id_,a.app_id,a.subject_id,a.subject_type,a.create_time,`subject`.name_,app.name_ as app_name,app.type_ as app_type,app.template_ as app_template,app.protocol_ as app_protocol  FROM app_access_policy a LEFT JOIN app ON a.app_id = app.id_ LEFT JOIN ");
-        builder.append("(SELECT id_,name_ FROM user_group UNION ALL SELECT id_,name_ FROM organization UNION ALL SELECT id_,username_ as name_ FROM `user`) `subject` ON a.subject_id = `subject`.id_ WHERE 1=1");
+        StringBuilder builder = new StringBuilder("""
+                SELECT
+                	a.id_,
+                	a.app_id,
+                	a.subject_id,
+                	a.subject_type,
+                	a.create_time,
+                	subject.name_,
+                	app.name_ AS app_name,
+                	app.type_ AS app_type,
+                	app.template_ AS app_template,
+                	app.protocol_ AS app_protocol
+                FROM
+                	app_access_policy a
+                	LEFT JOIN app ON a.app_id = app.id_ AND app.is_deleted = '0'
+                LEFT JOIN
+                """);
+        builder.append("""
+                ( SELECT
+                	id_,
+                	name_,
+                	is_deleted
+                FROM
+                	user_group UNION ALL
+                SELECT
+                	id_,
+                	name_,
+                	is_deleted
+                FROM
+                	organization UNION ALL
+                SELECT
+                	id_,
+                	username_ AS name_,
+                	is_deleted
+                FROM
+                	`user`
+                	) `subject` ON a.subject_id = `subject`.id_ AND `subject`.is_deleted = '0'
+                WHERE
+                	a.is_deleted = '0'
+                """);
         if (ObjectUtils.isNotEmpty(query.getSubjectType())) {
             builder.append(" AND a.subject_type = '").append(query.getSubjectType().getCode()).append("'");
         }

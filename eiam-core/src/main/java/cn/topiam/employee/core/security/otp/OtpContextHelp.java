@@ -174,7 +174,7 @@ public class OtpContextHelp {
                                MessageNoticeChannel channel) {
         String keyPrefix = cacheProperties.getRedis().getKeyPrefix();
         return keyPrefix + COLON + "otp" + COLON + prefix + COLON + channel.getCode() + COLON + type
-               + recipient;
+               + COLON + recipient;
     }
 
     /**

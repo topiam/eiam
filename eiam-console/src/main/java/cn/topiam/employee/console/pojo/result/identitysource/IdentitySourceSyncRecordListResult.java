@@ -17,15 +17,13 @@
  */
 package cn.topiam.employee.console.pojo.result.identitysource;
 
-import java.io.Serializable;
-
 import cn.topiam.employee.common.enums.identitysource.IdentitySourceActionType;
 import cn.topiam.employee.common.enums.identitysource.IdentitySourceObjectType;
-
-import lombok.Data;
-
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * 身份源同步详情列表

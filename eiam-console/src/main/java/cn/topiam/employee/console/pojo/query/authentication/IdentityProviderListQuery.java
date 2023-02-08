@@ -17,19 +17,14 @@
  */
 package cn.topiam.employee.console.pojo.query.authentication;
 
-import java.io.Serial;
-import java.io.Serializable;
-
-import javax.validation.constraints.NotNull;
-
-import org.springdoc.api.annotations.ParameterObject;
-
-import cn.topiam.employee.common.enums.IdentityProviderCategory;
-
-import lombok.Data;
-
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import org.springdoc.api.annotations.ParameterObject;
+
+import javax.validation.constraints.NotNull;
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * @author TopIAM
@@ -41,19 +36,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public class IdentityProviderListQuery implements Serializable {
 
     @Serial
-    private static final long        serialVersionUID = 1191998425971892318L;
+    private static final long serialVersionUID = 1191998425971892318L;
 
     /**
      * 认证源ID
      */
     @Parameter(description = "认证源名称")
-    private String                   name;
+    private String            name;
 
     /**
      * 认证源类型
      */
     @Parameter(description = "认证源分类")
     @NotNull(message = "认证源分类不能为空")
-    private IdentityProviderCategory category;
+    private String            category;
 
 }

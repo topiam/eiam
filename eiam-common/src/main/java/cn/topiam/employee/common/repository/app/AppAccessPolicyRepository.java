@@ -19,12 +19,17 @@ package cn.topiam.employee.common.repository.app;
 
 import java.util.Optional;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.app.AppAccessPolicyEntity;
 import cn.topiam.employee.common.enums.PolicySubjectType;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 
 /**
  * 应用授权策略 Repository
@@ -33,7 +38,8 @@ import cn.topiam.employee.common.enums.PolicySubjectType;
  * Created by support@topiam.cn on  2022/6/4 19:54
  */
 @Repository
-public interface AppAccessPolicyRepository extends JpaRepository<AppAccessPolicyEntity, Long>,
+public interface AppAccessPolicyRepository extends
+                                           LogicDeleteRepository<AppAccessPolicyEntity, Long>,
                                            QuerydslPredicateExecutor<AppAccessPolicyEntity>,
                                            AppAccessPolicyRepositoryCustomized {
     /**
@@ -41,7 +47,11 @@ public interface AppAccessPolicyRepository extends JpaRepository<AppAccessPolicy
      *
      * @param appId {@link Long}
      */
-    void deleteAllByAppId(Long appId);
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE app_access_policy SET " + SOFT_DELETE_SET
+                   + " WHERE app_id = :appId", nativeQuery = true)
+    void deleteAllByAppId(@Param("appId") Long appId);
 
     /**
      * 根据应用ID、主体ID，主体类型查询

@@ -17,15 +17,14 @@
  */
 package cn.topiam.employee.portal.listener;
 
-import javax.servlet.http.HttpServletResponse;
-
+import cn.topiam.employee.support.result.ApiRestResult;
+import cn.topiam.employee.support.util.HttpResponseUtils;
+import com.alibaba.fastjson2.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.web.session.SessionInformationExpiredEvent;
 
-import com.alibaba.fastjson2.JSONObject;
+import javax.servlet.http.HttpServletResponse;
 
-import cn.topiam.employee.support.result.ApiRestResult;
-import cn.topiam.employee.support.util.HttpResponseUtils;
 import static cn.topiam.employee.support.exception.enums.ExceptionStatus.EX000203;
 
 /**
