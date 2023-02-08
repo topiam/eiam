@@ -49,25 +49,7 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
  */
 @Component
 public class CasStandardApplicationServiceImpl extends AbstractCasApplicationService {
-    private final Logger                   logger = LoggerFactory
-        .getLogger(CasStandardApplicationServiceImpl.class);
-
-    /**
-     * AppCasConfigRepository
-     */
-    protected final AppCasConfigRepository appCasConfigRepository;
-
-    public CasStandardApplicationServiceImpl(AppCertRepository appCertRepository,
-                                             AppAccountRepository appAccountRepository,
-                                             AppAccessPolicyRepository appAccessPolicyRepository,
-                                             AppRepository appRepository,
-                                             AppCasConfigRepository appCasConfigRepository,
-                                             AppCasStandardConfigConverter casStandardConfigConverter) {
-        super(appCertRepository, appAccountRepository, appAccessPolicyRepository, appRepository,
-            appCasConfigRepository);
-        this.appCasConfigRepository = appCasConfigRepository;
-        this.casStandardConfigConverter = casStandardConfigConverter;
-    }
+    private final Logger logger = LoggerFactory.getLogger(CasStandardApplicationServiceImpl.class);
 
     /**
      * 更新应用配置
@@ -114,7 +96,7 @@ public class CasStandardApplicationServiceImpl extends AbstractCasApplicationSer
             throw new AppNotExistException();
         }
         AppCasConfigEntity entity = cas.get();
-        entity.setClientServiceUrl(model.getClientServerUrl());
+        entity.setClientServiceUrl(model.getClientServiceUrl());
         entity.setUserIdentityType(model.getUserIdentityType());
         entity.setServiceTicketExpireTime(model.getServiceTicketExpireTime());
         appCasConfigRepository.save(entity);
@@ -236,5 +218,22 @@ public class CasStandardApplicationServiceImpl extends AbstractCasApplicationSer
     }
 
     private final AppCasStandardConfigConverter casStandardConfigConverter;
+
+    /**
+     * AppCasConfigRepository
+     */
+    protected final AppCasConfigRepository      appCasConfigRepository;
+
+    public CasStandardApplicationServiceImpl(AppCertRepository appCertRepository,
+                                             AppAccountRepository appAccountRepository,
+                                             AppAccessPolicyRepository appAccessPolicyRepository,
+                                             AppRepository appRepository,
+                                             AppCasConfigRepository appCasConfigRepository,
+                                             AppCasStandardConfigConverter casStandardConfigConverter) {
+        super(appCertRepository, appAccountRepository, appAccessPolicyRepository, appRepository,
+            appCasConfigRepository);
+        this.appCasConfigRepository = appCasConfigRepository;
+        this.casStandardConfigConverter = casStandardConfigConverter;
+    }
 
 }

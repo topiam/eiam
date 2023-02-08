@@ -20,11 +20,9 @@ package cn.topiam.employee.application.cas.pojo;
 import cn.topiam.employee.common.enums.app.AuthorizationType;
 import cn.topiam.employee.common.enums.app.CasUserIdentityType;
 import cn.topiam.employee.common.enums.app.InitLoginType;
-
 import io.swagger.v3.oas.annotations.Parameter;
-import lombok.Data;
-
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
 /**
  * @author TopIAM
@@ -73,6 +71,7 @@ public class AppCasStandardConfigGetResult {
     /**
      * serviceTicket 过期时间（秒）
      */
+    @Schema(name = "serviceTicket 过期时间（秒）")
     private Integer                serviceTicketExpireTime;
     /**
      * CAS 协议端点

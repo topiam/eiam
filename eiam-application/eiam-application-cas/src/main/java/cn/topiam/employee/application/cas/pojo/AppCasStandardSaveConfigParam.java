@@ -17,16 +17,14 @@
  */
 package cn.topiam.employee.application.cas.pojo;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 import cn.topiam.employee.common.enums.app.AuthorizationType;
 import cn.topiam.employee.common.enums.app.CasUserIdentityType;
 import cn.topiam.employee.common.enums.app.InitLoginType;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * @author TopIAM
@@ -56,20 +54,20 @@ public class AppCasStandardSaveConfigParam implements Serializable {
     private String              initLoginUrl;
 
     /**
-     * CAS 用户身份类型
+     * 客户端服务URL
      */
-    @Schema(name = "CAS 用户身份类型")
+    @Schema(name = "客户端服务URL")
+    private String              clientServiceUrl;
+
+    /**
+     * 用户身份类型标识
+     */
+    @Schema(name = "用户身份类型标识")
     private CasUserIdentityType userIdentityType;
 
     /**
-     * 单点登录 SP 回调地址
+     * serviceTicket 过期时间（秒）
      */
-    @Schema(name = "客户端服务URL")
-    private String              clientServerUrl;
-
-    /**
-     * serviceTicket过期时间
-     */
-    @Schema(name = "serviceTicket过期时间")
+    @Schema(name = "serviceTicket 过期时间（秒）")
     private Integer             serviceTicketExpireTime;
 }
