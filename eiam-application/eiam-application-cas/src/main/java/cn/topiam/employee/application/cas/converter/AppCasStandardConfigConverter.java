@@ -44,30 +44,25 @@ public interface AppCasStandardConfigConverter {
     default AppCasStandardConfigGetResult entityConverterToCasConfigResult(AppCasConfigPO po) {
         AppCasStandardConfigGetResult result = new AppCasStandardConfigGetResult();
         result.setAuthorizationType(po.getAuthorizationType());
+        result.setAppId(String.valueOf(po.getAppId()));
         result.setInitLoginType(po.getInitLoginType());
         result.setInitLoginUrl(po.getInitLoginUrl());
         result.setClientServiceUrl(po.getClientServiceUrl());
         result.setUserIdentityType(po.getUserIdentityType());
+        result.setServiceTicketExpireTime(po.getServiceTicketExpireTime());
 
         //封装端点信息
+        //@formatter:off
         AppCasProtocolEndpoint protocolEndpoint = new AppCasProtocolEndpoint();
         String baseUrl = ServerContextHelp.getPortalPublicBaseUrl();
-        protocolEndpoint
-            .setCasSsoEndpoint(baseUrl + ProtocolConstants.CasEndpointConstants.CAS_LOGIN_PATH
-                .replace(APP_CODE_VARIABLE, po.getAppCode()));
-        protocolEndpoint
-            .setCasSloEndpoint(baseUrl + ProtocolConstants.CasEndpointConstants.CAS_LOGOUT_PATH
-                .replace(APP_CODE_VARIABLE, po.getAppCode()));
-        protocolEndpoint.setCasValidateEndpoint(
-            baseUrl + ProtocolConstants.CasEndpointConstants.CAS_VALIDATE_V1_PATH
-                .replace(APP_CODE_VARIABLE, po.getAppCode()));
-        protocolEndpoint.setCasValidateV2Endpoint(
-            baseUrl + ProtocolConstants.CasEndpointConstants.CAS_VALIDATE_V2_PATH
-                .replace(APP_CODE_VARIABLE, po.getAppCode()));
-        protocolEndpoint.setCasValidateV3Endpoint(
-            baseUrl + ProtocolConstants.CasEndpointConstants.CAS_VALIDATE_V3_PATH
-                .replace(APP_CODE_VARIABLE, po.getAppCode()));
+        protocolEndpoint.setCasServerUrlPrefix(baseUrl+ProtocolConstants.CasEndpointConstants.CAS_AUTHORIZE_BASE_PATH.replace(APP_CODE_VARIABLE, po.getAppCode()));
+        protocolEndpoint.setCasSsoEndpoint(baseUrl + ProtocolConstants.CasEndpointConstants.CAS_LOGIN_PATH.replace(APP_CODE_VARIABLE, po.getAppCode()));
+        protocolEndpoint.setCasSloEndpoint(baseUrl + ProtocolConstants.CasEndpointConstants.CAS_LOGOUT_PATH.replace(APP_CODE_VARIABLE, po.getAppCode()));
+        protocolEndpoint.setCasValidateEndpoint(baseUrl + ProtocolConstants.CasEndpointConstants.CAS_VALIDATE_V1_PATH.replace(APP_CODE_VARIABLE, po.getAppCode()));
+        protocolEndpoint.setCasValidateV2Endpoint(baseUrl + ProtocolConstants.CasEndpointConstants.CAS_VALIDATE_V2_PATH.replace(APP_CODE_VARIABLE, po.getAppCode()));
+        protocolEndpoint.setCasValidateV3Endpoint(baseUrl + ProtocolConstants.CasEndpointConstants.CAS_VALIDATE_V3_PATH.replace(APP_CODE_VARIABLE, po.getAppCode()));
         result.setProtocolEndpoint(protocolEndpoint);
+        //@formatter:on
         return result;
     }
 }

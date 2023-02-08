@@ -17,15 +17,15 @@
  */
 package cn.topiam.employee.common.repository.app.impl.mapper;
 
+import cn.topiam.employee.common.entity.app.po.AppCasConfigPO;
+import cn.topiam.employee.common.enums.app.AuthorizationType;
+import cn.topiam.employee.common.enums.app.CasUserIdentityType;
+import cn.topiam.employee.common.enums.app.InitLoginType;
+import org.springframework.jdbc.core.RowMapper;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-
-import org.springframework.jdbc.core.RowMapper;
-
-import cn.topiam.employee.common.entity.app.po.AppCasConfigPO;
-import cn.topiam.employee.common.enums.app.CasUserIdentityType;
-import cn.topiam.employee.common.enums.app.InitLoginType;
 
 /**
  * AppCasConfigPOPOMapper
@@ -45,6 +45,8 @@ public class AppCasConfigPoMapper implements RowMapper<AppCasConfigPO> {
         configPo.setClientSecret(rs.getString("client_secret"));
         configPo.setInitLoginType(InitLoginType.getType(rs.getString("init_login_type")));
         configPo.setInitLoginUrl(rs.getString("init_login_url"));
+        configPo
+            .setAuthorizationType(AuthorizationType.getType(rs.getString("authorization_type")));
         configPo.setAppTemplate(rs.getString("template_"));
         configPo.setCreateBy(rs.getString("create_by"));
         configPo.setCreateTime(rs.getObject("create_time", LocalDateTime.class));
@@ -52,6 +54,7 @@ public class AppCasConfigPoMapper implements RowMapper<AppCasConfigPO> {
         configPo.setCreateTime(rs.getObject("update_time", LocalDateTime.class));
         configPo.setRemark(rs.getString("remark_"));
         configPo.setClientServiceUrl(rs.getString("client_service_url"));
+        configPo.setServiceTicketExpireTime(rs.getInt("service_ticket_expire_time"));
         configPo
             .setUserIdentityType(CasUserIdentityType.getType(rs.getString("user_identity_type")));
         return configPo;

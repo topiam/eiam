@@ -21,6 +21,7 @@ import cn.topiam.employee.common.enums.app.AuthorizationType;
 import cn.topiam.employee.common.enums.app.CasUserIdentityType;
 import cn.topiam.employee.common.enums.app.InitLoginType;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -34,22 +35,28 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public class AppCasStandardConfigGetResult {
 
     /**
-     * 应用ID
+     * 应用id
      */
-    @Schema(description = "授权类型")
-    private AuthorizationType      authorizationType;
+    @Schema(description = "应用id")
+    private String                 appId;
 
     /**
-     * SSO 发起登录类型
+     * SSO 发起方
      */
-    @Schema(description = "SSO 发起登录类型")
+    @Parameter(description = "SSO 发起方")
     private InitLoginType          initLoginType;
 
     /**
-     * SSO 发起登录URL
+     * SSO 登录链接
      */
-    @Schema(description = "SSO 发起登录URL")
+    @Parameter(description = "SSO 登录链接")
     private String                 initLoginUrl;
+
+    /**
+     * 授权范围
+     */
+    @Parameter(description = "SSO 授权范围")
+    private AuthorizationType      authorizationType;
 
     /**
      * 客户端服务URL
@@ -63,6 +70,10 @@ public class AppCasStandardConfigGetResult {
     @Schema(name = "用户身份类型标识")
     private CasUserIdentityType    userIdentityType;
 
+    /**
+     * serviceTicket 过期时间（秒）
+     */
+    private Integer                serviceTicketExpireTime;
     /**
      * CAS 协议端点
      */
