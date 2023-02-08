@@ -124,7 +124,8 @@ public interface AppPermissionRoleConverter {
      */
     default Predicate rolePaginationParamConvertToPredicate(AppPermissionRoleListQuery query) {
         QAppPermissionRoleEntity role = QAppPermissionRoleEntity.appPermissionRoleEntity;
-        Predicate predicate = role.isNotNull();
+        Predicate predicate = ExpressionUtils.and(role.isNotNull(),
+            role.isDeleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         // 角色名称

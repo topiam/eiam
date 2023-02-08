@@ -20,7 +20,7 @@ package cn.topiam.employee.console.pojo.result.identitysource;
 import java.io.Serial;
 import java.io.Serializable;
 
-import cn.topiam.employee.common.enums.identityprovider.IdentitySourceProvider;
+import cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider;
 
 import lombok.Data;
 

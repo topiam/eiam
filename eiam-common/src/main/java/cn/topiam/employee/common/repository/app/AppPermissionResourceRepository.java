@@ -17,13 +17,18 @@
  */
 package cn.topiam.employee.common.repository.app;
 
+import java.util.Optional;
+
+import org.jetbrains.annotations.NotNull;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.common.entity.app.AppPermissionResourceEntity;
 import cn.topiam.employee.common.repository.authorization.ResourceRepositoryCustomized;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
 
 /**
  * <p>
@@ -35,9 +40,18 @@ import cn.topiam.employee.common.repository.authorization.ResourceRepositoryCust
  */
 @Repository
 public interface AppPermissionResourceRepository extends
-                                                 CrudRepository<AppPermissionResourceEntity, Long>,
+                                                 LogicDeleteRepository<AppPermissionResourceEntity, Long>,
                                                  ResourceRepositoryCustomized,
-                                                 PagingAndSortingRepository<AppPermissionResourceEntity, Long>,
                                                  QuerydslPredicateExecutor<AppPermissionResourceEntity> {
 
+    /**
+     * findByIdContainsDeleted
+     *
+     * @param id must not be {@literal null}.
+     * @return {@link AppPermissionResourceEntity}
+     */
+    @NotNull
+    @Cacheable
+    @Query(value = "SELECT * FROM app_permission_resource WHERE id_ = :id", nativeQuery = true)
+    Optional<AppPermissionResourceEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") Long id);
 }

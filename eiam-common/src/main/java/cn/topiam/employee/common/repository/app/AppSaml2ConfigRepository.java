@@ -22,19 +22,24 @@ import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.app.AppSaml2ConfigEntity;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
 import static cn.topiam.employee.common.constants.ProtocolConstants.SAML2_CONFIG_CACHE_NAME;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 
 /**
  * @author TopIAM
  */
 @Repository
 @CacheConfig(cacheNames = { SAML2_CONFIG_CACHE_NAME })
-public interface AppSaml2ConfigRepository extends JpaRepository<AppSaml2ConfigEntity, Long>,
+public interface AppSaml2ConfigRepository extends LogicDeleteRepository<AppSaml2ConfigEntity, Long>,
                                           QuerydslPredicateExecutor<AppSaml2ConfigEntity>,
                                           AppSaml2ConfigRepositoryCustomized {
     /**
@@ -43,7 +48,11 @@ public interface AppSaml2ConfigRepository extends JpaRepository<AppSaml2ConfigEn
      * @param appId {@link Long}
      */
     @CacheEvict(allEntries = true)
-    void deleteByAppId(Long appId);
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE app_saml2_config SET " + SOFT_DELETE_SET
+                   + " WHERE app_id = :appId", nativeQuery = true)
+    void deleteByAppId(@Param("appId") Long appId);
 
     /**
      * delete

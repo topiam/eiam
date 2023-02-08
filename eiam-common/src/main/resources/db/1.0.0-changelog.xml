@@ -1,0 +1,1358 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<!--
+
+    eiam-common - Employee Identity and Access Management Program
+    Copyright © 2020-2023 TopIAM (support@topiam.cn)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd
+          http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/pro/liquibase-pro-4.3.xsd">
+    <!--init-->
+    <changeSet author="TopIAM" id="1.0.0">
+        <!--创建表-->
+        <createTable remarks="管理员表" tableName="administrator">
+            <column name="id_" remarks="主键ID" type="BIGINT" >
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="username_" remarks="用户名" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password_" remarks="密码" type="VARCHAR(300)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone_" remarks="手机号" type="VARCHAR(64)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="email_" remarks="邮箱" type="VARCHAR(64)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="avatar_" remarks="头像" type="VARCHAR(255)"/>
+            <column name="status_" remarks="状态  ENABLE:启用 DISABLE:禁用 LOCKING:锁定" type="VARCHAR(20)"/>
+            <column name="email_verified" remarks="邮箱验证有效" type="TINYINT(1)"/>
+            <column name="auth_total" remarks="认证次数" type="BIGINT" defaultValueNumeric="0"/>
+            <column name="last_auth_ip" remarks="上次认证IP" type="VARCHAR(50)"/>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="last_auth_time" remarks="上次认证时间"
+                    type="datetime"/>
+            <column name="expand_" remarks="扩展参数" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="用户表" tableName="user">
+            <column name="id_" remarks="主键ID" type="BIGINT" >
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="username_" remarks="用户名" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password_" remarks="密码" type="VARCHAR(300)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email_" remarks="邮箱" type="VARCHAR(50)">
+            </column>
+            <column name="phone_" remarks="电话号码" type="VARCHAR(50)">
+            </column>
+            <column name="phone_area_code" remarks="电话地区代码" type="VARCHAR(50)">
+            </column>
+            <column name="full_name" remarks="姓名" type="VARCHAR(100)"/>
+            <column name="nick_name" remarks="昵称" type="VARCHAR(50)"/>
+            <column name="avatar_" remarks="头像" type="VARCHAR(255)"/>
+            <column name="data_origin" remarks="数据来源" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="identity_source_id" remarks="身份源ID" type="BIGINT"/>
+            <column name="email_verified" remarks="邮箱验证有效" type="TINYINT(1)"/>
+            <column name="phone_verified" remarks="电话验证有效" type="TINYINT(1)"/>
+            <column name="shared_secret" remarks="共享秘钥-TIME OTP" type="VARCHAR(50)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="totp_bind" remarks="是否绑定 TOTP" type="TINYINT(1)"/>
+            <column name="external_id" remarks="外部ID" type="VARCHAR(100)"/>
+            <column name="expire_date" remarks="过期日期" type="date"/>
+            <column name="status_" remarks="状态  ENABLE:启用 DISABLE:禁用 LOCKING:锁定" type="VARCHAR(20)"/>
+            <column name="auth_total" remarks="认证次数" type="BIGINT" defaultValueNumeric="0"/>
+            <column name="last_auth_ip" remarks="上次认证IP" type="VARCHAR(50)"/>
+            <column name="last_auth_time" remarks="上次认证时间" type="datetime"/>
+            <column name="expand_" remarks="扩展参数" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_update_password_time" remarks="上次更新密码时间" type="datetime"/>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="用户详情表" tableName="user_detail">
+            <column name="id_" remarks="主键ID" type="BIGINT" >
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="user_id" remarks="用户ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_type" remarks="证件类型" type="VARCHAR(10)"/>
+            <column name="id_card" remarks="证件号" type="VARCHAR(18)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="website_" remarks="个人主页" type="VARCHAR(100)"/>
+            <column name="address_" remarks="地址" type="VARCHAR(200)"/>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="用户组" tableName="user_group">
+            <column name="id_" remarks="主键ID" type="BIGINT" >
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name_" remarks="用户组名称" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code_" remarks="用户组编码" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="用户组成员" tableName="user_group_member">
+            <column name="id_" remarks="主键ID" type="BIGINT" >
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="group_id" remarks="用户组ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" remarks="用户ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="用户历史密码表" tableName="user_history_password">
+            <column name="id_" remarks="主键ID" type="BIGINT" >
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="user_id" remarks="用户ID" type="BIGINT"/>
+            <column name="password_" remarks="密码" type="VARCHAR(300)"/>
+            <column name="change_time" remarks="更改时间" type="datetime"/>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="用户身份提供商绑定" tableName="user_idp_bind">
+            <column name="id_" remarks="主键ID" type="BIGINT" >
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="user_id" remarks="用户ID" type="BIGINT"/>
+            <column name="open_id" remarks="OPEN ID" type="VARCHAR(50)"/>
+            <column name="idp_id" remarks="身份提供商ID" type="VARCHAR(50)"/>
+            <column name="idp_type" remarks="身份提供商类型" type="VARCHAR(50)"/>
+            <column name="bind_time" defaultValueComputed="CURRENT_TIMESTAMP" remarks="绑定时间" type="datetime"/>
+            <column name="addition_info" remarks="附加信息" type="TEXT"/>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="组织架构" tableName="organization">
+            <column name="id_" remarks="主键ID" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name_" remarks="名称" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code_" remarks="编码" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type_" remarks="类型" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_id" remarks="上级部门" type="VARCHAR(64)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="path_" remarks="上级部门" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="display_path" remarks="显示路径" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="external_id" remarks="外部ID" type="VARCHAR(128)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="data_origin" remarks="数据来源" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="identity_source_id" remarks="身份源ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_leaf" remarks="是否叶子节点" type="TINYINT(1)"/>
+            <column name="is_enabled" remarks="是否启用" type="TINYINT(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="order_" remarks="次序" type="BIGINT" defaultValue="9999">
+                <constraints nullable="true"/>
+            </column>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="组织机构成员" tableName="organization_member">
+            <column name="id_" remarks="主键ID" type="BIGINT" >
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="org_id" remarks="组织机构ID" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" remarks="用户ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="应用信息" tableName="app">
+            <column name="id_" type="BIGINT" remarks="主键ID">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name_" remarks="应用名称" type="VARCHAR(100)"/>
+            <column name="code_" remarks="编码" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="client_id" remarks="客户端ID" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="client_secret" remarks="客户端秘钥" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="protocol_" remarks="协议类型" type="VARCHAR(300)"/>
+            <column name="type_" remarks="应用类型" type="VARCHAR(45)"/>
+            <column name="template_" remarks="应用模板" type="VARCHAR(45)"/>
+            <column name="icon_" remarks="应用图标" type="VARCHAR(300)"/>
+            <column name="init_login_type" remarks="SSO 发起登录类型" type="VARCHAR(50)"/>
+            <column name="init_login_url" remarks="SSO 发起登录URL" type="VARCHAR(500)"/>
+            <column name="authorization_type" remarks="SSO 授权类型" type="VARCHAR(20)"/>
+            <column name="is_enabled" remarks="是否启用" type="TINYINT(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="应用访问授权策略" tableName="app_access_policy">
+            <column name="id_" type="BIGINT" remarks="主键ID">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="app_id" remarks="应用ID" type="BIGINT"/>
+            <column name="subject_id" remarks="主体ID（用户、分组、组织机构）" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="subject_type" remarks="主体类型（用户、分组、组织机构）" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="应用账户" tableName="app_account">
+            <column name="id_" type="BIGINT" remarks="主键ID">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="app_id" remarks="应用ID" type="BIGINT"/>
+            <column name="user_id" remarks="用户ID" type="BIGINT"/>
+            <column name="account_" remarks="账户名称" type="VARCHAR(64)"/>
+            <column name="password_" remarks="账户密码" type="VARCHAR(200)"/>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="应用证书" tableName="app_cert">
+            <column name="id_" type="BIGINT" remarks="主键ID">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="app_id" remarks="应用ID" type="BIGINT"/>
+            <column name="serial_" remarks="证书序列号" type="VARCHAR(128)"/>
+            <column name="subject_" remarks="主题信息" type="VARCHAR(512)"/>
+            <column name="issuer_" remarks="签发者信息" type="VARCHAR(512)"/>
+            <column name="begin_date" remarks="开始时间" type="datetime"/>
+            <column name="end_date" remarks="结束时间" type="datetime"/>
+            <column name="validity_" remarks="有效天数" type="INT"/>
+            <column name="sign_algo" remarks="算法" type="VARCHAR(32)"/>
+            <column name="key_long" remarks="私钥长度" type="INT"/>
+            <column name="private_key" remarks="私钥" type="TEXT"/>
+            <column name="public_key" remarks="公钥" type="TEXT"/>
+            <column name="cert_" remarks="证书" type="TEXT"/>
+            <column name="using_type" remarks="使用类型" type="VARCHAR(64)"/>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="CAS 应用配置" tableName="app_cas_config">
+            <column name="id_" type="BIGINT" remarks="主键ID">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="app_id" remarks="应用ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_identity_type" remarks="CAS用户身份标识" type="VARCHAR(20)"/>
+            <column name="client_service_url" remarks="客户端服务URL地址" type="TEXT"/>
+            <column name="service_ticket_expire_time" remarks="serviceTicket 过期时间（秒）" type="int"/>
+            <column name="custom_response_attribute" remarks="CAS自定义校验响应" type="JSON"/>
+            <column name="additional_config" remarks="额外配置" type="JSON"/>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="表单代填 应用配置" tableName="app_form_config">
+            <column name="id_" type="BIGINT" remarks="主键ID">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="app_id" remarks="应用ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="login_url" remarks="登录URL" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="username_field" remarks="登录名属性名称" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password_field" remarks="登录密码属性名称" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="submit_type" remarks="登录提交方式" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="other_field" remarks="登录其他字段" type="JSON">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="OIDC 应用配置" tableName="app_oidc_config">
+            <column name="id_" type="BIGINT" remarks="主键ID">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="app_id" remarks="应用ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="client_auth_methods" remarks="客户端认证方法" type="JSON">
+                <constraints nullable="false"/>
+            </column>
+            <column name="auth_grant_types" remarks="认证授权类型" type="JSON">
+                <constraints nullable="false"/>
+            </column>
+            <column name="response_types" remarks="响应类型" type="JSON">
+                <constraints nullable="false"/>
+            </column>
+            <column name="redirect_uris" remarks="重定向URIs" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="grant_scopes" remarks="授权范围" type="JSON">
+                <constraints nullable="false"/>
+            </column>
+            <column name="require_auth_consent" remarks="是否需要授权同意" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="require_proof_key" remarks="需要PKCE" type="TINYINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="token_endpoint_auth_signing_algorithm" remarks="令牌 Endpoint 身份验证签名算法"
+                    type="VARCHAR(100)"/>
+            <column name="refresh_token_time_to_live" remarks="刷新 Token生存时间" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_token_time_to_live" remarks="ID Token生存时间" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="access_token_time_to_live" remarks="访问 Token生存时间" type="INT"/>
+            <column name="id_token_signature_algorithm" remarks="Id Token 签名算法" type="VARCHAR(100)"/>
+            <column name="access_token_format" remarks="Access Token 格式" type="VARCHAR(100)"/>
+            <column name="reuse_refresh_token" remarks="是否重用刷新令牌" type="TINYINT"/>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="SAML2 应用配置" tableName="app_saml2_config">
+            <column name="id_" type="BIGINT" remarks="主键ID">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="app_id" remarks="应用ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sp_entity_id" remarks="SP EntityId" type="VARCHAR(128)"/>
+            <column name="sp_metadata" remarks="SP 元数据" type="TEXT"/>
+            <column name="sp_acs_url" remarks="SP 断言消费地址" type="VARCHAR(128)"/>
+            <column name="sp_slo_url" remarks="SP 单点登出地址" type="VARCHAR(128)"/>
+            <column name="sp_requests_signed"
+                    remarks="是否对 SAML Request 签名进行验证 ，用来对SAML Request签名进行验证，对应SP元数据文件中“AuthnRequestsSigned”值"
+                    type="TINYINT(1)"/>
+            <column name="sp_sign_cert"
+                    remarks="SP公钥证书，用来验证SAML request的签名，对应SP元数据文件中 use='signing' 证书内容"
+                    type="TEXT"/>
+            <column name="acs_binding" remarks="断言 Binding 方式" type="VARCHAR(64)"/>
+            <column name="sls_binding" remarks="单点登出 Binding 方式" type="VARCHAR(64)"/>
+            <column name="recipient_" remarks="断言接收者地址" type="VARCHAR(128)"/>
+            <column name="audience_" remarks="指定此SAML断言的目标受众，默认和SP Entity ID相同。"
+                    type="VARCHAR(128)"/>
+            <column name="nameid_format" remarks="断言 NameIDFormat" type="VARCHAR(64)"/>
+            <column name="nameid_value_type" remarks="断言 NameID值表达式" type="VARCHAR(64)"/>
+            <column name="assert_signed" remarks="断言是否签名" type="TINYINT(1)" defaultValueNumeric="0"/>
+            <column name="assert_sign_algorithm" remarks="断言签名使用的非对称算法" type="VARCHAR(128)"/>
+            <column name="assert_encrypted" remarks="断言是否加密" type="TINYINT(1)" defaultValueNumeric="0"/>
+            <column name="assert_encrypt_algorithm" remarks="断言加密使用的非对称算法" type="VARCHAR(128)"/>
+            <column name="response_signed" remarks="是否签名 Response" type="TINYINT(1)" defaultValueNumeric="0"/>
+            <column name="response_sign_algorithm" remarks="Response 签名使用的非对称算法" type="VARCHAR(128)"/>
+            <column name="authn_context_classref" remarks="SAML 身份认证上下文" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="relay_state" remarks="RelayState" type="TEXT"/>
+            <column name="attribute_statements" remarks="AttributeStatements" type="JSON"/>
+            <column name="additional_config" remarks="额外配置" type="JSON"/>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="TSA 应用配置" tableName="app_tsa_config">
+            <column name="id_" type="BIGINT" remarks="主键ID">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="app_id" remarks="应用ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="login_page" remarks="登录页面URL" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="auto_login_steps" remarks="自动登录步骤" type="JSON">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_account_steps" remarks="创建账号步骤" type="JSON">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="应用权限角色表" tableName="app_permission_role">
+            <column name="id_" remarks="主键ID" type="BIGINT" >
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name_" remarks="角色名称" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code_" remarks="角色编码" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="app_id" remarks="所属应用" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_enabled" remarks="是否启用" type="TINYINT(1)"/>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="应用权限资源" tableName="app_permission_resource">
+            <column name="id_" remarks="主键ID" type="BIGINT" >
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name_" remarks="资源名称" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code_" remarks="资源编码" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="desc_" remarks="资源描述" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="app_id" remarks="所属应用" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_enabled" remarks="是否启用" type="TINYINT(1)"/>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="应用权限项" tableName="app_permission_action">
+            <column name="id_" remarks="主键ID" type="BIGINT" >
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="value_" remarks="操作编码" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type_" remarks="权限类型" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name_" remarks="权限描述" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="resource_id" remarks="所属资源" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="应用权限策略" tableName="app_permission_policy">
+            <column name="id_" type="BIGINT" remarks="主键ID">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="app_id" remarks="所属应用" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="subject_id" remarks="权限主体ID（用户、角色、分组、组织机构）" type="VARCHAR2(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="subject_type" remarks="权限主体类型（用户、角色、分组、组织机构）" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="object_id" remarks="权限客体ID（操作权限、角色）" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="object_type" remarks="权限客体类型（操作权限、角色）" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="effect_" remarks="效果（Allow（允许）、Deny（拒绝））" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="行为审计" tableName="audit">
+            <column name="id_" type="BIGINT" remarks="主键ID">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="request_id" remarks="请求ID" type="VARCHAR(100)"/>
+            <column name="session_id" remarks="会话ID" type="VARCHAR(100)"/>
+            <column name="event_type" remarks="事件类型" type="VARCHAR(100)"/>
+            <column name="event_param" remarks="事件参数" type="LONGTEXT"/>
+            <column name="event_content" remarks="事件内容" type="LONGTEXT"/>
+            <column name="event_result" remarks="事件结果" type="LONGTEXT"/>
+            <column name="event_time" remarks="事件时间" type="datetime"/>
+            <column name="event_status" remarks="事件状态" type="VARCHAR(10)"/>
+            <column name="actor_id" remarks="操作者ID" type="VARCHAR(100)"/>
+            <column name="actor_type" remarks="操作者类型" type="VARCHAR(10)"/>
+            <column name="actor_auth_type" remarks="操作者认证类型" type="VARCHAR(20)"/>
+            <column name="target_" remarks="操作目标" type="JSON"/>
+            <column name="user_agent" remarks="用户代理" type="JSON"/>
+            <column name="geo_location" remarks="地理位置" type="JSON"/>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="身份提供商" tableName="identity_provider">
+            <column name="id_" remarks="主键ID" type="BIGINT" >
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name_" remarks="名称" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code_" remarks="编码" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type_" remarks="提供者类型" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="config_" remarks="配置JSON" type="JSON">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_" remarks="认证源分类（社交、企业）" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_enabled" remarks="是否启用" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_displayed" remarks="是否展示" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="身份源" tableName="identity_source">
+            <column name="id_" remarks="主键ID" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name_" remarks="名称" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code_" remarks="编码" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provider_" remarks="提供者" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="basic_config" remarks="基础配置" type="JSON">
+                <constraints nullable="false"/>
+            </column>
+            <column name="strategy_config" remarks="同步策略配置" type="JSON">
+                <constraints nullable="false"/>
+            </column>
+            <column name="job_config" remarks="作业配置" type="JSON">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_enabled" remarks="是否启用" type="TINYINT(1)"/>
+            <column name="is_configured" remarks="是否已配置" type="TINYINT(1)" defaultValue="false"/>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="身份源事件记录" tableName="identity_source_event_record">
+            <column name="id_" remarks="主键ID" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="identity_source_id" remarks="身份源ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="action_type" remarks="动作类型" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="object_id" remarks="对象ID" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="object_name" remarks="对象名称（用户、组织）" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="object_type" remarks="对象类型（用户、组织）" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_time" remarks="事件时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status_" remarks="事件状态" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="desc_" remarks="描述" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="身份源同步历史" tableName="identity_source_sync_history">
+            <column name="id_" remarks="主键ID" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="batch_" remarks="批号" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="identity_source_id" remarks="身份源ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_count" remarks="创建数量" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_count" remarks="更新数量" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deleted_count" remarks="删除数量" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="skipped_count" remarks="跳过数量" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_time" remarks="开始时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_time" remarks="结束时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="object_type" remarks="对象类型（用户、组织）" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trigger_type" remarks="触发类型（手动、任务）" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status_" remarks="同步状态" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="身份源同步记录" tableName="identity_source_sync_record">
+            <column name="id_" remarks="主键ID" type="BIGINT" >
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="sync_history_id" remarks="记录ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="action_type" remarks="动作类型" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="object_id" remarks="对象ID（用户、组织）" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="object_name" remarks="对象名称（用户、组织）" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="object_type" remarks="对象类型（用户、组织）" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status_" remarks="状态" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="desc_" remarks="描述" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="邮件发送记录" tableName="mail_send_record">
+            <column  name="id_" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="subject_" remarks="主题" type="VARCHAR(50)"/>
+            <column name="sender_" remarks="发送人" type="VARCHAR(100)"/>
+            <column name="receiver_" remarks="接收人" type="VARCHAR(100)"/>
+            <column name="content_" remarks="内容" type="TEXT"/>
+            <column name="type_" remarks="邮件类型" type="VARCHAR(20)"/>
+            <column name="provider_" remarks="邮件提供商" type="VARCHAR(50)"/>
+            <column name="is_success" remarks="是否成功" type="TINYINT(1)"/>
+            <column name="send_time" remarks="发送日期" type="datetime"/>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="短信发送记录" tableName="sms_send_record">
+            <column  name="id_" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="phone_" remarks="手机号" type="VARCHAR(50)"/>
+            <column name="content_" remarks="内容" type="TEXT"/>
+            <column name="type_" remarks="消息类型" type="VARCHAR(50)"/>
+            <column name="category_" remarks="消息类别" type="VARCHAR(50)"/>
+            <column name="provider_" remarks="平台" type="VARCHAR(50)"/>
+            <column name="is_success" remarks="是否成功" type="TINYINT(1)"/>
+            <column name="result_" remarks="返回结果" type="TEXT"/>
+            <column name="send_time" remarks="发送日期" type="datetime"/>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="邮件模板" tableName="mail_template">
+            <column name="id_" type="BIGINT" >
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="type_" remarks="模板类型" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sender_" remarks="发件人" type="VARCHAR(200)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="subject_" remarks="主题" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content_" remarks="内容" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="系统设置" tableName="setting">
+            <column name="id_" type="BIGINT" >
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name_" remarks="参数名" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value_" remarks="参数值" type="TEXT"/>
+            <column name="desc_" remarks="描述" type="VARCHAR(100)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <!--创建索引-->
+        <createIndex tableName="administrator" indexName="uk_administrator_username" unique="true">
+            <column name="username_"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="administrator" indexName="uk_administrator_phone" unique="true">
+            <column name="phone_"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="administrator" indexName="uk_administrator_email" unique="true">
+            <column name="email_"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="user" indexName="uk_user_username" unique="true">
+            <column name="username_"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="user" indexName="uk_user_email" unique="true">
+            <column name="email_"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="user" indexName="uk_user_phone" unique="true">
+            <column name="phone_"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="user_detail" indexName="uk_user_detail_user" unique="true">
+            <column name="user_id"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="user_detail" indexName="uk_user_detail_id_card" unique="true">
+            <column name="id_card"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="user_group" indexName="uk_user_group_name" unique="true">
+            <column name="name_"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="user_group" indexName="uk_user_group_code" unique="true">
+            <column name="code_"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="user_group_member" indexName="uk_user_group_member" unique="true">
+            <column name="group_id"/>
+            <column name="user_id"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="user_group_member" indexName="inx_group_id">
+            <column name="group_id"/>
+        </createIndex>
+        <createIndex tableName="user_group_member" indexName="inx_user_id">
+            <column name="user_id"/>
+        </createIndex>
+        <createIndex tableName="user_idp_bind" indexName="uk_user_idp_bind" unique="true">
+            <column name="user_id"/>
+            <column name="idp_id"/>
+            <column name="idp_type"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="organization" indexName="uk_organization_code" unique="true">
+            <column name="code_"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="organization_member" indexName="uk_organization_member" unique="true">
+            <column name="org_id"/>
+            <column name="user_id"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="organization_member" indexName="inx_org_id">
+            <column name="org_id"/>
+        </createIndex>
+        <createIndex tableName="organization_member" indexName="inx_user_id">
+            <column name="user_id"/>
+        </createIndex>
+        <createIndex tableName="app" indexName="uk_app_code" unique="true">
+            <column name="code_"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="app" indexName="uk_app_client_id" unique="true">
+            <column name="client_id"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="app_access_policy" indexName="uk_app_access_policy" unique="true">
+            <column name="app_id"/>
+            <column name="subject_id"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="app_account" indexName="uk_app_account" unique="true">
+            <column name="app_id"/>
+            <column name="user_id"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="app_cas_config" indexName="uk_cas_appid" unique="true">
+            <column name="app_id"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="app_form_config" indexName="uk_form_appid" unique="true">
+            <column name="app_id"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="app_oidc_config" indexName="uk_oidc_appid" unique="true">
+            <column name="app_id"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="app_tsa_config" indexName="uk_tsa_appid" unique="true">
+            <column name="app_id"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="app_permission_role" indexName="uk_role_name" unique="true">
+            <column name="name_"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="app_permission_role" indexName="uk_role_code" unique="true">
+            <column name="code_"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="app_permission_resource" indexName="uk_resource_name" unique="true">
+            <column name="name_"/>
+            <column name="app_id"/>
+            <column name="code_"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="identity_provider" indexName="uk_identity_provider_code" unique="true">
+            <column name="code_"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="identity_source" indexName="uk_identity_source_code" unique="true">
+            <column name="code_"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="mail_template" indexName="uk_mail_template_type" unique="true">
+            <column name="type_"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="setting" indexName="uk_setting_name" unique="true">
+            <column name="name_"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <!-- 添加唯一 -->
+        <addUniqueConstraint tableName="app_permission_policy"
+                             columnNames="subject_id,subject_type,object_id,object_type, is_deleted"
+                             constraintName="uk_app_permission_policy"/>
+        <!--新增数据-->
+        <insert tableName="organization">
+            <column name="id_" value="root"/>
+            <column name="name_" value="TopIAM Employee"/>
+            <column name="path_" value="/root"/>
+            <column name="display_path" value="/TopIAM Employee"/>
+            <column name="code_" value="root"/>
+            <column name="type_" value="department"/>
+            <column name="data_origin" value="input"/>
+            <column name="is_leaf" value="0"/>
+            <column name="is_enabled" value="1"/>
+            <column name="is_deleted" value="0"/>
+            <column name="order_" value="0"/>
+            <column name="create_by" value="topiam"/>
+            <column name="update_by" value="topiam"/>
+            <column name="remark_" value="根节点"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

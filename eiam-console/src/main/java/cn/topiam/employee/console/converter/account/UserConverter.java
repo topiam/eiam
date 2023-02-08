@@ -122,9 +122,15 @@ public interface UserConverter {
         UserEntity userEntity = new UserEntity();
         userEntity.setRemark(param.getRemark());
         userEntity.setUsername(param.getUsername());
-        userEntity.setEmail(param.getEmail());
+        //邮箱
+        if (StringUtils.hasText(param.getEmail())) {
+            userEntity.setEmail(param.getEmail());
+            userEntity.setEmailVerified(Boolean.TRUE);
+        }
+        //手机号
         if (StringUtils.hasText(param.getPhone())) {
             userEntity.setPhone(getPhoneNumber(param.getPhone()));
+            userEntity.setPhoneVerified(Boolean.TRUE);
             userEntity.setPhoneAreaCode(getPhoneAreaCode(param.getPhone()));
         }
         userEntity.setFullName(param.getFullName());
@@ -133,7 +139,6 @@ public interface UserConverter {
         userEntity.setStatus(cn.topiam.employee.common.enums.UserStatus.ENABLE);
         userEntity.setAvatar("https://joeschmoe.io/api/v1/random");
         userEntity.setDataOrigin(cn.topiam.employee.common.enums.DataOrigin.INPUT);
-        userEntity.setEmailVerified(Boolean.FALSE);
         userEntity.setExpireDate(
             java.util.Objects.isNull(param.getExpireDate()) ? java.time.LocalDate.of(2116, 12, 31)
                 : param.getExpireDate());

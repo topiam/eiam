@@ -124,7 +124,7 @@ public class AppAccessPolicyServiceImpl implements AppAccessPolicyService {
     public Boolean deleteAppAccessPolicy(String id) {
         Optional<AppAccessPolicyEntity> optional = appAccessPolicyRepository
             .findById(Long.valueOf(id));
-        //管理员不存在
+        //策略不存在
         if (optional.isEmpty()) {
             AuditContext.setContent("删除失败，应用授权策略不存在");
             log.warn(AuditContext.getContent());

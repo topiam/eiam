@@ -21,7 +21,6 @@ import java.io.Serial;
 import java.io.Serializable;
 
 import cn.topiam.employee.authentication.common.config.IdentityProviderConfig;
-import cn.topiam.employee.common.enums.IdentityProviderType;
 
 import lombok.Data;
 
@@ -56,7 +55,7 @@ public class IdentityProviderResult implements Serializable {
      * 提供商类型
      */
     @Parameter(description = "提供商类型")
-    private IdentityProviderType   type;
+    private String                 type;
 
     /**
      * 配置

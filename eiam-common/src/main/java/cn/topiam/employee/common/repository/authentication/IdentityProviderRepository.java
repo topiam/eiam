@@ -27,14 +27,12 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
-import cn.topiam.employee.common.enums.IdentityProviderType;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
 
 /**
  * <p>
@@ -46,16 +44,16 @@ import cn.topiam.employee.common.enums.IdentityProviderType;
  */
 @Repository
 @CacheConfig(cacheNames = "idp")
-public interface IdentityProviderRepository extends CrudRepository<IdentityProviderEntity, Long>,
-                                            PagingAndSortingRepository<IdentityProviderEntity, Long>,
+public interface IdentityProviderRepository extends
+                                            LogicDeleteRepository<IdentityProviderEntity, Long>,
                                             QuerydslPredicateExecutor<IdentityProviderEntity> {
     /**
      * 根据平台类型查询认证源配置
      *
-     * @param type {@link IdentityProviderType}
+     * @param type {@link String}
      * @return {@link IdentityProviderEntity}
      */
-    List<IdentityProviderEntity> findByType(IdentityProviderType type);
+    List<IdentityProviderEntity> findByType(String type);
 
     /**
      * 根据平台类型查询是否显示
@@ -103,7 +101,19 @@ public interface IdentityProviderRepository extends CrudRepository<IdentityProvi
     @NotNull
     @Override
     @Cacheable(key = "#a0")
-    Optional<IdentityProviderEntity> findById(@NotNull Long id);
+    Optional<IdentityProviderEntity> findById(@NotNull @Param(value = "id") Long id);
+
+    /**
+     * Retrieves an entity by its id.
+     *
+     * @param id must not be {@literal null}.
+     * @return the entity with the given id or {@literal Optional#empty()} if none found.
+     * @throws IllegalArgumentException if {@literal id} is {@literal null}.
+     */
+    @NotNull
+    @Cacheable(key = "#a0")
+    @Query(value = "SELECT * FROM identity_provider WHERE id_ = :id", nativeQuery = true)
+    Optional<IdentityProviderEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") Long id);
 
     /**
      * 更新社交认证源状态
@@ -127,4 +137,13 @@ public interface IdentityProviderRepository extends CrudRepository<IdentityProvi
      */
     @Cacheable(key = "#a0", unless = "#result == null")
     Optional<IdentityProviderEntity> findByIdAndEnabledIsTrue(Long id);
+
+    /**
+     * 根据code查找，并且为启用
+     *
+     * @param code {@link Long}
+     * @return {@link IdentityProviderEntity}
+     */
+    @Cacheable(key = "#a0", unless = "#result == null")
+    Optional<IdentityProviderEntity> findByCodeAndEnabledIsTrue(String code);
 }

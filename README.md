@@ -195,7 +195,7 @@ application.yml文件依次修改以下配置
 
 ## 加入社群
 
-![](https://user-images.githubusercontent.com/30397655/216215736-815861e7-8890-4c62-a496-e69c9c6ee216.jpg)
+![](https://user-images.githubusercontent.com/30397655/217441678-f6499558-77d6-422d-92a4-13a439c0faa6.jpg)
 
 ## 参与贡献
 
@@ -229,3 +229,12 @@ application.yml文件依次修改以下配置
 - portal-public-base-url (门户前台服务域名，可配置IP+端口）
 - openapi-public-base-url  (后台服务域名，可配置IP+端口）
 - synchronizer-public-base-url  (同步认证源服务域名，可配置IP+端口）
+
+2、提示 cn.topiam.employee.common.entity.* 相关包缺失
+
+因项目用到了 `QueryDSL` 查询框架，需要进行编译。
+
+解决方案：
+-  使用命令 `mvn compile`之后，自动生成代码，对应的代码目标在target/generated-sources目录下。
+-  通过 IDEA 选中其目录，Mark Directory as -> generated sources root 。
+-  通过 IDEA 工具类中File -> Invalidate Caches 清理缓存(可选操作)

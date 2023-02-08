@@ -18,7 +18,7 @@
 package cn.topiam.employee.audit.event;
 
 import java.io.Serial;
-import java.util.*;
+import java.util.List;
 
 import org.springframework.context.ApplicationEvent;
 

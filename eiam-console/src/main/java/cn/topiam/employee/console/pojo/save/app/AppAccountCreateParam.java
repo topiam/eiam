@@ -54,4 +54,10 @@ public class AppAccountCreateParam {
     @Schema(description = "账户名称")
     @NotBlank(message = "账户名称不能为空")
     private String account;
+
+    /**
+     * 账户密码
+     */
+    @Schema(description = "账户密码")
+    private String password;
 }

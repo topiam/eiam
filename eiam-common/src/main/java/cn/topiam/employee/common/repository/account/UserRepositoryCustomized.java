@@ -44,7 +44,7 @@ public interface UserRepositoryCustomized {
     Page<UserPO> getUserList(UserListQuery query, Pageable pageable);
 
     /**
-     * 获取用户组成员列表
+     * 获取用户组不存在成员列表
      *
      * @param query    {@link UserListNotInGroupQuery}
      * @param pageable {@link Pageable}

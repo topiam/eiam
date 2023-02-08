@@ -30,8 +30,8 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson2.JSON;
 import com.google.common.collect.Lists;
 
+import cn.topiam.employee.authentication.common.IdentityProviderType;
 import cn.topiam.employee.common.entity.account.UserEntity;
-import cn.topiam.employee.common.enums.IdentityProviderType;
 import cn.topiam.employee.common.enums.PasswordStrength;
 import cn.topiam.employee.core.security.util.UserUtils;
 import cn.topiam.employee.support.result.ApiRestResult;

@@ -83,12 +83,13 @@ public class UserGroupMemberRepositoryCustomizedImpl implements
                 	group_concat( organization_.display_path ) AS org_display_path
                 FROM
                 	user_group_member ugm
-                	INNER JOIN user u ON ugm.user_id = u.id_
-                	INNER JOIN user_group ug ON ug.id_ = ugm.group_id
-                	LEFT JOIN organization_member ON ( u.id_ = organization_member.user_id )
-                    LEFT JOIN organization organization_ ON ( organization_.id_ = organization_member.org_id )
+                	INNER JOIN user u ON ugm.user_id = u.id_ AND u.is_deleted = '0'
+                	INNER JOIN user_group ug ON ug.id_ = ugm.group_id AND ug.is_deleted = '0'
+                	LEFT JOIN organization_member ON ( u.id_ = organization_member.user_id AND organization_member.is_deleted = '0')
+                    LEFT JOIN organization organization_ ON ( organization_.id_ = organization_member.org_id AND organization_.is_deleted = '0')
                 WHERE
-                	ugm.group_id = '%s'
+                    ugm.is_deleted = '0'
+                	AND ugm.group_id = '%s'
                 	AND ug.id_ = '%s'
                 """.formatted(query.getId(), query.getId()));
         //用户名

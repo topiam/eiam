@@ -139,7 +139,8 @@ public interface AdministratorConverter {
      */
     default Predicate queryAdministratorListParamConvertToPredicate(AdministratorListQuery query) {
         QAdministratorEntity user = QAdministratorEntity.administratorEntity;
-        Predicate predicate = user.isNotNull();
+        Predicate predicate = ExpressionUtils.and(user.isNotNull(),
+            user.isDeleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = StringUtils.isBlank(query.getUsername()) ? predicate : ExpressionUtils.and(predicate, user.username.eq(query.getUsername()));

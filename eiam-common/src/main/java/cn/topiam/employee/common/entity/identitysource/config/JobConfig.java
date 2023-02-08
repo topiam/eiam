@@ -170,14 +170,14 @@ public class JobConfig {
             }
         }
         //模式为定时 解析时分秒
-        if (mode.equals(JobConfig.Mode.timed)) {
+        if (mode.equals(Mode.timed)) {
             LocalTime time = LocalTime.parse(value, DateTimeFormatter.ofPattern("H[H]:mm:ss"));
             hour = on(time.getHour());
             minute = on(time.getMinute());
             second = on(time.getSecond());
         }
         //模式为周期（0- 某个小时）执行
-        if (mode.equals(JobConfig.Mode.period)) {
+        if (mode.equals(Mode.period)) {
             hour = new Every(on(0), new IntegerFieldValue(Integer.parseInt(value)));
             minute = on(0);
             second = on(0);

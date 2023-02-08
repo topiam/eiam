@@ -17,6 +17,8 @@
  */
 package cn.topiam.employee.console.service.setting;
 
+import java.time.LocalDateTime;
+
 import cn.topiam.employee.common.enums.CheckValidityType;
 import cn.topiam.employee.common.enums.UserStatus;
 import cn.topiam.employee.console.pojo.query.setting.AdministratorListQuery;
@@ -103,4 +105,13 @@ public interface AdministratorService {
      * @return {@link Boolean}
      */
     Boolean administratorParamCheck(CheckValidityType type, String value, Long id);
+
+    /**
+     * 更新认证成功信息
+     *
+     * @param id {@link String}
+     * @param ip {@link String}
+     * @param loginTime {@link LocalDateTime}
+     */
+    Boolean updateAuthSucceedInfo(String id, String ip, LocalDateTime loginTime);
 }

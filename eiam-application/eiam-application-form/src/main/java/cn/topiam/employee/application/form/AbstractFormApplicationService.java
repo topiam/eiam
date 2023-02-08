@@ -17,8 +17,11 @@
  */
 package cn.topiam.employee.application.form;
 
-import cn.topiam.employee.application.ApplicationService;
-import cn.topiam.employee.common.repository.app.AppCertRepository;
+import org.springframework.util.AlternativeJdkIdGenerator;
+import org.springframework.util.IdGenerator;
+
+import cn.topiam.employee.common.repository.app.AppAccountRepository;
+import cn.topiam.employee.common.repository.app.AppFormConfigRepository;
 import cn.topiam.employee.common.repository.app.AppRepository;
 
 /**
@@ -27,20 +30,40 @@ import cn.topiam.employee.common.repository.app.AppRepository;
  * @author TopIAM
  * Created by support@topiam.cn on  2022/8/23 20:58
  */
-public abstract class AbstractFormApplicationService implements ApplicationService {
+public abstract class AbstractFormApplicationService implements FormApplicationService {
 
-    /**
-     * AppCertRepository
-     */
-    protected final AppCertRepository appCertRepository;
+    @Override
+    public void delete(String appId) {
+        //删除应用
+        appRepository.deleteById(Long.valueOf(appId));
+        //删除应用账户
+        appAccountRepository.deleteAllByAppId(Long.valueOf(appId));
+        // 删除应用配置
+        appFormConfigRepository.deleteByAppId(Long.valueOf(appId));
+    }
+
     /**
      * ApplicationRepository
      */
-    protected final AppRepository     appRepository;
+    protected final AppRepository           appRepository;
 
-    protected AbstractFormApplicationService(AppCertRepository appCertRepository,
-                                             AppRepository appRepository) {
-        this.appCertRepository = appCertRepository;
+    /**
+     * AppAccountRepository
+     */
+    protected final AppAccountRepository    appAccountRepository;
+
+    protected final AppFormConfigRepository appFormConfigRepository;
+
+    /**
+     * IdGenerator
+     */
+    protected final IdGenerator             idGenerator = new AlternativeJdkIdGenerator();
+
+    protected AbstractFormApplicationService(AppRepository appRepository,
+                                             AppAccountRepository appAccountRepository,
+                                             AppFormConfigRepository appFormConfigRepository) {
         this.appRepository = appRepository;
+        this.appAccountRepository = appAccountRepository;
+        this.appFormConfigRepository = appFormConfigRepository;
     }
 }

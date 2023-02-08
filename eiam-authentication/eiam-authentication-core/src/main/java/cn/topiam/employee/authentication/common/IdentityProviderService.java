@@ -23,7 +23,6 @@ import java.util.Map;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.authentication.common.config.IdentityProviderConfig;
-import cn.topiam.employee.common.enums.IdentityProviderType;
 
 /**
  * IdentityProviderService

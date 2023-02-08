@@ -25,6 +25,7 @@ import javax.validation.constraints.NotEmpty;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import cn.topiam.employee.common.crypto.Encrypt;
 import cn.topiam.employee.common.storage.AbstractStorage;
 import cn.topiam.employee.common.storage.StorageConfig;
 import cn.topiam.employee.common.storage.StorageProviderException;
@@ -118,6 +119,7 @@ public class MinIoStorage extends AbstractStorage {
         /**
          * SecretKey
          */
+        @Encrypt
         @NotEmpty(message = "SecretKey不能为空")
         private String secretKey;
         /**

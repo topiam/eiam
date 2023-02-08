@@ -22,19 +22,20 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Lists;
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
-import cn.topiam.employee.common.entity.account.UserGroupEntity;
-import cn.topiam.employee.common.entity.account.UserGroupMemberEntity;
+import cn.topiam.employee.common.entity.account.*;
 import cn.topiam.employee.common.entity.account.po.UserPO;
 import cn.topiam.employee.common.entity.account.query.UserGroupMemberListQuery;
 import cn.topiam.employee.common.repository.account.UserGroupMemberRepository;
@@ -132,6 +133,11 @@ public class UserGroupServiceImpl implements UserGroupService {
             log.warn(AuditContext.getContent());
             throw new TopIamException(AuditContext.getContent());
         }
+        //用户组存在用户
+        Long count = getUserGroupMemberCount(id);
+        if (count > 0) {
+            throw new RuntimeException("删除用户组失败，当前用户组下存在用户");
+        }
         userGroupRepository.deleteById(Long.valueOf(id));
         AuditContext.setTarget(Target.builder().id(id).type(TargetType.USER_GROUP).build());
         return true;
@@ -176,6 +182,13 @@ public class UserGroupServiceImpl implements UserGroupService {
      */
     @Override
     public Boolean addMember(String groupId, String[] userIds) {
+        Optional<UserGroupEntity> optional = userGroupRepository.findById(Long.valueOf(groupId));
+        //用户组不存在
+        if (optional.isEmpty()) {
+            AuditContext.setContent("操作失败，用户组不存在");
+            log.warn(AuditContext.getContent());
+            throw new TopIamException(AuditContext.getContent());
+        }
         List<UserGroupMemberEntity> list = new ArrayList<>();
         Lists.newArrayList(userIds).forEach(id -> {
             UserGroupMemberEntity member = new UserGroupMemberEntity();
@@ -183,12 +196,14 @@ public class UserGroupServiceImpl implements UserGroupService {
             member.setUserId(Long.valueOf(id));
             list.add(member);
         });
-        List<Target> targets = new ArrayList<>(Arrays.stream(userIds)
-            .map(i -> Target.builder().id(i).type(TargetType.USER).build()).toList());
-        targets.add(Target.builder().id(groupId).type(TargetType.USER_GROUP).build());
-        AuditContext.setTarget(targets);
         //添加
         userGroupMemberRepository.saveAll(list);
+
+        List<Target> targets = new ArrayList<>(Arrays.stream(userIds)
+            .map(i -> Target.builder().id(i).type(TargetType.USER).build()).toList());
+
+        targets.add(Target.builder().id(groupId).type(TargetType.USER_GROUP).build());
+        AuditContext.setTarget(targets);
         return true;
     }
 
@@ -212,14 +227,46 @@ public class UserGroupServiceImpl implements UserGroupService {
      */
     @Override
     public Boolean batchRemoveMember(String id, List<String> userIds) {
+        Optional<UserGroupEntity> optional = userGroupRepository.findById(Long.valueOf(id));
+        //用户组不存在
+        if (optional.isEmpty()) {
+            AuditContext.setContent("操作失败，用户组不存在");
+            log.warn(AuditContext.getContent());
+            throw new TopIamException(AuditContext.getContent());
+        }
         userIds.forEach(userId -> userGroupMemberRepository
             .deleteByGroupIdAndUserId(Long.valueOf(id), Long.valueOf(userId)));
-        AuditContext.setTarget(
-            Target.builder().id(StringUtils.join(userIds)).type(TargetType.USER).build(),
-            Target.builder().id(id).type(TargetType.USER_GROUP).build());
+
+        List<Target> targets = new ArrayList<>(userIds.stream()
+            .map(i -> Target.builder().id(i).type(TargetType.USER).build()).toList());
+
+        targets.add(Target.builder().id(id).type(TargetType.USER_GROUP).build());
+        AuditContext.setTarget(targets);
         return true;
     }
 
+    @Override
+    public Long getUserGroupMemberCount(String groupId) {
+        //条件
+        QUserEntity user = QUserEntity.userEntity;
+        QUserGroupEntity qUserGroup = QUserGroupEntity.userGroupEntity;
+        Predicate predicate = ExpressionUtils.and(user.isNotNull(),
+            user.isDeleted.eq(Boolean.FALSE));
+        predicate = ExpressionUtils.and(predicate, qUserGroup.id.eq(Long.valueOf(groupId)));
+        //构造查询
+        JPAQuery<Long> jpaQuery = jpaQueryFactory.selectFrom(user).select(user.count())
+            .innerJoin(QUserGroupMemberEntity.userGroupMemberEntity)
+            .on(user.id.eq(QUserGroupMemberEntity.userGroupMemberEntity.userId))
+            .innerJoin(qUserGroup)
+            .on(qUserGroup.id.eq(QUserGroupMemberEntity.userGroupMemberEntity.groupId))
+            .where(predicate);
+        return jpaQuery.fetch().get(0);
+    }
+
+    /**
+     * JPAQueryFactory
+     */
+    private final JPAQueryFactory           jpaQueryFactory;
     /**
      * 用户组数据映射
      */

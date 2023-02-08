@@ -57,7 +57,7 @@ import static cn.topiam.employee.support.constant.EiamConstants.TOPIAM_ENCRYPT_S
 public class DecryptRequestBodyAdvice extends RequestBodyAdviceAdapter {
     private final Logger        logger  = LoggerFactory.getLogger(DecryptRequestBodyAdvice.class);
 
-    private final static String ENCRYPT = "encrypt";
+    private static final String ENCRYPT = "encrypt";
 
     @Override
     public boolean supports(MethodParameter methodParameter, @NonNull Type targetType,

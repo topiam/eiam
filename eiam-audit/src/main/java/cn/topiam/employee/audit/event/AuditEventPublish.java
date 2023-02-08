@@ -35,6 +35,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.google.common.collect.Maps;
 
 import cn.topiam.employee.audit.entity.*;
 import cn.topiam.employee.audit.enums.EventStatus;
@@ -92,6 +93,35 @@ public class AuditEventPublish {
      * @param eventType {@link EventType}
      */
     public void publish(EventType eventType, Authentication authentication, EventStatus eventStatus,
+                        List<Target> targets, String result) {
+        //@formatter:off
+        //封装操作事件
+        Event event = Event.builder()
+                .type(eventType)
+                .time(Instant.now())
+                .result(result)
+                .status(eventStatus).build();
+        if (authentication.getPrincipal() instanceof UserDetails){
+            String username = ((UserDetails) authentication.getPrincipal()).getUsername();
+            event.setContent(username+"："+event.getType().getDesc());
+        }
+        //封装地理位置
+        GeoLocation geoLocationModal = getGeoLocation();
+        //封装用户代理
+        UserAgent userAgent = getUserAgent();
+        //封装操作人
+        Actor actor = getActor(authentication);
+        //Publish AuditEvent
+        applicationEventPublisher.publishEvent(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, targets));
+        //@formatter:on
+    }
+
+    /**
+     * 发布 审计事件
+     *
+     * @param eventType {@link EventType}
+     */
+    public void publish(EventType eventType, Authentication authentication, EventStatus eventStatus,
                         List<Target> targets) {
         //@formatter:off
         //封装操作事件
@@ -99,9 +129,12 @@ public class AuditEventPublish {
                 .type(eventType)
                 .time(Instant.now())
                 .status(eventStatus).build();
-        if (authentication.getPrincipal() instanceof UserDetails){
-            String username = ((UserDetails) authentication.getPrincipal()).getUsername();
-            event.setContent(username+"："+event.getType().getDesc());
+        if (authentication.getPrincipal() instanceof UserDetails principal){
+            String username = principal.getUsername();
+            Map<String,String> content= Maps.newConcurrentMap();
+            content.put("auth_type",principal.getAuthType());
+            content.put("desc",username+"："+event.getType().getDesc());
+            event.setContent(JSONObject.toJSONString(content));
         }
         //封装地理位置
         GeoLocation geoLocationModal = getGeoLocation();
@@ -209,10 +242,16 @@ public class AuditEventPublish {
         //@formatter:off
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
-        return Actor.builder()
+        Object principal = authentication.getPrincipal();
+
+        Actor actor = Actor.builder()
                 .id(getActorId(authentication))
                 .type(getActorType(authentication))
                 .build();
+        if (principal instanceof UserDetails){
+            actor.setAuthType(((UserDetails) principal).getAuthType());
+        }
+        return actor;
         //@formatter:on
     }
 
@@ -223,10 +262,15 @@ public class AuditEventPublish {
      */
     private Actor getActor(Authentication authentication) {
         //@formatter:off
-        return Actor.builder()
+        Actor actor = Actor.builder()
                 .id(getActorId(authentication))
                 .type(getActorType(authentication))
                 .build();
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails){
+            actor.setAuthType(((UserDetails) principal).getAuthType());
+        }
+        return actor;
         //@formatter:on
     }
 

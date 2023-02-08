@@ -30,8 +30,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AbstractAuthenticationTargetUrlRequestHandler;
 
+import cn.topiam.employee.common.constants.AuthorizeConstants;
 import cn.topiam.employee.common.enums.SecretType;
 import cn.topiam.employee.core.context.ServerContextHelp;
+import cn.topiam.employee.core.security.authentication.IdpAuthentication;
 import cn.topiam.employee.support.result.ApiRestResult;
 import cn.topiam.employee.support.util.HttpResponseUtils;
 import cn.topiam.employee.support.util.HttpUrlUtils;
@@ -52,7 +54,9 @@ public class PortalAuthenticationSuccessHandler extends
                                                 implements
                                                 org.springframework.security.web.authentication.AuthenticationSuccessHandler {
 
-    private final Logger logger = LoggerFactory.getLogger(PortalAuthenticationSuccessHandler.class);
+    private final Logger        logger            = LoggerFactory
+        .getLogger(PortalAuthenticationSuccessHandler.class);
+    private static final String REQUIRE_USER_BIND = "require_user_bind";
 
     /**
      * Called when a user has been successfully authenticated.
@@ -74,11 +78,25 @@ public class PortalAuthenticationSuccessHandler extends
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
+
         //@formatter:off
         boolean isTextHtml = acceptIncludeTextHtml(request);
         //Clear Authentication Attributes
         clearAuthenticationAttributes(request);
         if (response.isCommitted()) {
+            return;
+        }
+        //TODO IDP 未关联
+        if (authentication instanceof IdpAuthentication && !((IdpAuthentication) authentication).getAssociated()) {
+            if (!isTextHtml) {
+                HttpResponseUtils.flushResponseJson(response, HttpStatus.BAD_REQUEST.value(),
+                        ApiRestResult.builder().status(REQUIRE_USER_BIND).message(REQUIRE_USER_BIND)
+                                .build());
+                return;
+            }
+            //跳转登录，前端会有接口获取状态，并进行展示绑定页面
+            response.sendRedirect(HttpUrlUtils
+                    .format(ServerContextHelp.getPortalPublicBaseUrl() + AuthorizeConstants.FE_LOGIN));
             return;
         }
         if (!isTextHtml) {

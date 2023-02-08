@@ -21,11 +21,11 @@ import java.time.LocalDateTime;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.audit.entity.AuditEntity;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
 
 /**
  * 行为审计repository
@@ -34,7 +34,7 @@ import cn.topiam.employee.audit.entity.AuditEntity;
  * Created by support@topiam.cn on  2021/9/11 22:32
  */
 @Repository
-public interface AuditRepository extends CrudRepository<AuditEntity, Long>,
+public interface AuditRepository extends LogicDeleteRepository<AuditEntity, Long>,
                                  QuerydslPredicateExecutor<AuditEntity> {
 
     /**

@@ -29,8 +29,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +36,9 @@ import org.springframework.transaction.annotation.Transactional;
 import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.enums.DataOrigin;
 import cn.topiam.employee.common.enums.UserStatus;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
 import static cn.topiam.employee.common.constants.AccountConstants.USER_CACHE_NAME;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
 /**
  * <p>
@@ -50,8 +50,7 @@ import static cn.topiam.employee.common.constants.AccountConstants.USER_CACHE_NA
  */
 @Repository
 @CacheConfig(cacheNames = { USER_CACHE_NAME })
-public interface UserRepository extends CrudRepository<UserEntity, Long>,
-                                PagingAndSortingRepository<UserEntity, Long>,
+public interface UserRepository extends LogicDeleteRepository<UserEntity, Long>,
                                 QuerydslPredicateExecutor<UserEntity>, UserRepositoryCustomized {
     /**
      * findById
@@ -62,7 +61,18 @@ public interface UserRepository extends CrudRepository<UserEntity, Long>,
     @NotNull
     @Override
     @Cacheable(key = "#p0", unless = "#result==null")
-    Optional<UserEntity> findById(@NotNull Long id);
+    Optional<UserEntity> findById(@NotNull @Param(value = "id") Long id);
+
+    /**
+     * findByIdContainsDeleted
+     *
+     * @param id must not be {@literal null}.
+     * @return {@link UserEntity}
+     */
+    @NotNull
+    @Cacheable(key = "#p0", unless = "#result==null")
+    @Query(value = "SELECT * FROM user WHERE id_ = :id", nativeQuery = true)
+    Optional<UserEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") Long id);
 
     /**
      * findById
@@ -195,7 +205,8 @@ public interface UserRepository extends CrudRepository<UserEntity, Long>,
      * @param expireWarnDays {@link Integer} 即将到期日期
      * @return {@link UserEntity}
      */
-    @Query(value = "SELECT * FROM `user` WHERE DATE_ADD(DATE_FORMAT(last_update_password_time,'%Y-%m-%d'), INTERVAL :expireWarnDays DAY ) <= CURDATE() and user.status_ != 'locked'", nativeQuery = true)
+    @Query(value = "SELECT * FROM `user` WHERE DATE_ADD(DATE_FORMAT(last_update_password_time,'%Y-%m-%d'), INTERVAL :expireWarnDays DAY ) <= CURDATE() and user.status_ != 'locked' AND "
+                   + SOFT_DELETE_WHERE, nativeQuery = true)
     List<UserEntity> findPasswordExpireWarnUser(@Param(value = "expireWarnDays") Integer expireWarnDays);
 
     /**
@@ -204,7 +215,8 @@ public interface UserRepository extends CrudRepository<UserEntity, Long>,
      * @param expireDays {@link Integer} 密码过期日期
      * @return {@link UserEntity}
      */
-    @Query(value = "SELECT * FROM `user` WHERE DATE_ADD(DATE_FORMAT(last_update_password_time,'%Y-%m-%d'), INTERVAL :expireDays DAY ) BETWEEN DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 1 HOUR),'%Y-%m-%d %h') AND DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 1 HOUR),'%Y-%m-%d %h') and user.status_ != 'password_expired_locked'", nativeQuery = true)
+    @Query(value = "SELECT * FROM `user` WHERE DATE_ADD(DATE_FORMAT(last_update_password_time,'%Y-%m-%d'), INTERVAL :expireDays DAY ) BETWEEN DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 1 HOUR),'%Y-%m-%d %h') AND DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 1 HOUR),'%Y-%m-%d %h') AND user.status_ != 'password_expired_locked' AND "
+                   + SOFT_DELETE_WHERE, nativeQuery = true)
     List<UserEntity> findPasswordExpireUser(@Param(value = "expireDays") Integer expireDays);
 
     /**
@@ -212,7 +224,8 @@ public interface UserRepository extends CrudRepository<UserEntity, Long>,
      *
      * @return {@link UserEntity}
      */
-    @Query(value = "SELECT * from `user` WHERE expire_date <= CURDATE() and status_ != 'expired_locked'", nativeQuery = true)
+    @Query(value = "SELECT * FROM `user` WHERE expire_date <= CURDATE() and status_ != 'expired_locked' AND "
+                   + SOFT_DELETE_WHERE, nativeQuery = true)
     List<UserEntity> findExpireUser();
 
     /**
@@ -229,13 +242,6 @@ public interface UserRepository extends CrudRepository<UserEntity, Long>,
     Integer updateUserSharedSecretAndTotpBind(@Param(value = "id") Long id,
                                               @Param(value = "sharedSecret") String sharedSecret,
                                               @Param(value = "totpBind") Boolean totpBind);
-
-    /**
-     * 根据第三方扩展ID 删除用户
-     *
-     * @param externalIds {@link List}
-     */
-    void deleteAllByExternalIdIn(Collection<String> externalIds);
 
     /**
      * 根据用户名查询全部
@@ -268,4 +274,17 @@ public interface UserRepository extends CrudRepository<UserEntity, Long>,
      * @return {@link List}
      */
     List<UserEntity> findAllByIdNotInAndDataOrigin(Collection<Long> ids, DataOrigin dataOrigin);
+
+    /**
+     * 更新认证成功信息
+     *
+     * @param id {@link String}
+     * @param ip {@link String}
+     * @param loginTime {@link LocalDateTime}
+     */
+    @CacheEvict(allEntries = true)
+    @Transactional(rollbackFor = Exception.class)
+    @Modifying
+    @Query(value = "UPDATE user SET auth_total = (IFNULL(auth_total,0) +1),last_auth_ip = ?2,last_auth_time = ?3 WHERE id_ = ?1", nativeQuery = true)
+    void updateAuthSucceedInfo(String id, String ip, LocalDateTime loginTime);
 }

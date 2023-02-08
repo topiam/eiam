@@ -20,11 +20,10 @@ package cn.topiam.employee.common.repository.account;
 import java.util.List;
 
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.common.entity.account.UserHistoryPasswordEntity;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
 
 /**
  * <p>
@@ -36,8 +35,7 @@ import cn.topiam.employee.common.entity.account.UserHistoryPasswordEntity;
  */
 @Repository
 public interface UserHistoryPasswordRepository extends
-                                               CrudRepository<UserHistoryPasswordEntity, Long>,
-                                               PagingAndSortingRepository<UserHistoryPasswordEntity, Long>,
+                                               LogicDeleteRepository<UserHistoryPasswordEntity, Long>,
                                                QuerydslPredicateExecutor<UserHistoryPasswordEntity> {
     /**
      * 根据用户ID查询历史密码

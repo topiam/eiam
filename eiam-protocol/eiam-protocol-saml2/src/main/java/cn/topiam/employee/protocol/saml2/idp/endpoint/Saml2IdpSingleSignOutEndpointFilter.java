@@ -17,10 +17,13 @@
  */
 package cn.topiam.employee.protocol.saml2.idp.endpoint;
 
+import java.util.Objects;
+
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.opensaml.messaging.context.MessageContext;
 import org.opensaml.saml.saml2.core.LogoutRequest;
 import org.opensaml.security.credential.CredentialResolver;
@@ -31,6 +34,7 @@ import org.springframework.core.Ordered;
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -39,9 +43,10 @@ import com.google.common.collect.Lists;
 
 import cn.topiam.employee.application.ApplicationService;
 import cn.topiam.employee.application.ApplicationServiceLoader;
-import cn.topiam.employee.application.Saml2ApplicationService;
 import cn.topiam.employee.application.context.ApplicationContext;
 import cn.topiam.employee.application.context.ApplicationContextHolder;
+import cn.topiam.employee.application.saml2.Saml2ApplicationService;
+import cn.topiam.employee.application.saml2.model.Saml2ProtocolConfig;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.EventStatus;
 import cn.topiam.employee.audit.enums.TargetType;
@@ -49,7 +54,6 @@ import cn.topiam.employee.audit.event.AuditEventPublish;
 import cn.topiam.employee.common.constants.ProtocolConstants;
 import cn.topiam.employee.common.util.SamlUtils;
 import cn.topiam.employee.core.context.ServerContextHelp;
-import cn.topiam.employee.core.protocol.Saml2ProtocolConfig;
 import cn.topiam.employee.protocol.saml2.idp.endpoint.xml.Saml2ValidatorSuite;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.exception.TopIamException;
@@ -73,7 +77,7 @@ public class Saml2IdpSingleSignOutEndpointFilter extends OncePerRequestFilter
 
     private final Logger                logger          = LoggerFactory
         .getLogger(Saml2IdpSingleSignOutEndpointFilter.class);
-    private final static RequestMatcher REQUEST_MATCHER = new AntPathRequestMatcher(
+    private static final RequestMatcher REQUEST_MATCHER = new AntPathRequestMatcher(
         ProtocolConstants.Saml2EndpointConstants.SAML_LOGOUT_PATH);
 
     public static RequestMatcher getRequestMatcher() {
@@ -104,13 +108,19 @@ public class Saml2IdpSingleSignOutEndpointFilter extends OncePerRequestFilter
                     LogoutRequest logoutRequest = (LogoutRequest) messageContext.getMessage();
                     logger.info("LogoutRequest: ");
                     SamlUtils.logSamlObject(logoutRequest);
-                    CredentialResolver credentialResolver = getKeyStoreCredentialResolver(protocolConfig.getSpEntityId(), protocolConfig.getSpSignCert());
-                    Saml2ValidatorSuite.verifySignatureUsingSignatureValidator(logoutRequest.getSignature(), credentialResolver, protocolConfig.getSpEntityId());
-                    Saml2ValidatorSuite.verifySignatureUsingMessageHandler(messageContext, credentialResolver, protocolConfig.getSpEntityId());
+                    if (protocolConfig.getSpRequestsSigned()){
+                        CredentialResolver credentialResolver = getKeyStoreCredentialResolver(protocolConfig.getSpEntityId(), protocolConfig.getSpSignCert());
+                        Saml2ValidatorSuite.verifySignatureUsingSignatureValidator(logoutRequest.getSignature(), credentialResolver, protocolConfig.getSpEntityId());
+                        Saml2ValidatorSuite.verifySignatureUsingMessageHandler(messageContext, credentialResolver, protocolConfig.getSpEntityId());
+                    }
                     //根据 SessionIndexes 清除会话
-                    logoutRequest.getSessionIndexes().forEach((i) -> sessionRegistry.removeSessionInformation(i.getValue()));
+                    Objects.requireNonNull(logoutRequest).getSessionIndexes().forEach((i) -> sessionRegistry.removeSessionInformation(i.getValue()));
                     //跳转登录
-                    response.sendRedirect(ServerContextHelp.getPortalPublicBaseUrl() + FE_LOGIN);
+                    StringBuilder loginUrl = new StringBuilder(ServerContextHelp.getPortalPublicBaseUrl() + FE_LOGIN);
+                    if(StringUtils.isNotBlank(logoutRequest.getDestination())) {
+                        loginUrl.append("?").append(OAuth2ParameterNames.REDIRECT_URI+"=").append(logoutRequest.getDestination());
+                    }
+                    response.sendRedirect(loginUrl.toString());
                 } catch (Exception e) {
                     success=false;
                     result=e.getMessage();

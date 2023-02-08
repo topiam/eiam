@@ -189,6 +189,11 @@ class OnlineSession implements Serializable {
     private UserAgent         userAgent;
 
     /**
+     * 认证类型
+     */
+    private String            authType;
+
+    /**
      * 登录时间
      */
     @JSONField(format = DEFAULT_DATE_TIME_FORMATTER_PATTERN)
@@ -231,6 +236,8 @@ interface OnlineUserConverter {
         onlineSession.setGeoLocation(sessionDetails.getGeoLocation());
         //用户代理
         onlineSession.setUserAgent(sessionDetails.getUserAgent());
+        //认证类型
+        onlineSession.setAuthType(sessionDetails.getAuthType());
         //登录时间
         onlineSession.setLoginTime(sessionDetails.getLoginTime());
         //最后请求时间

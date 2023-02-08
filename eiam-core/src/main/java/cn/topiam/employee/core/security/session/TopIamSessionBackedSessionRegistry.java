@@ -83,7 +83,7 @@ public class TopIamSessionBackedSessionRegistry<T extends Session>
     }
 
     private List<Object> getTopIamUserDetails(List<SessionInformation> infos) {
-        List<cn.topiam.employee.core.security.session.SessionDetails> details = new ArrayList<>();
+        List<SessionDetails> details = new ArrayList<>();
         for (SessionInformation information : infos) {
             //根据session id 获取缓存信息
             Session session = sessionRepository.findById(information.getSessionId());
@@ -97,8 +97,8 @@ public class TopIamSessionBackedSessionRegistry<T extends Session>
                 //转为实体
                 UserDetails principal = (UserDetails) securityContext.getAuthentication()
                     .getPrincipal();
-                cn.topiam.employee.core.security.session.SessionDetails sessionDetails = new SessionDetails(
-                    principal.getId(), principal.getUsername());
+                SessionDetails sessionDetails = new SessionDetails(principal.getId(),
+                    principal.getUsername());
                 //last request
                 Instant instant = information.getLastRequest().toInstant();
                 ZoneId zoneId = ZoneId.systemDefault();
@@ -107,6 +107,8 @@ public class TopIamSessionBackedSessionRegistry<T extends Session>
                 sessionDetails.setLastRequestTime(lastRequestTime);
                 //登录时间
                 sessionDetails.setLoginTime(principal.getLoginTime());
+                //登录时间
+                sessionDetails.setAuthType(principal.getAuthType());
                 //用户类型
                 sessionDetails.setUserType(principal.getUserType());
                 //地理位置

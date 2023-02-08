@@ -36,11 +36,11 @@ import org.opensaml.xmlsec.signature.support.SignatureConstants;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.opensaml.xmlsec.signature.support.Signer;
 
+import cn.topiam.employee.application.saml2.model.Saml2SsoModel;
 import cn.topiam.employee.common.enums.app.AuthnContextClassRefType;
 import cn.topiam.employee.common.enums.app.SamlEncryptAssertAlgorithmType;
 import cn.topiam.employee.common.enums.app.SamlNameIdFormatType;
 import cn.topiam.employee.common.enums.app.SamlSignAssertAlgorithmType;
-import cn.topiam.employee.core.protocol.Saml2SsoModel;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

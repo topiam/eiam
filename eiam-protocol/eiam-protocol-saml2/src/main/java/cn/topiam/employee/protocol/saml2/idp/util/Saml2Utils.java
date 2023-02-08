@@ -24,20 +24,20 @@ import org.opensaml.saml.saml2.core.NameIDType;
 import org.opensaml.saml.saml2.metadata.*;
 import org.opensaml.saml.saml2.metadata.impl.*;
 import org.opensaml.security.credential.UsageType;
-import org.springframework.context.ApplicationContext;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.core.session.SessionRegistry;
 
-import cn.topiam.employee.application.ApplicationServiceLoader;
+import cn.topiam.employee.application.saml2.model.Saml2ProtocolConfig;
 import cn.topiam.employee.common.repository.app.AppSaml2ConfigRepository;
 import cn.topiam.employee.common.util.SamlKeyStoreProvider;
 import cn.topiam.employee.core.context.ServerContextHelp;
-import cn.topiam.employee.core.protocol.Saml2ProtocolConfig;
 import cn.topiam.employee.support.exception.TopIamException;
 import static org.opensaml.saml.common.xml.SAMLConstants.SAML2_POST_BINDING_URI;
 import static org.opensaml.saml.common.xml.SAMLConstants.SAML2_REDIRECT_BINDING_URI;
 
-import static cn.topiam.employee.common.constants.ProtocolConstants.*;
+import static cn.topiam.employee.common.constants.ProtocolConstants.APP_CODE_VARIABLE;
+import static cn.topiam.employee.common.constants.ProtocolConstants.Saml2EndpointConstants;
+import static cn.topiam.employee.protocol.cas.util.ProtocolUtils.getBean;
 
 /**
  *
@@ -63,20 +63,6 @@ public class Saml2Utils {
             builder.setSharedObject(SessionRegistry.class, sessionRegistry);
         }
         return sessionRegistry;
-    }
-
-    public static <B extends HttpSecurityBuilder<B>> ApplicationServiceLoader getApplicationServiceLoader(B builder) {
-        ApplicationServiceLoader applicationServiceLoader = builder
-            .getSharedObject(ApplicationServiceLoader.class);
-        if (applicationServiceLoader == null) {
-            applicationServiceLoader = getBean(builder, ApplicationServiceLoader.class);
-            builder.setSharedObject(ApplicationServiceLoader.class, applicationServiceLoader);
-        }
-        return applicationServiceLoader;
-    }
-
-    public static <B extends HttpSecurityBuilder<B>, T> T getBean(B builder, Class<T> type) {
-        return builder.getSharedObject(ApplicationContext.class).getBean(type);
     }
 
     /**

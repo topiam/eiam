@@ -228,6 +228,13 @@ public class IdentitySourceServiceImpl implements IdentitySourceService {
      */
     @Override
     public void updateStrategyConfig(Long id, String strategyConfig) {
+        Optional<IdentitySourceEntity> optional = identitySourceRepository.findById(id);
+        //用户不存在
+        if (optional.isEmpty()) {
+            AuditContext.setContent("操作失败，身份源不存在");
+            log.warn(AuditContext.getContent());
+            throw new TopIamException(AuditContext.getContent());
+        }
         identitySourceRepository.updateStrategyConfig(id, strategyConfig);
         AuditContext
             .setTarget(Target.builder().id(id.toString()).type(TargetType.IDENTITY_SOURCE).build());

@@ -48,4 +48,8 @@ public final class SettingConstants {
      */
     public static final String ADMIN_CACHE_NAME   = "admin";
 
+    /**
+     * 应用AES秘钥
+     */
+    public static final String AES_SECRET         = "security.aes_secret";
 }

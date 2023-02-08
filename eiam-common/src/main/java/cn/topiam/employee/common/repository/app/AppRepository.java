@@ -23,11 +23,13 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.common.entity.app.AppEntity;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
 import static cn.topiam.employee.common.constants.AppConstants.APP_CACHE_NAME;
 
 /**
@@ -35,7 +37,7 @@ import static cn.topiam.employee.common.constants.AppConstants.APP_CACHE_NAME;
  */
 @Repository
 @CacheConfig(cacheNames = { APP_CACHE_NAME })
-public interface AppRepository extends JpaRepository<AppEntity, Long>,
+public interface AppRepository extends LogicDeleteRepository<AppEntity, Long>,
                                QuerydslPredicateExecutor<AppEntity>, AppRepositoryCustomized {
     /**
      * 根据应用ID查询已启用应用
@@ -76,7 +78,18 @@ public interface AppRepository extends JpaRepository<AppEntity, Long>,
     @NotNull
     @Override
     @Cacheable
-    Optional<AppEntity> findById(@NotNull Long id);
+    Optional<AppEntity> findById(@NotNull @Param(value = "id") Long id);
+
+    /**
+     * find by id
+     *
+     * @param id must not be {@literal null}.
+     * @return {@link AppEntity}
+     */
+    @NotNull
+    @Cacheable
+    @Query(value = "SELECT * FROM app WHERE id_ = :id", nativeQuery = true)
+    Optional<AppEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") Long id);
 
     /**
      * 根据clientId获取配置

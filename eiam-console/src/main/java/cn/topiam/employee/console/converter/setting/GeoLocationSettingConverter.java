@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import cn.topiam.employee.common.crypto.EncryptionModule;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.geo.GeoLocationProviderConfig;
 import cn.topiam.employee.common.geo.maxmind.MaxmindProviderConfig;
@@ -53,7 +54,7 @@ public interface GeoLocationSettingConverter {
      * @return {@link SettingEntity}
      */
     default SettingEntity geoLocationProviderConfigToEntity(GeoIpProviderSaveParam param) {
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = EncryptionModule.serializerEncrypt();
         // 指定序列化输入的类型
         objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
             ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
@@ -95,7 +96,7 @@ public interface GeoLocationSettingConverter {
         }
        try {
            String value = entity.getValue();
-           ObjectMapper objectMapper = new ObjectMapper();
+           ObjectMapper objectMapper = EncryptionModule.deserializerDecrypt();
            // 指定序列化输入的类型
            objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
                    ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);

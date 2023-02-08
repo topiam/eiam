@@ -34,7 +34,9 @@ import cn.topiam.employee.protocol.saml2.idp.endpoint.Saml2IdpSingleSignOnEndpoi
 import cn.topiam.employee.protocol.saml2.idp.endpoint.Saml2IdpSingleSignOutEndpointFilter;
 import cn.topiam.employee.protocol.saml2.idp.endpoint.Saml2InitSingleSignOnEndpointFilter;
 import cn.topiam.employee.protocol.saml2.idp.filter.EiamSaml2AuthorizationServerContextFilter;
-import static cn.topiam.employee.protocol.saml2.idp.util.Saml2Utils.*;
+import static cn.topiam.employee.protocol.cas.util.ProtocolUtils.getApplicationServiceLoader;
+import static cn.topiam.employee.protocol.saml2.idp.util.Saml2Utils.getAppSaml2ConfigRepository;
+import static cn.topiam.employee.protocol.saml2.idp.util.Saml2Utils.getSessionRegistry;
 
 /**
  * 认证配置

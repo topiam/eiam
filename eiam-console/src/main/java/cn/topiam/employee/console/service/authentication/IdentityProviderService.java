@@ -20,7 +20,6 @@ package cn.topiam.employee.console.service.authentication;
 import java.util.List;
 
 import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
-import cn.topiam.employee.common.enums.IdentityProviderType;
 import cn.topiam.employee.console.pojo.query.authentication.IdentityProviderListQuery;
 import cn.topiam.employee.console.pojo.result.authentication.IdentityProviderCreateResult;
 import cn.topiam.employee.console.pojo.result.authentication.IdentityProviderListResult;
@@ -50,10 +49,10 @@ public interface IdentityProviderService {
     /**
      * 通过平台类型获取
      *
-     * @param provider {@link IdentityProviderType}
+     * @param provider {@link String}
      * @return {@link IdentityProviderEntity}
      */
-    List<IdentityProviderEntity> getByIdentityProvider(IdentityProviderType provider);
+    List<IdentityProviderEntity> getByIdentityProvider(String provider);
 
     /**
      * 认证源列表

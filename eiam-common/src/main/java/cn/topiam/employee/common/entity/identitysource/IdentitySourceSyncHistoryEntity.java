@@ -23,16 +23,22 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLDeleteAll;
+import org.hibernate.annotations.Where;
+
 import cn.topiam.employee.common.enums.SyncStatus;
 import cn.topiam.employee.common.enums.TriggerType;
 import cn.topiam.employee.common.enums.identitysource.IdentitySourceObjectType;
-import cn.topiam.employee.support.repository.domain.BaseEntity;
+import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
 /**
  * 身份源同步记录表
@@ -47,7 +53,10 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @NoArgsConstructor
 @Table(name = "identity_source_sync_history")
-public class IdentitySourceSyncHistoryEntity extends BaseEntity<Long> {
+@SQLDelete(sql = "update identity_source_sync_history set " + SOFT_DELETE_SET + " where id_ = ?")
+@SQLDeleteAll(sql = "update identity_source_sync_history set " + SOFT_DELETE_SET + " where id_ = ?")
+@Where(clause = SOFT_DELETE_WHERE)
+public class IdentitySourceSyncHistoryEntity extends LogicDeleteEntity<Long> {
 
     /**
      * 批号

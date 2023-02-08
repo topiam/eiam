@@ -26,11 +26,14 @@ import org.mapstruct.Mapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.AlternativeJdkIdGenerator;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.IdGenerator;
 
 import cn.topiam.employee.application.AbstractApplicationService;
-import cn.topiam.employee.application.Saml2ApplicationService;
 import cn.topiam.employee.application.exception.AppCertNotExistException;
+import cn.topiam.employee.application.saml2.model.Saml2ProtocolConfig;
+import cn.topiam.employee.application.saml2.model.Saml2SsoModel;
 import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.entity.app.AppAccountEntity;
 import cn.topiam.employee.common.entity.app.AppCertEntity;
@@ -43,8 +46,6 @@ import cn.topiam.employee.common.exception.app.AppAccountNotExistException;
 import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.common.repository.app.*;
 import cn.topiam.employee.common.util.SamlKeyStoreProvider;
-import cn.topiam.employee.core.protocol.Saml2ProtocolConfig;
-import cn.topiam.employee.core.protocol.Saml2SsoModel;
 import cn.topiam.employee.core.security.util.SecurityUtils;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import static cn.topiam.employee.common.enums.app.SamlNameIdValueType.*;
@@ -134,6 +135,11 @@ public abstract class AbstractSamlAppService extends AbstractApplicationService
      */
     protected final AppSaml2ConfigRepository appSaml2ConfigRepository;
 
+    /**
+     * IdGenerator
+     */
+    protected final IdGenerator              idGenerator;
+
     protected AbstractSamlAppService(AppCertRepository appCertRepository,
                                      AppAccountRepository appAccountRepository,
                                      AppAccessPolicyRepository appAccessPolicyRepository,
@@ -141,6 +147,7 @@ public abstract class AbstractSamlAppService extends AbstractApplicationService
                                      AppSaml2ConfigRepository appSaml2ConfigRepository) {
         super(appCertRepository, appAccountRepository, appAccessPolicyRepository, appRepository);
         this.appSaml2ConfigRepository = appSaml2ConfigRepository;
+        this.idGenerator = new AlternativeJdkIdGenerator();
     }
 
     @Mapper(componentModel = "spring")

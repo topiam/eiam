@@ -19,6 +19,7 @@ package cn.topiam.employee.common.repository.app.impl;
 
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -48,20 +49,58 @@ public class AppSaml2ConfigRepositoryCustomizedImpl implements AppSaml2ConfigRep
     @Cacheable(key = "#p0", unless = "#result==null")
     public AppSaml2ConfigPO getByAppId(Long appId) {
         //@formatter:off
-        String sql = "select as2c.*,app.init_login_url,app.init_login_type,app.authorization_type,app.template_,app.code_,client_id,client_secret from app left join app_saml2_config as2c on app.id_ = as2c.app_id where 1=1"
+        String sql = """
+                    SELECT
+                        as2c.*,
+                        app.init_login_url,
+                        app.init_login_type,
+                        app.authorization_type,
+                        app.template_,
+                        app.code_,
+                        client_id,
+                        client_secret
+                    FROM
+                        app
+                        LEFT JOIN app_saml2_config as2c ON app.id_ = as2c.app_id AND as2c.is_deleted = '0'
+                    WHERE
+                        app.is_deleted = '0'
+                    """
                      + " AND app_id = " + appId;
         //@formatter:on
-        return jdbcTemplate.queryForObject(sql, new AppSaml2ConfigPoMapper());
+        try {
+            return jdbcTemplate.queryForObject(sql, new AppSaml2ConfigPoMapper());
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     @Override
     @Cacheable(key = "#p0", unless = "#result==null")
     public AppSaml2ConfigPO findByAppCode(String appCode) {
         //@formatter:off
-        String sql = "select as2c.*,app.init_login_url,app.init_login_type,app.authorization_type,app.template_,app.code_,client_id,client_secret from app left join app_saml2_config as2c on app.id_ = as2c.app_id where 1=1"
+        String sql = """
+                    SELECT
+                        as2c.*,
+                        app.init_login_url,
+                        app.init_login_type,
+                        app.authorization_type,
+                        app.template_,
+                        app.code_,
+                        client_id,
+                        client_secret
+                    FROM
+                        app
+                        LEFT JOIN app_saml2_config as2c ON app.id_ = as2c.app_id and as2c.is_deleted = '0'
+                    WHERE
+                        app.is_deleted = '0'
+                    """
                 + " AND code_ = " + "'"+appCode+"'";
         //@formatter:on
-        return jdbcTemplate.queryForObject(sql, new AppSaml2ConfigPoMapper());
+        try {
+            return jdbcTemplate.queryForObject(sql, new AppSaml2ConfigPoMapper());
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     /**

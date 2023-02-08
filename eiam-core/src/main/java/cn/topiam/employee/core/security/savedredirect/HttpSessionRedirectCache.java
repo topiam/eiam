@@ -55,7 +55,7 @@ public class HttpSessionRedirectCache implements RedirectCache {
             String redirectUri = request.getParameter(OAuth2ParameterNames.REDIRECT_URI);
             if (StringUtils.isNotBlank(redirectUri)) {
                 //saved session
-                cn.topiam.employee.core.security.savedredirect.SavedRedirect redirect = new cn.topiam.employee.core.security.savedredirect.SavedRedirect();
+                SavedRedirect redirect = new SavedRedirect();
                 int index = redirectUri.indexOf("?");
                 if (index > -1) {
                     redirect.setAction(redirectUri.substring(0, index));
@@ -70,7 +70,7 @@ public class HttpSessionRedirectCache implements RedirectCache {
         }
         //REQUEST
         if (type.equals(RedirectType.REQUEST)) {
-            cn.topiam.employee.core.security.savedredirect.SavedRedirect redirect = new cn.topiam.employee.core.security.savedredirect.SavedRedirect();
+            SavedRedirect redirect = new SavedRedirect();
             redirect.setParameters(getParametersByArray(request.getParameterMap()));
             redirect.setMethod(request.getMethod());
             redirect.setAction(UrlUtils.buildFullRequestUrl(request.getScheme(),
@@ -86,10 +86,10 @@ public class HttpSessionRedirectCache implements RedirectCache {
      * @param map {@link Map}
      * @return {@link List}
      */
-    public static List<cn.topiam.employee.core.security.savedredirect.SavedRedirect.Parameter> getParameters(Map<String, String> map) {
-        List<cn.topiam.employee.core.security.savedredirect.SavedRedirect.Parameter> parameters = new ArrayList<>();
+    public static List<SavedRedirect.Parameter> getParameters(Map<String, String> map) {
+        List<SavedRedirect.Parameter> parameters = new ArrayList<>();
         for (String key : map.keySet()) {
-            cn.topiam.employee.core.security.savedredirect.SavedRedirect.Parameter parameter = new cn.topiam.employee.core.security.savedredirect.SavedRedirect.Parameter();
+            SavedRedirect.Parameter parameter = new SavedRedirect.Parameter();
             parameter.setKey(key);
             parameter.setValue(map.get(key));
             parameters.add(parameter);
@@ -97,10 +97,10 @@ public class HttpSessionRedirectCache implements RedirectCache {
         return parameters;
     }
 
-    public List<cn.topiam.employee.core.security.savedredirect.SavedRedirect.Parameter> getParametersByArray(Map<String, String[]> map) {
-        List<cn.topiam.employee.core.security.savedredirect.SavedRedirect.Parameter> parameters = new ArrayList<>();
+    public List<SavedRedirect.Parameter> getParametersByArray(Map<String, String[]> map) {
+        List<SavedRedirect.Parameter> parameters = new ArrayList<>();
         for (String key : map.keySet()) {
-            cn.topiam.employee.core.security.savedredirect.SavedRedirect.Parameter parameter = new cn.topiam.employee.core.security.savedredirect.SavedRedirect.Parameter();
+            SavedRedirect.Parameter parameter = new SavedRedirect.Parameter();
             String[] paramValues = map.get(key);
             if (paramValues.length == 1) {
                 String paramValue = paramValues[0];
@@ -119,11 +119,10 @@ public class HttpSessionRedirectCache implements RedirectCache {
      *
      * @param request  {@link HttpServletRequest}
      * @param response {@link HttpServletResponse}
-     * @return {@link cn.topiam.employee.core.security.savedredirect.SavedRedirect}
+     * @return {@link SavedRedirect}
      */
     @Override
-    public cn.topiam.employee.core.security.savedredirect.SavedRedirect getRedirect(HttpServletRequest request,
-                                                                                    HttpServletResponse response) {
+    public SavedRedirect getRedirect(HttpServletRequest request, HttpServletResponse response) {
         return (SavedRedirect) request.getSession(false)
             .getAttribute(TOPIAM_SECURITY_SAVED_REDIRECT);
     }

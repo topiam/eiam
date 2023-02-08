@@ -19,7 +19,6 @@ package cn.topiam.employee.common.repository.account;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -28,6 +27,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.account.OrganizationMemberEntity;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 
 /**
  * 组织机构成员
@@ -36,7 +37,8 @@ import cn.topiam.employee.common.entity.account.OrganizationMemberEntity;
  * Created by support@topiam.cn on  2021/11/30 03:06
  */
 @Repository
-public interface OrganizationMemberRepository extends JpaRepository<OrganizationMemberEntity, Long>,
+public interface OrganizationMemberRepository extends
+                                              LogicDeleteRepository<OrganizationMemberEntity, Long>,
                                               QuerydslPredicateExecutor<OrganizationMemberEntity>,
                                               OrganizationMemberCustomizedRepository {
 
@@ -46,7 +48,10 @@ public interface OrganizationMemberRepository extends JpaRepository<Organization
      * @param orgId  {@link Long}
      * @param userId {@link Long}
      */
+    @Modifying
     @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE organization_member SET " + SOFT_DELETE_SET
+                   + " WHERE user_id = :userId AND org_id = :orgId", nativeQuery = true)
     void deleteByOrgIdAndUserId(@Param("orgId") String orgId, @Param("userId") Long userId);
 
     /**
@@ -63,7 +68,9 @@ public interface OrganizationMemberRepository extends JpaRepository<Organization
      * @param userIds {@link String}
      */
     @Modifying
-    @Query(value = "DELETE  FROM organization_member WHERE user_id IN :userIds", nativeQuery = true)
+    @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE organization_member SET " + SOFT_DELETE_SET
+                   + " WHERE user_id IN (:userIds)", nativeQuery = true)
     void deleteAllByUserId(@Param("userIds") Iterable<Long> userIds);
 
     /**
@@ -72,6 +79,8 @@ public interface OrganizationMemberRepository extends JpaRepository<Organization
      * @param id {@link String}
      */
     @Modifying
-    @Query(value = "DELETE  FROM organization_member WHERE user_id = :id", nativeQuery = true)
+    @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE organization_member SET " + SOFT_DELETE_SET
+                   + " WHERE user_id = :id", nativeQuery = true)
     void deleteByUserId(@Param("id") Long id);
 }

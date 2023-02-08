@@ -25,8 +25,6 @@ import javax.validation.constraints.NotNull;
 
 import com.alibaba.fastjson2.JSONObject;
 
-import cn.topiam.employee.common.enums.IdentityProviderType;
-
 import lombok.Data;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -41,44 +39,44 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "认证源修改参数")
 public class IdpUpdateParam implements Serializable {
     @Serial
-    private static final long    serialVersionUID = -1440230086940289961L;
+    private static final long serialVersionUID = -1440230086940289961L;
     /**
      * ID
      */
     @NotBlank(message = "ID不能为空")
     @Schema(description = "ID")
-    private String               id;
+    private String            id;
 
     /**
      * 名称
      */
     @NotBlank(message = "名称不能为空")
     @Schema(description = "名称")
-    private String               name;
+    private String            name;
 
     /**
      * 平台
      */
     @NotNull(message = "平台不能为空")
     @Schema(description = "平台")
-    private IdentityProviderType type;
+    private String            type;
 
     /**
      * 配置
      */
     @NotNull(message = "配置JSON不能为空")
     @Schema(description = "配置JSON")
-    private JSONObject           config;
+    private JSONObject        config;
 
     /**
      * 备注
      */
     @Schema(description = "备注")
-    private String               remark;
+    private String            remark;
 
     /**
      * 是否显示
      */
     @Schema(description = "是否显示")
-    private Boolean              displayed;
+    private Boolean           displayed;
 }

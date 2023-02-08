@@ -22,11 +22,11 @@ import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 
+import cn.topiam.employee.authentication.captcha.geetest.GeeTestCaptchaProviderConfig;
 import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
 import cn.topiam.employee.core.security.captcha.CaptchaProviderConfig;
-import cn.topiam.employee.core.security.captcha.geetest.GeeTestCaptchaProviderConfig;
 import cn.topiam.employee.portal.converter.LoginConfigConverter;
 import cn.topiam.employee.portal.pojo.result.LoginConfigResult;
 import cn.topiam.employee.portal.service.LoginConfigService;

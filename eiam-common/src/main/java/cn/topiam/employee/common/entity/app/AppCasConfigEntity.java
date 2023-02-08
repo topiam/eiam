@@ -25,6 +25,7 @@ import org.hibernate.annotations.TypeDef;
 
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 
+import cn.topiam.employee.common.enums.app.CasUserIdentityType;
 import cn.topiam.employee.support.repository.domain.BaseEntity;
 
 import lombok.Getter;
@@ -50,12 +51,24 @@ public class AppCasConfigEntity extends BaseEntity<Long> {
      * APP ID
      */
     @Column(name = "app_id")
-    private Long   appId;
+    private Long                appId;
 
     /**
-     * SP 接受回调地址
+     * 用户身份类型
      */
-    @Column(name = "sp_callback_url")
-    private String spCallbackUrl;
+    @Column(name = "user_identity_type")
+    private CasUserIdentityType userIdentityType;
+
+    /**
+     * 客户端服务URL
+     */
+    @Column(name = "client_service_url")
+    private String              clientServiceUrl;
+
+    /**
+     * serviceTicket 过期时间（秒）
+     */
+    @Column(name = "service_ticket_expire_time")
+    private Integer             serviceTicketExpireTime;
 
 }

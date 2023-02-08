@@ -29,13 +29,13 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson2.JSON;
 
-import cn.topiam.employee.common.entity.SmsSendRecordEntity;
+import cn.topiam.employee.common.entity.message.SmsSendRecordEntity;
 import cn.topiam.employee.common.enums.MessageCategory;
 import cn.topiam.employee.common.exception.MessageSendException;
 import cn.topiam.employee.common.message.sms.SendSmsRequest;
 import cn.topiam.employee.common.message.sms.SmsProviderSend;
 import cn.topiam.employee.common.message.sms.SmsResponse;
-import cn.topiam.employee.common.repository.SmsSendRecordRepository;
+import cn.topiam.employee.common.repository.message.SmsSendRecordRepository;
 
 /**
  * 短信消息通知事件

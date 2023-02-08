@@ -18,6 +18,7 @@
 package cn.topiam.employee.console.service.setting.impl;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
@@ -118,8 +119,9 @@ public class AdministratorServiceImpl implements AdministratorService {
         AdministratorEntity entity = administratorConverter
             .administratorCreateParamConvertToEntity(param);
         administratorRepository.save(entity);
-        AuditContext.setTarget(
-            Target.builder().id(entity.getId().toString()).type(TargetType.ADMINISTRATOR).build());
+        AuditContext.setTarget(Target.builder().id(entity.getId().toString())
+            .name(entity.getUsername()).type(TargetType.ADMINISTRATOR)
+            .typeName(TargetType.ADMINISTRATOR.getDesc()).build());
         return true;
     }
 
@@ -138,8 +140,9 @@ public class AdministratorServiceImpl implements AdministratorService {
         AuditContext.setContent(source.getUsername());
         BeanUtils.merge(source, target, LAST_MODIFIED_TIME, LAST_MODIFIED_BY);
         administratorRepository.save(target);
-        AuditContext.setTarget(
-            Target.builder().id(target.getId().toString()).type(TargetType.ADMINISTRATOR).build());
+        AuditContext.setTarget(Target.builder().id(target.getId().toString())
+            .name(target.getUsername()).type(TargetType.ADMINISTRATOR)
+            .typeName(TargetType.ADMINISTRATOR.getDesc()).build());
         return true;
     }
 
@@ -203,6 +206,13 @@ public class AdministratorServiceImpl implements AdministratorService {
      */
     @Override
     public Boolean resetAdministratorPassword(String id, String password) {
+        Optional<AdministratorEntity> optional = administratorRepository.findById(Long.valueOf(id));
+        //管理员不存在
+        if (optional.isEmpty()) {
+            AuditContext.setContent("删除失败，管理员不存在");
+            log.warn(AuditContext.getContent());
+            throw new TopIamException("操作失败");
+        }
         password = new String(
             Base64.getUrlDecoder().decode(password.getBytes(StandardCharsets.UTF_8)),
             StandardCharsets.UTF_8);
@@ -269,6 +279,19 @@ public class AdministratorServiceImpl implements AdministratorService {
         return result;
     }
 
+
+    /**
+     * 更新认证成功信息
+     *
+     * @param id {@link String}
+     * @param ip {@link String}
+     * @param loginTime {@link LocalDateTime}
+     */
+    public Boolean updateAuthSucceedInfo(String id, String ip, LocalDateTime loginTime) {
+        administratorRepository.updateAuthSucceedInfo(id,ip,loginTime);
+        return true;
+    }
+
     /**
      * 查询管理员详情
      *
@@ -278,7 +301,7 @@ public class AdministratorServiceImpl implements AdministratorService {
     @Override
     public AdministratorResult getAdministrator(String id) {
         AdministratorEntity entity = administratorRepository.findById(Long.valueOf(id))
-            .orElse(null);
+                .orElse(null);
         return administratorConverter.entityConvertToAdministratorDetailsResult(entity);
     }
 
@@ -291,7 +314,7 @@ public class AdministratorServiceImpl implements AdministratorService {
     /**
      * AdministratorConverter
      */
-    private final AdministratorConverter  administratorConverter;
+    private final AdministratorConverter administratorConverter;
 
     /**
      * AdministratorRepository
@@ -301,7 +324,7 @@ public class AdministratorServiceImpl implements AdministratorService {
     /**
      * PasswordEncoder
      */
-    private final PasswordEncoder         passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * SessionRegistry

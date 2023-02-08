@@ -22,6 +22,7 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -54,7 +55,7 @@ public class UserIdpRepositoryCustomizedImpl implements UserIdpRepositoryCustomi
     @Override
     public Optional<UserIdpBindPo> findByIdpIdAndOpenId(String idpId, String openId) {
         //@formatter:off
-        StringBuilder builder = new StringBuilder("SELECT uidp.*,`user`.username_,idp.name_ as idp_name FROM user_idp_bind uidp LEFT JOIN `user` ON uidp.user_id = `user`.id_ LEFT JOIN identity_provider idp ON uidp.idp_id = idp.id_ WHERE 1=1");
+        StringBuilder builder = new StringBuilder("SELECT uidp.*,`user`.username_,idp.name_ as idp_name FROM user_idp_bind uidp LEFT JOIN `user` ON uidp.user_id = `user`.id_ AND `user`.is_deleted = '0' LEFT JOIN identity_provider idp ON uidp.idp_id = idp.id_ AND idp.is_deleted = '0' WHERE uidp.is_deleted = '0' ");
         //身份提供商ID
         if (StringUtils.isNoneBlank(idpId)) {
             builder.append(" AND uidp.idp_id = '").append(idpId).append("'");
@@ -65,8 +66,13 @@ public class UserIdpRepositoryCustomizedImpl implements UserIdpRepositoryCustomi
         }
         //@formatter:on
         String sql = builder.toString();
-        UserIdpBindPo userIdpBindPo = jdbcTemplate.queryForObject(sql, new UserIdpBindPoMapper());
-        return Optional.ofNullable(userIdpBindPo);
+        try {
+            UserIdpBindPo userIdpBindPo = jdbcTemplate.queryForObject(sql,
+                new UserIdpBindPoMapper());
+            return Optional.ofNullable(userIdpBindPo);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -79,7 +85,7 @@ public class UserIdpRepositoryCustomizedImpl implements UserIdpRepositoryCustomi
     @Override
     public Optional<UserIdpBindPo> findByIdpIdAndUserId(String idpId, Long userId) {
         //@formatter:off
-        StringBuilder builder = new StringBuilder("SELECT uidp.*,`user`.username_,idp.name_ as idp_name FROM user_idp_bind uidp LEFT JOIN `user` ON uidp.user_id = `user`.id_ LEFT JOIN identity_provider idp ON uidp.idp_id = idp.id_ WHERE 1=1");
+        StringBuilder builder = new StringBuilder("SELECT uidp.*,`user`.username_,idp.name_ as idp_name FROM user_idp_bind uidp LEFT JOIN `user` ON uidp.user_id = `user`.id_ AND `user`.is_deleted = '0' LEFT JOIN identity_provider idp ON uidp.idp_id = idp.id_ AND idp.is_deleted = '0' WHERE uidp.is_deleted = '0' ");
         //身份提供商ID
         if (StringUtils.isNoneBlank(idpId)) {
             builder.append(" AND uidp.idp_id = '").append(idpId).append("'");
@@ -90,8 +96,13 @@ public class UserIdpRepositoryCustomizedImpl implements UserIdpRepositoryCustomi
         }
         //@formatter:on
         String sql = builder.toString();
-        UserIdpBindPo userIdpBindPo = jdbcTemplate.queryForObject(sql, new UserIdpBindPoMapper());
-        return Optional.ofNullable(userIdpBindPo);
+        try {
+            UserIdpBindPo userIdpBindPo = jdbcTemplate.queryForObject(sql,
+                new UserIdpBindPoMapper());
+            return Optional.ofNullable(userIdpBindPo);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -103,7 +114,7 @@ public class UserIdpRepositoryCustomizedImpl implements UserIdpRepositoryCustomi
     @Override
     public Iterable<UserIdpBindPo> getUserIdpBindList(Long userId) {
         //@formatter:off
-        StringBuilder builder = new StringBuilder("SELECT uidp.*,idp.name_ as idp_name FROM user_idp_bind uidp LEFT JOIN identity_provider idp ON uidp.idp_id = idp.id_ WHERE 1=1");
+        StringBuilder builder = new StringBuilder("SELECT uidp.*,idp.name_ as idp_name FROM user_idp_bind uidp LEFT JOIN identity_provider idp ON uidp.idp_id = idp.id_ AND idp.is_deleted = '0' WHERE uidp.is_deleted = '0' ");
         //用户ID
         if (Objects.nonNull(userId)) {
             builder.append(" AND uidp.user_id = '").append(userId).append("'");

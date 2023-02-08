@@ -31,13 +31,13 @@ import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import cn.topiam.employee.common.entity.MailSendRecordEntity;
+import cn.topiam.employee.common.entity.message.MailSendRecordEntity;
 import cn.topiam.employee.common.entity.setting.MailTemplateEntity;
 import cn.topiam.employee.common.enums.MailType;
 import cn.topiam.employee.common.exception.MailMessageSendException;
 import cn.topiam.employee.common.message.mail.MailProviderSend;
 import cn.topiam.employee.common.message.mail.SendMailRequest;
-import cn.topiam.employee.common.repository.MailSendRecordRepository;
+import cn.topiam.employee.common.repository.message.MailSendRecordRepository;
 import cn.topiam.employee.core.message.MsgVariable;
 import cn.topiam.employee.core.setting.constant.MessageSettingConstants;
 

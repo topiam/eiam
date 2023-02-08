@@ -32,6 +32,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import cn.topiam.employee.authentication.captcha.geetest.GeeTestCaptchaProviderConfig;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.enums.CaptchaProviderType;
 import cn.topiam.employee.common.enums.MfaFactor;
@@ -43,7 +44,6 @@ import cn.topiam.employee.console.pojo.save.setting.SecurityBasicSaveParam;
 import cn.topiam.employee.console.pojo.save.setting.SecurityCaptchaSaveParam;
 import cn.topiam.employee.console.pojo.save.setting.SecurityMfaSaveParam;
 import cn.topiam.employee.core.security.captcha.CaptchaProviderConfig;
-import cn.topiam.employee.core.security.captcha.geetest.GeeTestCaptchaProviderConfig;
 import cn.topiam.employee.support.validation.ValidationHelp;
 import static cn.topiam.employee.core.setting.constant.MfaSettingConstants.*;
 import static cn.topiam.employee.core.setting.constant.SecuritySettingConstants.*;

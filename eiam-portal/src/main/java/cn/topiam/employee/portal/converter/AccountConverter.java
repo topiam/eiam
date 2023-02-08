@@ -111,7 +111,7 @@ public interface AccountConverter {
         entity.setUserId(Long.valueOf(userId));
         entity.setOpenId(idpUser.getOpenId());
         entity.setIdpId(idpUser.getProviderId());
-        entity.setIdpType(idpUser.getProviderType());
+        entity.setIdpType(idpUser.getProviderType().value());
         if (MapUtils.isNotEmpty(idpUser.getAdditionalInfo())) {
             entity.setAdditionInfo(JSONObject.toJSONString(idpUser.getAdditionalInfo()));
         }

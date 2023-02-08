@@ -25,7 +25,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.lang.NonNull;
 
 import cn.topiam.employee.common.entity.account.po.UserIdpBindPo;
-import cn.topiam.employee.common.enums.IdentityProviderType;
 
 /**
  * @author TopIAM
@@ -52,7 +51,7 @@ public class UserIdpBindPoMapper implements RowMapper<UserIdpBindPo> {
         userIdpBindPo.setUserId(rs.getLong("user_id"));
         userIdpBindPo.setOpenId(rs.getString("open_id"));
         userIdpBindPo.setIdpId(rs.getString("idp_id"));
-        userIdpBindPo.setIdpType(IdentityProviderType.getType(rs.getString("idp_type")));
+        userIdpBindPo.setIdpType(rs.getString("idp_type"));
         userIdpBindPo.setBindTime(rs.getTimestamp("bind_time").toLocalDateTime());
         userIdpBindPo.setAdditionInfo(rs.getString("addition_info"));
         if (isExistColumn(rs, "username_")) {

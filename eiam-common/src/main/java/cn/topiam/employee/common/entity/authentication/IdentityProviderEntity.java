@@ -23,14 +23,18 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import cn.topiam.employee.common.enums.IdentityProviderCategory;
-import cn.topiam.employee.common.enums.IdentityProviderType;
-import cn.topiam.employee.support.repository.domain.BaseEntity;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLDeleteAll;
+import org.hibernate.annotations.Where;
+
+import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
 /**
  * <p>
@@ -46,51 +50,54 @@ import lombok.experimental.Accessors;
 @Entity
 @Accessors(chain = true)
 @Table(name = "identity_provider")
-public class IdentityProviderEntity extends BaseEntity<Long> {
+@SQLDelete(sql = "update identity_provider set " + SOFT_DELETE_SET + " where id_ = ?")
+@SQLDeleteAll(sql = "update identity_provider set " + SOFT_DELETE_SET + " where id_ = ?")
+@Where(clause = SOFT_DELETE_WHERE)
+public class IdentityProviderEntity extends LogicDeleteEntity<Long> {
 
     @Serial
-    private static final long        serialVersionUID = -7936931011805155568L;
+    private static final long serialVersionUID = -7936931011805155568L;
 
     /**
      * 名称
      */
     @Column(name = "name_")
-    private String                   name;
+    private String            name;
 
     /**
      * 唯一CODE 不可修改
      */
     @Column(name = "code_")
-    private String                   code;
+    private String            code;
 
     /**
      * 平台
      */
     @Column(name = "type_")
-    private IdentityProviderType     type;
+    private String            type;
 
     /**
      * 分类
      */
     @Column(name = "category_")
-    private IdentityProviderCategory category;
+    private String            category;
 
     /**
      * 配置JSON串
      */
     @Column(name = "config_")
-    private String                   config;
+    private String            config;
 
     /**
      * 是否启用
      */
     @Column(name = "is_enabled")
-    private Boolean                  enabled;
+    private Boolean           enabled;
 
     /**
      * 是否展示
      */
     @Column(name = "is_displayed")
-    private Boolean                  displayed;
+    private Boolean           displayed;
 
 }

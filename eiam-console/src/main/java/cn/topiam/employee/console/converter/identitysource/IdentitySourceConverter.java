@@ -39,7 +39,7 @@ import com.querydsl.core.types.Predicate;
 import cn.topiam.employee.common.constants.CommonConstants;
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceEntity;
 import cn.topiam.employee.common.entity.identitysource.QIdentitySourceEntity;
-import cn.topiam.employee.common.enums.identityprovider.IdentitySourceProvider;
+import cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider;
 import cn.topiam.employee.console.pojo.query.identity.IdentitySourceListQuery;
 import cn.topiam.employee.console.pojo.result.identitysource.IdentitySourceConfigGetResult;
 import cn.topiam.employee.console.pojo.result.identitysource.IdentitySourceGetResult;
@@ -236,7 +236,8 @@ public interface IdentitySourceConverter {
                                                                            PageModel pageModel) {
         QueryDslRequest request = new QueryDslRequest();
         QIdentitySourceEntity queryEntity = QIdentitySourceEntity.identitySourceEntity;
-        Predicate predicate = queryEntity.isNotNull();
+        Predicate predicate = ExpressionUtils.and(queryEntity.isNotNull(),
+            queryEntity.isDeleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = StringUtils.isBlank(query.getName()) ? predicate : ExpressionUtils.and(predicate, queryEntity.name.like("%" + query.getName() + "%"));

@@ -30,12 +30,12 @@ public class OpenApiConstants {
     /**
      * OpenAPI 路径
      */
-    public final static String OPEN_API_PATH            = API_PATH + "/openapi";
+    public static final String OPEN_API_PATH            = API_PATH + "/openapi";
 
     /**
      * 权限管理API 路径
      */
-    public final static String OPEN_API_PERMISSION_PATH = API_PATH + "/openapi/permission";
+    public static final String OPEN_API_PERMISSION_PATH = API_PATH + "/openapi/permission";
 
     /**
      * 组名称

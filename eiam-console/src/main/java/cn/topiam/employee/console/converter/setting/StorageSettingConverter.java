@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import cn.topiam.employee.common.crypto.EncryptionModule;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.storage.StorageConfig;
 import cn.topiam.employee.common.storage.enums.StorageProvider;
@@ -59,7 +60,7 @@ public interface StorageSettingConverter {
         ValidationHelp.ValidationResult<?> validationResult = null;
         StorageConfig.StorageConfigBuilder builder = StorageConfig.builder();
         builder.provider(provider);
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = EncryptionModule.deserializerEncrypt();
         try {
             //阿里云
             if (provider.equals(StorageProvider.ALIYUN_OSS)) {
@@ -121,7 +122,7 @@ public interface StorageSettingConverter {
         if (Objects.isNull(entity)) {
             return StorageProviderConfigResult.builder().enabled(false).build();
         }
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = EncryptionModule.deserializerDecrypt();
         // 指定序列化输入的类型
         objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
             ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
@@ -133,7 +134,7 @@ public interface StorageSettingConverter {
             return StorageProviderConfigResult.builder()
                     .provider(storageConfig.getProvider())
                     .enabled(true)
-                    .config(storageConfig).build();
+                    .config(storageConfig.getConfig()).build();
             //@formatter:on
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

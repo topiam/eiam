@@ -39,7 +39,7 @@ import cn.topiam.employee.common.enums.DataOrigin;
 import cn.topiam.employee.common.enums.MailType;
 import cn.topiam.employee.common.enums.SmsType;
 import cn.topiam.employee.common.enums.UserStatus;
-import cn.topiam.employee.common.enums.identityprovider.IdentitySourceProvider;
+import cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider;
 import cn.topiam.employee.common.repository.identitysource.IdentitySourceRepository;
 import cn.topiam.employee.common.repository.identitysource.IdentitySourceSyncHistoryRepository;
 import cn.topiam.employee.common.repository.identitysource.IdentitySourceSyncRecordRepository;
@@ -55,7 +55,7 @@ import lombok.extern.slf4j.Slf4j;
 import static cn.topiam.employee.common.constants.CommonConstants.SYSTEM_DEFAULT_USER_NAME;
 import static cn.topiam.employee.common.enums.UserStatus.DISABLE;
 import static cn.topiam.employee.common.enums.UserStatus.ENABLE;
-import static cn.topiam.employee.common.enums.identityprovider.IdentitySourceProvider.*;
+import static cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider.*;
 import static cn.topiam.employee.core.message.sms.SmsMsgEventPublish.PASSWORD;
 import static cn.topiam.employee.core.message.sms.SmsMsgEventPublish.USERNAME;
 

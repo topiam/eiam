@@ -175,6 +175,12 @@ public class AppServiceImpl implements AppService {
      */
     @Override
     public Boolean enableApp(String id) {
+        Optional<AppEntity> optional = appRepository.findById(Long.valueOf(id));
+        if (optional.isEmpty()) {
+            AuditContext.setContent("操作失败，应用不存在");
+            log.warn(AuditContext.getContent());
+            throw new TopIamException(AuditContext.getContent());
+        }
         Integer count = appRepository.updateAppStatus(Long.valueOf(id), Boolean.TRUE);
         AuditContext.setTarget(Target.builder().id(id).type(TargetType.APPLICATION).build());
         return count > 0;
@@ -188,6 +194,12 @@ public class AppServiceImpl implements AppService {
      */
     @Override
     public Boolean disableApp(String id) {
+        Optional<AppEntity> optional = appRepository.findById(Long.valueOf(id));
+        if (optional.isEmpty()) {
+            AuditContext.setContent("操作失败，应用不存在");
+            log.warn(AuditContext.getContent());
+            throw new TopIamException(AuditContext.getContent());
+        }
         Integer count = appRepository.updateAppStatus(Long.valueOf(id), Boolean.FALSE);
         AuditContext.setTarget(Target.builder().id(id).type(TargetType.APPLICATION).build());
         return count > 0;

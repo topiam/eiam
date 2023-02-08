@@ -39,7 +39,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationResponse;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationException;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationToken;
@@ -100,11 +99,11 @@ public class EiamOAuth2InitSingleSignOnEndpointFilter extends OncePerRequestFilt
     /**
      * 授权成功处理器
      */
-    private AuthenticationSuccessHandler                       authenticationSuccessHandler = this::sendAuthorizationResponse;
+    private final AuthenticationSuccessHandler                 authenticationSuccessHandler = this::sendAuthorizationResponse;
     /**
      * 授权失败处理器
      */
-    private AuthenticationFailureHandler                       authenticationFailureHandler = this::sendErrorResponse;
+    private final AuthenticationFailureHandler                 authenticationFailureHandler = this::sendErrorResponse;
     /**
      * 认证管理器
      */
@@ -237,50 +236,6 @@ public class EiamOAuth2InitSingleSignOnEndpointFilter extends OncePerRequestFilt
             throw new OAuth2AuthorizationCodeRequestAuthenticationException(error, null);
         }
         //@formatter:on
-    }
-
-    /**
-     * Sets the {@link AuthenticationDetailsSource} used for building an authentication details instance from {@link HttpServletRequest}.
-     *
-     * @param authenticationDetailsSource the {@link AuthenticationDetailsSource} used for building an authentication details instance from {@link HttpServletRequest}
-     * @since 0.3.1
-     */
-    public void setAuthenticationDetailsSource(AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource) {
-        Assert.notNull(authenticationDetailsSource, "authenticationDetailsSource cannot be null");
-        this.authenticationDetailsSource = authenticationDetailsSource;
-    }
-
-    /**
-     * Sets the {@link AuthenticationConverter} used when attempting to extract an Authorization Request (or Consent) from {@link HttpServletRequest}
-     * to an instance of {@link OAuth2AuthorizationCodeRequestAuthenticationToken} used for authenticating the request.
-     *
-     * @param authenticationConverter the {@link AuthenticationConverter} used when attempting to extract an Authorization Request (or Consent) from {@link HttpServletRequest}
-     */
-    public void setAuthenticationConverter(AuthenticationConverter authenticationConverter) {
-        Assert.notNull(authenticationConverter, "authenticationConverter cannot be null");
-        this.authenticationConverter = authenticationConverter;
-    }
-
-    /**
-     * Sets the {@link AuthenticationSuccessHandler} used for handling an {@link OAuth2AuthorizationCodeRequestAuthenticationToken}
-     * and returning the {@link OAuth2AuthorizationResponse Authorization Response}.
-     *
-     * @param authenticationSuccessHandler the {@link AuthenticationSuccessHandler} used for handling an {@link OAuth2AuthorizationCodeRequestAuthenticationToken}
-     */
-    public void setAuthenticationSuccessHandler(AuthenticationSuccessHandler authenticationSuccessHandler) {
-        Assert.notNull(authenticationSuccessHandler, "authenticationSuccessHandler cannot be null");
-        this.authenticationSuccessHandler = authenticationSuccessHandler;
-    }
-
-    /**
-     * Sets the {@link AuthenticationFailureHandler} used for handling an {@link OAuth2AuthorizationCodeRequestAuthenticationException}
-     * and returning the {@link OAuth2Error Error Response}.
-     *
-     * @param authenticationFailureHandler the {@link AuthenticationFailureHandler} used for handling an {@link OAuth2AuthorizationCodeRequestAuthenticationException}
-     */
-    public void setAuthenticationFailureHandler(AuthenticationFailureHandler authenticationFailureHandler) {
-        Assert.notNull(authenticationFailureHandler, "authenticationFailureHandler cannot be null");
-        this.authenticationFailureHandler = authenticationFailureHandler;
     }
 
     /**

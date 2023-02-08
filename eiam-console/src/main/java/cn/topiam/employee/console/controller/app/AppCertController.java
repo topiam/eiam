@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cn.topiam.employee.application.saml2.model.AppSaml2StandardConfigGetResult;
+import cn.topiam.employee.application.saml2.pojo.AppSaml2StandardConfigGetResult;
 import cn.topiam.employee.console.pojo.query.app.AppCertQuery;
 import cn.topiam.employee.console.pojo.result.app.AppCertListResult;
 import cn.topiam.employee.console.service.app.AppCertService;

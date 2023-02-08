@@ -40,13 +40,33 @@ import com.google.common.collect.Lists;
 
 import cn.topiam.employee.audit.controller.pojo.AuditListQuery;
 import cn.topiam.employee.audit.controller.pojo.AuditListResult;
-import cn.topiam.employee.audit.entity.*;
+import cn.topiam.employee.audit.entity.Actor;
+import cn.topiam.employee.audit.entity.AuditElasticSearchEntity;
+import cn.topiam.employee.audit.entity.Event;
+import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.EventType;
+import cn.topiam.employee.audit.enums.TargetType;
+import cn.topiam.employee.common.entity.account.OrganizationEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
+import cn.topiam.employee.common.entity.account.UserGroupEntity;
+import cn.topiam.employee.common.entity.app.AppEntity;
+import cn.topiam.employee.common.entity.app.AppPermissionResourceEntity;
+import cn.topiam.employee.common.entity.app.AppPermissionRoleEntity;
+import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
+import cn.topiam.employee.common.entity.identitysource.IdentitySourceEntity;
 import cn.topiam.employee.common.entity.setting.AdministratorEntity;
+import cn.topiam.employee.common.entity.setting.MailTemplateEntity;
 import cn.topiam.employee.common.enums.UserType;
+import cn.topiam.employee.common.repository.account.OrganizationRepository;
+import cn.topiam.employee.common.repository.account.UserGroupRepository;
 import cn.topiam.employee.common.repository.account.UserRepository;
+import cn.topiam.employee.common.repository.app.AppPermissionResourceRepository;
+import cn.topiam.employee.common.repository.app.AppPermissionRoleRepository;
+import cn.topiam.employee.common.repository.app.AppRepository;
+import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
+import cn.topiam.employee.common.repository.identitysource.IdentitySourceRepository;
 import cn.topiam.employee.common.repository.setting.AdministratorRepository;
+import cn.topiam.employee.common.repository.setting.MailTemplateRepository;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
@@ -69,7 +89,7 @@ public interface AuditDataConverter {
      * searchHits 转审计列表
      *
      * @param search {@link SearchHits}
-     * @param page {@link PageModel}
+     * @param page   {@link PageModel}
      * @return {@link Page}
      */
     default Page<AuditListResult> searchHitsConvertToAuditListResult(SearchHits<AuditElasticSearchEntity> search,
@@ -94,6 +114,14 @@ public interface AuditDataConverter {
             //用户类型
             result.setUserType(actor.getType().getCode());
             //操作对象
+            if (Objects.nonNull(content.getTargets())) {
+                for (Target target : content.getTargets()) {
+                    if (Objects.nonNull(target.getId())) {
+                        target.setName(getTargetName(target.getType(), target.getId()));
+                    }
+                    target.setTypeName(target.getType().getDesc());
+                }
+            }
             result.setTargets(content.getTargets());
             list.add(result);
         });
@@ -102,7 +130,7 @@ public interface AuditDataConverter {
         result.setPagination(Page.Pagination.builder()
                 .total(search.getTotalHits())
                 .totalPages(Math.toIntExact(search.getTotalHits() / page.getPageSize()))
-                .current(page.getCurrent()+1)
+                .current(page.getCurrent() + 1)
                 .build());
         result.setList(list);
         //@formatter:on
@@ -110,10 +138,9 @@ public interface AuditDataConverter {
     }
 
     /**
-     *
      * 获取用户名
      *
-     * @param actorId {@link String}
+     * @param actorId   {@link String}
      * @param actorType {@link UserType}
      * @return {@link String}
      */
@@ -140,7 +167,7 @@ public interface AuditDataConverter {
      * 审计列表请求到本机搜索查询
      *
      * @param query {@link AuditListQuery}
-     * @param page {@link PageModel}
+     * @param page  {@link PageModel}
      * @return {@link NativeSearchQuery}
      */
     default NativeSearchQuery auditListRequestConvertToNativeSearchQuery(AuditListQuery query,
@@ -200,5 +227,119 @@ public interface AuditDataConverter {
             .withPageable(PageRequest.of(page.getCurrent(), page.getPageSize()))
             //排序
             .withSorts(fieldSortBuilders).build();
+    }
+
+    /**
+     * 获取目标名称
+     *
+     * @param targetType {@link TargetType}
+     * @param id         {@link String}
+     * @return
+     */
+    @SuppressWarnings("AlibabaMethodTooLong")
+    default String getTargetName(TargetType targetType, String id) {
+        String name = "";
+        if (TargetType.USER.equals(targetType) || TargetType.USER_DETAIL.equals(targetType)) {
+            UserRepository userRepository = ApplicationContextHelp.getBean(UserRepository.class);
+            Optional<UserEntity> user = userRepository.findByIdContainsDeleted(Long.valueOf(id));
+            if (user.isPresent()) {
+                name = user.get().getUsername();
+            }
+        }
+
+        if (TargetType.USER_GROUP.equals(targetType)) {
+            UserGroupRepository userGroupRepository = ApplicationContextHelp
+                .getBean(UserGroupRepository.class);
+            Optional<UserGroupEntity> userGroup = userGroupRepository
+                .findByIdContainsDeleted(Long.valueOf(id));
+            if (userGroup.isPresent()) {
+                name = userGroup.get().getName();
+            }
+        }
+
+        if (TargetType.IDENTITY_SOURCE.equals(targetType)) {
+            IdentitySourceRepository identitySourceRepository = ApplicationContextHelp
+                .getBean(IdentitySourceRepository.class);
+            Optional<IdentitySourceEntity> identitySource = identitySourceRepository
+                .findByIdContainsDeleted(Long.valueOf(id));
+            if (identitySource.isPresent()) {
+                name = identitySource.get().getName();
+            }
+        }
+
+        if (TargetType.ORGANIZATION.equals(targetType)) {
+            OrganizationRepository organizationRepository = ApplicationContextHelp
+                .getBean(OrganizationRepository.class);
+            Optional<OrganizationEntity> organizationEntity = organizationRepository
+                .findByIdContainsDeleted(id);
+            if (organizationEntity.isPresent()) {
+                name = organizationEntity.get().getName();
+            }
+        }
+
+        if (TargetType.APPLICATION.equals(targetType)) {
+            AppRepository appRepository = ApplicationContextHelp.getBean(AppRepository.class);
+            Optional<AppEntity> appEntity = appRepository.findByIdContainsDeleted(Long.valueOf(id));
+            if (appEntity.isPresent()) {
+                name = appEntity.get().getName();
+            }
+        }
+
+        if (TargetType.APP_PERMISSION_RESOURCE.equals(targetType)) {
+            AppPermissionResourceRepository appPermissionResourceRepository = ApplicationContextHelp
+                .getBean(AppPermissionResourceRepository.class);
+            Optional<AppPermissionResourceEntity> appPermissionResourceEntity = appPermissionResourceRepository
+                .findByIdContainsDeleted(Long.valueOf(id));
+            if (appPermissionResourceEntity.isPresent()) {
+                name = appPermissionResourceEntity.get().getName();
+            }
+        }
+
+        if (TargetType.APPLICATION_ACCOUNT.equals(targetType)) {
+            if (org.apache.commons.lang3.StringUtils.isNotBlank(id)) {
+                name = id;
+            }
+        }
+
+        if (TargetType.APP_PERMISSION_ROLE.equals(targetType)) {
+            AppPermissionRoleRepository appPermissionResourceRepository = ApplicationContextHelp
+                .getBean(AppPermissionRoleRepository.class);
+            Optional<AppPermissionRoleEntity> appPermissionRoleEntity = appPermissionResourceRepository
+                .findByIdContainsDeleted(Long.valueOf(id));
+            if (appPermissionRoleEntity.isPresent()) {
+                name = appPermissionRoleEntity.get().getName();
+            }
+        }
+
+        if (TargetType.ADMINISTRATOR.equals(targetType)) {
+            AdministratorRepository administratorRepository = ApplicationContextHelp
+                .getBean(AdministratorRepository.class);
+            Optional<AdministratorEntity> administratorEntity = administratorRepository
+                .findByIdContainsDeleted(Long.valueOf(id));
+            if (administratorEntity.isPresent()) {
+                name = administratorEntity.get().getUsername();
+            }
+        }
+
+        if (TargetType.MAIL_TEMPLATE.equals(targetType)) {
+            MailTemplateRepository mailTemplateRepository = ApplicationContextHelp
+                .getBean(MailTemplateRepository.class);
+            Optional<MailTemplateEntity> mailTemplateEntity = mailTemplateRepository
+                .findByIdContainsDeleted(Long.valueOf(id));
+            if (mailTemplateEntity.isPresent()) {
+                name = mailTemplateEntity.get().getSender();
+            }
+        }
+
+        if (TargetType.IDENTITY_PROVIDER.equals(targetType)) {
+            IdentityProviderRepository identityProviderRepository = ApplicationContextHelp
+                .getBean(IdentityProviderRepository.class);
+            Optional<IdentityProviderEntity> identityProviderEntity = identityProviderRepository
+                .findByIdContainsDeleted(Long.valueOf(id));
+            if (identityProviderEntity.isPresent()) {
+                name = identityProviderEntity.get().getName();
+            }
+        }
+        return name;
     }
 }

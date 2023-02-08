@@ -147,14 +147,6 @@ public interface UserService {
     Boolean userParamCheck(CheckValidityType type, String value, Long id);
 
     /**
-     * 查询组织成员数量
-     *
-     * @param orgId {@link  String}
-     * @return {@link  Long}
-     */
-    Long getOrgMemberCount(String orgId);
-
-    /**
      * 批量删除
      *
      * @param removeIds {@link Long}

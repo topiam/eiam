@@ -22,12 +22,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-import static cn.topiam.employee.common.constants.ProtocolConstants.OidcEndpointConstants.OIDC_CLIENT_REGISTRATION_ENDPOINT;
 
 /**
  * Configurer for OpenID Connect 1.0 support.
@@ -50,50 +48,6 @@ public final class EiamOidcConfigurer extends AbstractOAuth2Configurer {
             new EiamOidcUserInfoEndpointConfigurer(objectPostProcessor));
     }
 
-    /**
-     * Configures the OpenID Connect 1.0 Provider Configuration Endpoint.
-     *
-     * @param providerConfigurationEndpointCustomizer the {@link Customizer} providing access to the {@link EiamOidcProviderConfigurationEndpointConfigurer}
-     * @return the {@link EiamOidcConfigurer} for further configuration
-     * @since 0.4.0
-     */
-    public EiamOidcConfigurer providerConfigurationEndpoint(Customizer<EiamOidcProviderConfigurationEndpointConfigurer> providerConfigurationEndpointCustomizer) {
-        providerConfigurationEndpointCustomizer
-            .customize(getConfigurer(EiamOidcProviderConfigurationEndpointConfigurer.class));
-        return this;
-    }
-
-    /**
-     * Configures the OpenID Connect Dynamic Client Registration 1.0 Endpoint.
-     *
-     * @param clientRegistrationEndpointCustomizer the {@link Customizer} providing access to the {@link EiamOidcClientRegistrationEndpointConfigurer}
-     * @return the {@link EiamOidcConfigurer} for further configuration
-     */
-    public EiamOidcConfigurer clientRegistrationEndpoint(Customizer<EiamOidcClientRegistrationEndpointConfigurer> clientRegistrationEndpointCustomizer) {
-        EiamOidcClientRegistrationEndpointConfigurer clientRegistrationEndpointConfigurer = getConfigurer(
-            EiamOidcClientRegistrationEndpointConfigurer.class);
-        if (clientRegistrationEndpointConfigurer == null) {
-            addConfigurer(EiamOidcClientRegistrationEndpointConfigurer.class,
-                new EiamOidcClientRegistrationEndpointConfigurer(getObjectPostProcessor()));
-            clientRegistrationEndpointConfigurer = getConfigurer(
-                EiamOidcClientRegistrationEndpointConfigurer.class);
-        }
-        clientRegistrationEndpointCustomizer.customize(clientRegistrationEndpointConfigurer);
-        return this;
-    }
-
-    /**
-     * Configures the OpenID Connect 1.0 UserInfo Endpoint.
-     *
-     * @param userInfoEndpointCustomizer the {@link Customizer} providing access to the {@link EiamOidcUserInfoEndpointConfigurer}
-     * @return the {@link OidcConfigurer} for further configuration
-     */
-    public EiamOidcConfigurer userInfoEndpoint(Customizer<EiamOidcUserInfoEndpointConfigurer> userInfoEndpointCustomizer) {
-        userInfoEndpointCustomizer
-            .customize(getConfigurer(EiamOidcUserInfoEndpointConfigurer.class));
-        return this;
-    }
-
     @Override
     void init(HttpSecurity httpSecurity) {
         List<RequestMatcher> requestMatchers = new ArrayList<>();
@@ -106,16 +60,6 @@ public final class EiamOidcConfigurer extends AbstractOAuth2Configurer {
 
     @Override
     void configure(HttpSecurity httpSecurity) {
-        EiamOidcClientRegistrationEndpointConfigurer clientRegistrationEndpointConfigurer = getConfigurer(
-            EiamOidcClientRegistrationEndpointConfigurer.class);
-        if (clientRegistrationEndpointConfigurer != null) {
-            EiamOidcProviderConfigurationEndpointConfigurer providerConfigurationEndpointConfigurer = getConfigurer(
-                EiamOidcProviderConfigurationEndpointConfigurer.class);
-
-            providerConfigurationEndpointConfigurer.addDefaultProviderConfigurationCustomizer(
-                (builder) -> builder.clientRegistrationEndpoint(OIDC_CLIENT_REGISTRATION_ENDPOINT));
-        }
-
         this.configurers.values().forEach(configurer -> configurer.configure(httpSecurity));
     }
 

@@ -45,7 +45,7 @@ public class PasswordComplexityRuleValidator implements
         //必须包含数字和字母
         if (rule.equals(PasswordComplexityRule.MUST_NUMBERS_AND_LETTERS)) {
             //校验
-            org.passay.PasswordValidator validator = new org.passay.PasswordValidator(
+            PasswordValidator validator = new PasswordValidator(
                 new CharacterRule(EnglishCharacterData.Digit, 1),
                 new CharacterRule(EnglishCharacterData.Alphabetical, 1));
             RuleResult validate = validator.validate(new PasswordData(password));
@@ -57,7 +57,7 @@ public class PasswordComplexityRuleValidator implements
         //必须包含数字和大写字母
         if (rule.equals(PasswordComplexityRule.MUST_NUMBERS_AND_CAPITAL_LETTERS)) {
             //校验
-            org.passay.PasswordValidator validator = new org.passay.PasswordValidator(
+            PasswordValidator validator = new PasswordValidator(
                 new CharacterRule(EnglishCharacterData.Digit, 1),
                 new CharacterRule(EnglishCharacterData.UpperCase, 1));
             RuleResult validate = validator.validate(new PasswordData(password));
@@ -70,7 +70,7 @@ public class PasswordComplexityRuleValidator implements
         if (rule.equals(
             PasswordComplexityRule.MUST_CONTAIN_NUMBERS_UPPERCASE_LETTERS_LOWERCASE_LETTERS_AND_SPECIAL_CHARACTERS)) {
             //校验
-            org.passay.PasswordValidator validator = new org.passay.PasswordValidator(
+            PasswordValidator validator = new PasswordValidator(
                 new CharacterRule(EnglishCharacterData.Alphabetical, 1),
                 new CharacterRule(EnglishCharacterData.Digit, 1),
                 new CharacterRule(EnglishCharacterData.Special, 1));
@@ -90,7 +90,7 @@ public class PasswordComplexityRuleValidator implements
                 new CharacterRule(EnglishCharacterData.Alphabetical, 1));
             rule.setNumberOfCharacteristics(2);
             //校验
-            org.passay.PasswordValidator validator = new org.passay.PasswordValidator(rule);
+            PasswordValidator validator = new PasswordValidator(rule);
             RuleResult validate = validator.validate(new PasswordData(password));
             if (!validate.isValid()) {
                 throw new PasswordComplexityRuleException("密码至少包含数字、字母、和特殊字符中的两种");
@@ -107,7 +107,7 @@ public class PasswordComplexityRuleValidator implements
                 new CharacterRule(EnglishCharacterData.UpperCase, 1));
             rule.setNumberOfCharacteristics(3);
             //校验
-            org.passay.PasswordValidator validator = new org.passay.PasswordValidator(rule);
+            PasswordValidator validator = new PasswordValidator(rule);
             RuleResult validate = validator.validate(new PasswordData(password));
             if (!validate.isValid()) {
                 throw new PasswordComplexityRuleException("密码至少包含数字、字母、和特殊字符中的两种");

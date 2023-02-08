@@ -63,6 +63,12 @@
             <artifactId>eiam-authentication-wechatwork</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- captcha-->
+        <dependency>
+            <groupId>cn.topiam</groupId>
+            <artifactId>eiam-authentication-captcha</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- sms-->
         <dependency>
             <groupId>cn.topiam</groupId>

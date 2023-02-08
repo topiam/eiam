@@ -146,4 +146,12 @@ public interface OrganizationService {
      * @return {@link Boolean}
      */
     Boolean batchDeleteOrg(String[] ids);
+
+    /**
+     * 查询组织成员数量
+     *
+     * @param orgId {@link  String}
+     * @return {@link  Long}
+     */
+    Long getOrgMemberCount(String orgId);
 }

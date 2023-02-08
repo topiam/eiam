@@ -25,14 +25,19 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLDeleteAll;
+import org.hibernate.annotations.Where;
 
 import cn.topiam.employee.common.enums.DataOrigin;
 import cn.topiam.employee.common.enums.OrganizationType;
-import cn.topiam.employee.support.repository.domain.BaseEntity;
+import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
 /**
  * <p>
@@ -46,8 +51,11 @@ import lombok.ToString;
 @Setter
 @ToString
 @Entity
-@Table(name = "`organization`")
-public class OrganizationEntity extends BaseEntity<String> {
+@Table(name = "organization")
+@SQLDelete(sql = "update organization set " + SOFT_DELETE_SET + " where id_ = ?")
+@SQLDeleteAll(sql = "update organization set " + SOFT_DELETE_SET + " where id_ = ?")
+@Where(clause = SOFT_DELETE_WHERE)
+public class OrganizationEntity extends LogicDeleteEntity<String> {
 
     @Serial
     private static final long serialVersionUID = 8143944323232082295L;

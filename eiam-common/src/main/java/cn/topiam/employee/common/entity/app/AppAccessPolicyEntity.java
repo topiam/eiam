@@ -21,13 +21,19 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLDeleteAll;
+import org.hibernate.annotations.Where;
+
 import cn.topiam.employee.common.enums.PolicySubjectType;
-import cn.topiam.employee.support.repository.domain.BaseEntity;
+import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
 /**
  * 应用授权策略
@@ -41,7 +47,10 @@ import lombok.experimental.Accessors;
 @Entity
 @Accessors(chain = true)
 @Table(name = "app_access_policy")
-public class AppAccessPolicyEntity extends BaseEntity<Long> {
+@SQLDelete(sql = "update app_access_policy set " + SOFT_DELETE_SET + " where id_ = ?")
+@SQLDeleteAll(sql = "update app_access_policy set " + SOFT_DELETE_SET + " where id_ = ?")
+@Where(clause = SOFT_DELETE_WHERE)
+public class AppAccessPolicyEntity extends LogicDeleteEntity<Long> {
     /**
      * 应用ID
      */

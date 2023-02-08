@@ -17,15 +17,20 @@
  */
 package cn.topiam.employee.console.service.app.impl;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Base64Utils;
+
+import com.alibaba.excel.util.StringUtils;
 
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
+import cn.topiam.employee.common.crypto.EncryptContextHelp;
 import cn.topiam.employee.common.entity.app.AppAccountEntity;
 import cn.topiam.employee.common.entity.app.po.AppAccountPO;
 import cn.topiam.employee.common.entity.app.query.AppAccountQuery;
@@ -86,9 +91,16 @@ public class AppAccountServiceImpl implements AppAccountService {
             throw new AppAccountExistException();
         }
         AppAccountEntity entity = appAccountConverter.appAccountCreateParamConvertToEntity(param);
+        //密码不为空
+        if (!StringUtils.isBlank(param.getPassword())) {
+            String password = new String(Base64Utils.decodeFromString(param.getPassword()),
+                StandardCharsets.UTF_8);
+            entity.setPassword(EncryptContextHelp.encrypt(password));
+        }
         appAccountRepository.save(entity);
         AuditContext.setTarget(
-            Target.builder().id(entity.getAccount()).type(TargetType.USER).build(),
+            Target.builder().id(entity.getUserId().toString()).type(TargetType.USER).build(),
+            Target.builder().id(entity.getAccount()).type(TargetType.APPLICATION_ACCOUNT).build(),
             Target.builder().id(entity.getAppId().toString()).type(TargetType.APPLICATION).build());
         return true;
     }

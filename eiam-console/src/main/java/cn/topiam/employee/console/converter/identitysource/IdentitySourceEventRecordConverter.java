@@ -54,7 +54,8 @@ public interface IdentitySourceEventRecordConverter {
      */
     default Predicate queryIdentitySourceEventRecordListQueryConvertToPredicate(IdentitySourceEventRecordListQuery query) {
         QIdentitySourceEventRecordEntity queryEntity = QIdentitySourceEventRecordEntity.identitySourceEventRecordEntity;
-        Predicate predicate = queryEntity.isNotNull();
+        Predicate predicate = ExpressionUtils.and(queryEntity.isNotNull(),
+            queryEntity.isDeleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = StringUtils.isBlank(query.getIdentitySourceId()) ? predicate : ExpressionUtils.and(predicate, queryEntity.identitySourceId.eq(Long.valueOf(query.getIdentitySourceId())));

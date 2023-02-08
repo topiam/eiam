@@ -19,6 +19,7 @@ package cn.topiam.employee.common.geo.maxmind;
 
 import javax.validation.constraints.NotEmpty;
 
+import cn.topiam.employee.common.crypto.Encrypt;
 import cn.topiam.employee.common.geo.GeoLocationProviderConfig;
 
 import lombok.Data;
@@ -35,6 +36,7 @@ public class MaxmindProviderConfig extends GeoLocationProviderConfig.GeoLocation
     /**
      * 密码
      */
+    @Encrypt
     @NotEmpty(message = "密码不能为空")
     private String sessionKey;
 }

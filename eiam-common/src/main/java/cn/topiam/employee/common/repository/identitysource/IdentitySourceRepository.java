@@ -26,8 +26,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
@@ -35,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.constants.AccountConstants;
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceEntity;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
 
 /**
  * <p>
@@ -48,8 +47,7 @@ import cn.topiam.employee.common.entity.identitysource.IdentitySourceEntity;
  */
 @Repository
 @CacheConfig(cacheNames = { AccountConstants.IDS_CACHE_NAME })
-public interface IdentitySourceRepository extends CrudRepository<IdentitySourceEntity, Long>,
-                                          PagingAndSortingRepository<IdentitySourceEntity, Long>,
+public interface IdentitySourceRepository extends LogicDeleteRepository<IdentitySourceEntity, Long>,
                                           QuerydslPredicateExecutor<IdentitySourceEntity> {
     /**
      * 根据ID查询
@@ -59,7 +57,17 @@ public interface IdentitySourceRepository extends CrudRepository<IdentitySourceE
      */
     @Override
     @Cacheable(key = "#p0", unless = "#result==null")
-    Optional<IdentitySourceEntity> findById(Long id);
+    Optional<IdentitySourceEntity> findById(@Param(value = "id") Long id);
+
+    /**
+     * 根据ID查询
+     *
+     * @param id {@link Long}
+     * @return {@link IdentitySourceEntity}
+     */
+    @Cacheable(key = "#p0", unless = "#result==null")
+    @Query(value = "SELECT * FROM identity_source WHERE id_ = :id", nativeQuery = true)
+    Optional<IdentitySourceEntity> findByIdContainsDeleted(@Param(value = "id") Long id);
 
     /**
      * 查询启用的身份源

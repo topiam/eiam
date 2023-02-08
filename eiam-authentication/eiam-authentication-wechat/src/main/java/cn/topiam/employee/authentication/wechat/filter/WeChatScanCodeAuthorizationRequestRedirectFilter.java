@@ -51,8 +51,9 @@ import com.google.common.collect.Sets;
 import cn.topiam.employee.authentication.wechat.WeChatIdpScanCodeConfig;
 import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
+import static cn.topiam.employee.authentication.common.IdentityProviderType.WECHAT_QR;
+import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.PROVIDER_CODE;
 import static cn.topiam.employee.authentication.wechat.constant.WeChatAuthenticationConstants.*;
-import static cn.topiam.employee.common.enums.IdentityProviderType.WECHAT_SCAN_CODE;
 
 /**
  * 微信扫码登录请求重定向过滤器
@@ -67,15 +68,10 @@ public class WeChatScanCodeAuthorizationRequestRedirectFilter extends OncePerReq
         .getLogger(WeChatScanCodeAuthorizationRequestRedirectFilter.class);
 
     /**
-     * 提供商ID
-     */
-    public static final String                                               PROVIDER_ID                       = "providerId";
-
-    /**
      * AntPathRequestMatcher
      */
     public static final AntPathRequestMatcher                                WE_CHAT_SCAN_CODE_REQUEST_MATCHER = new AntPathRequestMatcher(
-        WECHAT_SCAN_CODE.getAuthorizationPathPrefix() + "/" + "{" + PROVIDER_ID + "}",
+        WECHAT_QR.getAuthorizationPathPrefix() + "/" + "{" + PROVIDER_CODE + "}",
         HttpMethod.GET.name());
 
     /**
@@ -107,9 +103,9 @@ public class WeChatScanCodeAuthorizationRequestRedirectFilter extends OncePerReq
             return;
         }
         Map<String, String> variables = matcher.getVariables();
-        String providerId = variables.get(PROVIDER_ID);
+        String providerCode = variables.get(PROVIDER_CODE);
         Optional<IdentityProviderEntity> optional = identityProviderRepository
-            .findByIdAndEnabledIsTrue(Long.valueOf(providerId));
+            .findByCodeAndEnabledIsTrue(providerCode);
         if (optional.isEmpty()) {
             throw new NullPointerException("未查询到身份提供商信息");
         }
@@ -124,7 +120,7 @@ public class WeChatScanCodeAuthorizationRequestRedirectFilter extends OncePerReq
                 .clientId(config.getAppId())
                 .scopes(Sets.newHashSet(SNSAPI_LOGIN))
                 .authorizationUri(AUTHORIZATION_REQUEST)
-                .redirectUri(WeChatScanCodeLoginAuthenticationFilter.getLoginUrl(providerId))
+                .redirectUri(WeChatScanCodeLoginAuthenticationFilter.getLoginUrl(optional.get().getCode()))
                 .state(DEFAULT_STATE_GENERATOR.generateKey())
                 .attributes(attributes);
         //@formatter:on
@@ -160,13 +156,13 @@ public class WeChatScanCodeAuthorizationRequestRedirectFilter extends OncePerReq
             authorizationRequest.getAuthorizationRequestUri());
     }
 
-    private final static String STYLE        = ""
+    private static final String STYLE        = ""
                                                + ".impowerBox .qrcode {width: 280px;border: none;margin-top:10px;}\n"
                                                + ".impowerBox .title {display: none;}\n"
                                                + ".impowerBox .info {display: none;}\n"
                                                + ".status_icon {display: none}\n"
                                                + ".impowerBox .status {text-align: center;} ";
-    private final static String STYLE_BASE64 = "data:text/css;base64," + Base64.getEncoder()
+    private static final String STYLE_BASE64 = "data:text/css;base64," + Base64.getEncoder()
         .encodeToString(STYLE.getBytes(StandardCharsets.UTF_8));
 
     public static RequestMatcher getRequestMatcher() {

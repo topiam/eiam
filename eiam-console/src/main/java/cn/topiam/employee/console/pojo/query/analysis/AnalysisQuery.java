@@ -67,11 +67,17 @@ public class AnalysisQuery implements Serializable {
 
     @Getter
     public enum Interval {
-
+                          /**
+                           * HOUR
+                           */
                           HOUR(DateHistogramInterval.HOUR, "HH时"),
-
+                          /**
+                           * DAY
+                           */
                           DAY(DateHistogramInterval.DAY, "dd日"),
-
+                          /**
+                           * MONTH
+                           */
                           MONTH(DateHistogramInterval.MONTH, "MM月");
 
         private final DateHistogramInterval type;

@@ -31,6 +31,7 @@ import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
 
+import cn.topiam.employee.common.crypto.Encrypt;
 import cn.topiam.employee.common.storage.AbstractStorage;
 import cn.topiam.employee.common.storage.StorageConfig;
 import cn.topiam.employee.common.storage.StorageProviderException;
@@ -144,6 +145,7 @@ public class QiNiuKodoStorage extends AbstractStorage {
         /**
          * SecretKey
          */
+        @Encrypt
         @NotEmpty(message = "SecretKey不能为空")
         private String secretKey;
         /**
