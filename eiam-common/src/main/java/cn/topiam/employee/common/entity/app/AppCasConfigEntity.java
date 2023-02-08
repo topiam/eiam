@@ -26,7 +26,7 @@ import org.hibernate.annotations.TypeDef;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 
 import cn.topiam.employee.common.enums.app.CasUserIdentityType;
-import cn.topiam.employee.support.repository.domain.BaseEntity;
+import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -46,7 +46,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @Table(name = "app_cas_config")
 @TypeDef(name = "json", typeClass = JsonStringType.class)
-public class AppCasConfigEntity extends BaseEntity<Long> {
+public class AppCasConfigEntity extends LogicDeleteEntity<Long> {
     /**
      * APP ID
      */

@@ -218,7 +218,6 @@ public class CasStandardApplicationServiceImpl extends AbstractCasApplicationSer
     }
 
     private final AppCasStandardConfigConverter casStandardConfigConverter;
-
     /**
      * AppCasConfigRepository
      */

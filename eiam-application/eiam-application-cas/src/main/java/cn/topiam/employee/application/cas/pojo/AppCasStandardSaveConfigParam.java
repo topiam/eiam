@@ -17,14 +17,16 @@
  */
 package cn.topiam.employee.application.cas.pojo;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 import cn.topiam.employee.common.enums.app.AuthorizationType;
 import cn.topiam.employee.common.enums.app.CasUserIdentityType;
 import cn.topiam.employee.common.enums.app.InitLoginType;
-import io.swagger.v3.oas.annotations.media.Schema;
+
 import lombok.Data;
 
-import java.io.Serial;
-import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * @author TopIAM

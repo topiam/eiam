@@ -22,11 +22,11 @@ import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.common.entity.app.AppCasConfigEntity;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
 import static cn.topiam.employee.common.constants.ProtocolConstants.CAS_CONFIG_CACHE_NAME;
 
 /**
@@ -37,7 +37,7 @@ import static cn.topiam.employee.common.constants.ProtocolConstants.CAS_CONFIG_C
  */
 @Repository
 @CacheConfig(cacheNames = { CAS_CONFIG_CACHE_NAME })
-public interface AppCasConfigRepository extends JpaRepository<AppCasConfigEntity, Long>,
+public interface AppCasConfigRepository extends LogicDeleteRepository<AppCasConfigEntity, Long>,
                                         QuerydslPredicateExecutor<AppCasConfigEntity>,
                                         AppCasConfigRepositoryCustomized {
 

@@ -20,9 +20,11 @@ package cn.topiam.employee.application.cas.pojo;
 import cn.topiam.employee.common.enums.app.AuthorizationType;
 import cn.topiam.employee.common.enums.app.CasUserIdentityType;
 import cn.topiam.employee.common.enums.app.InitLoginType;
+
+import lombok.Data;
+
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
 
 /**
  * @author TopIAM

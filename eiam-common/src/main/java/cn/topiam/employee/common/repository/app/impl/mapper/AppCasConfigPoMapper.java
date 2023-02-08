@@ -17,15 +17,16 @@
  */
 package cn.topiam.employee.common.repository.app.impl.mapper;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+
+import org.springframework.jdbc.core.RowMapper;
+
 import cn.topiam.employee.common.entity.app.po.AppCasConfigPO;
 import cn.topiam.employee.common.enums.app.AuthorizationType;
 import cn.topiam.employee.common.enums.app.CasUserIdentityType;
 import cn.topiam.employee.common.enums.app.InitLoginType;
-import org.springframework.jdbc.core.RowMapper;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.LocalDateTime;
 
 /**
  * AppCasConfigPOPOMapper
