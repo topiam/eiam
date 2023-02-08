@@ -25,17 +25,22 @@ import lombok.Data;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
-* 协议端点域
-*
-* @author TopIAM
-* Created by support@topiam.cn on  2022/6/4 23:37
-*/
+ * 协议端点域
+ *
+ * @author TopIAM
+ * Created by support@topiam.cn on  2022/6/4 23:37
+ */
 @Data
 @Schema(description = "协议端点")
 public class AppCasProtocolEndpoint implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -2261602995152894964L;
+    /**
+     * CAS URL前缀
+     */
+    @Schema(description = "CAS URL前缀")
+    private String            casServerUrlPrefix;
 
     /**
      * CAS SSO 端点
