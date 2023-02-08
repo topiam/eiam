@@ -67,8 +67,8 @@ public class RequestUtils {
     /**
      **把request转换成map数据
      */
-    public static Map<String, String> getParams(HttpServletRequest request) {
-        Map<String, String> params = new HashMap<>(16);
+    public static Map<String, Object> getParams(HttpServletRequest request) {
+        Map<String, Object> params = new HashMap<>(16);
         Map<String, String[]> requestParams = request.getParameterMap();
         for (Map.Entry<String, String[]> entry : requestParams.entrySet()) {
             String[] values = entry.getValue();

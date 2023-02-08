@@ -40,6 +40,7 @@
         <module>eiam-authentication-wechatwork</module>
         <module>eiam-authentication-sms</module>
         <module>eiam-authentication-mfa</module>
+        <module>eiam-authentication-captcha</module>
         <module>eiam-authentication-all</module>
     </modules>
 

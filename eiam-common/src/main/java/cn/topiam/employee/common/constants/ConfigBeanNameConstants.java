@@ -32,10 +32,12 @@ public final class ConfigBeanNameConstants {
      * 安全过滤器链
      */
     public static final String DEFAULT_SECURITY_FILTER_CHAIN        = "defaultSecurityFilterChain";
-    public static final String SOCIAL_SECURITY_FILTER_CHAIN         = "socialSecurityFilterChain";
+    public static final String IDP_SECURITY_FILTER_CHAIN            = "idpSecurityFilterChain";
     public static final String SAML2_PROTOCOL_SECURITY_FILTER_CHAIN = "saml2ProtocolSecurityFilterChain";
     public static final String OIDC_PROTOCOL_SECURITY_FILTER_CHAIN  = "oidcProtocolSecurityFilterChain";
+    public static final String FORM_PROTOCOL_SECURITY_FILTER_CHAIN  = "formProtocolSecurityFilterChain";
     public static final String CAS_PROTOCOL_SECURITY_FILTER_CHAIN   = "casProtocolSecurityFilterChain";
+    public static final String TSA_PROTOCOL_SECURITY_FILTER_CHAIN   = "tsaProtocolSecurityFilterChain";
 
     /**
      * 默认密码策略管理器

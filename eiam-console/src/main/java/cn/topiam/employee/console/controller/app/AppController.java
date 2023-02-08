@@ -22,7 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import cn.topiam.employee.application.saml2.model.AppSaml2StandardConfigGetResult;
+import cn.topiam.employee.application.saml2.pojo.AppSaml2StandardConfigGetResult;
 import cn.topiam.employee.audit.annotation.Audit;
 import cn.topiam.employee.audit.enums.EventType;
 import cn.topiam.employee.console.pojo.query.app.AppQuery;

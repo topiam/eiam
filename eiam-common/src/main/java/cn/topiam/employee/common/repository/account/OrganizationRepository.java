@@ -22,18 +22,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.account.OrganizationEntity;
 import cn.topiam.employee.common.enums.DataOrigin;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
 
 /**
  * <p>
@@ -44,8 +44,7 @@ import cn.topiam.employee.common.enums.DataOrigin;
  * Created by support@topiam.cn on  2020-08-09
  */
 @Repository
-public interface OrganizationRepository extends CrudRepository<OrganizationEntity, String>,
-                                        PagingAndSortingRepository<OrganizationEntity, String>,
+public interface OrganizationRepository extends LogicDeleteRepository<OrganizationEntity, String>,
                                         JpaSpecificationExecutor<OrganizationEntity>,
                                         QuerydslPredicateExecutor<OrganizationRepository>,
                                         OrganizationRepositoryCustomized {
@@ -197,4 +196,13 @@ public interface OrganizationRepository extends CrudRepository<OrganizationEntit
      */
     List<OrganizationEntity> findByIdInOrderByOrderAsc(Collection<String> parentIds);
 
+    /**
+     * findByIdContainsDeleted
+     *
+     * @param id must not be {@literal null}.
+     * @return {@link OrganizationEntity}
+     */
+    @NotNull
+    @Query(value = "SELECT * FROM organization WHERE id_ = :id", nativeQuery = true)
+    Optional<OrganizationEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") String id);
 }

@@ -45,7 +45,7 @@ import com.cronutils.model.CronType;
 import cn.topiam.employee.common.constants.SettingConstants;
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceEntity;
 import cn.topiam.employee.common.enums.TriggerType;
-import cn.topiam.employee.common.enums.identityprovider.IdentitySourceProvider;
+import cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider;
 import cn.topiam.employee.common.repository.identitysource.IdentitySourceRepository;
 import cn.topiam.employee.identitysource.core.IdentitySource;
 import cn.topiam.employee.identitysource.core.IdentitySourceConfig;
@@ -69,7 +69,7 @@ import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.synchronizer.task.IdentitySourceSyncTask;
 
 import lombok.extern.slf4j.Slf4j;
-import static cn.topiam.employee.common.enums.identityprovider.IdentitySourceProvider.DINGTALK;
+import static cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider.DINGTALK;
 import static cn.topiam.employee.support.lock.LockAspect.getTopiamLockKeyPrefix;
 import static cn.topiam.employee.synchronizer.configuration.IdentitySourceBeanUtils.getSourceBeanName;
 

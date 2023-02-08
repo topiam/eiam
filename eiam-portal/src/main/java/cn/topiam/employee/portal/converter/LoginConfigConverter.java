@@ -44,7 +44,7 @@ public interface LoginConfigConverter {
         List<LoginConfigResult.Idps> result = new ArrayList<>();
         for (IdentityProviderEntity entity : list) {
             LoginConfigResult.Idps idp = new LoginConfigResult.Idps();
-            idp.setId(String.valueOf(entity.getId()));
+            idp.setCode(entity.getCode());
             idp.setName(entity.getName());
             idp.setType(entity.getType());
             idp.setCategory(entity.getCategory());

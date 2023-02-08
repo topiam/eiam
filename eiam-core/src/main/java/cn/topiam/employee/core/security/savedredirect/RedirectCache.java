@@ -56,7 +56,7 @@ public interface RedirectCache {
      *
      * @param request {@link HttpServletRequest}
      * @param response {@link HttpServletResponse}
-     * @return {@link cn.topiam.employee.core.security.savedredirect.SavedRedirect}
+     * @return {@link SavedRedirect}
      */
     SavedRedirect getRedirect(HttpServletRequest request, HttpServletResponse response);
 

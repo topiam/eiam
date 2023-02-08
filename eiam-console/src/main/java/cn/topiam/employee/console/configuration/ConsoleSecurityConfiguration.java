@@ -84,7 +84,7 @@ public class ConsoleSecurityConfiguration {
         http
                 //认证请求
                 .authorizeHttpRequests(authorizeRequests())
-                // 表单登录配置
+                //表单登录配置
                 .formLogin(withFormLoginConfigurerDefaults())
                 //x509
                 .x509(withDefaults())
@@ -179,12 +179,12 @@ public class ConsoleSecurityConfiguration {
             configurer.xssProtection(xssProtection -> xssProtection.block(false));
             configurer.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin);
             configurer.contentSecurityPolicy(
-                    "default-src 'self'; " +
-                            "frame-src 'self' data:; " +
+                    "default-src 'self' data:; " +
+                            "frame-src 'self' login.dingtalk.com open.weixin.qq.com open.work.weixin.qq.com passport.feishu.cn data:; " +
                             "frame-ancestors 'self' https://eiam.topiam.cn data:; " +
-                            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; " +
+                            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com sf3-cn.feishucdn.com;" +
                             "style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net 'unsafe-inline'; " +
-                            "img-src 'self' https://img.alicdn.com https://static-legacy.dingtalk.com  https://joeschmoe.io data:; " +
+                            "img-src 'self' https://img.alicdn.com https://static-legacy.dingtalk.com  https://joeschmoe.io https://api.multiavatar.com data:; " +
                             "font-src 'self' https://fonts.gstatic.com data:; "+
                             "worker-src 'self' https://storage.googleapis.com blob:;");
             configurer.referrerPolicy(

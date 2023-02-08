@@ -23,12 +23,18 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import cn.topiam.employee.support.repository.domain.BaseEntity;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLDeleteAll;
+import org.hibernate.annotations.Where;
+
+import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
 /**
  * <p>
@@ -43,8 +49,11 @@ import lombok.experimental.Accessors;
 @ToString
 @Entity
 @Accessors(chain = true)
-@Table(name = "`app_permission_role`")
-public class AppPermissionRoleEntity extends BaseEntity<Long> {
+@Table(name = "app_permission_role")
+@SQLDelete(sql = "update app_permission_role set " + SOFT_DELETE_SET + " where id_ = ?")
+@SQLDeleteAll(sql = "update app_permission_role set " + SOFT_DELETE_SET + " where id_ = ?")
+@Where(clause = SOFT_DELETE_WHERE)
+public class AppPermissionRoleEntity extends LogicDeleteEntity<Long> {
 
     @Serial
     private static final long serialVersionUID = -7761332532995424593L;

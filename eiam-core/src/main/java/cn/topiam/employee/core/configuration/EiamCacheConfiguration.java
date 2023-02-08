@@ -17,6 +17,7 @@
  */
 package cn.topiam.employee.core.configuration;
 
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -27,8 +28,13 @@ import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.lang.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -113,6 +119,64 @@ public class EiamCacheConfiguration {
         return config;
     }
 
+    /**
+     * 自定义 RedisTemplate
+     *
+     * @param redisConnectionFactory {@link RedisConnectionFactory}
+     * @return {@link RedisTemplate}
+     */
+    @Bean
+    public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        ObjectMapper objectMapper = jacksonObjectMapper.copy();
+        // 指定要序列化的域，field,get和set,以及修饰符范围，ANY是都有包括private和public
+        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        // 指定序列化输入的类型
+        objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
+            ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(
+            objectMapper);
+        // 设置value的序列化规则和 key的序列化规则
+        redisTemplate.setKeySerializer(
+            new KeyStringRedisSerializer(cacheProperties.getRedis().getKeyPrefix()));
+        redisTemplate.setHashKeySerializer(
+            new KeyStringRedisSerializer(cacheProperties.getRedis().getKeyPrefix()));
+        //jackson2JsonRedisSerializer就是JSON序列号规则，
+        redisTemplate.setValueSerializer(serializer);
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
+    }
+
+    /**
+     * 配置 StringRedisTemplate
+     *
+     * @param redisConnectionFactory {@link RedisConnectionFactory}
+     * @return {@link StringRedisTemplate}
+     */
+    @Bean
+    public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        StringRedisTemplate template = new StringRedisTemplate();
+        template.setConnectionFactory(redisConnectionFactory);
+        ObjectMapper objectMapper = jacksonObjectMapper.copy();
+        // 指定要序列化的域，field,get和set,以及修饰符范围，ANY是都有包括private和public
+        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        // 指定序列化输入的类型
+        objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
+            ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(
+            objectMapper);
+        //key配置
+        template.setKeySerializer(
+            new KeyStringRedisSerializer(cacheProperties.getRedis().getKeyPrefix()));
+        template.setHashKeySerializer(
+            new KeyStringRedisSerializer(cacheProperties.getRedis().getKeyPrefix()));
+        //value配置
+        template.setValueSerializer(serializer);
+        template.setHashValueSerializer(serializer);
+        return template;
+    }
+
     private final CacheProperties cacheProperties;
 
     private final ObjectMapper    jacksonObjectMapper;
@@ -121,5 +185,24 @@ public class EiamCacheConfiguration {
                                   ObjectMapper jacksonObjectMapper) {
         this.cacheProperties = cacheProperties;
         this.jacksonObjectMapper = jacksonObjectMapper;
+    }
+
+    private class KeyStringRedisSerializer implements RedisSerializer<String> {
+        private final String keyPrefix;
+
+        private KeyStringRedisSerializer(String keyPrefix) {
+            this.keyPrefix = keyPrefix + COLON;
+        }
+
+        @Override
+        public String deserialize(@Nullable byte[] bytes) {
+            return (bytes == null ? null
+                : new String(bytes, StandardCharsets.UTF_8).replaceFirst(keyPrefix, ""));
+        }
+
+        @Override
+        public byte[] serialize(@Nullable String string) {
+            return (string == null ? null : (keyPrefix + string).getBytes(StandardCharsets.UTF_8));
+        }
     }
 }

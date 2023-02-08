@@ -57,7 +57,7 @@ public abstract class AbstractApplicationService implements ApplicationService {
      * 创建证书
      *
      * @param appId     {@link Long}
-     * @param appCode   {@link Long}
+     * @param appCode     {@link Long}
      * @param usingType {@link AppCertUsingType}
      */
     public void createCertificate(Long appId, String appCode, AppCertUsingType usingType) {
@@ -120,7 +120,7 @@ public abstract class AbstractApplicationService implements ApplicationService {
     protected final AppAccountRepository      appAccountRepository;
 
     /**
-     * AppAccessPolicyRepository
+     *AppAccessPolicyRepository
      */
     protected final AppAccessPolicyRepository appAccessPolicyRepository;
 

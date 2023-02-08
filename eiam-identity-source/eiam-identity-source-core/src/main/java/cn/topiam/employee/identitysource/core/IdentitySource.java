@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import cn.topiam.employee.common.enums.TriggerType;
+import cn.topiam.employee.support.exception.TopIamException;
 
 /**
  * 身份源Provider
@@ -66,6 +67,8 @@ public interface IdentitySource<T extends IdentitySourceConfig> {
      * @param response {@link HttpServletResponse}
      * @return {@link Map}
      */
-    Object event(HttpServletRequest request, HttpServletResponse response);
+    default Object event(HttpServletRequest request, HttpServletResponse response) {
+        throw new TopIamException("暂未实现");
+    }
 
 }

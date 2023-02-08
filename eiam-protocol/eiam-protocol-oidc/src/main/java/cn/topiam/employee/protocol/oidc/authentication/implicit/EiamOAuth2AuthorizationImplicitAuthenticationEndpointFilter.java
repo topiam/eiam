@@ -18,7 +18,6 @@
 package cn.topiam.employee.protocol.oidc.authentication.implicit;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -30,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.core.log.LogMessage;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -60,10 +58,22 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.google.common.collect.Lists;
+
+import cn.topiam.employee.application.context.ApplicationContext;
+import cn.topiam.employee.application.context.ApplicationContextHolder;
+import cn.topiam.employee.audit.context.AuditContext;
+import cn.topiam.employee.audit.entity.Target;
+import cn.topiam.employee.audit.enums.EventStatus;
+import cn.topiam.employee.audit.enums.EventType;
+import cn.topiam.employee.audit.enums.TargetType;
+import cn.topiam.employee.audit.event.AuditEventPublish;
 import cn.topiam.employee.common.constants.ProtocolConstants;
 import cn.topiam.employee.core.context.ServerContextHelp;
 import cn.topiam.employee.core.security.savedredirect.HttpSessionRedirectCache;
 import cn.topiam.employee.core.security.savedredirect.RedirectCache;
+import cn.topiam.employee.protocol.oidc.authentication.consent.DefaultConsentPage;
+import cn.topiam.employee.support.context.ApplicationContextHelp;
 import static org.springframework.security.oauth2.core.OAuth2TokenIntrospectionClaimNames.TOKEN_TYPE;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.*;
 
@@ -73,7 +83,7 @@ import static cn.topiam.employee.protocol.oidc.util.EiamOAuth2Utils.appendUrl;
 /**
  * OAuth2 授权过滤器
  *
- * 用于支持 授权码模式和隐式授权模式
+ * 用于支持隐式授权模式
  *
  * @author TopIAM
  * Created by support@topiam.cn on  2022/10/28 23:26
@@ -281,6 +291,15 @@ public final class EiamOAuth2AuthorizationImplicitAuthenticationEndpointFilter e
             vars.put(OAuth2ParameterNames.STATE, state);
         }
         String append = appendUrl(redirectUri, vars, keys, true);
+        //审计
+        ApplicationContext applicationContext = ApplicationContextHolder.getApplicationContext();
+        Target target = Target.builder().id(applicationContext.getAppId().toString())
+            .type(TargetType.APPLICATION).build();
+        ArrayList<Target> targets = Lists.newArrayList(target);
+
+        AuditEventPublish publish = ApplicationContextHelp.getBean(AuditEventPublish.class);
+        publish.publish(EventType.APP_SSO, AuditContext.getAuthorization(), EventStatus.SUCCESS,
+            Lists.newArrayList(target));
         this.redirectStrategy.sendRedirect(request, response, append);
     }
 
@@ -328,6 +347,17 @@ public final class EiamOAuth2AuthorizationImplicitAuthenticationEndpointFilter e
             uriBuilder.queryParam(OAuth2ParameterNames.STATE,
                 authorizationImplicitRequestAuthenticationToken.getState());
         }
+
+        //审计
+        ApplicationContext applicationContext = ApplicationContextHolder.getApplicationContext();
+        Target target = Target.builder().id(applicationContext.getAppId().toString())
+            .type(TargetType.APPLICATION).build();
+        ArrayList<Target> targets = Lists.newArrayList(target);
+
+        AuditEventPublish publish = ApplicationContextHelp.getBean(AuditEventPublish.class);
+        publish.publish(EventType.APP_SSO, AuditContext.getAuthorization(), EventStatus.FAIL,
+            targets, error.toString());
+
         this.redirectStrategy.sendRedirect(request, response, uriBuilder.toUriString());
     }
 
@@ -374,133 +404,4 @@ public final class EiamOAuth2AuthorizationImplicitAuthenticationEndpointFilter e
         this.consentPage = consentPage;
     }
 
-    /**
-     * For internal use only.
-     */
-    @SuppressWarnings("AlibabaMethodTooLong")
-    private static class DefaultConsentPage {
-        private static final MediaType TEXT_HTML_UTF8 = new MediaType("text", "html",
-            StandardCharsets.UTF_8);
-
-        private static void displayConsent(HttpServletRequest request, HttpServletResponse response,
-                                           String clientId, Authentication principal,
-                                           Set<String> requestedScopes,
-                                           Set<String> authorizedScopes,
-                                           String state) throws IOException {
-
-            String consentPage = generateConsentPage(request, clientId, principal, requestedScopes,
-                authorizedScopes, state);
-            response.setContentType(TEXT_HTML_UTF8.toString());
-            response.setContentLength(consentPage.getBytes(StandardCharsets.UTF_8).length);
-            response.getWriter().write(consentPage);
-        }
-
-        private static String generateConsentPage(HttpServletRequest request, String clientId,
-                                                  Authentication principal,
-                                                  Set<String> requestedScopes,
-                                                  Set<String> authorizedScopes, String state) {
-            Set<String> scopesToAuthorize = new HashSet<>();
-            Set<String> scopesPreviouslyAuthorized = new HashSet<>();
-            for (String scope : requestedScopes) {
-                if (authorizedScopes.contains(scope)) {
-                    scopesPreviouslyAuthorized.add(scope);
-                } else if (!scope.equals(OidcScopes.OPENID)) { // openid scope does not require consent
-                    scopesToAuthorize.add(scope);
-                }
-            }
-
-            StringBuilder builder = new StringBuilder();
-
-            builder.append("<!DOCTYPE html>");
-            builder.append("<html lang=\"en\">");
-            builder.append("<head>");
-            builder.append("    <meta charset=\"utf-8\">");
-            builder.append(
-                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\">");
-            builder.append(
-                "    <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css\" integrity=\"sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z\" crossorigin=\"anonymous\">");
-            builder.append("    <title>Consent required</title>");
-            builder.append("	<script>");
-            builder.append("		function cancelConsent() {");
-            builder.append("			document.consent_form.reset();");
-            builder.append("			document.consent_form.submit();");
-            builder.append("		}");
-            builder.append("	</script>");
-            builder.append("</head>");
-            builder.append("<body>");
-            builder.append("<div class=\"container\">");
-            builder.append("    <div class=\"py-5\">");
-            builder.append("        <h1 class=\"text-center\">Consent required</h1>");
-            builder.append("    </div>");
-            builder.append("    <div class=\"row\">");
-            builder.append("        <div class=\"col text-center\">");
-            builder
-                .append("            <p><span class=\"font-weight-bold text-primary\">" + clientId
-                        + "</span> wants to access your account <span class=\"font-weight-bold\">"
-                        + principal.getName() + "</span></p>");
-            builder.append("        </div>");
-            builder.append("    </div>");
-            builder.append("    <div class=\"row pb-3\">");
-            builder.append("        <div class=\"col text-center\">");
-            builder.append(
-                "            <p>The following permissions are requested by the above app.<br/>Please review these and consent if you approve.</p>");
-            builder.append("        </div>");
-            builder.append("    </div>");
-            builder.append("    <div class=\"row\">");
-            builder.append("        <div class=\"col text-center\">");
-            builder.append("            <form name=\"consent_form\" method=\"post\" action=\""
-                           + request.getRequestURI() + "\">");
-            builder.append("                <input type=\"hidden\" name=\"client_id\" value=\""
-                           + clientId + "\">");
-            builder.append(
-                "                <input type=\"hidden\" name=\"state\" value=\"" + state + "\">");
-
-            for (String scope : scopesToAuthorize) {
-                builder.append("                <div class=\"form-group form-check py-1\">");
-                builder.append(
-                    "                    <input class=\"form-check-input\" type=\"checkbox\" name=\"scope\" value=\""
-                               + scope + "\" id=\"" + scope + "\">");
-                builder.append("                    <label class=\"form-check-label\" for=\""
-                               + scope + "\">" + scope + "</label>");
-                builder.append("                </div>");
-            }
-
-            if (!scopesPreviouslyAuthorized.isEmpty()) {
-                builder.append(
-                    "                <p>You have already granted the following permissions to the above app:</p>");
-                for (String scope : scopesPreviouslyAuthorized) {
-                    builder.append("                <div class=\"form-group form-check py-1\">");
-                    builder.append(
-                        "                    <input class=\"form-check-input\" type=\"checkbox\" name=\"scope\" id=\""
-                                   + scope + "\" checked disabled>");
-                    builder.append("                    <label class=\"form-check-label\" for=\""
-                                   + scope + "\">" + scope + "</label>");
-                    builder.append("                </div>");
-                }
-            }
-
-            builder.append("                <div class=\"form-group pt-3\">");
-            builder.append(
-                "                    <button class=\"btn btn-primary btn-lg\" type=\"submit\" id=\"submit-consent\">Submit Consent</button>");
-            builder.append("                </div>");
-            builder.append("                <div class=\"form-group\">");
-            builder.append(
-                "                    <button class=\"btn btn-link regular\" type=\"button\" onclick=\"cancelConsent();\" id=\"cancel-consent\">Cancel</button>");
-            builder.append("                </div>");
-            builder.append("            </form>");
-            builder.append("        </div>");
-            builder.append("    </div>");
-            builder.append("    <div class=\"row pt-4\">");
-            builder.append("        <div class=\"col text-center\">");
-            builder.append(
-                "            <p><small>Your consent to provide access is required.<br/>If you do not approve, click Cancel, in which case no information will be shared with the app.</small></p>");
-            builder.append("        </div>");
-            builder.append("    </div>");
-            builder.append("</div>");
-            builder.append("</body>");
-            builder.append("</html>");
-
-            return builder.toString();
-        }
-    }
 }

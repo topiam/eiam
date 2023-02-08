@@ -20,9 +20,7 @@ package cn.topiam.employee.console.service.analysis;
 import java.util.List;
 
 import cn.topiam.employee.console.pojo.query.analysis.AnalysisQuery;
-import cn.topiam.employee.console.pojo.result.analysis.AppVisitRankResult;
-import cn.topiam.employee.console.pojo.result.analysis.AuthnQuantityResult;
-import cn.topiam.employee.console.pojo.result.analysis.OverviewResult;
+import cn.topiam.employee.console.pojo.result.analysis.*;
 
 /**
  * 统计 service
@@ -40,7 +38,7 @@ public interface AnalysisService {
     OverviewResult overview();
 
     /**
-     * 认证统计
+     * 认证量统计
      *
      * @param params {@link AnalysisQuery}
      * @return {@link List<AuthnQuantityResult>}
@@ -48,10 +46,26 @@ public interface AnalysisService {
     List<AuthnQuantityResult> authnQuantity(AnalysisQuery params);
 
     /**
-     * 认证统计
+     * 应用热点统计
      *
      * @param params {@link AnalysisQuery}
-     * @return {@link List<  AppVisitRankResult  >}
+     * @return {@link List<AppVisitRankResult>}
      */
     List<AppVisitRankResult> appVisitRank(AnalysisQuery params);
+
+    /**
+     * 热门认证方式统计
+     *
+     * @param params {@link AnalysisQuery}
+     * @return {@link List<AuthnHotProviderResult>}
+     */
+    List<AuthnHotProviderResult> authnHotProvider(AnalysisQuery params);
+
+    /**
+     * 登录区域统计
+     *
+     * @param params {@link AnalysisQuery}
+     * @return {@link List<AuthnZoneResult>}
+     */
+    List<AuthnZoneResult> authnZone(AnalysisQuery params);
 }

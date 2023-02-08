@@ -25,8 +25,9 @@ import org.apache.commons.text.StringSubstitutor;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import cn.topiam.employee.application.oidc.model.AppOidcStandardConfigGetResult;
-import cn.topiam.employee.application.oidc.model.AppOidcStandardSaveConfigParam;
+import cn.topiam.employee.application.oidc.pojo.AppOidcProtocolEndpoint;
+import cn.topiam.employee.application.oidc.pojo.AppOidcStandardConfigGetResult;
+import cn.topiam.employee.application.oidc.pojo.AppOidcStandardSaveConfigParam;
 import cn.topiam.employee.common.constants.ProtocolConstants;
 import cn.topiam.employee.common.entity.app.AppOidcConfigEntity;
 import cn.topiam.employee.common.entity.app.po.AppOidcConfigPO;
@@ -88,6 +89,7 @@ public interface AppOidcStandardConfigConverter {
      * @param config {@link AppOidcConfigEntity}
      * @return {@link AppOidcConfigEntity}
      */
+    @Mapping(target = "responseTypes", ignore = true)
     @Mapping(target = "updateTime", ignore = true)
     @Mapping(target = "updateBy", ignore = true)
     @Mapping(target = "remark", ignore = true)
@@ -101,11 +103,11 @@ public interface AppOidcStandardConfigConverter {
      * 获取协议端点
      *
      * @param appCode {@link String}
-     * @return {@link AppOidcStandardConfigGetResult.ProtocolEndpoint}
+     * @return {@link AppOidcProtocolEndpoint}
      */
-    private AppOidcStandardConfigGetResult.ProtocolEndpoint getProtocolEndpointDomain(String appCode) {
+    private AppOidcProtocolEndpoint getProtocolEndpointDomain(String appCode) {
         //@formatter:off
-        AppOidcStandardConfigGetResult.ProtocolEndpoint domain = new AppOidcStandardConfigGetResult.ProtocolEndpoint();
+        AppOidcProtocolEndpoint domain = new AppOidcProtocolEndpoint();
         //issues
         Map<String,String> variables = new HashMap<>(16);
         variables.put(APP_CODE,appCode);

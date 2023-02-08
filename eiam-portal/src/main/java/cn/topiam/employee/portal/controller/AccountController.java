@@ -66,6 +66,17 @@ public class AccountController {
     }
 
     /**
+     * 准备修改手机
+     *
+     * @return {@link  ApiRestResult}
+     */
+    @Operation(summary = "准备修改手机")
+    @PostMapping("/prepare_change_phone")
+    public ApiRestResult<Boolean> prepareChangePhone(@DecryptRequestBody @RequestBody @Validated PrepareChangePhoneRequest param) {
+        return ApiRestResult.ok(accountService.prepareChangePhone(param));
+    }
+
+    /**
      * 修改手机
      *
      * @return {@link  ApiRestResult}
@@ -74,6 +85,17 @@ public class AccountController {
     @PutMapping("/change_phone")
     public ApiRestResult<Boolean> changePhone(@RequestBody @Validated ChangePhoneRequest param) {
         return ApiRestResult.ok(accountService.changePhone(param));
+    }
+
+    /**
+     * 准备修改邮箱
+     *
+     * @return {@link  ApiRestResult}
+     */
+    @Operation(summary = "准备修改邮箱")
+    @PostMapping("/prepare_change_email")
+    public ApiRestResult<Boolean> prepareChangeEmail(@DecryptRequestBody @RequestBody @Validated PrepareChangeEmailRequest param) {
+        return ApiRestResult.ok(accountService.prepareChangeEmail(param));
     }
 
     /**

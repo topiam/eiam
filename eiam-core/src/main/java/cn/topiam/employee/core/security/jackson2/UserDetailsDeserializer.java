@@ -82,13 +82,15 @@ class UserDetailsDeserializer extends JsonDeserializer<UserDetails> {
         boolean accountNonExpired = readJsonNode(jsonNode, "accountNonExpired").asBoolean();
         boolean credentialsNonExpired = readJsonNode(jsonNode, "credentialsNonExpired").asBoolean();
         boolean accountNonLocked = readJsonNode(jsonNode, "accountNonLocked").asBoolean();
+        String authType = readJsonNode(jsonNode, "authType").asText(null);
         //用户类型
         String userType = readJsonNode(jsonNode, "userType").asText(null);
         // 封装值
         UserDetails result = new UserDetails(id, username, password,
             StringUtils.isNoneBlank(userType) ? UserType.getType(userType) : null, enabled,
             accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
-
+        //认证类型
+        result.setAuthType(authType);
         //IP地址、设备相关
         result.setGeoLocation(geoLocation);
         result.setUserAgent(userAgent);

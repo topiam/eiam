@@ -30,7 +30,7 @@ import cn.topiam.employee.audit.enums.EventStatus;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.audit.event.AuditEventPublish;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
-import static cn.topiam.employee.audit.enums.EventType.*;
+import static cn.topiam.employee.audit.enums.EventType.LOGOUT_CONSOLE;
 
 /**
  * 退出成功

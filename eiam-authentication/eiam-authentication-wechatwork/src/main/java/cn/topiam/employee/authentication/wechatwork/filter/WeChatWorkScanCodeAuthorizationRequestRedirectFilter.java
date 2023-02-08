@@ -49,7 +49,8 @@ import cn.topiam.employee.authentication.wechatwork.WeChatWorkIdpScanCodeConfig;
 import cn.topiam.employee.authentication.wechatwork.constant.WeChatWorkAuthenticationConstants;
 import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
-import static cn.topiam.employee.common.enums.IdentityProviderType.WECHATWORK_SCAN_CODE;
+import static cn.topiam.employee.authentication.common.IdentityProviderType.WECHAT_WORK_QR;
+import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.PROVIDER_CODE;
 
 /**
  * 微信扫码登录请求重定向过滤器
@@ -63,13 +64,8 @@ public class WeChatWorkScanCodeAuthorizationRequestRedirectFilter extends OncePe
     private final Logger                                                     logger                         = LoggerFactory
         .getLogger(WeChatWorkScanCodeAuthorizationRequestRedirectFilter.class);
 
-    /**
-     * 提供商ID
-     */
-    public static final String                                               PROVIDER_ID                    = "providerId";
-
     public static final AntPathRequestMatcher                                WECHAT_WORK_REQUEST_MATCHER    = new AntPathRequestMatcher(
-        WECHATWORK_SCAN_CODE.getAuthorizationPathPrefix() + "/" + "{" + PROVIDER_ID + "}",
+        WECHAT_WORK_QR.getAuthorizationPathPrefix() + "/" + "{" + PROVIDER_CODE + "}",
         HttpMethod.GET.name());
 
     /**
@@ -101,9 +97,9 @@ public class WeChatWorkScanCodeAuthorizationRequestRedirectFilter extends OncePe
             return;
         }
         Map<String, String> variables = matcher.getVariables();
-        String providerId = variables.get(PROVIDER_ID);
+        String providerCode = variables.get(PROVIDER_CODE);
         Optional<IdentityProviderEntity> optional = identityProviderRepository
-            .findByIdAndEnabledIsTrue(Long.valueOf(providerId));
+            .findByCodeAndEnabledIsTrue(providerCode);
         if (optional.isEmpty()) {
             throw new NullPointerException("未查询到身份提供商信息");
         }
@@ -115,7 +111,8 @@ public class WeChatWorkScanCodeAuthorizationRequestRedirectFilter extends OncePe
         OAuth2AuthorizationRequest.Builder builder = OAuth2AuthorizationRequest.authorizationCode()
             .clientId(config.getCorpId())
             .authorizationUri(WeChatWorkAuthenticationConstants.URL_AUTHORIZE)
-            .redirectUri(WeChatWorkScanCodeLoginAuthenticationFilter.getLoginUrl(providerId))
+            .redirectUri(
+                WeChatWorkScanCodeLoginAuthenticationFilter.getLoginUrl(optional.get().getCode()))
             .state(DEFAULT_STATE_GENERATOR.generateKey());
         builder.parameters(parameters -> {
             HashMap<String, Object> linkedParameters = new LinkedHashMap<>();
@@ -149,13 +146,13 @@ public class WeChatWorkScanCodeAuthorizationRequestRedirectFilter extends OncePe
             authorizationRequest.getAuthorizationRequestUri());
     }
 
-    private final static String STYLE        = ""
+    private static final String STYLE        = ""
                                                + ".impowerBox .qrcode {width: 280px;border: none;margin-top:10px;}\n"
                                                + ".impowerBox .title {display: none;}\n"
                                                + ".impowerBox .info {display: none;}\n"
                                                + ".status_icon {display: none}\n"
                                                + ".impowerBox .status {text-align: center;} ";
-    private final static String STYLE_BASE64 = "data:text/css;base64," + Base64.getEncoder()
+    private static final String STYLE_BASE64 = "data:text/css;base64," + Base64.getEncoder()
         .encodeToString(STYLE.getBytes(StandardCharsets.UTF_8));
 
     public static RequestMatcher getRequestMatcher() {

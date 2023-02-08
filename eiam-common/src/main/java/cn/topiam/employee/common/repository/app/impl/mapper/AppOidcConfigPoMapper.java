@@ -51,41 +51,41 @@ public class AppOidcConfigPoMapper implements RowMapper<AppOidcConfigPO> {
     @Override
     public AppOidcConfigPO mapRow(ResultSet rs, int rowNum) throws SQLException {
         //@formatter:off
-        AppOidcConfigPO appAccount = new AppOidcConfigPO();
-        appAccount.setAppId(rs.getLong("id_"));
-        appAccount.setAppId(rs.getLong("app_id"));
+        AppOidcConfigPO appOidc = new AppOidcConfigPO();
+        appOidc.setAppId(rs.getLong("id_"));
+        appOidc.setAppId(rs.getLong("app_id"));
         //应用表相关
-        appAccount.setAppCode(rs.getString("code_"));
-        appAccount.setAppTemplate(rs.getString("template_"));
-        appAccount.setEnabled(rs.getBoolean("is_enabled"));
-        appAccount.setClientId(rs.getString("client_id"));
-        appAccount.setClientSecret(rs.getString("client_secret"));
-        appAccount.setInitLoginType(InitLoginType.getType(rs.getString("init_login_type")));
-        appAccount.setInitLoginUrl(rs.getString("init_login_url"));
-        appAccount.setAuthorizationType(AuthorizationType.getType(rs.getString("authorization_type")));
+        appOidc.setAppCode(rs.getString("code_"));
+        appOidc.setAppTemplate(rs.getString("template_"));
+        appOidc.setEnabled(rs.getBoolean("is_enabled"));
+        appOidc.setClientId(rs.getString("client_id"));
+        appOidc.setClientSecret(rs.getString("client_secret"));
+        appOidc.setInitLoginType(InitLoginType.getType(rs.getString("init_login_type")));
+        appOidc.setInitLoginUrl(rs.getString("init_login_url"));
+        appOidc.setAuthorizationType(AuthorizationType.getType(rs.getString("authorization_type")));
         //配置相关
-        appAccount.setClientAuthMethods(JSONObject.parseObject(rs.getString("client_auth_methods"), Set.class));
-        appAccount.setAuthGrantTypes(JSONObject.parseObject(rs.getString("auth_grant_types"), Set.class));
-        appAccount.setResponseTypes(JSONObject.parseObject(rs.getString("response_types"), Set.class));
-        appAccount.setRedirectUris(JSONObject.parseObject(rs.getString("redirect_uris"), Set.class));
-        appAccount.setGrantScopes(JSONObject.parseObject(rs.getString("grant_scopes"), Set.class));
-        appAccount.setRequireAuthConsent(rs.getBoolean("require_auth_consent"));
-        appAccount.setRequireProofKey(rs.getBoolean("require_proof_key"));
-        appAccount.setTokenEndpointAuthSigningAlgorithm(
+        appOidc.setClientAuthMethods(JSONObject.parseObject(rs.getString("client_auth_methods"), Set.class));
+        appOidc.setAuthGrantTypes(JSONObject.parseObject(rs.getString("auth_grant_types"), Set.class));
+        appOidc.setResponseTypes(JSONObject.parseObject(rs.getString("response_types"), Set.class));
+        appOidc.setRedirectUris(JSONObject.parseObject(rs.getString("redirect_uris"), Set.class));
+        appOidc.setGrantScopes(JSONObject.parseObject(rs.getString("grant_scopes"), Set.class));
+        appOidc.setRequireAuthConsent(rs.getBoolean("require_auth_consent"));
+        appOidc.setRequireProofKey(rs.getBoolean("require_proof_key"));
+        appOidc.setTokenEndpointAuthSigningAlgorithm(
             rs.getString("token_endpoint_auth_signing_algorithm"));
-        appAccount.setRefreshTokenTimeToLive(rs.getInt("refresh_token_time_to_live"));
-        appAccount.setAccessTokenFormat(rs.getString("access_token_format"));
-        appAccount.setAccessTokenTimeToLive(rs.getInt("access_token_time_to_live"));
-        appAccount.setIdTokenTimeToLive(rs.getInt("id_token_time_to_live"));
-        appAccount.setIdTokenSignatureAlgorithm(rs.getString("id_token_signature_algorithm"));
-        appAccount.setReuseRefreshToken(rs.getBoolean("reuse_refresh_token"));
+        appOidc.setRefreshTokenTimeToLive(rs.getInt("refresh_token_time_to_live"));
+        appOidc.setAccessTokenFormat(rs.getString("access_token_format"));
+        appOidc.setAccessTokenTimeToLive(rs.getInt("access_token_time_to_live"));
+        appOidc.setIdTokenTimeToLive(rs.getInt("id_token_time_to_live"));
+        appOidc.setIdTokenSignatureAlgorithm(rs.getString("id_token_signature_algorithm"));
+        appOidc.setReuseRefreshToken(rs.getBoolean("reuse_refresh_token"));
         //创建修改相关
-        appAccount.setCreateBy(rs.getString("create_by"));
-        appAccount.setCreateTime(rs.getObject("create_time", LocalDateTime.class));
-        appAccount.setUpdateBy(rs.getString("update_by"));
-        appAccount.setCreateTime(rs.getObject("update_time", LocalDateTime.class));
-        appAccount.setRemark(rs.getString("remark_"));
-        return appAccount;
+        appOidc.setCreateBy(rs.getString("create_by"));
+        appOidc.setCreateTime(rs.getObject("create_time", LocalDateTime.class));
+        appOidc.setUpdateBy(rs.getString("update_by"));
+        appOidc.setCreateTime(rs.getObject("update_time", LocalDateTime.class));
+        appOidc.setRemark(rs.getString("remark_"));
+        return appOidc;
         //@formatter:on
     }
 }

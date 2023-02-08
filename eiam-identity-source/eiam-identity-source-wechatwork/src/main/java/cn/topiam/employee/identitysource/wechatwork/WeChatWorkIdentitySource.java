@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.alibaba.fastjson2.JSON;
 
-import cn.topiam.employee.common.enums.identityprovider.IdentitySourceProvider;
+import cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider;
 import cn.topiam.employee.common.util.RequestUtils;
 import cn.topiam.employee.identitysource.core.AbstractDefaultIdentitySource;
 import cn.topiam.employee.identitysource.core.client.IdentitySourceClient;
@@ -79,7 +79,7 @@ public class WeChatWorkIdentitySource extends AbstractDefaultIdentitySource<WeCh
     @Override
     public Object event(HttpServletRequest request, HttpServletResponse response) {
         LocalDateTime eventTime = LocalDateTime.now();
-        Map<String, String> params = RequestUtils.getParams(request);
+        Map<String, Object> params = RequestUtils.getParams(request);
         WeChatWorkRequest weWorkResult = null;
         try {
             if (RequestMethod.POST.name().equals(request.getMethod())) {
@@ -108,14 +108,14 @@ public class WeChatWorkIdentitySource extends AbstractDefaultIdentitySource<WeCh
      * @param params {@link Map}
      * @return 返回第三方平台结果
      */
-    private String eventCallBack(LocalDateTime eventTime, Map<String, String> params,
+    private String eventCallBack(LocalDateTime eventTime, Map<String, Object> params,
                                  WeChatWorkRequest weWorkResult) throws IllegalArgumentException {
         try {
-            String msgSignature = params.get(MSG_SIGNATURE);
-            String timeStamp = params.get(TIMESTAMP);
-            String nonce = params.get(NONCE);
+            String msgSignature = (String) params.get(MSG_SIGNATURE);
+            String timeStamp = (String) params.get(TIMESTAMP);
+            String nonce = (String) params.get(NONCE);
             if (params.containsKey(ECHOSTR)) {
-                String echoStr = params.get(ECHOSTR);
+                String echoStr = (String) params.get(ECHOSTR);
                 return verifyUrl(msgSignature, timeStamp, nonce, echoStr);
             } else {
                 EventParameter callBackDTO = processMessage(msgSignature, timeStamp, nonce,

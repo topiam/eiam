@@ -48,7 +48,8 @@ public interface AppCertConverter {
      */
     default Predicate queryAppCertListParamConvertToPredicate(AppCertQuery query) {
         QAppCertEntity cert = QAppCertEntity.appCertEntity;
-        Predicate predicate = cert.isNotNull();
+        Predicate predicate = ExpressionUtils.and(cert.isNotNull(),
+            cert.isDeleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = StringUtils.isBlank(query.getAppId()) ? predicate : ExpressionUtils.and(predicate, cert.appId.eq(Long.valueOf(query.getAppId())));

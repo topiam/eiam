@@ -22,8 +22,6 @@ import java.io.Serializable;
 import java.util.List;
 
 import cn.topiam.employee.common.enums.CaptchaProviderType;
-import cn.topiam.employee.common.enums.IdentityProviderCategory;
-import cn.topiam.employee.common.enums.IdentityProviderType;
 
 import lombok.Builder;
 import lombok.Data;
@@ -72,30 +70,30 @@ public class LoginConfigResult implements Serializable {
     @Data
     public static class Idps implements Serializable {
         @Serial
-        private static final long        serialVersionUID = -6482651783349719888L;
+        private static final long serialVersionUID = -6482651783349719888L;
 
         /**
-         * ID
+         * CODE
          */
-        @Schema(description = "ID")
-        private String                   id;
+        @Schema(description = "CODE")
+        private String            code;
 
         /**
          * name
          */
         @Parameter(description = "名称")
-        private String                   name;
+        private String            name;
 
         /**
          * 提供商
          */
         @Parameter(description = "提供商")
-        private IdentityProviderType     type;
+        private String            type;
 
         /**
          * 提供商类型
          */
         @Parameter(description = "提供商类型")
-        private IdentityProviderCategory category;
+        private String            category;
     }
 }

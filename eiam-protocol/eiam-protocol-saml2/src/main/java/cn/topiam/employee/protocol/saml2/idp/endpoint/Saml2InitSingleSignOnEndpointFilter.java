@@ -37,15 +37,15 @@ import com.google.common.collect.Lists;
 
 import cn.topiam.employee.application.ApplicationService;
 import cn.topiam.employee.application.ApplicationServiceLoader;
-import cn.topiam.employee.application.Saml2ApplicationService;
 import cn.topiam.employee.application.context.ApplicationContext;
 import cn.topiam.employee.application.context.ApplicationContextHolder;
+import cn.topiam.employee.application.saml2.Saml2ApplicationService;
+import cn.topiam.employee.application.saml2.model.Saml2SsoModel;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.EventStatus;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.audit.event.AuditEventPublish;
 import cn.topiam.employee.core.context.ServerContextHelp;
-import cn.topiam.employee.core.protocol.Saml2SsoModel;
 import cn.topiam.employee.core.security.savedredirect.HttpSessionRedirectCache;
 import cn.topiam.employee.core.security.savedredirect.RedirectCache;
 import cn.topiam.employee.support.context.ApplicationContextHelp;

@@ -21,12 +21,18 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import cn.topiam.employee.support.repository.domain.BaseEntity;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLDeleteAll;
+import org.hibernate.annotations.Where;
+
+import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
 /**
  * 应用账户
@@ -40,7 +46,10 @@ import lombok.experimental.Accessors;
 @Entity
 @Accessors(chain = true)
 @Table(name = "app_account")
-public class AppAccountEntity extends BaseEntity<Long> {
+@SQLDelete(sql = "update app_account set " + SOFT_DELETE_SET + " where id_ = ?")
+@SQLDeleteAll(sql = "update app_account set " + SOFT_DELETE_SET + " where id_ = ?")
+@Where(clause = SOFT_DELETE_WHERE)
+public class AppAccountEntity extends LogicDeleteEntity<Long> {
     /**
      * 应用ID
      */
@@ -58,4 +67,10 @@ public class AppAccountEntity extends BaseEntity<Long> {
      */
     @Column(name = "account_")
     private String account;
+
+    /**
+     * 账户密码
+     */
+    @Column(name = "password_")
+    private String password;
 }

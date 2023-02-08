@@ -27,6 +27,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.topiam.employee.common.constants.SettingConstants;
+import cn.topiam.employee.common.crypto.EncryptContextHelp;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.entity.setting.config.SmsConfig;
 import cn.topiam.employee.common.enums.MfaFactor;
@@ -40,7 +41,6 @@ import cn.topiam.employee.core.security.captcha.CaptchaProviderConfig;
 import cn.topiam.employee.core.setting.constant.SecuritySettingConstants;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.exception.TopIamException;
-import cn.topiam.employee.support.util.AesUtils;
 import static cn.topiam.employee.core.setting.constant.MessageSettingConstants.MESSAGE_SMS_PROVIDER;
 import static cn.topiam.employee.core.setting.constant.MfaSettingConstants.*;
 import static cn.topiam.employee.core.setting.constant.SecuritySettingConstants.*;
@@ -127,20 +127,21 @@ public class SettingContextHelp {
                 if (SmsProvider.ALIYUN.equals(provider)) {
                     AliyunSmsProviderConfig smsConfig = (AliyunSmsProviderConfig) config
                         .getConfig();
-                    smsConfig.setAccessKeySecret(AesUtils.decrypt(smsConfig.getAccessKeySecret()));
+                    smsConfig.setAccessKeySecret(
+                        EncryptContextHelp.decrypt(smsConfig.getAccessKeySecret()));
                     return config;
                 }
                 //腾讯
                 else if (SmsProvider.TENCENT.equals(provider)) {
                     TencentSmsProviderConfig smsConfig = (TencentSmsProviderConfig) config
                         .getConfig();
-                    smsConfig.setSecretKey(AesUtils.decrypt(smsConfig.getSecretKey()));
+                    smsConfig.setSecretKey(EncryptContextHelp.decrypt(smsConfig.getSecretKey()));
                     return config;
                 }
                 //七牛
                 else if (SmsProvider.QINIU.equals(provider)) {
                     QiNiuSmsProviderConfig smsConfig = (QiNiuSmsProviderConfig) config.getConfig();
-                    smsConfig.setSecretKey(AesUtils.decrypt(smsConfig.getSecretKey()));
+                    smsConfig.setSecretKey(EncryptContextHelp.decrypt(smsConfig.getSecretKey()));
                     return config;
                 }
                 throw new TopIamException("暂未支持此短信 [" + provider + "] 提供商配置获取");

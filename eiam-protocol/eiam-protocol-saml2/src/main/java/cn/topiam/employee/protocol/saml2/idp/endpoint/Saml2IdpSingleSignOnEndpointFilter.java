@@ -56,16 +56,16 @@ import com.google.common.collect.Lists;
 
 import cn.topiam.employee.application.ApplicationService;
 import cn.topiam.employee.application.ApplicationServiceLoader;
-import cn.topiam.employee.application.Saml2ApplicationService;
 import cn.topiam.employee.application.context.ApplicationContext;
 import cn.topiam.employee.application.context.ApplicationContextHolder;
+import cn.topiam.employee.application.saml2.Saml2ApplicationService;
+import cn.topiam.employee.application.saml2.model.Saml2SsoModel;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.EventStatus;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.audit.event.AuditEventPublish;
 import cn.topiam.employee.common.util.SamlUtils;
 import cn.topiam.employee.core.context.ServerContextHelp;
-import cn.topiam.employee.core.protocol.Saml2SsoModel;
 import cn.topiam.employee.core.security.savedredirect.HttpSessionRedirectCache;
 import cn.topiam.employee.core.security.savedredirect.RedirectCache;
 import cn.topiam.employee.protocol.saml2.idp.endpoint.xml.ResponseGenerator;
@@ -82,7 +82,8 @@ import static org.springframework.util.StringUtils.hasText;
 
 import static cn.topiam.employee.audit.enums.EventType.APP_SSO;
 import static cn.topiam.employee.common.constants.AuthorizeConstants.FE_LOGIN;
-import static cn.topiam.employee.common.constants.ProtocolConstants.*;
+import static cn.topiam.employee.common.constants.ProtocolConstants.APP_CODE_VARIABLE;
+import static cn.topiam.employee.common.constants.ProtocolConstants.Saml2EndpointConstants;
 import static cn.topiam.employee.common.util.SamlKeyStoreProvider.getKeyStoreCredentialResolver;
 import static cn.topiam.employee.common.util.SamlUtils.getMessageContext;
 import static cn.topiam.employee.core.security.util.SecurityUtils.isAuthenticated;
@@ -99,7 +100,7 @@ public class Saml2IdpSingleSignOnEndpointFilter extends OncePerRequestFilter
                                                 implements OrderedFilter {
     private static final Logger         logger          = LoggerFactory
         .getLogger(Saml2IdpSingleSignOnEndpointFilter.class);
-    private final static RequestMatcher REQUEST_MATCHER = new AntPathRequestMatcher(
+    private static final RequestMatcher REQUEST_MATCHER = new AntPathRequestMatcher(
         Saml2EndpointConstants.SAML_SSO_PATH);
     private final RedirectCache         redirectCache   = new HttpSessionRedirectCache();
 

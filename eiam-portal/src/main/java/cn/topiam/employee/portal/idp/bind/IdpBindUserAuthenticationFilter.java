@@ -17,20 +17,19 @@
  */
 package cn.topiam.employee.portal.idp.bind;
 
-import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolationException;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
@@ -50,14 +49,15 @@ import cn.topiam.employee.common.entity.account.po.UserIdpBindPo;
 import cn.topiam.employee.common.enums.SecretType;
 import cn.topiam.employee.common.repository.account.UserIdpRepository;
 import cn.topiam.employee.common.repository.account.UserRepository;
-import cn.topiam.employee.common.util.RequestUtils;
 import cn.topiam.employee.core.security.authentication.IdpAuthentication;
 import cn.topiam.employee.core.security.userdetails.UserDetails;
+import cn.topiam.employee.core.security.util.SecurityUtils;
 import cn.topiam.employee.portal.pojo.request.AccountBindIdpRequest;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.context.ServletContextHelp;
 import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.support.util.AesUtils;
+import cn.topiam.employee.support.validation.ValidationHelp;
 
 import lombok.extern.slf4j.Slf4j;
 import static cn.topiam.employee.authentication.common.filter.AbstractIdpAuthenticationProcessingFilter.TOPIAM_USER_BIND_IDP;
@@ -76,10 +76,6 @@ public class IdpBindUserAuthenticationFilter extends AbstractAuthenticationProce
     public final static String         DEFAULT_FILTER_PROCESSES_URI = USER_BIND_IDP;
     public static final RequestMatcher IDP_BIND_USER_MATCHER        = new AntPathRequestMatcher(
         DEFAULT_FILTER_PROCESSES_URI, HttpMethod.POST.name());
-
-    public static RequestMatcher getRequestMatcher() {
-        return IDP_BIND_USER_MATCHER;
-    }
 
     /**
      * Performs actual authentication.
@@ -103,33 +99,38 @@ public class IdpBindUserAuthenticationFilter extends AbstractAuthenticationProce
      */
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
-                                                HttpServletResponse response) throws AuthenticationException,
-                                                                              IOException,
-                                                                              ServletException {
+                                                HttpServletResponse response) throws AuthenticationException {
         //@formatter:off
         TraceUtils.put(UUID.randomUUID().toString());
-        IdpAuthentication context = (IdpAuthentication) SecurityContextHolder.getContext();
-        UserDetails principal = (UserDetails) context.getPrincipal();
+        SecurityContext securityContext = SecurityUtils.getSecurityContext();
+        Authentication authentication = securityContext.getAuthentication();
+        if (!(authentication instanceof IdpAuthentication)){
+            return null;
+        }
         Object value = request.getSession().getAttribute(TOPIAM_USER_BIND_IDP);
+        AccountBindIdpRequest idpRequest = new AccountBindIdpRequest(request.getParameter("username"),request.getParameter("password"));
+        ValidationHelp.ValidationResult<AccountBindIdpRequest> requestValidationResult = ValidationHelp.validateEntity(idpRequest);
+        if (requestValidationResult.isHasErrors()){
+            throw new ConstraintViolationException(requestValidationResult.getConstraintViolations());
+        }
         //参数为空
         if (Objects.isNull(value)) {
-            String content = "用户 [" + principal.getUsername() + "] 绑定 IDP 失败, 参数无效";
+            String content = "用户 [" + idpRequest.getUsername() + "] 绑定 IDP 失败, 参数无效";
             log.error(content);
             auditEventPublish.publish(EventType.BIND_IDP_USER, content, EventStatus.SUCCESS);
             throw new UserBindIdpException("user_bind_idp_invalid_argument_error", content);
         }
-        AccountBindIdpRequest idpRequest = JSONObject.parseObject(RequestUtils.getBody(request), AccountBindIdpRequest.class);
         idpRequest.setPassword(idpRequest.getPassword());
         //会话上下文数据转 UserInfo
         IdpUser idpUserInfo = JSONObject.parseObject((String) value, IdpUser.class);
         //验证
-        UserEntity user = authnUserBindValidate(idpRequest, idpUserInfo.getProviderId(),idpUserInfo.getOpenId(),principal);
+        UserEntity user = authnUserBindValidate(idpRequest, idpUserInfo.getProviderId(),idpUserInfo.getOpenId());
         //认证
         Boolean bind = userIdpService.bindUserIdp(user.getId().toString(),idpUserInfo);
         if (bind){
-            String content="用户 ["+principal.getUsername()+"] 绑定 IDP 成功";
+            String content="用户 ["+idpRequest.getUsername()+"] 绑定 IDP 成功";
             UserDetails userDetails = userIdpService.getUserDetails(idpUserInfo.getOpenId(), idpUserInfo.getProviderId());
-            IdpAuthentication token = new IdpAuthentication(userDetails, idpUserInfo.getProviderType().getCode(), idpUserInfo.getProviderId(), true, userDetails.getAuthorities());
+            IdpAuthentication token = new IdpAuthentication(userDetails, idpUserInfo.getProviderType().value(), idpUserInfo.getProviderId(), true, userDetails.getAuthorities());
             // Allow subclasses to set the "details" property
             token.setDetails(this.authenticationDetailsSource.buildDetails(request));
             removeState(request,response);
@@ -153,13 +154,13 @@ public class IdpBindUserAuthenticationFilter extends AbstractAuthenticationProce
     }
 
     private UserEntity authnUserBindValidate(AccountBindIdpRequest request, String providerId,
-                                             String openId, UserDetails principal) {
+                                             String openId) {
         HttpServletRequest servletRequest = ServletContextHelp.getRequest();
         //根据用户名查询用户
         UserRepository userRepository = ApplicationContextHelp.getBean(UserRepository.class);
-        UserEntity user = userRepository.findByUsername(principal.getUsername());
+        UserEntity user = userRepository.findByUsername(request.getUsername());
         if (Objects.isNull(user)) {
-            String content = "用户 [" + principal.getUsername() + "] 绑定 IDP 失败, 未查询到用户信息";
+            String content = "用户 [" + request.getUsername() + "] 绑定 IDP 失败, 未查询到用户信息";
             log.error(content);
             auditEventPublish.publish(EventType.BIND_IDP_USER, content, EventStatus.SUCCESS);
             throw new UsernameNotFoundException("用户名或密码错误");
@@ -170,14 +171,14 @@ public class IdpBindUserAuthenticationFilter extends AbstractAuthenticationProce
                 .getAttribute(SecretType.LOGIN.getKey());
             request.setPassword(AesUtils.decrypt(request.getPassword(), secret));
         } catch (Exception exception) {
-            String content = "用户 [" + principal.getUsername() + "] 绑定 IDP 失败, 密码解密异常";
+            String content = "用户 [" + request.getUsername() + "] 绑定 IDP 失败, 密码解密异常";
             log.error(content, exception);
             auditEventPublish.publish(EventType.BIND_IDP_USER, content, EventStatus.SUCCESS);
             throw new UserBindIdpException();
         }
         boolean matches = passwordEncoder.matches(request.getPassword(), user.getPassword());
         if (!matches) {
-            String content = "用户 [" + principal.getUsername() + "] 绑定 IDP 失败, 用户密码验证失败";
+            String content = "用户 [" + request.getUsername() + "] 绑定 IDP 失败, 用户密码验证失败";
             log.error(content);
             auditEventPublish.publish(EventType.BIND_IDP_USER, content, EventStatus.SUCCESS);
             throw new UsernameNotFoundException("用户名或密码错误");
@@ -186,7 +187,7 @@ public class IdpBindUserAuthenticationFilter extends AbstractAuthenticationProce
         Optional<UserIdpBindPo> bindEntity = userIdpRepository.findByIdpIdAndUserId(providerId,
             user.getId());
         if (bindEntity.isPresent()) {
-            String content = "用户 [" + principal.getUsername() + "] 绑定 IDP 失败, 用户已存在绑定";
+            String content = "用户 [" + request.getUsername() + "] 绑定 IDP 失败, 用户已存在绑定";
             log.error(content);
             auditEventPublish.publish(EventType.BIND_IDP_USER, content, EventStatus.SUCCESS);
             throw new UsernameNotFoundException("用户已存在绑定");
@@ -194,7 +195,7 @@ public class IdpBindUserAuthenticationFilter extends AbstractAuthenticationProce
         //是否绑定
         bindEntity = userIdpRepository.findByIdpIdAndOpenId(providerId, openId);
         if (bindEntity.isPresent()) {
-            String content = "用户 [" + principal.getUsername() + "] 绑定 IDP 失败, 已存在其他用户绑定";
+            String content = "用户 [" + request.getUsername() + "] 绑定 IDP 失败, 已存在其他用户绑定";
             log.error(content);
             auditEventPublish.publish(EventType.BIND_IDP_USER, content, EventStatus.SUCCESS);
             throw new UsernameNotFoundException("已存在其他用户绑定");

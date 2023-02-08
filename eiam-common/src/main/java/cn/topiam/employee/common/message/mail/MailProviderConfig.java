@@ -20,9 +20,9 @@ package cn.topiam.employee.common.message.mail;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import cn.topiam.employee.common.crypto.EncryptContextHelp;
 import cn.topiam.employee.common.message.enums.MailProvider;
 import cn.topiam.employee.common.message.enums.MailSafetyType;
-import cn.topiam.employee.support.util.AesUtils;
 
 import lombok.Builder;
 import lombok.Data;
@@ -86,6 +86,6 @@ public class MailProviderConfig {
     private String         secret;
 
     public String getDecryptSecret() {
-        return AesUtils.decrypt(this.secret);
+        return EncryptContextHelp.decrypt(this.secret);
     }
 }

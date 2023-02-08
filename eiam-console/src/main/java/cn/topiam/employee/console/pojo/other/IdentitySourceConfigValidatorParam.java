@@ -26,7 +26,7 @@ import org.springdoc.api.annotations.ParameterObject;
 
 import com.alibaba.fastjson2.JSONObject;
 
-import cn.topiam.employee.common.enums.identityprovider.IdentitySourceProvider;
+import cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider;
 
 import lombok.Data;
 

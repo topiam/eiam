@@ -42,7 +42,11 @@ public enum AppType implements BaseEnum {
                                          /**
                                           * 自研
                                           */
-                                         SELF_DEVELOPED("self_developed", "自研应用");
+                                         SELF_DEVELOPED("self_developed", "自研应用"),
+                                         /**
+                                           * TSA
+                                           */
+                                         TSA("tsa", "TSA"),;
 
     /**
      * code

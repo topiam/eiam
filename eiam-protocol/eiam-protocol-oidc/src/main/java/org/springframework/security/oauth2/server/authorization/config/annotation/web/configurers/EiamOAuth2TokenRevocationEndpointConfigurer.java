@@ -17,21 +17,28 @@
  */
 package org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.http.converter.OAuth2ErrorHttpMessageConverter;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2TokenRevocationAuthenticationProvider;
-import org.springframework.security.oauth2.server.authorization.authentication.OAuth2TokenRevocationAuthenticationToken;
 import org.springframework.security.oauth2.server.authorization.web.OAuth2TokenRevocationEndpointFilter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.DelegatingAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2TokenRevocationAuthenticationConverter;
@@ -41,7 +48,6 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.util.Assert;
 
 import cn.topiam.employee.common.constants.ProtocolConstants;
 
@@ -60,94 +66,15 @@ public final class EiamOAuth2TokenRevocationEndpointConfigurer extends AbstractO
     private final List<AuthenticationProvider>      authenticationProviders             = new ArrayList<>();
     private Consumer<List<AuthenticationProvider>>  authenticationProvidersConsumer     = (authenticationProviders) -> {
                                                                                         };
-    private AuthenticationSuccessHandler            revocationResponseHandler;
-    private AuthenticationFailureHandler            errorResponseHandler;
+    private final HttpMessageConverter<OAuth2Error> errorHttpResponseConverter          = new OAuth2ErrorHttpMessageConverter();
+    private final AuthenticationSuccessHandler      authenticationSuccessHandler        = this::sendRevocationSuccessResponse;
+    private final AuthenticationFailureHandler      authenticationFailureHandler        = this::sendErrorResponse;
 
     /**
      * Restrict for internal use only.
      */
     EiamOAuth2TokenRevocationEndpointConfigurer(ObjectPostProcessor<Object> objectPostProcessor) {
         super(objectPostProcessor);
-    }
-
-    /**
-     * Adds an {@link AuthenticationConverter} used when attempting to extract a Revoke Token Request from {@link HttpServletRequest}
-     * to an instance of {@link OAuth2TokenRevocationAuthenticationToken} used for authenticating the request.
-     *
-     * @param revocationRequestConverter an {@link AuthenticationConverter} used when attempting to extract a Revoke Token Request from {@link HttpServletRequest}
-     * @return the {@link EiamOAuth2TokenRevocationEndpointConfigurer} for further configuration
-     */
-    public EiamOAuth2TokenRevocationEndpointConfigurer revocationRequestConverter(AuthenticationConverter revocationRequestConverter) {
-        Assert.notNull(revocationRequestConverter, "revocationRequestConverter cannot be null");
-        this.revocationRequestConverters.add(revocationRequestConverter);
-        return this;
-    }
-
-    /**
-     * Sets the {@code Consumer} providing access to the {@code List} of default
-     * and (optionally) added {@link #revocationRequestConverter(AuthenticationConverter) AuthenticationConverter}'s
-     * allowing the ability to add, remove, or customize a specific {@link AuthenticationConverter}.
-     *
-     * @param revocationRequestConvertersConsumer the {@code Consumer} providing access to the {@code List} of default and (optionally) added {@link AuthenticationConverter}'s
-     * @return the {@link EiamOAuth2TokenRevocationEndpointConfigurer} for further configuration
-     * @since 0.4.0
-     */
-    public EiamOAuth2TokenRevocationEndpointConfigurer revocationRequestConverters(Consumer<List<AuthenticationConverter>> revocationRequestConvertersConsumer) {
-        Assert.notNull(revocationRequestConvertersConsumer,
-            "revocationRequestConvertersConsumer cannot be null");
-        this.revocationRequestConvertersConsumer = revocationRequestConvertersConsumer;
-        return this;
-    }
-
-    /**
-     * Adds an {@link AuthenticationProvider} used for authenticating a type of {@link OAuth2TokenRevocationAuthenticationToken}.
-     *
-     * @param authenticationProvider an {@link AuthenticationProvider} used for authenticating a type of {@link OAuth2TokenRevocationAuthenticationToken}
-     * @return the {@link EiamOAuth2TokenRevocationEndpointConfigurer} for further configuration
-     */
-    public EiamOAuth2TokenRevocationEndpointConfigurer authenticationProvider(AuthenticationProvider authenticationProvider) {
-        Assert.notNull(authenticationProvider, "authenticationProvider cannot be null");
-        this.authenticationProviders.add(authenticationProvider);
-        return this;
-    }
-
-    /**
-     * Sets the {@code Consumer} providing access to the {@code List} of default
-     * and (optionally) added {@link #authenticationProvider(AuthenticationProvider) AuthenticationProvider}'s
-     * allowing the ability to add, remove, or customize a specific {@link AuthenticationProvider}.
-     *
-     * @param authenticationProvidersConsumer the {@code Consumer} providing access to the {@code List} of default and (optionally) added {@link AuthenticationProvider}'s
-     * @return the {@link EiamOAuth2TokenRevocationEndpointConfigurer} for further configuration
-     * @since 0.4.0
-     */
-    public EiamOAuth2TokenRevocationEndpointConfigurer authenticationProviders(Consumer<List<AuthenticationProvider>> authenticationProvidersConsumer) {
-        Assert.notNull(authenticationProvidersConsumer,
-            "authenticationProvidersConsumer cannot be null");
-        this.authenticationProvidersConsumer = authenticationProvidersConsumer;
-        return this;
-    }
-
-    /**
-     * Sets the {@link AuthenticationSuccessHandler} used for handling an {@link OAuth2TokenRevocationAuthenticationToken}.
-     *
-     * @param revocationResponseHandler the {@link AuthenticationSuccessHandler} used for handling an {@link OAuth2TokenRevocationAuthenticationToken}
-     * @return the {@link EiamOAuth2TokenRevocationEndpointConfigurer} for further configuration
-     */
-    public EiamOAuth2TokenRevocationEndpointConfigurer revocationResponseHandler(AuthenticationSuccessHandler revocationResponseHandler) {
-        this.revocationResponseHandler = revocationResponseHandler;
-        return this;
-    }
-
-    /**
-     * Sets the {@link AuthenticationFailureHandler} used for handling an {@link OAuth2AuthenticationException}
-     * and returning the {@link OAuth2Error Error Response}.
-     *
-     * @param errorResponseHandler the {@link AuthenticationFailureHandler} used for handling an {@link OAuth2AuthenticationException}
-     * @return the {@link EiamOAuth2TokenRevocationEndpointConfigurer} for further configuration
-     */
-    public EiamOAuth2TokenRevocationEndpointConfigurer errorResponseHandler(AuthenticationFailureHandler errorResponseHandler) {
-        this.errorResponseHandler = errorResponseHandler;
-        return this;
     }
 
     @Override
@@ -174,6 +101,8 @@ public final class EiamOAuth2TokenRevocationEndpointConfigurer extends AbstractO
         OAuth2TokenRevocationEndpointFilter revocationEndpointFilter = new OAuth2TokenRevocationEndpointFilter(
             authenticationManager,
             ProtocolConstants.OidcEndpointConstants.TOKEN_REVOCATION_ENDPOINT);
+        revocationEndpointFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
+        revocationEndpointFilter.setAuthenticationFailureHandler(authenticationFailureHandler);
         List<AuthenticationConverter> authenticationConverters = createDefaultAuthenticationConverters();
         if (!this.revocationRequestConverters.isEmpty()) {
             authenticationConverters.addAll(0, this.revocationRequestConverters);
@@ -181,13 +110,6 @@ public final class EiamOAuth2TokenRevocationEndpointConfigurer extends AbstractO
         this.revocationRequestConvertersConsumer.accept(authenticationConverters);
         revocationEndpointFilter.setAuthenticationConverter(
             new DelegatingAuthenticationConverter(authenticationConverters));
-        if (this.revocationResponseHandler != null) {
-            revocationEndpointFilter
-                .setAuthenticationSuccessHandler(this.revocationResponseHandler);
-        }
-        if (this.errorResponseHandler != null) {
-            revocationEndpointFilter.setAuthenticationFailureHandler(this.errorResponseHandler);
-        }
         httpSecurity.addFilterAfter(postProcess(revocationEndpointFilter),
             FilterSecurityInterceptor.class);
     }
@@ -215,4 +137,32 @@ public final class EiamOAuth2TokenRevocationEndpointConfigurer extends AbstractO
         return authenticationProviders;
     }
 
+    /**
+     * 撤销成功
+     *
+     * @param request {@link HttpServletRequest}
+     * @param response {@link HttpServletResponse}
+     * @param authentication {@link Authentication}
+     */
+    private void sendRevocationSuccessResponse(HttpServletRequest request,
+                                               HttpServletResponse response,
+                                               Authentication authentication) {
+        response.setStatus(HttpStatus.OK.value());
+    }
+
+    /**
+     * 响应失败
+     *
+     * @param request {@link HttpServletRequest}
+     * @param response {@link HttpServletResponse}
+     * @param exception {@link AuthenticationException}
+     * @throws IOException IOException
+     */
+    private void sendErrorResponse(HttpServletRequest request, HttpServletResponse response,
+                                   AuthenticationException exception) throws IOException {
+        OAuth2Error error = ((OAuth2AuthenticationException) exception).getError();
+        ServletServerHttpResponse httpResponse = new ServletServerHttpResponse(response);
+        httpResponse.setStatusCode(HttpStatus.BAD_REQUEST);
+        this.errorHttpResponseConverter.write(error, null, httpResponse);
+    }
 }

@@ -57,7 +57,6 @@ public class GeoLocationSettingServiceImpl extends SettingServiceImpl
         SettingEntity settingEntity = geoLocationSettingsConverter
             .geoLocationProviderConfigToEntity(param);
         Boolean success = saveSetting(settingEntity);
-        downloadDbFile();
         ApplicationContextHelp.refresh(GEO_LOCATION);
         return success;
     }

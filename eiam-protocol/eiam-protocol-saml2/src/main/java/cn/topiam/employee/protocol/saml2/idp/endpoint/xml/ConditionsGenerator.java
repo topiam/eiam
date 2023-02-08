@@ -38,7 +38,7 @@ import lombok.AllArgsConstructor;
  */
 @AllArgsConstructor
 public class ConditionsGenerator {
-    private final static Logger logger = LoggerFactory.getLogger(ConditionsGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConditionsGenerator.class);
     /**
      * audienceUri
      */

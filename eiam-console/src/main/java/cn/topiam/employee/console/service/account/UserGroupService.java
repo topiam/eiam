@@ -113,4 +113,12 @@ public interface UserGroupService {
      * @return {@link Boolean}
      */
     Boolean batchRemoveMember(String id, List<String> userIds);
+
+    /**
+     * 查询用户组成员数量
+     *
+     * @param groupId {@link  String}
+     * @return {@link  Long}
+     */
+    Long getUserGroupMemberCount(String groupId);
 }

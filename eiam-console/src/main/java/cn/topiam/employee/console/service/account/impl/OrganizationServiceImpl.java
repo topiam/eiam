@@ -25,11 +25,20 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import com.google.common.collect.Lists;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.common.entity.account.OrganizationEntity;
+import cn.topiam.employee.common.entity.account.QOrganizationEntity;
+import cn.topiam.employee.common.entity.account.QOrganizationMemberEntity;
+import cn.topiam.employee.common.entity.account.QUserEntity;
 import cn.topiam.employee.common.enums.DataOrigin;
 import cn.topiam.employee.common.repository.account.OrganizationRepository;
 import cn.topiam.employee.console.converter.account.OrganizationConverter;
@@ -40,8 +49,6 @@ import cn.topiam.employee.console.pojo.result.account.OrganizationTreeResult;
 import cn.topiam.employee.console.pojo.save.account.OrganizationCreateParam;
 import cn.topiam.employee.console.pojo.update.account.OrganizationUpdateParam;
 import cn.topiam.employee.console.service.account.OrganizationService;
-import cn.topiam.employee.console.service.account.UserService;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.util.BeanUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -207,8 +214,7 @@ public class OrganizationServiceImpl implements OrganizationService {
             List<OrganizationEntity> list = organizationRepository.findByParentId(id);
             if (CollectionUtils.isEmpty(list)) {
                 //查询当前机构和当前机构下子机构下是否存在用户，不存在删除，存在抛出异常
-                Long count = ApplicationContextHelp.getBean(UserService.class)
-                    .getOrgMemberCount(id);
+                Long count = getOrgMemberCount(id);
                 if (count > 0) {
                     throw new RuntimeException("删除机构失败，当前机构下存在用户");
                 }
@@ -251,8 +257,6 @@ public class OrganizationServiceImpl implements OrganizationService {
      */
     @Override
     public Boolean moveOrganization(String id, String parentId) {
-        AuditContext.setTarget(Target.builder().type(TargetType.ORGANIZATION).id(id).build(),
-            Target.builder().type(TargetType.ORGANIZATION).id(parentId).build());
         Optional<OrganizationEntity> organization = organizationRepository.findById(id);
         if (organization.isPresent()) {
             OrganizationEntity entity = organization.get();
@@ -282,6 +286,13 @@ public class OrganizationServiceImpl implements OrganizationService {
                     organizationRepository.save(oldParentOrganization.get());
                 }
             }
+            AuditContext.setTarget(
+                Target.builder().type(TargetType.ORGANIZATION)
+                    .typeName(TargetType.ORGANIZATION.getDesc()).id(id)
+                    .name(organization.get().getName()).build(),
+                Target.builder().type(TargetType.ORGANIZATION)
+                    .typeName(TargetType.ORGANIZATION.getDesc()).id(parentId)
+                    .name(parent.get().getName()).build());
             //存在子组织，递归更改子组织 path 和 displayPath
             recursiveUpdateChildNodePathAndDisplayPath(entity.getId());
             return true;
@@ -404,9 +415,42 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     /**
+     * 查询组织成员数量
+     *
+     * @param orgId {@link  String}
+     * @return {@link  Long}
+     */
+    @Override
+    public Long getOrgMemberCount(String orgId) {
+        //条件
+        QUserEntity user = QUserEntity.userEntity;
+        QOrganizationEntity qOrganization = QOrganizationEntity.organizationEntity;
+        Predicate predicate = ExpressionUtils.and(user.isNotNull(),
+            user.isDeleted.eq(Boolean.FALSE));
+        //FIND_IN_SET函数
+        BooleanExpression template = Expressions.booleanTemplate(
+            "FIND_IN_SET({0}, replace({1}, '/', ','))> 0", orgId, qOrganization.path);
+        predicate = ExpressionUtils.and(predicate, qOrganization.id.eq(orgId).or(template));
+        //构造查询
+        JPAQuery<Long> jpaQuery = jpaQueryFactory.selectFrom(user).select(user.count())
+            .innerJoin(QOrganizationMemberEntity.organizationMemberEntity)
+            .on(user.id.eq(QOrganizationMemberEntity.organizationMemberEntity.userId))
+            .innerJoin(qOrganization)
+            .on(qOrganization.id.eq(QOrganizationMemberEntity.organizationMemberEntity.orgId))
+            .where(predicate);
+        return jpaQuery.fetch().get(0);
+    }
+
+    /**
+     * JPAQueryFactory
+     */
+    private final JPAQueryFactory        jpaQueryFactory;
+
+    /**
      * 组织架构数据映射器
      */
     private final OrganizationConverter  orgDataConverter;
+
     /**
      * OrganizationRepository
      */

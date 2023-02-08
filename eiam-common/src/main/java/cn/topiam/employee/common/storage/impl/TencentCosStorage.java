@@ -37,6 +37,7 @@ import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.model.*;
 import com.qcloud.cos.region.Region;
 
+import cn.topiam.employee.common.crypto.Encrypt;
 import cn.topiam.employee.common.storage.AbstractStorage;
 import cn.topiam.employee.common.storage.StorageConfig;
 import cn.topiam.employee.common.storage.StorageProviderException;
@@ -157,6 +158,7 @@ public class TencentCosStorage extends AbstractStorage {
         /**
          * SecretKey
          */
+        @Encrypt
         @NotEmpty(message = "SecretKey不能为空")
         private String secretKey;
         /**

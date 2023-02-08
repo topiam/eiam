@@ -40,6 +40,8 @@ public class Actor implements Serializable {
     public static final String ACTOR_ID         = "actor.id";
     public static final String ACTOR_TYPE       = "actor.type";
 
+    public static final String ACTOR_AUTH_TYPE  = "actor.auth_type.keyword";
+
     @Serial
     private static final long  serialVersionUID = -1144169992714000310L;
     /**
@@ -53,5 +55,11 @@ public class Actor implements Serializable {
      */
     @Field(type = FieldType.Keyword, name = "type")
     private UserType           type;
+
+    /**
+     * 身份验证类型
+     */
+    @Field(type = FieldType.Keyword, name = "auth_type")
+    private String             authType;
 
 }

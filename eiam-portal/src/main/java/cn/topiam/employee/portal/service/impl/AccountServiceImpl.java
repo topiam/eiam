@@ -35,6 +35,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.account.UserDetailEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
+import cn.topiam.employee.common.enums.MailType;
+import cn.topiam.employee.common.enums.MessageNoticeChannel;
+import cn.topiam.employee.common.enums.SmsType;
 import cn.topiam.employee.common.exception.BindMfaNotFoundSecretException;
 import cn.topiam.employee.common.exception.InvalidMfaCodeException;
 import cn.topiam.employee.common.exception.PasswordValidatedFailException;
@@ -43,6 +46,7 @@ import cn.topiam.employee.common.repository.account.UserDetailRepository;
 import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.core.context.ServerContextHelp;
 import cn.topiam.employee.core.security.mfa.provider.TotpAuthenticator;
+import cn.topiam.employee.core.security.otp.OtpContextHelp;
 import cn.topiam.employee.core.security.session.SessionDetails;
 import cn.topiam.employee.core.security.session.TopIamSessionBackedSessionRegistry;
 import cn.topiam.employee.core.security.util.SecurityUtils;
@@ -50,6 +54,7 @@ import cn.topiam.employee.portal.converter.AccountConverter;
 import cn.topiam.employee.portal.pojo.request.*;
 import cn.topiam.employee.portal.pojo.result.PrepareBindMfaResult;
 import cn.topiam.employee.portal.service.AccountService;
+import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.context.ServletContextHelp;
 import cn.topiam.employee.support.util.BeanUtils;
 
@@ -117,6 +122,23 @@ public class AccountServiceImpl implements AccountService {
         });
         SecurityContextHolder.clearContext();
         //@formatter:on
+        return true;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean prepareChangePhone(PrepareChangePhoneRequest param) {
+        UserEntity user = validatedPassword(param.getPassword());
+        OtpContextHelp otpContextHelp = ApplicationContextHelp.getApplicationContext()
+            .getBean(OtpContextHelp.class);
+        // 发送短信验证码
+        if (StringUtils.isNotBlank(user.getPhone())) {
+            otpContextHelp.sendOtp(param.getPhone(), SmsType.UPDATE_PHONE.getCode(),
+                MessageNoticeChannel.SMS);
+        } else {
+            otpContextHelp.sendOtp(param.getPhone(), SmsType.BIND_PHONE.getCode(),
+                MessageNoticeChannel.SMS);
+        }
         return true;
     }
 
@@ -204,6 +226,28 @@ public class AccountServiceImpl implements AccountService {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 准备修改邮箱
+     *
+     * @param param {@link PrepareChangeEmailRequest}
+     * @return {@link Boolean}
+     */
+    @Override
+    public Boolean prepareChangeEmail(PrepareChangeEmailRequest param) {
+        UserEntity user = validatedPassword(param.getPassword());
+        OtpContextHelp otpContextHelp = ApplicationContextHelp.getApplicationContext()
+            .getBean(OtpContextHelp.class);
+        // 发送邮箱验证码
+        if (StringUtils.isNotBlank(user.getPhone())) {
+            otpContextHelp.sendOtp(param.getEmail(), MailType.UPDATE_BIND_MAIL.getCode(),
+                MessageNoticeChannel.MAIL);
+        } else {
+            otpContextHelp.sendOtp(param.getEmail(), MailType.BIND_EMAIL.getCode(),
+                MessageNoticeChannel.MAIL);
+        }
+        return true;
     }
 
     /**

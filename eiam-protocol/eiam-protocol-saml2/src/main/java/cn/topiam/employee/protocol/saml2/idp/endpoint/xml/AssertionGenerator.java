@@ -39,11 +39,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
+import cn.topiam.employee.application.saml2.model.Saml2SsoModel;
 import cn.topiam.employee.common.enums.app.AuthnContextClassRefType;
 import cn.topiam.employee.common.enums.app.SamlEncryptAssertAlgorithmType;
 import cn.topiam.employee.common.enums.app.SamlNameIdFormatType;
 import cn.topiam.employee.common.enums.app.SamlSignAssertAlgorithmType;
-import cn.topiam.employee.core.protocol.Saml2SsoModel;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -60,7 +60,7 @@ import static cn.topiam.employee.common.util.SamlUtils.generateSecureRandomId;
 @RequiredArgsConstructor
 @Getter
 public class AssertionGenerator {
-    private final static Logger                          logger = LoggerFactory
+    private static final Logger                          logger = LoggerFactory
         .getLogger(AssertionGenerator.class);
 
     /**

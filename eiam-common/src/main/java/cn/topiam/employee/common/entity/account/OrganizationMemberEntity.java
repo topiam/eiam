@@ -24,13 +24,18 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLDeleteAll;
+import org.hibernate.annotations.Where;
 
-import cn.topiam.employee.support.repository.domain.BaseEntity;
+import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
 /**
  * 组织机构成员
@@ -43,8 +48,11 @@ import lombok.experimental.Accessors;
 @ToString
 @Accessors(chain = true)
 @Entity
-@Table(name = "`organization_member`")
-public class OrganizationMemberEntity extends BaseEntity<Long> {
+@Table(name = "organization_member")
+@SQLDelete(sql = "update organization_member set " + SOFT_DELETE_SET + " where id_ = ?")
+@SQLDeleteAll(sql = "update organization_member set " + SOFT_DELETE_SET + " where id_ = ?")
+@Where(clause = SOFT_DELETE_WHERE)
+public class OrganizationMemberEntity extends LogicDeleteEntity<Long> {
     /**
      * 组织机构ID
      */

@@ -23,13 +23,18 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.app.AppCertEntity;
 import cn.topiam.employee.common.entity.app.AppOidcConfigEntity;
 import cn.topiam.employee.common.enums.app.AppCertUsingType;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
 import static cn.topiam.employee.common.constants.ProtocolConstants.APP_CERT_CACHE_NAME;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 
 /**
  * AppCertificateRepository
@@ -38,7 +43,7 @@ import static cn.topiam.employee.common.constants.ProtocolConstants.APP_CERT_CAC
  * Created by support@topiam.cn on  2022/5/31 20:52
  */
 @CacheConfig(cacheNames = { APP_CERT_CACHE_NAME })
-public interface AppCertRepository extends JpaRepository<AppCertEntity, Long>,
+public interface AppCertRepository extends LogicDeleteRepository<AppCertEntity, Long>,
                                    QuerydslPredicateExecutor<AppCertEntity> {
     /**
      * 根据应用ID查询证书
@@ -77,7 +82,11 @@ public interface AppCertRepository extends JpaRepository<AppCertEntity, Long>,
      * @param appId {@link Long}
      */
     @CacheEvict(allEntries = true)
-    void deleteByAppId(Long appId);
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE app_cert SET " + SOFT_DELETE_SET
+                   + " WHERE app_id = :appId", nativeQuery = true)
+    void deleteByAppId(@Param("appId") Long appId);
 
     /**
      * find by id

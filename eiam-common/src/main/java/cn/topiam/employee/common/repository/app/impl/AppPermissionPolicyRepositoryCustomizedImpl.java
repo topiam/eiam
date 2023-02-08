@@ -45,7 +45,7 @@ public class AppPermissionPolicyRepositoryCustomizedImpl implements
                                                          AppPermissionPolicyRepositoryCustomized {
 
     private String leftJoin(String table, String condition) {
-        return " LEFT JOIN " + table + " ON " + condition;
+        return " LEFT JOIN " + table + " ON " + condition + " AND " + table + ".is_deleted = '0' ";
     }
 
     @Override
@@ -53,7 +53,7 @@ public class AppPermissionPolicyRepositoryCustomizedImpl implements
         //查询条件
         //@formatter:off
         // 所属应用
-        StringBuilder where = new StringBuilder("WHERE policy.app_id = '").append(query.getAppId()).append("' ");
+        StringBuilder where = new StringBuilder("WHERE policy.is_deleted = '0' AND policy.app_id = '").append(query.getAppId()).append("' ");
         // 主体类型
         where.append(" AND policy.subject_type = '").append(query.getSubjectType().getCode()).append("' ");
         // 客体类型

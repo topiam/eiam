@@ -29,6 +29,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import cn.topiam.employee.common.crypto.EncryptContextHelp;
+import cn.topiam.employee.common.crypto.EncryptionModule;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.entity.setting.config.SmsConfig;
 import cn.topiam.employee.common.enums.MessageNoticeChannel;
@@ -44,7 +46,6 @@ import cn.topiam.employee.console.pojo.result.setting.EmailProviderConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.MailProviderSaveParam;
 import cn.topiam.employee.console.pojo.save.setting.SmsProviderSaveParam;
 import cn.topiam.employee.console.pojo.setting.SmsProviderConfigResult;
-import cn.topiam.employee.support.util.AesUtils;
 import cn.topiam.employee.support.validation.ValidationHelp;
 import static cn.topiam.employee.core.context.SettingContextHelp.getSmsProviderConfig;
 import static cn.topiam.employee.core.setting.constant.MessageSettingConstants.MESSAGE_PROVIDER_EMAIL;
@@ -73,7 +74,7 @@ public interface MessageSettingConverter {
         MailProviderConfig.MailProviderConfigBuilder builder =
                 MailProviderConfig.builder()
                         .username(param.getUsername())
-                        .secret(AesUtils.encrypt(param.getSecret()));
+                        .secret(EncryptContextHelp.encrypt(param.getSecret()));
         //根据提供商封装参数
         if (MailProvider.CUSTOMIZE.equals(param.getProvider())) {
             desc = desc + MailProvider.CUSTOMIZE.getName();
@@ -134,13 +135,12 @@ public interface MessageSettingConverter {
         ValidationHelp.ValidationResult<?> validationResult = null;
         String desc = MessageNoticeChannel.SMS.getDesc();
         SmsProviderConfig providerConfig = new SmsProviderConfig();
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = EncryptionModule.deserializerEncrypt();
         try {
             // 七牛云
             if (SmsProvider.QINIU.equals(param.getProvider())) {
                 QiNiuSmsProviderConfig smsConfig = objectMapper.readValue(param.getConfig().toJSONString(), QiNiuSmsProviderConfig.class);
                 validationResult = ValidationHelp.validateEntity(smsConfig);
-                smsConfig.setSecretKey(AesUtils.encrypt(smsConfig.getSecretKey()));
                 providerConfig = smsConfig;
                 desc = desc + SmsProvider.QINIU.getDesc();
             }
@@ -148,7 +148,6 @@ public interface MessageSettingConverter {
             else if (SmsProvider.ALIYUN.equals(param.getProvider())) {
                 AliyunSmsProviderConfig smsConfig = objectMapper.readValue(param.getConfig().toJSONString(), AliyunSmsProviderConfig.class);
                 validationResult = ValidationHelp.validateEntity(smsConfig);
-                smsConfig.setAccessKeySecret(AesUtils.encrypt(smsConfig.getAccessKeySecret()));
                 providerConfig = smsConfig;
                 desc = desc + SmsProvider.ALIYUN.getDesc();
             }
@@ -156,7 +155,6 @@ public interface MessageSettingConverter {
             else if (SmsProvider.TENCENT.equals(param.getProvider())) {
                 TencentSmsProviderConfig smsConfig = objectMapper.readValue(param.getConfig().toJSONString(), TencentSmsProviderConfig.class);
                 validationResult = ValidationHelp.validateEntity(smsConfig);
-                smsConfig.setSecretKey(AesUtils.encrypt(smsConfig.getSecretKey()));
                 providerConfig = smsConfig;
                 desc = desc + SmsProvider.TENCENT.getDesc();
             }
@@ -205,7 +203,7 @@ public interface MessageSettingConverter {
                 .port(setting.getPort())
                 .safetyType(setting.getSafetyType())
                 .username(setting.getUsername())
-                .secret(AesUtils.decrypt(setting.getSecret()))
+                .secret(EncryptContextHelp.decrypt(setting.getSecret()))
                 .smtpUrl(setting.getSmtpUrl())
                 .enabled(true)
                 .build();

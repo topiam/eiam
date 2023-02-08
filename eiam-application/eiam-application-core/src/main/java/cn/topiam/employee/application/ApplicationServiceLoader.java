@@ -44,6 +44,7 @@ public class ApplicationServiceLoader implements ApplicationContextAware {
      * 用于保存接口实现类名及对应的类
      */
     private Map<String, ApplicationService>       loadMap               = new HashMap<>(16);
+    private ApplicationContext                    applicationContext;
     /**
      * key: code，value：templateImpl
      */
@@ -64,9 +65,9 @@ public class ApplicationServiceLoader implements ApplicationContextAware {
      * @see BeanInitializationException
      */
     @Override
-    public void setApplicationContext(org.springframework.context.ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
         loadMap = applicationContext.getBeansOfType(ApplicationService.class);
-        getApplicationServiceList();
     }
 
     /**
@@ -101,4 +102,12 @@ public class ApplicationServiceLoader implements ApplicationContextAware {
         return impl;
     }
 
+    public void addApplicationService(List<String> beanNameList) {
+        Map<String, ApplicationService> applicationServiceMap = new HashMap<>(16);
+        for (String beanName : beanNameList) {
+            applicationServiceMap.put(beanName,
+                applicationContext.getBean(beanName, ApplicationService.class));
+        }
+        loadMap.putAll(applicationServiceMap);
+    }
 }

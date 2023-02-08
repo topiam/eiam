@@ -23,7 +23,5 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd
           http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/pro/liquibase-pro-4.3.xsd">
-    <!--包含db/changelog下的xml文件-->
-    <includeAll path="classpath:db/changelog"
-                relativeToChangelogFile="false"/>
+    <include file="db/1.0.0-changelog.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

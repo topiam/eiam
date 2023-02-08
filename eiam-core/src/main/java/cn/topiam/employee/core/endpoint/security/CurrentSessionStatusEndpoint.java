@@ -77,7 +77,7 @@ public class CurrentSessionStatusEndpoint extends HttpServlet {
             builder.status(Status.require_bind_idp);
         }
         //其他信息
-        ApiRestResult<CurrentSessionStatusEndpoint.CurrentStatusResult> build = ApiRestResult.<CurrentSessionStatusEndpoint.CurrentStatusResult> builder()
+        ApiRestResult<CurrentStatusResult> build = ApiRestResult.<CurrentStatusResult> builder()
             .result(builder.build()).build();
         build.setSuccess(true);
         HttpResponseUtils.flushResponse(resp, JSONObject.toJSONString(build));

@@ -18,11 +18,10 @@
 package cn.topiam.employee.common.repository.identitysource;
 
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceSyncHistoryEntity;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
 
 /**
  * 身份源同步结果
@@ -32,7 +31,6 @@ import cn.topiam.employee.common.entity.identitysource.IdentitySourceSyncHistory
  */
 @Repository
 public interface IdentitySourceSyncHistoryRepository extends
-                                                     CrudRepository<IdentitySourceSyncHistoryEntity, Long>,
-                                                     PagingAndSortingRepository<IdentitySourceSyncHistoryEntity, Long>,
+                                                     LogicDeleteRepository<IdentitySourceSyncHistoryEntity, Long>,
                                                      QuerydslPredicateExecutor<IdentitySourceSyncHistoryEntity> {
 }

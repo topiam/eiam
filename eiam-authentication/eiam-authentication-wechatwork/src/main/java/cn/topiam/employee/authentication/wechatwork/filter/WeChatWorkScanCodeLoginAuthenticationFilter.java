@@ -53,8 +53,8 @@ import cn.topiam.employee.common.repository.authentication.IdentityProviderRepos
 import cn.topiam.employee.core.context.ServerContextHelp;
 import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.support.util.HttpClientUtils;
-import static cn.topiam.employee.authentication.wechatwork.filter.WeChatWorkScanCodeAuthorizationRequestRedirectFilter.PROVIDER_ID;
-import static cn.topiam.employee.common.enums.IdentityProviderType.WECHATWORK_SCAN_CODE;
+import static cn.topiam.employee.authentication.common.IdentityProviderType.WECHAT_WORK_QR;
+import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.PROVIDER_CODE;
 
 /**
  * 企业微信扫码登录
@@ -67,10 +67,10 @@ public class WeChatWorkScanCodeLoginAuthenticationFilter extends
                                                          AbstractIdpAuthenticationProcessingFilter {
     final String                              ERROR_CODE                   = "errcode";
     final String                              SUCCESS                      = "0";
-    public final static String                DEFAULT_FILTER_PROCESSES_URI = WECHATWORK_SCAN_CODE
+    public final static String                DEFAULT_FILTER_PROCESSES_URI = WECHAT_WORK_QR
         .getLoginPathPrefix() + "/*";
     public static final AntPathRequestMatcher REQUEST_MATCHER              = new AntPathRequestMatcher(
-        WECHATWORK_SCAN_CODE.getLoginPathPrefix() + "/" + "{" + PROVIDER_ID + "}",
+        WECHAT_WORK_QR.getLoginPathPrefix() + "/" + "{" + PROVIDER_CODE + "}",
         HttpMethod.GET.name());
 
     /**
@@ -101,7 +101,7 @@ public class WeChatWorkScanCodeLoginAuthenticationFilter extends
         TraceUtils.put(UUID.randomUUID().toString());
         RequestMatcher.MatchResult matcher = REQUEST_MATCHER.matcher(request);
         Map<String, String> variables = matcher.getVariables();
-        String providerId = variables.get(PROVIDER_ID);
+        String providerId = variables.get(PROVIDER_CODE);
         //code
         String code = request.getParameter(OAuth2ParameterNames.CODE);
         if (StringUtils.isEmpty(code)) {
@@ -145,7 +145,7 @@ public class WeChatWorkScanCodeLoginAuthenticationFilter extends
         String userId = StringUtils.defaultString(result.getString("UserId"),
             result.getString("OpenId"));
         IdpUser idpUser = IdpUser.builder().openId(userId).build();
-        return attemptAuthentication(request, response, WECHATWORK_SCAN_CODE, providerId, idpUser);
+        return attemptAuthentication(request, response, WECHAT_WORK_QR, providerId, idpUser);
     }
 
     /**
@@ -186,7 +186,7 @@ public class WeChatWorkScanCodeLoginAuthenticationFilter extends
 
     public static String getLoginUrl(String providerId) {
         String url = ServerContextHelp.getPortalPublicBaseUrl()
-                     + WECHATWORK_SCAN_CODE.getLoginPathPrefix() + "/" + providerId;
+                     + WECHAT_WORK_QR.getLoginPathPrefix() + "/" + providerId;
         return url.replaceAll("(?<!(http:|https:))/+", "/");
 
     }

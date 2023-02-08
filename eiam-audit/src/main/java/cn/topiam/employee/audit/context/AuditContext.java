@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.util.CollectionUtils;
 
 import com.alibaba.ttl.TransmittableThreadLocal;
@@ -40,6 +41,11 @@ public class AuditContext {
      * 内容
      */
     private static final TransmittableThreadLocal<String>              CONTENT         = new TransmittableThreadLocal<>();
+
+    /**
+     * Authentication
+     */
+    private static final TransmittableThreadLocal<Authentication>      AUTHENTICATION  = new TransmittableThreadLocal<>();
 
     /**
      * 目标对象
@@ -123,6 +129,19 @@ public class AuditContext {
     }
 
     /**
+     * Get Authentication
+     *
+     * @return {@link Authentication}
+     */
+    public static Authentication getAuthorization() {
+        return AUTHENTICATION.get();
+    }
+
+    public static void setAuthorization(Authentication authorization) {
+        AUTHENTICATION.set(authorization);
+    }
+
+    /**
      * Get Target
      *
      * @return {@link Object}
@@ -157,6 +176,13 @@ public class AuditContext {
     }
 
     /**
+     * Remove Authentication
+     */
+    public static void removeAuthentication() {
+        AUTHENTICATION.remove();
+    }
+
+    /**
      * remove
      */
     public static void removeAdditionalData() {
@@ -182,5 +208,7 @@ public class AuditContext {
         removeAdditionalData();
         removeContent();
         removeTarget();
+        removeAuthentication();
     }
+
 }

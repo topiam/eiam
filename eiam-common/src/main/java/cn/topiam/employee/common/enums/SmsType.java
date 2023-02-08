@@ -63,7 +63,7 @@ public enum SmsType implements BaseEnum {
                                          RESET_PASSWORD_SUCCESS("reset_password_success", "重置密码成功",
                                                                 MessageCategory.NOTICE),
                                          /**
-                                          * 登录验证 未使用
+                                          * 登录验证
                                           */
                                          LOGIN("login", "登录验证", MessageCategory.CODE),
 

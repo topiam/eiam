@@ -28,17 +28,22 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLDeleteAll;
+import org.hibernate.annotations.Where;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import cn.topiam.employee.common.enums.DataOrigin;
 import cn.topiam.employee.common.enums.UserStatus;
-import cn.topiam.employee.support.repository.domain.BaseEntity;
+import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
 /**
  * <p>
@@ -53,8 +58,11 @@ import lombok.experimental.Accessors;
 @ToString
 @Accessors(chain = true)
 @Entity
-@Table(name = "`user`")
-public class UserEntity extends BaseEntity<Long> {
+@Table(name = "user")
+@SQLDelete(sql = "update user set " + SOFT_DELETE_SET + " where id_ = ?")
+@SQLDeleteAll(sql = "update user set " + SOFT_DELETE_SET + " where id_ = ?")
+@Where(clause = SOFT_DELETE_WHERE)
+public class UserEntity extends LogicDeleteEntity<Long> {
 
     @Serial
     private static final long serialVersionUID = -2619231849746900857L;

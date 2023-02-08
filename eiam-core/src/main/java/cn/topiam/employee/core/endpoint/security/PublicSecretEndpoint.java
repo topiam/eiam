@@ -54,7 +54,7 @@ public class PublicSecretEndpoint extends HttpServlet {
 
     public static final String  PUBLIC_SECRET_PATH = EiamConstants.API_PATH + "/public_secret";
 
-    private final static String TYPE               = "type";
+    private static final String TYPE               = "type";
 
     /**
      * 获取加密key

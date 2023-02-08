@@ -53,8 +53,8 @@ import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.support.util.HttpClientUtils;
 import static com.nimbusds.oauth2.sdk.GrantType.AUTHORIZATION_CODE;
 
-import static cn.topiam.employee.authentication.qq.filter.QqOAuth2AuthorizationRequestRedirectFilter.PROVIDER_ID;
-import static cn.topiam.employee.common.enums.IdentityProviderType.QQ;
+import static cn.topiam.employee.authentication.common.IdentityProviderType.QQ;
+import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.PROVIDER_CODE;
 import static cn.topiam.employee.portal.idp.qq.constant.QqAuthenticationConstants.URL_GET_ACCESS_TOKEN;
 import static cn.topiam.employee.portal.idp.qq.constant.QqAuthenticationConstants.URL_GET_OPEN_ID;
 
@@ -70,7 +70,7 @@ public class QqOAuth2LoginAuthenticationFilter extends AbstractIdpAuthentication
     public final static String                DEFAULT_FILTER_PROCESSES_URI = QQ.getLoginPathPrefix()
                                                                              + "/*";
     public static final AntPathRequestMatcher REQUEST_MATCHER              = new AntPathRequestMatcher(
-        QQ.getLoginPathPrefix() + "/" + "{" + PROVIDER_ID + "}", HttpMethod.GET.name());
+        QQ.getLoginPathPrefix() + "/" + "{" + PROVIDER_CODE + "}", HttpMethod.GET.name());
 
     /**
      * Creates a new instance
@@ -100,7 +100,7 @@ public class QqOAuth2LoginAuthenticationFilter extends AbstractIdpAuthentication
         TraceUtils.put(UUID.randomUUID().toString());
         RequestMatcher.MatchResult matcher = REQUEST_MATCHER.matcher(request);
         Map<String, String> variables = matcher.getVariables();
-        String providerId = variables.get(PROVIDER_ID);
+        String providerId = variables.get(PROVIDER_CODE);
         //code
         String code = request.getParameter(OAuth2ParameterNames.CODE);
         if (StringUtils.isEmpty(code)) {
@@ -133,7 +133,7 @@ public class QqOAuth2LoginAuthenticationFilter extends AbstractIdpAuthentication
         param.put(OAuth2ParameterNames.CLIENT_ID, config.getAppId().trim());
         param.put(OAuth2ParameterNames.CLIENT_SECRET, config.getAppKey().trim());
         param.put(OAuth2ParameterNames.CODE, code.trim());
-        param.put(OAuth2ParameterNames.REDIRECT_URI, getLoginUrl(providerId));
+        param.put(OAuth2ParameterNames.REDIRECT_URI, getLoginUrl(provider.getCode()));
         param.put("fmt", "json");
         //注意：QQ不能使用编码后的get请求，否则会报 {"error_description":"redirect uri is illegal","error":100010}
         JSONObject result = JSON.parseObject(HttpClientUtils.doGet(URL_GET_ACCESS_TOKEN, param));

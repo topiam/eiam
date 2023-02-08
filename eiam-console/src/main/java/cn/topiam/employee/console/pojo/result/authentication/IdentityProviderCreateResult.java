@@ -19,8 +19,6 @@ package cn.topiam.employee.console.pojo.result.authentication;
 
 import java.io.Serializable;
 
-import cn.topiam.employee.common.enums.IdentityProviderType;
-
 import lombok.Builder;
 import lombok.Data;
 
@@ -42,11 +40,11 @@ public class IdentityProviderCreateResult implements Serializable {
      * ID
      */
     @Parameter(description = "ID")
-    private String               id;
+    private String id;
 
     /**
      * 提供商类型
      */
     @Parameter(description = "提供商类型")
-    private IdentityProviderType type;
+    private String type;
 }

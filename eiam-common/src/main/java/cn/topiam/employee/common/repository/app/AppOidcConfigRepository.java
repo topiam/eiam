@@ -22,19 +22,24 @@ import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.app.AppOidcConfigEntity;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
 import static cn.topiam.employee.common.constants.ProtocolConstants.OIDC_CONFIG_CACHE_NAME;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 
 /**
  * @author TopIAM
  */
 @Repository
 @CacheConfig(cacheNames = { OIDC_CONFIG_CACHE_NAME })
-public interface AppOidcConfigRepository extends JpaRepository<AppOidcConfigEntity, Long>,
+public interface AppOidcConfigRepository extends LogicDeleteRepository<AppOidcConfigEntity, Long>,
                                          QuerydslPredicateExecutor<AppOidcConfigEntity>,
                                          AppOidcConfigRepositoryCustomized {
     /**
@@ -43,7 +48,11 @@ public interface AppOidcConfigRepository extends JpaRepository<AppOidcConfigEnti
      * @param appId {@link Long}
      */
     @CacheEvict(allEntries = true)
-    void deleteByAppId(Long appId);
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE app_oidc_config SET " + SOFT_DELETE_SET
+                   + " WHERE app_id = :appId", nativeQuery = true)
+    void deleteByAppId(@Param("appId") Long appId);
 
     /**
      * delete

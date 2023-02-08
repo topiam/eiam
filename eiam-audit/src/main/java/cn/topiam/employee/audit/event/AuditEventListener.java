@@ -30,7 +30,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import cn.topiam.employee.audit.entity.*;
-import cn.topiam.employee.audit.repository.*;
+import cn.topiam.employee.audit.repository.AuditRepository;
 import cn.topiam.employee.core.configuration.EiamSupportProperties;
 import static cn.topiam.employee.common.constants.AuditConstants.getAuditIndexPrefix;
 import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_FORMATTER_PATTERN;

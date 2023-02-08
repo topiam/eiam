@@ -28,7 +28,6 @@ import cn.topiam.employee.audit.annotation.Audit;
 import cn.topiam.employee.audit.enums.EventType;
 import cn.topiam.employee.common.enums.MailType;
 import cn.topiam.employee.console.pojo.result.setting.EmailProviderConfigResult;
-import cn.topiam.employee.console.pojo.save.authentication.InitializeAdminSaveParam;
 import cn.topiam.employee.console.pojo.save.setting.MailProviderSaveParam;
 import cn.topiam.employee.console.service.setting.MessageSettingService;
 import cn.topiam.employee.core.context.ServerContextHelp;
@@ -60,7 +59,7 @@ public class MailProviderController {
     /**
      * 保存邮件服务商配置
      *
-     * @param param {@link InitializeAdminSaveParam}
+     * @param param {@link MailProviderSaveParam}
      * @return {@link ApiRestResult}
      */
     @Lock

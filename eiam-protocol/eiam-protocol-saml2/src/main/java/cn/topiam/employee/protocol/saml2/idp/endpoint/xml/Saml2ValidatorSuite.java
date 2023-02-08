@@ -27,7 +27,6 @@ import org.opensaml.saml.common.messaging.context.SAMLProtocolContext;
 import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.criterion.EntityRoleCriterion;
 import org.opensaml.saml.criterion.ProtocolCriterion;
-import org.opensaml.saml.saml2.core.AuthnRequest;
 import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
 import org.opensaml.saml.security.impl.SAMLSignatureProfileValidator;
 import org.opensaml.security.credential.Credential;
@@ -56,7 +55,7 @@ public class Saml2ValidatorSuite {
     /**
      * 验证签名
      *
-     * @param authnRequest       {@link AuthnRequest}
+     * @param signature       {@link Signature}
      * @param credentialResolver {@link CredentialResolver}
      * @throws Exception Exception
      */

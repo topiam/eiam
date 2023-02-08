@@ -27,7 +27,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.*;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.util.MultiValueMap;
@@ -47,7 +48,7 @@ import static cn.topiam.employee.protocol.oidc.util.EiamOAuth2Utils.getParameter
 @SuppressWarnings({ "AlibabaClassNamingShouldBeCamel" })
 public class EiamOAuth2AuthorizationPasswordAuthenticationConverter implements
                                                                     AuthenticationConverter {
-    public final static String DEFAULT_ERROR_URI = "https://datatracker.ietf.org/doc/html/rfc6749#section-5.2";
+    public static final String DEFAULT_ERROR_URI = "https://datatracker.ietf.org/doc/html/rfc6749#section-5.2";
 
     @Override
     public Authentication convert(HttpServletRequest request) {

@@ -23,13 +23,13 @@ import java.util.Collection;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.app.AppPermissionPolicyEntity;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 
 /**
  * @author TopIAM
@@ -37,29 +37,40 @@ import cn.topiam.employee.common.entity.app.AppPermissionPolicyEntity;
  */
 @Repository
 public interface AppPermissionPolicyRepository extends AppPermissionPolicyRepositoryCustomized,
-                                               CrudRepository<AppPermissionPolicyEntity, Long>,
-                                               PagingAndSortingRepository<AppPermissionPolicyEntity, Long>,
+                                               LogicDeleteRepository<AppPermissionPolicyEntity, Long>,
                                                QuerydslPredicateExecutor<AppPermissionPolicyEntity> {
     /**
      * 按主体 ID 删除所有
      *
      * @param subjectIds {@link String}
      */
-    void deleteAllBySubjectIdIn(Collection<String> subjectIds);
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE app_permission_policy SET " + SOFT_DELETE_SET
+                   + " WHERE subject_id IN (:subjectIds)", nativeQuery = true)
+    void deleteAllBySubjectIdIn(@Param("subjectIds") Collection<String> subjectIds);
 
     /**
      * 按客体 ID 删除所有
      *
      * @param objectIds {@link String}
      */
-    void deleteAllByObjectIdIn(Collection<Long> objectIds);
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE app_permission_policy SET " + SOFT_DELETE_SET
+                   + " WHERE object_id IN (:objectIds)", nativeQuery = true)
+    void deleteAllByObjectIdIn(@Param("objectIds") Collection<Long> objectIds);
 
     /**
      * 根据主体删除所有
      *
      * @param objectId
      */
-    void deleteAllByObjectId(Long objectId);
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE app_permission_policy SET " + SOFT_DELETE_SET
+                   + " WHERE object_id = :objectId", nativeQuery = true)
+    void deleteAllByObjectId(@Param("objectId") Long objectId);
 
     /**
      * 更新启用/禁用

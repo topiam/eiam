@@ -54,7 +54,25 @@ public class AppAccountRepositoryCustomizedImpl implements AppAccountRepositoryC
     @Override
     public Page<AppAccountPO> getAppAccountList(AppAccountQuery query, Pageable pageable) {
         //@formatter:off
-        StringBuilder builder = new StringBuilder("SELECT a.id_,a.app_id,a.user_id,a.account_,a.create_time,u.username_,p.name_ as app_name,p.type_ as app_type,p.template_ as app_template,p.protocol_ as app_protocol FROM app_account a LEFT JOIN `user` u ON a.user_id = u.id_ LEFT JOIN app p ON a.app_id = p.id_ WHERE 1=1");
+        StringBuilder builder = new StringBuilder("""
+                SELECT
+                	a.id_,
+                	a.app_id,
+                	a.user_id,
+                	a.account_,
+                	a.create_time,
+                	u.username_,
+                	p.name_ AS app_name,
+                	p.type_ AS app_type,
+                	p.template_ AS app_template,
+                	p.protocol_ AS app_protocol
+                FROM
+                	app_account a
+                	LEFT JOIN `user` u ON a.user_id = u.id_ AND u.is_deleted = '0'
+                	LEFT JOIN app p ON a.app_id = p.id_ AND p.is_deleted = '0'
+                WHERE
+                	a.is_deleted = '0'
+                """);
         //用户名
         if (StringUtils.isNoneBlank(query.getUsername())) {
             builder.append(" AND u.username_ like '%").append(query.getUsername()).append("%'");

@@ -38,12 +38,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import cn.topiam.employee.application.ApplicationService;
 import cn.topiam.employee.application.ApplicationServiceLoader;
-import cn.topiam.employee.application.CasApplicationService;
+import cn.topiam.employee.application.cas.CasApplicationService;
+import cn.topiam.employee.application.cas.model.CasSsoModel;
 import cn.topiam.employee.application.context.ApplicationContext;
 import cn.topiam.employee.application.context.ApplicationContextHolder;
 import cn.topiam.employee.common.constants.ProtocolConstants;
 import cn.topiam.employee.core.context.ServerContextHelp;
-import cn.topiam.employee.core.protocol.CasSsoModel;
 import cn.topiam.employee.core.security.savedredirect.HttpSessionRedirectCache;
 import cn.topiam.employee.core.security.savedredirect.RedirectCache;
 import cn.topiam.employee.core.security.util.SecurityUtils;
@@ -125,7 +125,7 @@ public class CasIdpSingleSignOnEndpointFilter extends OncePerRequestFilter
             ServiceTicket serviceTicket = centralAuthenticationService
                 .grantServiceTicket(ticketGrantingTicket.getId(), service);
 
-            response.sendRedirect(UriComponentsBuilder.fromHttpUrl(ssoModel.getSsoCallbackUrl())
+            response.sendRedirect(UriComponentsBuilder.fromHttpUrl(ssoModel.getClientServiceUrl())
                 .queryParam(TICKET, serviceTicket.getId()).build().toString());
         }
         filterChain.doFilter(request, response);

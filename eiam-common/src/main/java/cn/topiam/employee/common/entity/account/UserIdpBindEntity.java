@@ -24,13 +24,18 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import cn.topiam.employee.common.enums.IdentityProviderType;
-import cn.topiam.employee.support.repository.domain.BaseEntity;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLDeleteAll;
+import org.hibernate.annotations.Where;
+
+import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
 /**
  * 用户认证方式绑定表
@@ -40,47 +45,50 @@ import lombok.experimental.Accessors;
  */
 @Entity
 @Table(name = "user_idp_bind")
+@SQLDelete(sql = "update user_idp_bind set " + SOFT_DELETE_SET + " where id_ = ?")
+@SQLDeleteAll(sql = "update user_idp_bind set " + SOFT_DELETE_SET + " where id_ = ?")
+@Where(clause = SOFT_DELETE_WHERE)
 @Accessors(chain = true)
 @Getter
 @Setter
 @ToString
-public class UserIdpBindEntity extends BaseEntity<Long> {
+public class UserIdpBindEntity extends LogicDeleteEntity<Long> {
     @Serial
-    private static final long    serialVersionUID = -14364708756807242L;
+    private static final long serialVersionUID = -14364708756807242L;
 
     /**
      * 用户ID
      */
     @Column(name = "user_id")
-    private Long                 userId;
+    private Long              userId;
 
     /**
      * OpenId
      */
     @Column(name = "open_id")
-    private String               openId;
+    private String            openId;
 
     /**
      * 身份提供商 ID
      */
     @Column(name = "idp_id")
-    private String               idpId;
+    private String            idpId;
 
     /**
      * 身份提供商 类型
      */
     @Column(name = "idp_type")
-    private IdentityProviderType idpType;
+    private String            idpType;
 
     /**
      * 绑定时间
      */
     @Column(name = "bind_time")
-    private LocalDateTime        bindTime;
+    private LocalDateTime     bindTime;
 
     /**
      * 附加信息
      */
     @Column(name = "addition_info")
-    private String               additionInfo;
+    private String            additionInfo;
 }

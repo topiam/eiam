@@ -25,18 +25,23 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLDeleteAll;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.Where;
 
 import cn.topiam.employee.audit.enums.EventStatus;
 import cn.topiam.employee.audit.enums.EventType;
 import cn.topiam.employee.common.enums.UserType;
-import cn.topiam.employee.support.repository.domain.BaseEntity;
+import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
 /**
  * 审计
@@ -51,7 +56,10 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @Entity
 @Table(name = "audit")
-public class AuditEntity extends BaseEntity<Long> {
+@SQLDelete(sql = "update audit set " + SOFT_DELETE_SET + " where id_ = ?")
+@SQLDeleteAll(sql = "update audit set " + SOFT_DELETE_SET + " where id_ = ?")
+@Where(clause = SOFT_DELETE_WHERE)
+public class AuditEntity extends LogicDeleteEntity<Long> {
 
     @Serial
     private static final long serialVersionUID = -3119319193111206582L;
@@ -136,4 +144,10 @@ public class AuditEntity extends BaseEntity<Long> {
      */
     @Column(name = "actor_type")
     private UserType          actorType;
+
+    /**
+     * 身份验证类型
+     */
+    @Column(name = "actor_auth_type")
+    private String            actorAuthType;
 }

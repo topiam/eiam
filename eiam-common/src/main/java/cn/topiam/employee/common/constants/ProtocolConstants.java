@@ -65,6 +65,16 @@ public final class ProtocolConstants {
     public static final String APP_CERT_CACHE_NAME     = APP_CACHE_NAME_PREFIX + "cert";
 
     /**
+     * FORM 配置缓存名称
+     */
+    public static final String FORM_CONFIG_CACHE_NAME  = APP_CACHE_NAME_PREFIX + "form";
+
+    /**
+     * TSA 配置缓存名称
+     */
+    public static final String TSA_CONFIG_CACHE_NAME   = APP_CACHE_NAME_PREFIX + "tsa";
+
+    /**
      * OIDC Endpoint config
      */
     @Data
@@ -75,19 +85,19 @@ public final class ProtocolConstants {
          */
         public final static String OIDC_AUTHORIZE_BASE_PATH = AUTHORIZE_PATH + "/" + APP_CODE_VARIABLE;
 
-        public final static String OIDC_AUTHORIZE_PATH = OIDC_AUTHORIZE_BASE_PATH + "/oidc";
+        public final static String OIDC_AUTHORIZE_PATH = OIDC_AUTHORIZE_BASE_PATH +"/oidc";
 
-        public final static String OAUTH2_AUTHORIZE_PATH = OIDC_AUTHORIZE_BASE_PATH + "/oauth2";
+        public final static String OAUTH2_AUTHORIZE_PATH = OIDC_AUTHORIZE_BASE_PATH +"/oauth2";
 
         /**
          * OpenID Provider metadata.
          */
-        public static final String WELL_KNOWN_OPENID_CONFIGURATION = OIDC_AUTHORIZE_PATH + OPENID_PROVIDER_WELL_KNOWN_PATH;
+        public static final String WELL_KNOWN_OPENID_CONFIGURATION   = OIDC_AUTHORIZE_PATH +OPENID_PROVIDER_WELL_KNOWN_PATH;
 
         /**
          * Jwk Set Endpoint
          */
-        public static final String JWK_SET_ENDPOINT = OIDC_AUTHORIZE_PATH + "/jwks";
+        public static final String JWK_SET_ENDPOINT                  = OIDC_AUTHORIZE_PATH + "/jwks";
 
         /**
          * OIDC Client Registration Endpoint
@@ -97,27 +107,32 @@ public final class ProtocolConstants {
         /**
          * Authorization Endpoint
          */
-        public static final String AUTHORIZATION_ENDPOINT = OAUTH2_AUTHORIZE_PATH + "/auth";
+        public static final String AUTHORIZATION_ENDPOINT            = OAUTH2_AUTHORIZE_PATH + "/auth";
+
+        /**
+         * Authorization Consent Endpoint
+         */
+        public static final String AUTHORIZATION_CONSENT_ENDPOINT            = AUTHORIZATION_ENDPOINT+"/consent";
 
         /**
          * Token Endpoint
          */
-        public static final String TOKEN_ENDPOINT = OAUTH2_AUTHORIZE_PATH + "/token";
+        public static final String TOKEN_ENDPOINT                    = OAUTH2_AUTHORIZE_PATH + "/token";
 
         /**
          * Jwk Revocation Endpoint
          */
-        public static final String TOKEN_REVOCATION_ENDPOINT = OAUTH2_AUTHORIZE_PATH + "/revoke";
+        public static final String TOKEN_REVOCATION_ENDPOINT         = OAUTH2_AUTHORIZE_PATH + "/revoke";
 
         /**
          * Token Introspection Endpoint
          */
-        public static final String TOKEN_INTROSPECTION_ENDPOINT = OAUTH2_AUTHORIZE_PATH + "/introspect";
+        public static final String TOKEN_INTROSPECTION_ENDPOINT      = OAUTH2_AUTHORIZE_PATH + "/introspect";
 
         /**
          * OIDC User Info Endpoint
          */
-        public static final String OIDC_USER_INFO_ENDPOINT = OAUTH2_AUTHORIZE_PATH + "/userinfo";
+        public static final String OIDC_USER_INFO_ENDPOINT           = OAUTH2_AUTHORIZE_PATH + "/userinfo";
 
         //@formatter:on
     }
@@ -149,6 +164,30 @@ public final class ProtocolConstants {
         public static final String SAML_SSO_PATH             = SAML2_AUTHORIZE_BASE_PATH + "/sso";
     }
 
+    /**
+     * Form Endpoint config
+     */
+    @Data
+    public static class FormEndpointConstants {
+
+        /**
+         * FORM  认证路径
+         */
+        public final static String FORM_AUTHORIZE_BASE_PATH = AUTHORIZE_PATH + "/form/"
+                                                              + APP_CODE_VARIABLE;
+
+        /**
+         * FORM_SSO
+         */
+        public static final String FORM_SSO_PATH            = FORM_AUTHORIZE_BASE_PATH + "/sso";
+
+        /**
+         * FORM IDP SSO 发起
+         */
+        public static final String IDP_FORM_SSO_INITIATOR   = FORM_AUTHORIZE_BASE_PATH
+                                                              + "/initiator";
+    }
+
     @Data
     public static class CasEndpointConstants {
         /**
@@ -160,6 +199,12 @@ public final class ProtocolConstants {
          * cas 登陆地址
          */
         public final static String CAS_LOGIN_PATH          = CAS_AUTHORIZE_BASE_PATH + "/login";
+
+        /**
+         * cas 登出地址
+         */
+        public final static String CAS_LOGOUT_PATH         = CAS_AUTHORIZE_BASE_PATH + "/logout";
+
         /**
          * cas ticket校验地址
          */
@@ -172,4 +217,21 @@ public final class ProtocolConstants {
                                                              + "/p3/serviceValidate";
     }
 
+    /**
+     * TSA Endpoint config
+     */
+    @Data
+    public static class TsaEndpointConstants {
+
+        /**
+         * TSA  认证路径
+         */
+        public final static String TSA_AUTHORIZE_BASE_PATH = AUTHORIZE_PATH + "/tsa/"
+                                                             + APP_CODE_VARIABLE;
+
+        /**
+         * TSA_SSO
+         */
+        public static final String TSA_SSO_PATH            = TSA_AUTHORIZE_BASE_PATH + "/sso";
+    }
 }

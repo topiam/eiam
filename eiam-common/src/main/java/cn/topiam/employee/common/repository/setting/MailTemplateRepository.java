@@ -17,13 +17,20 @@
  */
 package cn.topiam.employee.common.repository.setting;
 
-import org.springframework.data.repository.CrudRepository;
+import java.util.Optional;
+
+import org.jetbrains.annotations.NotNull;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.setting.MailTemplateEntity;
 import cn.topiam.employee.common.enums.MailType;
+import cn.topiam.employee.support.repository.LogicDeleteRepository;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 
 /**
  * <p>
@@ -34,7 +41,7 @@ import cn.topiam.employee.common.enums.MailType;
  * Created by support@topiam.cn on  2020-08-13
  */
 @Repository
-public interface MailTemplateRepository extends CrudRepository<MailTemplateEntity, Long> {
+public interface MailTemplateRepository extends LogicDeleteRepository<MailTemplateEntity, Long> {
     /**
      * 根据类型查询模板
      *
@@ -48,6 +55,20 @@ public interface MailTemplateRepository extends CrudRepository<MailTemplateEntit
      *
      * @param type {@link MailType}
      */
+    @Modifying
     @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE mail_template SET " + SOFT_DELETE_SET
+                   + " WHERE type_ = :type", nativeQuery = true)
     void deleteByType(@Param("type") MailType type);
+
+    /**
+     * findByIdContainsDeleted
+     *
+     * @param id must not be {@literal null}.
+     * @return {@link MailTemplateEntity}
+     */
+    @NotNull
+    @Cacheable
+    @Query(value = "SELECT * FROM mail_template WHERE id_ = :id", nativeQuery = true)
+    Optional<MailTemplateEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") Long id);
 }

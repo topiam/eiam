@@ -23,18 +23,23 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLDeleteAll;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.Where;
 
 import cn.topiam.employee.common.entity.identitysource.config.JobConfig;
 import cn.topiam.employee.common.entity.identitysource.config.StrategyConfig;
-import cn.topiam.employee.common.enums.identityprovider.IdentitySourceProvider;
-import cn.topiam.employee.support.repository.domain.BaseEntity;
+import cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider;
+import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
+import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
 /**
  * <p>
@@ -51,7 +56,10 @@ import lombok.extern.slf4j.Slf4j;
 @Accessors(chain = true)
 @Slf4j
 @Table(name = "identity_source")
-public class IdentitySourceEntity extends BaseEntity<Long> {
+@SQLDelete(sql = "update identity_source set " + SOFT_DELETE_SET + " where id_ = ?")
+@SQLDeleteAll(sql = "update identity_source set " + SOFT_DELETE_SET + " where id_ = ?")
+@Where(clause = SOFT_DELETE_WHERE)
+public class IdentitySourceEntity extends LogicDeleteEntity<Long> {
 
     @Serial
     private static final long      serialVersionUID = -7936931011805155568L;

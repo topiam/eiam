@@ -32,7 +32,7 @@ public class DefaultTicketFactory implements TicketFactory {
     public void initialize() {
         serviceTicketFactory = new DefaultServiceTicketFactory();
         ticketGrantingTicketFactory = new DefaultTicketGrantingTicketFactory();
-        factoryMap = new HashMap<>();
+        factoryMap = new HashMap<>(16);
         factoryMap.put(TicketGrantingTicket.class.getCanonicalName(),
             this.ticketGrantingTicketFactory);
         factoryMap.put(ServiceTicket.class.getCanonicalName(), this.serviceTicketFactory);

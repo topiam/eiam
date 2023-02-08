@@ -22,6 +22,7 @@ import java.io.Serializable;
 
 import cn.topiam.employee.common.enums.app.AppProtocol;
 import cn.topiam.employee.common.enums.app.AppType;
+import cn.topiam.employee.common.enums.app.InitLoginType;
 
 import lombok.Data;
 
@@ -82,16 +83,16 @@ public class GetAppListResult implements Serializable {
     private String            icon;
 
     /**
-     * IDP发起
+     * Sso 发起方
      */
-    @Parameter(description = "IDP发起")
-    private Boolean           idpInit;
+    @Parameter(description = "SSO 发起方")
+    private InitLoginType     initLoginType;
 
     /**
-     * IDP发起URL
+     * SSO 发起URL
      */
-    @Parameter(description = "IDP发起URL")
-    private String            idpInitUrl;
+    @Parameter(description = "SSO 发起URL")
+    private String            initLoginUrl;
 
     /**
      * 应用描述

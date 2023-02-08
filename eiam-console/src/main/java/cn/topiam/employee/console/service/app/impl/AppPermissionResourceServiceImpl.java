@@ -231,8 +231,7 @@ public class AppPermissionResourceServiceImpl implements AppPermissionResourceSe
             if (StringUtils.equals(entity.getName(), value)) {
                 return true;
             }
-            BooleanExpression eq = role.name.eq(value);
-            eq.and(role.appId.eq(appId));
+            BooleanExpression eq = role.name.eq(value).and(role.appId.eq(appId));
             result = !appResourceRepository.exists(eq);
         }
         //资源编码
@@ -240,8 +239,7 @@ public class AppPermissionResourceServiceImpl implements AppPermissionResourceSe
             if (StringUtils.equals(entity.getCode(), value)) {
                 return true;
             }
-            BooleanExpression eq = role.code.eq(value);
-            eq.and(role.appId.eq(appId));
+            BooleanExpression eq = role.code.eq(value).and(role.appId.eq(appId));
             result = !appResourceRepository.exists(eq);
         }
         return result;

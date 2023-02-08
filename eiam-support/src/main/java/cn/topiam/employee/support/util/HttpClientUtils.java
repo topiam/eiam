@@ -43,6 +43,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.springframework.http.*;
@@ -159,7 +160,7 @@ public class HttpClientUtils {
      * @param paramMap paramMap
      * @return String
      */
-    public static String get(String url, Map<String, String> paramMap) {
+    public static String get(String url, Map<String, String> paramMap, BasicHeader... basicHeader) {
         String httpEntityContent;
 
         try {
@@ -170,6 +171,7 @@ public class HttpClientUtils {
             RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(5000)
                 .setConnectionRequestTimeout(1000).setSocketTimeout(60000).build();
             httpGet.setConfig(requestConfig);
+            httpGet.setHeaders(basicHeader);
             List<NameValuePair> formParams = setHttpParams(paramMap);
             String param = URLEncodedUtils.format(formParams, UTF8);
             URL urL = new URL(url + "?" + param);

@@ -34,7 +34,6 @@ import cn.topiam.employee.portal.pojo.result.GetAppListResult;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import static cn.topiam.employee.common.constants.ProtocolConstants.APP_CODE_VARIABLE;
-import static cn.topiam.employee.common.enums.app.InitLoginType.APP;
 import static cn.topiam.employee.common.enums.app.InitLoginType.PORTAL_OR_APP;
 
 /**
@@ -62,9 +61,11 @@ public interface AppConverter {
            result.setType(entity.getType());
            result.setProtocol(entity.getProtocol());
            result.setTemplate(entity.getTemplate());
-           result.setIdpInit(APP.equals(entity.getInitLoginType()) | PORTAL_OR_APP.equals(entity.getInitLoginType()));
+           result.setInitLoginType(entity.getInitLoginType());
            //登录发起URL
-           result.setIdpInitUrl(StringUtils.defaultString(entity.getInitLoginUrl(), getIdpInitUrl(entity.getProtocol(), entity.getCode())));
+           if (PORTAL_OR_APP.equals(entity.getInitLoginType())){
+               result.setInitLoginUrl(StringUtils.defaultString(entity.getInitLoginUrl(), getIdpInitUrl(entity.getProtocol(), entity.getCode())));
+           }
            result.setIcon(entity.getIcon());
            //图标未配置，所以先从模版中拿
            if (StringUtils.isBlank(entity.getIcon())){
@@ -84,7 +85,7 @@ public interface AppConverter {
            results.add(result);
        }
        page.setList(results);
-       page.setPagination(cn.topiam.employee.support.repository.page.domain.Page.Pagination.builder()
+       page.setPagination(Page.Pagination.builder()
                .total(list.getTotalElements())
                .totalPages(list.getTotalPages())
                .current(list.getPageable().getPageNumber() + 1)

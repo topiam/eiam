@@ -53,7 +53,6 @@ import cn.topiam.employee.common.repository.app.AppOidcConfigRepository;
 import cn.topiam.employee.protocol.oidc.authentication.implicit.EiamOAuth2AuthorizationImplicitAuthenticationException;
 import cn.topiam.employee.protocol.oidc.jwk.ApplicationJwkSource;
 import cn.topiam.employee.protocol.oidc.jwt.ApplicationJwtDecoder;
-import cn.topiam.employee.protocol.oidc.token.EiamOAuth2TokenGenerator;
 
 /**
  * EiamOAuth2Utils
@@ -150,7 +149,7 @@ public class EiamOAuth2Utils {
         if (tokenGenerator == null) {
             tokenGenerator = getOptionalBean(builder, OAuth2TokenGenerator.class);
             if (tokenGenerator == null) {
-                EiamOAuth2TokenGenerator jwtGenerator = getJwtGenerator(builder);
+                JwtGenerator jwtGenerator = getJwtGenerator(builder);
                 OAuth2AccessTokenGenerator accessTokenGenerator = new OAuth2AccessTokenGenerator();
                 OAuth2TokenCustomizer<OAuth2TokenClaimsContext> accessTokenCustomizer = getAccessTokenCustomizer(
                     builder);
@@ -171,18 +170,17 @@ public class EiamOAuth2Utils {
         return tokenGenerator;
     }
 
-    private static <B extends HttpSecurityBuilder<B>> EiamOAuth2TokenGenerator getJwtGenerator(B builder) {
-        EiamOAuth2TokenGenerator jwtGenerator = builder
-            .getSharedObject(EiamOAuth2TokenGenerator.class);
+    private static <B extends HttpSecurityBuilder<B>> JwtGenerator getJwtGenerator(B builder) {
+        JwtGenerator jwtGenerator = builder.getSharedObject(JwtGenerator.class);
         if (jwtGenerator == null) {
             JwtEncoder jwtEncoder = getJwtEncoder(builder);
             if (jwtEncoder != null) {
-                jwtGenerator = new EiamOAuth2TokenGenerator(jwtEncoder);
+                jwtGenerator = new JwtGenerator(jwtEncoder);
                 OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer = getJwtCustomizer(builder);
                 if (jwtCustomizer != null) {
                     jwtGenerator.setJwtCustomizer(jwtCustomizer);
                 }
-                builder.setSharedObject(EiamOAuth2TokenGenerator.class, jwtGenerator);
+                builder.setSharedObject(JwtGenerator.class, jwtGenerator);
             }
         }
         return jwtGenerator;

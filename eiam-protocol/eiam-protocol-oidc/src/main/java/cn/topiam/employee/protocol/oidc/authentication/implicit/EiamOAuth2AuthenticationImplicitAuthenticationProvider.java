@@ -18,7 +18,9 @@
 package cn.topiam.employee.protocol.oidc.authentication.implicit;
 
 import java.security.Principal;
-import java.util.*;
+import java.util.Base64;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -35,7 +37,10 @@ import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.core.oidc.endpoint.OidcParameterNames;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.authorization.*;
-import org.springframework.security.oauth2.server.authorization.authentication.*;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AccessTokenAuthenticationToken;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationException;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationValidator;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientAuthenticationToken;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.context.AuthorizationServerContextHolder;
@@ -46,6 +51,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import com.google.common.collect.Maps;
+
+import cn.topiam.employee.audit.context.AuditContext;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.REDIRECT_URI;
 
 /**
@@ -57,6 +64,8 @@ import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterN
 @SuppressWarnings("AlibabaClassNamingShouldBeCamel")
 public class EiamOAuth2AuthenticationImplicitAuthenticationProvider implements
                                                                     AuthenticationProvider {
+    public static final AuthorizationGrantType                             IMPLICIT                = new AuthorizationGrantType(
+        "implicit");
 
     private static final String                                            ERROR_URI               = "https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2.1";
     private static final StringKeyGenerator                                DEFAULT_STATE_GENERATOR = new Base64StringKeyGenerator(
@@ -91,6 +100,7 @@ public class EiamOAuth2AuthenticationImplicitAuthenticationProvider implements
         this.tokenGenerator = tokenGenerator;
     }
 
+    @SuppressWarnings("AlibabaMethodTooLong")
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         EiamOAuth2AuthorizationImplicitAuthenticationToken authorizationImplicitRequestAuthentication = (EiamOAuth2AuthorizationImplicitAuthenticationToken) authentication;
@@ -109,8 +119,7 @@ public class EiamOAuth2AuthenticationImplicitAuthenticationProvider implements
             .build();
         this.authenticationValidator.accept(authenticationContext);
 
-        if (!registeredClient.getAuthorizationGrantTypes()
-            .contains(AuthorizationGrantType.IMPLICIT)) {
+        if (!registeredClient.getAuthorizationGrantTypes().contains(IMPLICIT)) {
             throwError(OAuth2ErrorCodes.UNAUTHORIZED_CLIENT, OAuth2ParameterNames.CLIENT_ID,
                 authorizationImplicitRequestAuthentication, registeredClient);
         }
@@ -252,6 +261,8 @@ public class EiamOAuth2AuthenticationImplicitAuthenticationProvider implements
         OAuth2AccessTokenAuthenticationToken token = new OAuth2AccessTokenAuthenticationToken(
             registeredClient, clientPrincipal, accessToken, refreshToken, additionalParameters);
         token.setAuthenticated(true);
+        //放入审计上下文中
+        AuditContext.setAuthorization(authorization.getAttribute(Principal.class.getName()));
         return token;
     }
 
@@ -259,7 +270,6 @@ public class EiamOAuth2AuthenticationImplicitAuthenticationProvider implements
     public boolean supports(Class<?> authentication) {
         return authentication
             .isAssignableFrom(EiamOAuth2AuthorizationImplicitAuthenticationToken.class);
-
     }
 
     private static boolean requireAuthorizationConsent(RegisteredClient registeredClient,

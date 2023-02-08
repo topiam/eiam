@@ -23,6 +23,7 @@ import java.util.Objects;
 
 import javax.validation.ConstraintViolationException;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.querydsl.QPageRequest;
@@ -34,15 +35,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 
+import cn.topiam.employee.authentication.common.IdentityProviderCategory;
+import cn.topiam.employee.authentication.common.IdentityProviderType;
 import cn.topiam.employee.authentication.common.config.IdentityProviderConfig;
 import cn.topiam.employee.authentication.dingtalk.DingTalkIdpOauthConfig;
 import cn.topiam.employee.authentication.dingtalk.DingTalkIdpScanCodeConfig;
+import cn.topiam.employee.authentication.feishu.FeiShuIdpScanCodeConfig;
 import cn.topiam.employee.authentication.qq.QqIdpOauthConfig;
 import cn.topiam.employee.authentication.wechat.WeChatIdpScanCodeConfig;
 import cn.topiam.employee.authentication.wechatwork.WeChatWorkIdpScanCodeConfig;
 import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
 import cn.topiam.employee.common.entity.authentication.QIdentityProviderEntity;
-import cn.topiam.employee.common.enums.IdentityProviderType;
 import cn.topiam.employee.console.pojo.query.authentication.IdentityProviderListQuery;
 import cn.topiam.employee.console.pojo.result.authentication.IdentityProviderListResult;
 import cn.topiam.employee.console.pojo.result.authentication.IdentityProviderResult;
@@ -54,6 +57,7 @@ import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.repository.page.domain.QueryDslRequest;
 import cn.topiam.employee.support.validation.ValidationHelp;
+import static cn.topiam.employee.authentication.common.IdentityProviderType.*;
 
 /**
  * 身份提供商转换器
@@ -93,7 +97,7 @@ public interface IdentityProviderConverter {
      * @param entity {@link  IdentityProviderEntity}
      * @return {@link  IdentityProviderListResult}
      */
-    @Mapping(target = "desc", source = "type.desc")
+    @Mapping(target = "desc", expression = "java(IdentityProviderConverter.getIdentityProviderType(entity.getType()).desc())")
     IdentityProviderListResult entityConverterToIdentityProviderResult(IdentityProviderEntity entity);
 
     /**
@@ -106,7 +110,9 @@ public interface IdentityProviderConverter {
         if (param == null) {
             return null;
         }
-        if (!param.getCategory().getProviders().contains(param.getType())) {
+        IdentityProviderCategory category = IdentityProviderCategory.getType(param.getCategory());
+        if (!category.getProviders().stream().map(IdentityProviderType::value).toList()
+            .contains(param.getType())) {
             throw new TopIamException("认证源类型与认证源提供商不匹配");
         }
         try {
@@ -117,19 +123,17 @@ public interface IdentityProviderConverter {
             objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
                 ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
             //封装数据
-            IdentityProviderEntity identityProviderEntity = new IdentityProviderEntity();
-            identityProviderEntity.setName(param.getName());
-            identityProviderEntity.setCode(
-                org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric(32).toLowerCase());
-            identityProviderEntity.setType(param.getType());
-            identityProviderEntity.setCategory(param.getCategory());
-            identityProviderEntity.setDisplayed(param.getDisplayed());
-            identityProviderEntity.setEnabled(Boolean.TRUE);
-            identityProviderEntity.setRemark(param.getRemark());
+            IdentityProviderEntity entity = new IdentityProviderEntity();
+            entity.setName(param.getName());
+            entity.setCode(RandomStringUtils.randomAlphanumeric(32).toLowerCase());
+            entity.setType(param.getType());
+            entity.setCategory(param.getCategory());
+            entity.setDisplayed(param.getDisplayed());
+            entity.setEnabled(Boolean.TRUE);
+            entity.setRemark(param.getRemark());
             //配置
-            identityProviderEntity
-                .setConfig(objectMapper.writeValueAsString(identityProviderConfig));
-            return identityProviderEntity;
+            entity.setConfig(objectMapper.writeValueAsString(identityProviderConfig));
+            return entity;
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -155,7 +159,8 @@ public interface IdentityProviderConverter {
         result.setRemark(entity.getRemark());
         //回调地址
         result.setRedirectUri(ServerContextHelp.getPortalPublicBaseUrl()
-                              + entity.getType().getLoginPathPrefix() + "/" + entity.getCode());
+                              + getIdentityProviderType(entity.getType()).getLoginPathPrefix() + "/"
+                              + entity.getCode());
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             // 指定序列化输入的类型
@@ -181,7 +186,8 @@ public interface IdentityProviderConverter {
                                                                              PageModel pageModel) {
         QueryDslRequest request = new QueryDslRequest();
         QIdentityProviderEntity queryEntity = QIdentityProviderEntity.identityProviderEntity;
-        Predicate predicate = queryEntity.isNotNull();
+        Predicate predicate = ExpressionUtils.and(queryEntity.isNotNull(),
+            queryEntity.isDeleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = Objects.isNull(query.getCategory()) ? predicate : ExpressionUtils.and(predicate, queryEntity.category.eq(query.getCategory()));
@@ -232,25 +238,29 @@ public interface IdentityProviderConverter {
      * @param config {@link  JSONObject}
      * @return {@link  IdentityProviderConfig}
      */
-    default IdentityProviderConfig getIdentityProviderConfig(IdentityProviderType type,
-                                                             JSONObject config) {
+    default IdentityProviderConfig getIdentityProviderConfig(String type, JSONObject config) {
         //开始处理不同提供商的配置
         IdentityProviderConfig identityProviderConfig;
-        switch (type) {
-            //微信扫码
-            case WECHAT_SCAN_CODE ->
-                identityProviderConfig = config.to(WeChatIdpScanCodeConfig.class);
+        //微信扫码
+        if (type.equals(WECHAT_QR.value())) {
+            identityProviderConfig = config.to(WeChatIdpScanCodeConfig.class);
             //钉钉扫码
-            case DINGTALK_SCAN_CODE ->
-                identityProviderConfig = config.to(DingTalkIdpScanCodeConfig.class);
+        } else if (type.equals(DINGTALK_QR.value())) {
+            identityProviderConfig = config.to(DingTalkIdpScanCodeConfig.class);
             //钉钉Oauth
-            case DINGTALK_OAUTH -> identityProviderConfig = config.to(DingTalkIdpOauthConfig.class);
+        } else if (type.equals(DINGTALK_OAUTH.value())) {
+            identityProviderConfig = config.to(DingTalkIdpOauthConfig.class);
             //企业微信扫码
-            case WECHATWORK_SCAN_CODE ->
-                identityProviderConfig = config.to(WeChatWorkIdpScanCodeConfig.class);
+        } else if (type.equals(WECHAT_WORK_QR.value())) {
+            identityProviderConfig = config.to(WeChatWorkIdpScanCodeConfig.class);
             //QQ认证
-            case QQ -> identityProviderConfig = config.to(QqIdpOauthConfig.class);
-            default -> throw new TopIamException("不支持此身份提供商");
+        } else if (type.equals(QQ.value())) {
+            identityProviderConfig = config.to(QqIdpOauthConfig.class);
+            //飞书认证
+        } else if (type.equals(FEISHU_OAUTH.value())) {
+            identityProviderConfig = config.to(FeiShuIdpScanCodeConfig.class);
+        } else {
+            throw new TopIamException("不支持此身份提供商");
         }
         if (!Objects.nonNull(identityProviderConfig)) {
             throw new NullPointerException("提供商配置不能为空");
@@ -261,5 +271,42 @@ public interface IdentityProviderConverter {
             throw new ConstraintViolationException(validationResult.getConstraintViolations());
         }
         return identityProviderConfig;
+    }
+
+    /**
+     * getIdentityProviderType
+     *
+     * @param type {@link String}
+     * @return {@link IdentityProviderType}
+     */
+    static IdentityProviderType getIdentityProviderType(String type) {
+        if (type.equals(FEISHU_OAUTH.value())) {
+            return FEISHU_OAUTH;
+        }
+        if (type.equals(DINGTALK_OAUTH.value())) {
+            return DINGTALK_OAUTH;
+        }
+        if (type.equals(DINGTALK_QR.value())) {
+            return DINGTALK_QR;
+        }
+        if (type.equals(WECHAT_QR.value())) {
+            return WECHAT_QR;
+        }
+        if (type.equals(WECHAT_WORK_QR.value())) {
+            return WECHAT_WORK_QR;
+        }
+        if (type.equals(QQ.value())) {
+            return QQ;
+        }
+        if (type.equals(LDAP.value())) {
+            return LDAP;
+        }
+        if (type.equals(USERNAME_PASSWORD.value())) {
+            return USERNAME_PASSWORD;
+        }
+        if (type.equals(SMS.value())) {
+            return SMS;
+        }
+        throw new IllegalArgumentException("未知身份提供商类型");
     }
 }

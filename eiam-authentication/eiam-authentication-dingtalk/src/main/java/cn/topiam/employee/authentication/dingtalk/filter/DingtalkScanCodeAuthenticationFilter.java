@@ -59,15 +59,14 @@ import cn.topiam.employee.authentication.common.modal.IdpUser;
 import cn.topiam.employee.authentication.common.service.UserIdpService;
 import cn.topiam.employee.authentication.dingtalk.DingTalkIdpScanCodeConfig;
 import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
-import cn.topiam.employee.common.enums.IdentityProviderType;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 import cn.topiam.employee.core.context.ServerContextHelp;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.support.util.HttpUrlUtils;
+import static cn.topiam.employee.authentication.common.IdentityProviderType.DINGTALK_QR;
+import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.PROVIDER_CODE;
 import static cn.topiam.employee.authentication.dingtalk.constant.DingTalkAuthenticationConstants.*;
-import static cn.topiam.employee.authentication.dingtalk.filter.DingtalkScanCodeAuthorizationRequestGetFilter.PROVIDER_ID;
-import static cn.topiam.employee.common.enums.IdentityProviderType.DINGTALK_SCAN_CODE;
 
 /**
  * 钉钉认证过滤器
@@ -80,14 +79,13 @@ import static cn.topiam.employee.common.enums.IdentityProviderType.DINGTALK_SCAN
 @SuppressWarnings("DuplicatedCode")
 public class DingtalkScanCodeAuthenticationFilter extends
                                                   AbstractIdpAuthenticationProcessingFilter {
-    public final static String                DEFAULT_FILTER_PROCESSES_URI = DINGTALK_SCAN_CODE
+    public final static String                DEFAULT_FILTER_PROCESSES_URI = DINGTALK_QR
         .getLoginPathPrefix() + "/*";
     /**
      * AntPathRequestMatcher
      */
     public static final AntPathRequestMatcher REQUEST_MATCHER              = new AntPathRequestMatcher(
-        DINGTALK_SCAN_CODE.getLoginPathPrefix() + "/" + "{" + PROVIDER_ID + "}",
-        HttpMethod.GET.name());
+        DINGTALK_QR.getLoginPathPrefix() + "/" + "{" + PROVIDER_CODE + "}", HttpMethod.GET.name());
 
     /**
      * Creates a new instance
@@ -117,7 +115,7 @@ public class DingtalkScanCodeAuthenticationFilter extends
         TraceUtils.put(UUID.randomUUID().toString());
         RequestMatcher.MatchResult matcher = REQUEST_MATCHER.matcher(request);
         Map<String, String> variables = matcher.getVariables();
-        String providerId = variables.get(PROVIDER_ID);
+        String providerId = variables.get(PROVIDER_CODE);
         //code
         String code = request.getParameter(OAuth2ParameterNames.CODE);
         if (StringUtils.isEmpty(code)) {
@@ -195,8 +193,7 @@ public class DingtalkScanCodeAuthenticationFilter extends
         //4、执行逻辑
         OapiV2UserGetResponse.UserGetResponse result = rspGetResponse.getResult();
         IdpUser idpUser = IdpUser.builder().openId(result.getUserid()).build();
-        return attemptAuthentication(request, response, IdentityProviderType.DINGTALK_SCAN_CODE,
-            providerId, idpUser);
+        return attemptAuthentication(request, response, DINGTALK_QR, providerId, idpUser);
     }
 
     /**
@@ -234,8 +231,8 @@ public class DingtalkScanCodeAuthenticationFilter extends
     private Cache<String, String> cache;
 
     public static String getLoginUrl(String providerId) {
-        String url = ServerContextHelp.getPortalPublicBaseUrl()
-                     + DINGTALK_SCAN_CODE.getLoginPathPrefix() + "/" + providerId;
+        String url = ServerContextHelp.getPortalPublicBaseUrl() + DINGTALK_QR.getLoginPathPrefix()
+                     + "/" + providerId;
         return HttpUrlUtils.format(url);
     }
 

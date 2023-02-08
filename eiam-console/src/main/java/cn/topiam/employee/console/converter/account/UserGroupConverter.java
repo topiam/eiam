@@ -152,7 +152,8 @@ public interface UserGroupConverter {
      */
     default Predicate queryUserGroupListParamConvertToPredicate(UserGroupListQuery query) {
         QUserGroupEntity userGroup = QUserGroupEntity.userGroupEntity;
-        Predicate predicate = userGroup.isNotNull();
+        Predicate predicate = ExpressionUtils.and(userGroup.isNotNull(),
+            userGroup.isDeleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = StringUtils.isBlank(query.getName()) ? predicate : ExpressionUtils.and(predicate, userGroup.name.like("%" + query.getName() + "%"));

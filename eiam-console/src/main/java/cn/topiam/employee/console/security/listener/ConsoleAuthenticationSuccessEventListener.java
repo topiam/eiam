@@ -19,13 +19,11 @@ package cn.topiam.employee.console.security.listener;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.security.core.Authentication;
 
 import com.google.common.collect.Lists;
 
@@ -33,13 +31,13 @@ import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.EventStatus;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.audit.event.AuditEventPublish;
+import cn.topiam.employee.authentication.common.util.AuthenticationUtils;
 import cn.topiam.employee.common.geo.GeoLocationService;
+import cn.topiam.employee.console.service.setting.AdministratorService;
 import cn.topiam.employee.core.security.userdetails.UserDetails;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.context.ServletContextHelp;
 import cn.topiam.employee.support.util.IpUtils;
-import cn.topiam.employee.support.web.useragent.UserAgent;
-import cn.topiam.employee.support.web.useragent.UserAgentUtils;
 
 import lombok.AllArgsConstructor;
 import static cn.topiam.employee.audit.enums.EventType.LOGIN_CONSOLE;
@@ -61,24 +59,24 @@ public class ConsoleAuthenticationSuccessEventListener implements
      */
     @Override
     public void onApplicationEvent(@NonNull AuthenticationSuccessEvent event) {
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder
-            .getRequestAttributes();
-        AuditEventPublish auditEventPublish = ApplicationContextHelp
-            .getBean(AuditEventPublish.class);
-        Object principal = event.getAuthentication().getPrincipal();
         //@formatter:off
+        AuditEventPublish auditEventPublish = ApplicationContextHelp.getBean(AuditEventPublish.class);
+        AdministratorService administratorService = ApplicationContextHelp.getBean(AdministratorService.class);
+        Authentication authentication = event.getAuthentication();
+        Object principal = authentication.getPrincipal();
         //@formatter:on
         if (principal instanceof UserDetails) {
+            //认证类型
+            ((UserDetails) principal).setAuthType(AuthenticationUtils.geAuthType(authentication));
             //登录事件
             ((UserDetails) principal).setLoginTime(LocalDateTime.now());
             //区域
             ((UserDetails) principal).setGeoLocation(geoLocationService
                 .getGeoLocation(IpUtils.getIpAddr(ServletContextHelp.getRequest())));
-            //浏览器
-            UserAgent agent = UserAgentUtils
-                .getUserAgent(Objects.requireNonNull(attributes).getRequest());
-            ((UserDetails) principal).setUserAgent(agent);
-
+            //认证次数+1
+            administratorService.updateAuthSucceedInfo(((UserDetails) principal).getId(),
+                ((UserDetails) principal).getGeoLocation().getIp(),
+                ((UserDetails) principal).getLoginTime());
             // 审计事件
             //@formatter:off
             List<Target> targets= Lists.newArrayList(Target.builder().type(TargetType.CONSOLE).build());

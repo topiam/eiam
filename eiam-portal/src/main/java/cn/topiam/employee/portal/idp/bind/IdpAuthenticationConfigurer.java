@@ -27,7 +27,8 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import cn.topiam.employee.audit.event.AuditEventPublish;
 import cn.topiam.employee.authentication.common.service.UserIdpService;
 import cn.topiam.employee.common.repository.account.UserIdpRepository;
-import cn.topiam.employee.portal.handler.PortalAuthenticationHandler;
+import cn.topiam.employee.portal.handler.PortalAuthenticationFailureHandler;
+import cn.topiam.employee.portal.handler.PortalAuthenticationSuccessHandler;
 
 /**
  * IDP Authentication Configurer
@@ -53,8 +54,8 @@ public final class IdpAuthenticationConfigurer<H extends HttpSecurityBuilder<H>>
     @Override
     public void init(H http) throws Exception {
         //设置登录成功失败处理器
-        super.successHandler(new PortalAuthenticationHandler());
-        super.failureHandler(new PortalAuthenticationHandler());
+        super.successHandler(new PortalAuthenticationSuccessHandler());
+        super.failureHandler(new PortalAuthenticationFailureHandler());
         //MFA认证
         IdpBindUserAuthenticationFilter loginAuthenticationFilter = new IdpBindUserAuthenticationFilter(
             userIdpService, userIdpRepository, passwordEncoder, auditEventPublish);
@@ -68,10 +69,6 @@ public final class IdpAuthenticationConfigurer<H extends HttpSecurityBuilder<H>>
     public void configure(H http) throws Exception {
         http.addFilterBefore(this.getAuthenticationFilter(), OAuth2LoginAuthenticationFilter.class);
         super.configure(http);
-    }
-
-    public RequestMatcher getRequestMatcher() {
-        return IdpBindUserAuthenticationFilter.getRequestMatcher();
     }
 
     private final UserIdpService    userIdpService;

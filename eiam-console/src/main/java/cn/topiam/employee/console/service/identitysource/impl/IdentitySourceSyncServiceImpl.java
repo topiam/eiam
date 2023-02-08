@@ -113,8 +113,8 @@ public class IdentitySourceSyncServiceImpl implements IdentitySourceSyncService 
      */
     @Override
     public void executeIdentitySourceSync(String id) {
-        AuditContext.setTarget(Target.builder().id(id).type(IDENTITY_SOURCE).build());
         IdentitySourceEntity entity = identitySourceService.getIdentitySource(id);
+        AuditContext.setTarget(Target.builder().id(id).type(IDENTITY_SOURCE).build());
         if (!ObjectUtils.isEmpty(entity)) {
             if (Objects.isNull(entity.getBasicConfig())) {
                 throw new NullPointerException("请完善参数配置");

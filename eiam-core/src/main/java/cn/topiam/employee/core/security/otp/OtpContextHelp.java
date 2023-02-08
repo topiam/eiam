@@ -174,13 +174,13 @@ public class OtpContextHelp {
                                MessageNoticeChannel channel) {
         String keyPrefix = cacheProperties.getRedis().getKeyPrefix();
         return keyPrefix + COLON + "otp" + COLON + prefix + COLON + channel.getCode() + COLON + type
-               + recipient;
+               + COLON + recipient;
     }
 
     /**
      * 发送验证码频繁，请稍候重试
      */
-    private final static String       SEND_FREQUENTLY             = "发送验证码频繁，请稍候重试";
+    private static final String       SEND_FREQUENTLY             = "发送验证码频繁，请稍候重试";
 
     /**
      * 验证码 code 值前缀

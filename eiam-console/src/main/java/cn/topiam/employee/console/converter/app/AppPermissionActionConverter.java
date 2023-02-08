@@ -51,7 +51,8 @@ public interface AppPermissionActionConverter {
      */
     default Predicate appPermissionActionListQueryConvertToPredicate(AppPermissionActionListQuery query) {
         QAppPermissionResourceEntity resource = QAppPermissionResourceEntity.appPermissionResourceEntity;
-        Predicate predicate = resource.isNotNull();
+        Predicate predicate = ExpressionUtils.and(resource.isNotNull(),
+            resource.isDeleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         // 资源名称

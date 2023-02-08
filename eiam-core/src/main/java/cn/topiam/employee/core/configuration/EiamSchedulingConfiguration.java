@@ -17,10 +17,6 @@
  */
 package cn.topiam.employee.core.configuration;
 
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.task.TaskSchedulingAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.TaskScheduler;
@@ -34,7 +30,6 @@ import cn.topiam.employee.support.task.TaskSchedulerRegistrarHelp;
  */
 @Configuration
 @EnableScheduling
-@AutoConfigureAfter(value = TaskSchedulingAutoConfiguration.class)
 public class EiamSchedulingConfiguration {
 
     /**
@@ -44,8 +39,6 @@ public class EiamSchedulingConfiguration {
      * @return {@link  TaskSchedulerRegistrarHelp}
      */
     @Bean
-    @ConditionalOnBean(TaskScheduler.class)
-    @ConditionalOnMissingBean
     public TaskSchedulerRegistrarHelp taskSchedulerRegistrarHelp(TaskScheduler taskScheduler) {
         return new TaskSchedulerRegistrarHelp(taskScheduler);
     }

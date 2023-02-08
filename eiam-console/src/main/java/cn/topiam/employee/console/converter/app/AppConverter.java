@@ -58,7 +58,8 @@ public interface AppConverter {
      */
     default Predicate queryAppListParamConvertToPredicate(AppQuery query) {
         QAppEntity application = QAppEntity.appEntity;
-        Predicate predicate = application.isNotNull();
+        Predicate predicate = ExpressionUtils.and(application.isNotNull(),
+            application.isDeleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = StringUtils.isBlank(query.getName()) ? predicate : ExpressionUtils.and(predicate, application.name.like("%" + query.getName() + "%"));

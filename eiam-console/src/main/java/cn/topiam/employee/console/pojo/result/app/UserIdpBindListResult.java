@@ -19,8 +19,6 @@ package cn.topiam.employee.console.pojo.result.app;
 
 import java.time.LocalDateTime;
 
-import cn.topiam.employee.common.enums.IdentityProviderType;
-
 import lombok.Data;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -39,29 +37,29 @@ public class UserIdpBindListResult {
      * id
      */
     @Schema(description = "id")
-    private String               id;
+    private String        id;
 
     /**
      * open id
      */
     @Schema(description = "open id")
-    private Long                 openId;
+    private String        openId;
 
     /**
      * 提供商名称
      */
     @Schema(description = "提供商名称")
-    private String               idpName;
+    private String        idpName;
 
     /**
      * 提供商类型
      */
     @Schema(description = "提供商类型")
-    private IdentityProviderType idpType;
+    private String        idpType;
 
     /**
      * 绑定时间
      */
     @Schema(description = "绑定时间")
-    private LocalDateTime        bindTime;
+    private LocalDateTime bindTime;
 }

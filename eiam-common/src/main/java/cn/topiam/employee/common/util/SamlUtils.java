@@ -61,7 +61,7 @@ import static org.opensaml.saml.common.xml.SAMLConstants.POST_METHOD;
  * Created by support@topiam.cn on  2022/5/18 21:54
  */
 public class SamlUtils {
-    private final static Logger        logger      = LoggerFactory.getLogger(SamlUtils.class);
+    private static final Logger        logger      = LoggerFactory.getLogger(SamlUtils.class);
     private static final AtomicBoolean INITIALIZED = new AtomicBoolean(false);
 
     /**

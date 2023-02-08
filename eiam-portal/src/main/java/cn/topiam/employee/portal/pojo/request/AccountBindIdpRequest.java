@@ -22,6 +22,7 @@ import java.io.Serializable;
 
 import javax.validation.constraints.NotBlank;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,6 +32,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * Created by support@topiam.cn on  2022/4/3 22:22
  */
 @Data
+@AllArgsConstructor
 @Schema(description = "账户绑定IDP入参")
 public class AccountBindIdpRequest implements Serializable {
 

@@ -58,7 +58,8 @@ public interface IdentitySourceSyncConverter {
      */
     default Predicate queryIdentitySourceSyncHistoryListQueryConvertToPredicate(IdentitySourceSyncHistoryListQuery query) {
         QIdentitySourceSyncHistoryEntity queryEntity = QIdentitySourceSyncHistoryEntity.identitySourceSyncHistoryEntity;
-        Predicate predicate = queryEntity.isNotNull();
+        Predicate predicate = ExpressionUtils.and(queryEntity.isNotNull(),
+            queryEntity.isDeleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = StringUtils.isBlank(query.getIdentitySourceId()) ? predicate : ExpressionUtils.and(predicate, queryEntity.identitySourceId.eq(Long.valueOf(query.getIdentitySourceId())));
@@ -156,7 +157,8 @@ public interface IdentitySourceSyncConverter {
      */
     default Predicate queryIdentitySourceSyncRecordListQueryConvertToPredicate(IdentitySourceSyncRecordListQuery query) {
         QIdentitySourceSyncRecordEntity entity = QIdentitySourceSyncRecordEntity.identitySourceSyncRecordEntity;
-        Predicate predicate = entity.isNotNull();
+        Predicate predicate = ExpressionUtils.and(entity.isNotNull(),
+            entity.isDeleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = StringUtils.isBlank(query.getSyncHistoryId()) ? predicate : ExpressionUtils.and(predicate, entity.syncHistoryId.eq(Long.valueOf(query.getSyncHistoryId())));
