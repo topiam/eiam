@@ -55,7 +55,8 @@ public class UserUnlockTask {
     public void execute() {
         logger.info("用户自动解锁任务开始");
         QUserEntity qUserEntity = QUserEntity.userEntity;
-        Predicate predicate = qUserEntity.isNotNull();
+        Predicate predicate = ExpressionUtils.and(qUserEntity.isNotNull(),
+            qUserEntity.isDeleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = ExpressionUtils.and(predicate, qUserEntity.status.eq(UserStatus.LOCKED));
