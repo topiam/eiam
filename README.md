@@ -229,3 +229,14 @@ application.yml文件依次修改以下配置
 - portal-public-base-url (门户前台服务域名，可配置IP+端口）
 - openapi-public-base-url  (后台服务域名，可配置IP+端口）
 - synchronizer-public-base-url  (同步认证源服务域名，可配置IP+端口）
+
+
+
+2、cn.topiam.employee.common.entity.account包下类缺失
+
+因项目用到了 QueryDSL 通用的查询框架来实现复杂的 Sql。
+
+解决方案：
+-  使用命令 `mvn compile`之后，自动生成代码，对应的代码目标在target/generated-sources目录下。
+-  通过IDEA 选中其目录，Mark Directory as -> generated sources root 。
+-  通过IDEA 工具类中File -> Invalidate Caches 清理缓存(可选操作)
