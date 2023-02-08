@@ -17,10 +17,10 @@
  */
 package cn.topiam.employee.console.service.setting;
 
+import java.util.List;
+
 import cn.topiam.employee.common.enums.Language;
 import cn.topiam.employee.console.pojo.result.setting.SmsTemplateListResult;
-
-import java.util.List;
 
 /**
  * <p>

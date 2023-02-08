@@ -17,20 +17,15 @@
  */
 package cn.topiam.employee.console.service.analysis.impl;
 
-import cn.topiam.employee.audit.entity.AuditElasticSearchEntity;
-import cn.topiam.employee.audit.enums.EventStatus;
-import cn.topiam.employee.audit.enums.EventType;
-import cn.topiam.employee.authentication.common.IdentityProviderType;
-import cn.topiam.employee.common.entity.app.AppEntity;
-import cn.topiam.employee.common.repository.account.UserRepository;
-import cn.topiam.employee.common.repository.app.AppRepository;
-import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
-import cn.topiam.employee.console.pojo.query.analysis.AnalysisQuery;
-import cn.topiam.employee.console.pojo.result.analysis.*;
-import cn.topiam.employee.console.service.analysis.AnalysisService;
-import cn.topiam.employee.core.configuration.EiamSupportProperties;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
@@ -56,15 +51,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import cn.topiam.employee.audit.entity.AuditElasticSearchEntity;
+import cn.topiam.employee.audit.enums.EventStatus;
+import cn.topiam.employee.audit.enums.EventType;
+import cn.topiam.employee.authentication.common.IdentityProviderType;
+import cn.topiam.employee.common.entity.app.AppEntity;
+import cn.topiam.employee.common.repository.account.UserRepository;
+import cn.topiam.employee.common.repository.app.AppRepository;
+import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
+import cn.topiam.employee.console.pojo.query.analysis.AnalysisQuery;
+import cn.topiam.employee.console.pojo.result.analysis.*;
+import cn.topiam.employee.console.service.analysis.AnalysisService;
+import cn.topiam.employee.core.configuration.EiamSupportProperties;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import static cn.topiam.employee.audit.entity.Actor.ACTOR_AUTH_TYPE;
 import static cn.topiam.employee.audit.entity.Event.*;
 import static cn.topiam.employee.audit.entity.GeoLocation.GEO_LOCATION_PROVINCE_CODE;

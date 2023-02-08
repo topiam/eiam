@@ -41,14 +41,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 import cn.topiam.employee.application.context.ApplicationContext;
 import cn.topiam.employee.application.context.ApplicationContextHolder;
 import cn.topiam.employee.application.exception.AppNotExistException;
-import cn.topiam.employee.common.constants.ProtocolConstants;
 import cn.topiam.employee.common.entity.app.po.AppOidcConfigPO;
 import cn.topiam.employee.common.repository.app.AppOidcConfigRepository;
 import cn.topiam.employee.core.context.ServerContextHelp;
 import cn.topiam.employee.support.util.HttpUrlUtils;
 import static cn.topiam.employee.common.constants.ProtocolConstants.APP_CODE;
-import static cn.topiam.employee.common.constants.ProtocolConstants.OidcEndpointConstants.OIDC_AUTHORIZE_BASE_PATH;
-import static cn.topiam.employee.common.constants.ProtocolConstants.OidcEndpointConstants.OIDC_AUTHORIZE_PATH;
+import static cn.topiam.employee.common.constants.ProtocolConstants.OidcEndpointConstants.*;
 
 /**
  * A {@code Filter} that associates the {@link AuthorizationServerContext} to the {@link AuthorizationServerContextHolder}.
@@ -92,13 +90,13 @@ public final class EiamOidcAuthorizationServerContextFilter extends OncePerReque
                 StringSubstitutor sub = new StringSubstitutor(variables, "{", "}");
                 AuthorizationServerSettings providerSettings = AuthorizationServerSettings.builder()
                         .issuer(sub.replace(HttpUrlUtils.format(ServerContextHelp.getPortalPublicBaseUrl() + OIDC_AUTHORIZE_PATH)))
-                        .authorizationEndpoint(asUrl(ServerContextHelp.getPortalPublicBaseUrl(), sub.replace(ProtocolConstants.OidcEndpointConstants.AUTHORIZATION_ENDPOINT)))
-                        .tokenEndpoint(asUrl(ServerContextHelp.getPortalPublicBaseUrl(), sub.replace(ProtocolConstants.OidcEndpointConstants.TOKEN_ENDPOINT)))
-                        .jwkSetEndpoint(asUrl(ServerContextHelp.getPortalPublicBaseUrl(), sub.replace(ProtocolConstants.OidcEndpointConstants.JWK_SET_ENDPOINT)))
-                        .oidcClientRegistrationEndpoint(asUrl(ServerContextHelp.getPortalPublicBaseUrl(), sub.replace(ProtocolConstants.OidcEndpointConstants.OIDC_CLIENT_REGISTRATION_ENDPOINT)))
-                        .tokenIntrospectionEndpoint(asUrl(ServerContextHelp.getPortalPublicBaseUrl(), sub.replace(ProtocolConstants.OidcEndpointConstants.TOKEN_INTROSPECTION_ENDPOINT)))
-                        .tokenRevocationEndpoint(asUrl(ServerContextHelp.getPortalPublicBaseUrl(), sub.replace(ProtocolConstants.OidcEndpointConstants.TOKEN_REVOCATION_ENDPOINT)))
-                        .oidcUserInfoEndpoint(asUrl(ServerContextHelp.getPortalPublicBaseUrl(), sub.replace(ProtocolConstants.OidcEndpointConstants.OIDC_USER_INFO_ENDPOINT)))
+                        .authorizationEndpoint(asUrl(ServerContextHelp.getPortalPublicBaseUrl(), sub.replace(AUTHORIZATION_ENDPOINT)))
+                        .tokenEndpoint(asUrl(ServerContextHelp.getPortalPublicBaseUrl(), sub.replace(TOKEN_ENDPOINT)))
+                        .jwkSetEndpoint(asUrl(ServerContextHelp.getPortalPublicBaseUrl(), sub.replace(JWK_SET_ENDPOINT)))
+                        .oidcClientRegistrationEndpoint(asUrl(ServerContextHelp.getPortalPublicBaseUrl(), sub.replace(OIDC_CLIENT_REGISTRATION_ENDPOINT)))
+                        .tokenIntrospectionEndpoint(asUrl(ServerContextHelp.getPortalPublicBaseUrl(), sub.replace(TOKEN_INTROSPECTION_ENDPOINT)))
+                        .tokenRevocationEndpoint(asUrl(ServerContextHelp.getPortalPublicBaseUrl(), sub.replace(TOKEN_REVOCATION_ENDPOINT)))
+                        .oidcUserInfoEndpoint(asUrl(ServerContextHelp.getPortalPublicBaseUrl(), sub.replace(OIDC_USER_INFO_ENDPOINT)))
                         .build();
                 AuthorizationServerContext providerContext = new AuthorizationServerContext() {
                     @Override

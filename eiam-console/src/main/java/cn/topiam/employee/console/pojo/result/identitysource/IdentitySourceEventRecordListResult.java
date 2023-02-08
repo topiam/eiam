@@ -17,17 +17,19 @@
  */
 package cn.topiam.employee.console.pojo.result.identitysource;
 
-import cn.topiam.employee.common.enums.SyncStatus;
-import cn.topiam.employee.common.enums.identitysource.IdentitySourceActionType;
-import cn.topiam.employee.common.enums.identitysource.IdentitySourceObjectType;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import cn.topiam.employee.common.enums.SyncStatus;
+import cn.topiam.employee.common.enums.identitysource.IdentitySourceActionType;
+import cn.topiam.employee.common.enums.identitysource.IdentitySourceObjectType;
+
+import lombok.Data;
+
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIME_FORMATTER_PATTERN;
 
 /**

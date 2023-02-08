@@ -17,13 +17,14 @@
  */
 package cn.topiam.employee.portal.pojo.result;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
+
 import lombok.Builder;
 import lombok.Data;
 
-import java.io.Serial;
-import java.io.Serializable;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  *  准备绑定TOTP 结果

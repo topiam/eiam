@@ -91,7 +91,7 @@ public class Cas10IdpValidateEndpointFilter extends OncePerRequestFilter impleme
             } else {
                 UserDetails userDetails = serviceTicket.getTicketGrantingTicket().getUserDetails();
                 // TODO: 2023/1/2 根据配置返回额外的属性配置
-                generator.genSucceedMessage(userDetails.getUsername(), new HashMap<>(16));
+                generator.genSucceedMessage(userDetails.getUsername(), new HashMap<>());
             }
             generator.sendMessage();
         }

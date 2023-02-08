@@ -17,19 +17,21 @@
  */
 package cn.topiam.employee.portal.converter;
 
-import cn.topiam.employee.authentication.common.modal.IdpUser;
-import cn.topiam.employee.common.entity.account.UserDetailEntity;
-import cn.topiam.employee.common.entity.account.UserEntity;
-import cn.topiam.employee.common.entity.account.UserIdpBindEntity;
-import cn.topiam.employee.portal.pojo.request.UpdateUserInfoRequest;
-import com.alibaba.fastjson2.JSONObject;
+import java.time.LocalDateTime;
+
 import org.apache.commons.collections4.MapUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.LocalDateTime;
+import com.alibaba.fastjson2.JSONObject;
+
+import cn.topiam.employee.authentication.common.modal.IdpUser;
+import cn.topiam.employee.common.entity.account.UserDetailEntity;
+import cn.topiam.employee.common.entity.account.UserEntity;
+import cn.topiam.employee.common.entity.account.UserIdpBindEntity;
+import cn.topiam.employee.portal.pojo.request.UpdateUserInfoRequest;
 
 /**
  * AccountConverter

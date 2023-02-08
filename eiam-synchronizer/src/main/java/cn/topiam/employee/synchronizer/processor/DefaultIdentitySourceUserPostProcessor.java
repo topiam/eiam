@@ -116,7 +116,7 @@ public class DefaultIdentitySourceUserPostProcessor extends AbstractIdentitySour
                 //删除用户
                 userRepository.deleteAllById(deleteUserIds);
                 //删除用户详情
-                userDetailRepository.deleteAllByUserId(deleteUserIds);
+                userDetailRepository.deleteAllByUserIds(deleteUserIds);
                 //删除组织用户关联关系
                 organizationMemberRepository.deleteAllByUserId(deleteUserIds);
                 //删除用户组关系

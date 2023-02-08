@@ -17,21 +17,23 @@
  */
 package cn.topiam.employee.portal.handler;
 
-import cn.topiam.employee.core.context.ServerContextHelp;
-import cn.topiam.employee.support.result.ApiRestResult;
-import cn.topiam.employee.support.util.HttpResponseUtils;
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import cn.topiam.employee.core.context.ServerContextHelp;
+import cn.topiam.employee.support.result.ApiRestResult;
+import cn.topiam.employee.support.util.HttpResponseUtils;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import static cn.topiam.employee.common.constants.AuthorizeConstants.FE_LOGIN;
 import static cn.topiam.employee.support.context.ServletContextHelp.acceptIncludeTextHtml;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 /**
  * 认证入口点

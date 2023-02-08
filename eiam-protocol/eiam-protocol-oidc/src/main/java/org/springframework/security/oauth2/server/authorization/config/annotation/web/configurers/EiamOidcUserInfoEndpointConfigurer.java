@@ -17,18 +17,11 @@
  */
 package org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers;
 
-import java.util.function.Function;
-
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.oidc.OidcIdToken;
-import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
-import org.springframework.security.oauth2.server.authorization.oidc.authentication.OidcUserInfoAuthenticationContext;
 import org.springframework.security.oauth2.server.authorization.oidc.authentication.OidcUserInfoAuthenticationProvider;
-import org.springframework.security.oauth2.server.authorization.oidc.authentication.OidcUserInfoAuthenticationToken;
 import org.springframework.security.oauth2.server.authorization.oidc.web.OidcUserInfoEndpointFilter;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -44,35 +37,13 @@ import cn.topiam.employee.common.constants.ProtocolConstants;
  * Created by support@topiam.cn on  2022/10/26 19:24
  */
 public final class EiamOidcUserInfoEndpointConfigurer extends AbstractOAuth2Configurer {
-    private RequestMatcher                                            requestMatcher;
-    private Function<OidcUserInfoAuthenticationContext, OidcUserInfo> userInfoMapper;
+    private RequestMatcher requestMatcher;
 
     /**
      * Restrict for internal use only.
      */
     EiamOidcUserInfoEndpointConfigurer(ObjectPostProcessor<Object> objectPostProcessor) {
         super(objectPostProcessor);
-    }
-
-    /**
-     * Sets the {@link Function} used to extract claims from {@link OidcUserInfoAuthenticationContext}
-     * to an instance of {@link OidcUserInfo} for the UserInfo response.
-     *
-     * <p>
-     * The {@link OidcUserInfoAuthenticationContext} gives the mapper access to the {@link OidcUserInfoAuthenticationToken},
-     * as well as, the following context attributes:
-     * <ul>
-     * <li>{@link OidcUserInfoAuthenticationContext#getAccessToken()} containing the bearer token used to make the request.</li>
-     * <li>{@link OidcUserInfoAuthenticationContext#getAuthorization()} containing the {@link OidcIdToken} and
-     * {@link OAuth2AccessToken} associated with the bearer token used to make the request.</li>
-     * </ul>
-     *
-     * @param userInfoMapper the {@link Function} used to extract claims from {@link OidcUserInfoAuthenticationContext} to an instance of {@link OidcUserInfo}
-     * @return the {@link EiamOidcUserInfoEndpointConfigurer} for further configuration
-     */
-    public EiamOidcUserInfoEndpointConfigurer userInfoMapper(Function<OidcUserInfoAuthenticationContext, OidcUserInfo> userInfoMapper) {
-        this.userInfoMapper = userInfoMapper;
-        return this;
     }
 
     @Override
@@ -84,9 +55,6 @@ public final class EiamOidcUserInfoEndpointConfigurer extends AbstractOAuth2Conf
 
         OidcUserInfoAuthenticationProvider oidcUserInfoAuthenticationProvider = new OidcUserInfoAuthenticationProvider(
             OAuth2ConfigurerUtils.getAuthorizationService(httpSecurity));
-        if (this.userInfoMapper != null) {
-            oidcUserInfoAuthenticationProvider.setUserInfoMapper(this.userInfoMapper);
-        }
         httpSecurity.authenticationProvider(postProcess(oidcUserInfoAuthenticationProvider));
     }
 

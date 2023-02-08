@@ -17,11 +17,11 @@
  */
 package cn.topiam.employee.console.service.setting;
 
+import java.util.List;
+
 import cn.topiam.employee.console.pojo.result.setting.PasswordPolicyConfigResult;
 import cn.topiam.employee.console.pojo.result.setting.WeakPasswordLibListResult;
 import cn.topiam.employee.console.pojo.save.setting.PasswordPolicySaveParam;
-
-import java.util.List;
 
 /**
  * <p>

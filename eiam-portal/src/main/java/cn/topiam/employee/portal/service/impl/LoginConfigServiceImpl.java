@@ -17,6 +17,11 @@
  */
 package cn.topiam.employee.portal.service.impl;
 
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.stereotype.Service;
+
 import cn.topiam.employee.authentication.captcha.geetest.GeeTestCaptchaProviderConfig;
 import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
@@ -25,12 +30,8 @@ import cn.topiam.employee.core.security.captcha.CaptchaProviderConfig;
 import cn.topiam.employee.portal.converter.LoginConfigConverter;
 import cn.topiam.employee.portal.pojo.result.LoginConfigResult;
 import cn.topiam.employee.portal.service.LoginConfigService;
+
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Objects;
-
 import static cn.topiam.employee.common.enums.CaptchaProviderType.GEE_TEST;
 import static cn.topiam.employee.core.context.SettingContextHelp.getCaptchaProviderConfig;
 

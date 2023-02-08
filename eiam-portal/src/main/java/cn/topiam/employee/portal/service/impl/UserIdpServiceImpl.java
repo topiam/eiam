@@ -17,6 +17,13 @@
  */
 package cn.topiam.employee.portal.service.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Optional;
+
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Component;
+
 import cn.topiam.employee.authentication.common.modal.IdpUser;
 import cn.topiam.employee.authentication.common.service.UserIdpService;
 import cn.topiam.employee.common.entity.account.UserDetailEntity;
@@ -32,14 +39,9 @@ import cn.topiam.employee.core.security.userdetails.UserDetails;
 import cn.topiam.employee.portal.converter.AccountConverter;
 import cn.topiam.employee.portal.service.userdetail.UserDetailsServiceImpl;
 import cn.topiam.employee.support.exception.TopIamException;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
 
 /**
  * 身份验证用户详细信息实现

@@ -38,11 +38,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import cn.topiam.employee.application.ApplicationService;
 import cn.topiam.employee.application.ApplicationServiceLoader;
-import cn.topiam.employee.application.Saml2ApplicationService;
 import cn.topiam.employee.application.context.ApplicationContext;
 import cn.topiam.employee.application.context.ApplicationContextHolder;
+import cn.topiam.employee.application.saml2.Saml2ApplicationService;
+import cn.topiam.employee.application.saml2.model.Saml2ProtocolConfig;
 import cn.topiam.employee.common.constants.ProtocolConstants;
-import cn.topiam.employee.core.protocol.Saml2ProtocolConfig;
 import static cn.topiam.employee.common.util.SamlUtils.initOpenSaml;
 import static cn.topiam.employee.common.util.SamlUtils.transformSamlObject2String;
 import static cn.topiam.employee.protocol.saml2.idp.util.Saml2Utils.getEntityDescriptor;

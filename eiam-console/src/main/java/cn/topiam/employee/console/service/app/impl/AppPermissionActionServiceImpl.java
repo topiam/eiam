@@ -17,17 +17,20 @@
  */
 package cn.topiam.employee.console.service.app.impl;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.querydsl.core.types.Predicate;
+
 import cn.topiam.employee.common.entity.app.AppPermissionResourceEntity;
 import cn.topiam.employee.common.repository.app.AppPermissionResourceRepository;
 import cn.topiam.employee.console.converter.app.AppPermissionActionConverter;
 import cn.topiam.employee.console.pojo.query.app.AppPermissionActionListQuery;
 import cn.topiam.employee.console.pojo.result.app.AppPermissionActionListResult;
 import cn.topiam.employee.console.service.app.AppPermissionActionService;
-import com.querydsl.core.types.Predicate;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 /**
  * <p>

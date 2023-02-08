@@ -647,6 +647,39 @@
                 <constraints nullable="true"/>
             </column>
         </createTable>
+        <createTable remarks="TSA 应用配置" tableName="app_tsa_config">
+            <column name="id_" type="BIGINT" remarks="主键ID">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="app_id" remarks="应用ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="login_page" remarks="登录页面URL" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="auto_login_steps" remarks="自动登录步骤" type="JSON">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_account_steps" remarks="创建账号步骤" type="JSON">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
         <createTable remarks="应用权限角色表" tableName="app_permission_role">
             <column name="id_" remarks="主键ID" type="BIGINT" >
                 <constraints nullable="false" primaryKey="true"/>

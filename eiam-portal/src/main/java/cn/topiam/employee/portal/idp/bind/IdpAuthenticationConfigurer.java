@@ -17,17 +17,18 @@
  */
 package cn.topiam.employee.portal.idp.bind;
 
-import cn.topiam.employee.audit.event.AuditEventPublish;
-import cn.topiam.employee.authentication.common.service.UserIdpService;
-import cn.topiam.employee.common.repository.account.UserIdpRepository;
-import cn.topiam.employee.portal.handler.PortalAuthenticationFailureHandler;
-import cn.topiam.employee.portal.handler.PortalAuthenticationSuccessHandler;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+
+import cn.topiam.employee.audit.event.AuditEventPublish;
+import cn.topiam.employee.authentication.common.service.UserIdpService;
+import cn.topiam.employee.common.repository.account.UserIdpRepository;
+import cn.topiam.employee.portal.handler.PortalAuthenticationFailureHandler;
+import cn.topiam.employee.portal.handler.PortalAuthenticationSuccessHandler;
 
 /**
  * IDP Authentication Configurer

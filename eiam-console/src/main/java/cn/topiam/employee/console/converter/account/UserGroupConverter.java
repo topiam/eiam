@@ -17,6 +17,18 @@
  */
 package cn.topiam.employee.console.converter.account;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.util.CollectionUtils;
+
+import com.google.common.collect.Lists;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
+
 import cn.topiam.employee.common.entity.account.QUserGroupEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.entity.account.UserGroupEntity;
@@ -29,16 +41,6 @@ import cn.topiam.employee.console.pojo.save.account.UserGroupCreateParam;
 import cn.topiam.employee.console.pojo.update.account.UserGroupUpdateParam;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.repository.page.domain.Page;
-import com.google.common.collect.Lists;
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
-import org.apache.commons.lang3.StringUtils;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.springframework.util.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 用户映射

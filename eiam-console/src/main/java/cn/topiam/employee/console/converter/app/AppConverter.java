@@ -17,6 +17,19 @@
  */
 package cn.topiam.employee.console.converter.app;
 
+import java.util.List;
+import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.util.AlternativeJdkIdGenerator;
+import org.springframework.util.IdGenerator;
+
+import com.google.common.collect.Lists;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
+
 import cn.topiam.employee.application.ApplicationService;
 import cn.topiam.employee.application.ApplicationServiceLoader;
 import cn.topiam.employee.common.entity.app.AppEntity;
@@ -27,17 +40,6 @@ import cn.topiam.employee.console.pojo.result.app.AppListResult;
 import cn.topiam.employee.console.pojo.update.app.AppUpdateParam;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.repository.page.domain.Page;
-import com.google.common.collect.Lists;
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
-import org.apache.commons.lang3.StringUtils;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.springframework.util.AlternativeJdkIdGenerator;
-import org.springframework.util.IdGenerator;
-
-import java.util.List;
-import java.util.Objects;
 
 /**
  * 应用映射

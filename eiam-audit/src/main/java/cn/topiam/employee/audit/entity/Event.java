@@ -64,7 +64,7 @@ public class Event implements Serializable {
     /**
      * 事件内容
      */
-    @Field(type = FieldType.Text, name = "content")
+    @Field(type = FieldType.Object, name = "content")
     private String             content;
 
     /**

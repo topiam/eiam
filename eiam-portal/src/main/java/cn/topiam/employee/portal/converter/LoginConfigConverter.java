@@ -17,12 +17,13 @@
  */
 package cn.topiam.employee.portal.converter;
 
-import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
-import cn.topiam.employee.portal.pojo.result.LoginConfigResult;
-import org.mapstruct.Mapper;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.mapstruct.Mapper;
+
+import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
+import cn.topiam.employee.portal.pojo.result.LoginConfigResult;
 
 /**
  * AuthenticationConverter

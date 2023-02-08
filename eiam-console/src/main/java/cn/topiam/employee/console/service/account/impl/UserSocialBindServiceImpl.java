@@ -17,9 +17,11 @@
  */
 package cn.topiam.employee.console.service.account.impl;
 
-import cn.topiam.employee.console.service.account.UserSocialBindService;
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import cn.topiam.employee.console.service.account.UserSocialBindService;
+
+import lombok.AllArgsConstructor;
 
 /**
  * @author TopIAM

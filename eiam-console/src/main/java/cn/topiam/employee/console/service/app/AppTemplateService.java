@@ -17,11 +17,11 @@
  */
 package cn.topiam.employee.console.service.app;
 
-import cn.topiam.employee.common.enums.app.AppType;
-import cn.topiam.employee.console.pojo.result.app.AppTemplateResult;
-
 import java.util.List;
 import java.util.Map;
+
+import cn.topiam.employee.common.enums.app.AppType;
+import cn.topiam.employee.console.pojo.result.app.AppTemplateResult;
 
 /**
  * 应用模板服务

@@ -41,7 +41,9 @@ import lombok.Data;
 public class GeoLocation implements Serializable {
 
     @Serial
-    private static final long   serialVersionUID = -1144169992714000310L;
+    private static final long   serialVersionUID           = -1144169992714000310L;
+
+    public static final String  GEO_LOCATION_PROVINCE_CODE = "geo_location.province_code.keyword";
 
     /**
      * IP

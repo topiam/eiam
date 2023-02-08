@@ -17,6 +17,24 @@
  */
 package cn.topiam.employee.console.converter.authentication;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import javax.validation.ConstraintViolationException;
+
+import org.apache.commons.lang3.RandomStringUtils;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.data.querydsl.QPageRequest;
+
+import com.alibaba.fastjson2.JSONObject;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
+
 import cn.topiam.employee.authentication.common.IdentityProviderCategory;
 import cn.topiam.employee.authentication.common.IdentityProviderType;
 import cn.topiam.employee.authentication.common.config.IdentityProviderConfig;
@@ -39,22 +57,6 @@ import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.repository.page.domain.QueryDslRequest;
 import cn.topiam.employee.support.validation.ValidationHelp;
-import com.alibaba.fastjson2.JSONObject;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.springframework.data.querydsl.QPageRequest;
-
-import javax.validation.ConstraintViolationException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import static cn.topiam.employee.authentication.common.IdentityProviderType.*;
 
 /**

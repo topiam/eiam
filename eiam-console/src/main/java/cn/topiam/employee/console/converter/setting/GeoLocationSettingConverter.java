@@ -17,6 +17,16 @@
  */
 package cn.topiam.employee.console.converter.setting;
 
+import java.util.Objects;
+
+import javax.validation.ValidationException;
+
+import org.mapstruct.Mapper;
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import cn.topiam.employee.common.crypto.EncryptionModule;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.geo.GeoLocationProviderConfig;
@@ -27,14 +37,6 @@ import cn.topiam.employee.console.pojo.result.setting.GeoIpProviderResult;
 import cn.topiam.employee.console.pojo.save.setting.GeoIpProviderSaveParam;
 import cn.topiam.employee.console.pojo.save.setting.MailProviderSaveParam;
 import cn.topiam.employee.support.validation.ValidationHelp;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.mapstruct.Mapper;
-
-import javax.validation.ValidationException;
-import java.util.Objects;
-
 import static cn.topiam.employee.core.setting.constant.GeoIpProviderConstants.IPADDRESS_SETTING_NAME;
 
 /**

@@ -17,6 +17,8 @@
  */
 package cn.topiam.employee.console.service.authentication;
 
+import java.util.List;
+
 import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
 import cn.topiam.employee.console.pojo.query.authentication.IdentityProviderListQuery;
 import cn.topiam.employee.console.pojo.result.authentication.IdentityProviderCreateResult;
@@ -26,8 +28,6 @@ import cn.topiam.employee.console.pojo.save.authentication.IdentityProviderCreat
 import cn.topiam.employee.console.pojo.update.authentication.IdpUpdateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
-
-import java.util.List;
 
 /**
  * <p>

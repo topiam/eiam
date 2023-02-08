@@ -17,6 +17,21 @@
  */
 package cn.topiam.employee.console.service.account.impl;
 
+import java.util.*;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import com.google.common.collect.Lists;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
@@ -35,22 +50,9 @@ import cn.topiam.employee.console.pojo.save.account.OrganizationCreateParam;
 import cn.topiam.employee.console.pojo.update.account.OrganizationUpdateParam;
 import cn.topiam.employee.console.service.account.OrganizationService;
 import cn.topiam.employee.support.util.BeanUtils;
-import com.google.common.collect.Lists;
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-
-import java.util.*;
-
 import static cn.topiam.employee.support.constant.EiamConstants.ROOT_NODE;
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;

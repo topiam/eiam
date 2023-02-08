@@ -30,10 +30,10 @@ public final class SynchronizerConstants {
     /**
      * 同步器事件接收路径
      */
-    public static final String EVENT_PATH         = EiamConstants.API_PATH + "/event";
+    public final static String EVENT_PATH         = EiamConstants.API_PATH + "/event";
 
     /**
      * 同步器事件接收路径
      */
-    public static final String EVENT_RECEIVE_PATH = EVENT_PATH + "/receive";
+    public final static String EVENT_RECEIVE_PATH = EVENT_PATH + "/receive";
 }

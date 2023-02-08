@@ -122,8 +122,7 @@ public class HttpSessionRedirectCache implements RedirectCache {
      * @return {@link SavedRedirect}
      */
     @Override
-    public SavedRedirect getRedirect(HttpServletRequest request,
-                                                                                    HttpServletResponse response) {
+    public SavedRedirect getRedirect(HttpServletRequest request, HttpServletResponse response) {
         return (SavedRedirect) request.getSession(false)
             .getAttribute(TOPIAM_SECURITY_SAVED_REDIRECT);
     }

@@ -17,11 +17,7 @@
  */
 package cn.topiam.employee.protocol.oidc.authentication.implicit;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AbstractAuthenticationToken;

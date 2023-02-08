@@ -17,6 +17,11 @@
  */
 package cn.topiam.employee.console.controller.app;
 
+import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
 import cn.topiam.employee.common.entity.app.query.AppPolicyQuery;
 import cn.topiam.employee.console.pojo.result.app.AppPermissionPolicyGetResult;
 import cn.topiam.employee.console.pojo.result.app.AppPermissionPolicyListResult;
@@ -31,14 +36,11 @@ import cn.topiam.employee.support.preview.Preview;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.result.ApiRestResult;
+
+import lombok.RequiredArgsConstructor;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
 import static cn.topiam.employee.common.constants.AppConstants.APP_PATH;
 
 /**

@@ -17,16 +17,19 @@
  */
 package cn.topiam.employee.console.pojo.query.identity;
 
+import java.io.Serial;
+import java.io.Serializable;
+
+import org.springdoc.api.annotations.ParameterObject;
+
 import cn.topiam.employee.common.enums.SyncStatus;
 import cn.topiam.employee.common.enums.identitysource.IdentitySourceActionType;
 import cn.topiam.employee.common.enums.identitysource.IdentitySourceObjectType;
+
+import lombok.Data;
+
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-import org.springdoc.api.annotations.ParameterObject;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * 查询身份源事件记录列表入参

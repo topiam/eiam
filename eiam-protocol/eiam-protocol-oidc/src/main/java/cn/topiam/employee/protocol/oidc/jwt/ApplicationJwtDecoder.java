@@ -46,7 +46,6 @@ public class ApplicationJwtDecoder implements JwtDecoder {
     public Jwt decode(String token) throws JwtException {
         ApplicationContext applicationContext = ApplicationContextHolder.getApplicationContext();
         Long appId = applicationContext.getAppId();
-        String appCode = applicationContext.getAppCode();
         try {
             Optional<AppCertEntity> certOptional = appCertRepository.findByAppIdAndUsingType(appId,
                 AppCertUsingType.OIDC_JWK);

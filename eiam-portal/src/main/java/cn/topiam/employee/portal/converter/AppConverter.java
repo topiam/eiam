@@ -17,6 +17,14 @@
  */
 package cn.topiam.employee.portal.converter;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
+
 import cn.topiam.employee.application.ApplicationService;
 import cn.topiam.employee.application.ApplicationServiceLoader;
 import cn.topiam.employee.common.entity.app.AppEntity;
@@ -25,14 +33,6 @@ import cn.topiam.employee.portal.constant.PortalConstants;
 import cn.topiam.employee.portal.pojo.result.GetAppListResult;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.repository.page.domain.Page;
-import org.apache.commons.lang3.StringUtils;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingConstants;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import static cn.topiam.employee.common.constants.ProtocolConstants.APP_CODE_VARIABLE;
 import static cn.topiam.employee.common.enums.app.InitLoginType.PORTAL_OR_APP;
 

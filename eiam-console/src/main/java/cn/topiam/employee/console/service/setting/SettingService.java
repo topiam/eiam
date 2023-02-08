@@ -17,9 +17,9 @@
  */
 package cn.topiam.employee.console.service.setting;
 
-import cn.topiam.employee.common.entity.setting.SettingEntity;
-
 import java.util.List;
+
+import cn.topiam.employee.common.entity.setting.SettingEntity;
 
 /**
  * @author TopIAM

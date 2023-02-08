@@ -17,14 +17,18 @@
  */
 package cn.topiam.employee.console.pojo.save.setting;
 
-import cn.topiam.employee.common.enums.CaptchaProviderType;
-import com.alibaba.fastjson2.JSONObject;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import java.io.Serializable;
 
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
+
+import com.alibaba.fastjson2.JSONObject;
+
+import cn.topiam.employee.common.enums.CaptchaProviderType;
+
+import lombok.Data;
+
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 行为验证码保存入参

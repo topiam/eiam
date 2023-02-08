@@ -17,13 +17,12 @@
  */
 package cn.topiam.employee.portal.handler;
 
-import cn.topiam.employee.common.constants.AuthorizeConstants;
-import cn.topiam.employee.common.enums.SecretType;
-import cn.topiam.employee.core.context.ServerContextHelp;
-import cn.topiam.employee.core.security.authentication.IdpAuthentication;
-import cn.topiam.employee.support.result.ApiRestResult;
-import cn.topiam.employee.support.util.HttpResponseUtils;
-import cn.topiam.employee.support.util.HttpUrlUtils;
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -31,11 +30,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AbstractAuthenticationTargetUrlRequestHandler;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-
+import cn.topiam.employee.common.constants.AuthorizeConstants;
+import cn.topiam.employee.common.enums.SecretType;
+import cn.topiam.employee.core.context.ServerContextHelp;
+import cn.topiam.employee.core.security.authentication.IdpAuthentication;
+import cn.topiam.employee.support.result.ApiRestResult;
+import cn.topiam.employee.support.util.HttpResponseUtils;
+import cn.topiam.employee.support.util.HttpUrlUtils;
 import static cn.topiam.employee.support.constant.EiamConstants.*;
 import static cn.topiam.employee.support.context.ServletContextHelp.acceptIncludeTextHtml;
 import static cn.topiam.employee.support.result.ApiRestResult.SUCCESS;

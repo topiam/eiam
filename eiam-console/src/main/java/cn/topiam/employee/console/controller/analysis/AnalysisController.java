@@ -17,20 +17,21 @@
  */
 package cn.topiam.employee.console.controller.analysis;
 
-import cn.topiam.employee.console.pojo.query.analysis.AnalysisQuery;
-import cn.topiam.employee.console.pojo.result.analysis.*;
-import cn.topiam.employee.console.service.analysis.AnalysisService;
-import cn.topiam.employee.support.result.ApiRestResult;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import cn.topiam.employee.console.pojo.query.analysis.AnalysisQuery;
+import cn.topiam.employee.console.pojo.result.analysis.*;
+import cn.topiam.employee.console.service.analysis.AnalysisService;
+import cn.topiam.employee.support.result.ApiRestResult;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import static cn.topiam.employee.common.constants.AnalysisConstants.ANALYSIS_GROUP_NAME;
 import static cn.topiam.employee.common.constants.AnalysisConstants.ANALYSIS_PATH;
 

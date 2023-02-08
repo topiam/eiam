@@ -17,6 +17,14 @@
  */
 package cn.topiam.employee.console.converter.account;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.util.CollectionUtils;
+
 import cn.topiam.employee.common.entity.account.OrganizationEntity;
 import cn.topiam.employee.console.pojo.result.account.OrganizationChildResult;
 import cn.topiam.employee.console.pojo.result.account.OrganizationResult;
@@ -24,13 +32,6 @@ import cn.topiam.employee.console.pojo.result.account.OrganizationRootResult;
 import cn.topiam.employee.console.pojo.result.account.OrganizationTreeResult;
 import cn.topiam.employee.console.pojo.save.account.OrganizationCreateParam;
 import cn.topiam.employee.console.pojo.update.account.OrganizationUpdateParam;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.springframework.util.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * 组织架构数据映射

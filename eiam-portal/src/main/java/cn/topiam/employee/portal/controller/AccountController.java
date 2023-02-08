@@ -17,16 +17,18 @@
  */
 package cn.topiam.employee.portal.controller;
 
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
 import cn.topiam.employee.core.security.decrypt.DecryptRequestBody;
 import cn.topiam.employee.portal.pojo.request.*;
 import cn.topiam.employee.portal.pojo.result.PrepareBindMfaResult;
 import cn.topiam.employee.portal.service.AccountService;
 import cn.topiam.employee.support.result.ApiRestResult;
-import io.swagger.v3.oas.annotations.Operation;
-import lombok.AllArgsConstructor;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
 
+import lombok.AllArgsConstructor;
+
+import io.swagger.v3.oas.annotations.Operation;
 import static cn.topiam.employee.support.constant.EiamConstants.API_PATH;
 
 /**

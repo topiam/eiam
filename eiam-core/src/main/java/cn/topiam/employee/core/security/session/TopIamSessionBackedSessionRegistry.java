@@ -97,8 +97,8 @@ public class TopIamSessionBackedSessionRegistry<T extends Session>
                 //转为实体
                 UserDetails principal = (UserDetails) securityContext.getAuthentication()
                     .getPrincipal();
-                SessionDetails sessionDetails = new SessionDetails(
-                    principal.getId(), principal.getUsername());
+                SessionDetails sessionDetails = new SessionDetails(principal.getId(),
+                    principal.getUsername());
                 //last request
                 Instant instant = information.getLastRequest().toInstant();
                 ZoneId zoneId = ZoneId.systemDefault();

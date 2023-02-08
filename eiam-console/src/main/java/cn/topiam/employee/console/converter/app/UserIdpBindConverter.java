@@ -17,13 +17,14 @@
  */
 package cn.topiam.employee.console.converter.app;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.mapstruct.Mapper;
+
 import cn.topiam.employee.common.entity.account.po.UserIdpBindPo;
 import cn.topiam.employee.console.pojo.result.app.UserIdpBindListResult;
 import cn.topiam.employee.support.repository.page.domain.Page;
-import org.mapstruct.Mapper;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 用户身份提供商绑定

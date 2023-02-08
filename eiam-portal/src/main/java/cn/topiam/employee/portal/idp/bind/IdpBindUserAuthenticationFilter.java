@@ -17,6 +17,28 @@
  */
 package cn.topiam.employee.portal.idp.bind;
 
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolationException;
+
+import org.springframework.http.HttpMethod;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.util.Assert;
+
+import com.alibaba.fastjson2.JSONObject;
+
 import cn.topiam.employee.audit.enums.EventStatus;
 import cn.topiam.employee.audit.enums.EventType;
 import cn.topiam.employee.audit.event.AuditEventPublish;
@@ -36,27 +58,8 @@ import cn.topiam.employee.support.context.ServletContextHelp;
 import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.support.util.AesUtils;
 import cn.topiam.employee.support.validation.ValidationHelp;
-import com.alibaba.fastjson2.JSONObject;
+
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.util.Assert;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolationException;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-
 import static cn.topiam.employee.authentication.common.filter.AbstractIdpAuthenticationProcessingFilter.TOPIAM_USER_BIND_IDP;
 import static cn.topiam.employee.common.constants.AuthorizeConstants.USER_BIND_IDP;
 import static cn.topiam.employee.portal.constant.PortalConstants.BIND_ACCOUNT;

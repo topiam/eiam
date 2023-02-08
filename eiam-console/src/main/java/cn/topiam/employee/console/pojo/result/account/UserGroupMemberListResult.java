@@ -17,12 +17,13 @@
  */
 package cn.topiam.employee.console.pojo.result.account;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import java.io.Serial;
 import java.io.Serializable;
+
+import lombok.Data;
+
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 查询用户详情结果

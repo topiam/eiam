@@ -17,6 +17,19 @@
  */
 package cn.topiam.employee.portal.controller;
 
+import java.io.Serializable;
+import java.util.List;
+
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.stereotype.Component;
+
+import com.alibaba.fastjson2.JSON;
+import com.google.common.collect.Lists;
+
 import cn.topiam.employee.authentication.common.IdentityProviderType;
 import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.enums.PasswordStrength;
@@ -24,20 +37,11 @@ import cn.topiam.employee.core.security.util.UserUtils;
 import cn.topiam.employee.support.result.ApiRestResult;
 import cn.topiam.employee.support.util.DesensitizationUtil;
 import cn.topiam.employee.support.util.HttpResponseUtils;
-import com.alibaba.fastjson2.JSON;
-import com.google.common.collect.Lists;
-import io.swagger.v3.oas.annotations.media.Schema;
+
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.Serializable;
-import java.util.List;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import static cn.topiam.employee.common.constants.SessionConstants.CURRENT_USER;
 
 /**

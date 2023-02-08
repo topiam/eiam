@@ -17,6 +17,8 @@
  */
 package cn.topiam.employee.console.service.app;
 
+import java.util.Map;
+
 import cn.topiam.employee.console.pojo.query.app.AppQuery;
 import cn.topiam.employee.console.pojo.result.app.AppCreateResult;
 import cn.topiam.employee.console.pojo.result.app.AppGetResult;
@@ -26,8 +28,6 @@ import cn.topiam.employee.console.pojo.update.app.AppSaveConfigParam;
 import cn.topiam.employee.console.pojo.update.app.AppUpdateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
-
-import java.util.Map;
 
 /**
  * <p>

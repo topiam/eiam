@@ -17,15 +17,17 @@
  */
 package cn.topiam.employee.portal.pojo.result;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 import cn.topiam.employee.common.enums.app.AppProtocol;
 import cn.topiam.employee.common.enums.app.AppType;
 import cn.topiam.employee.common.enums.app.InitLoginType;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
+
 import lombok.Data;
 
-import java.io.Serial;
-import java.io.Serializable;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 获取应用列表

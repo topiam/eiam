@@ -17,14 +17,17 @@
  */
 package cn.topiam.employee.console.pojo.save.authentication;
 
-import com.alibaba.fastjson2.JSONObject;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import java.io.Serial;
+import java.io.Serializable;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.io.Serial;
-import java.io.Serializable;
+
+import com.alibaba.fastjson2.JSONObject;
+
+import lombok.Data;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 源创建参数入参

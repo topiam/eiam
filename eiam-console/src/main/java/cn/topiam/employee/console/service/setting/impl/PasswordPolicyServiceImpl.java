@@ -17,6 +17,12 @@
  */
 package cn.topiam.employee.console.service.setting.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import cn.topiam.employee.common.constants.ConfigBeanNameConstants;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
@@ -27,12 +33,6 @@ import cn.topiam.employee.console.pojo.save.setting.PasswordPolicySaveParam;
 import cn.topiam.employee.console.service.setting.PasswordPolicyService;
 import cn.topiam.employee.core.security.password.weak.PasswordWeakLib;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static cn.topiam.employee.core.setting.constant.PasswordPolicySettingConstants.PASSWORD_POLICY_KEYS;
 
 /**

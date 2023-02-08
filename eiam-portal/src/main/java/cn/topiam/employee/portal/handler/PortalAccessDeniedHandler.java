@@ -17,16 +17,19 @@
  */
 package cn.topiam.employee.portal.handler;
 
-import cn.topiam.employee.core.security.util.SecurityUtils;
-import lombok.AllArgsConstructor;
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import cn.topiam.employee.core.security.util.SecurityUtils;
+
+import lombok.AllArgsConstructor;
 
 /**
  * 访问拒绝处理程序

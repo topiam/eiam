@@ -17,13 +17,15 @@
  */
 package cn.topiam.employee.console.pojo.query.identity;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-import org.springdoc.api.annotations.ParameterObject;
-
 import java.io.Serial;
 import java.io.Serializable;
+
+import org.springdoc.api.annotations.ParameterObject;
+
+import lombok.Data;
+
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 查询身份源列表入参

@@ -17,14 +17,16 @@
  */
 package cn.topiam.employee.console.pojo.result.setting;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 import cn.topiam.employee.common.enums.Language;
 import cn.topiam.employee.common.enums.MessageCategory;
 import cn.topiam.employee.common.enums.SmsType;
-import io.swagger.v3.oas.annotations.media.Schema;
+
 import lombok.Data;
 
-import java.io.Serial;
-import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 短信配置结果

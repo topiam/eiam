@@ -17,17 +17,18 @@
  */
 package cn.topiam.employee.console.configuration;
 
-import cn.topiam.employee.EiamConsoleApplication;
-import cn.topiam.employee.common.constants.AuthenticationConstants;
-import cn.topiam.employee.support.util.AppVersionUtils;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Contact;
-import io.swagger.v3.oas.models.info.Info;
 import org.springdoc.core.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
+import cn.topiam.employee.EiamConsoleApplication;
+import cn.topiam.employee.common.constants.AuthenticationConstants;
+import cn.topiam.employee.support.util.AppVersionUtils;
+
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
 import static cn.topiam.employee.common.constants.AccountConstants.ACCOUNT_API_DOC_GROUP_NAME;
 import static cn.topiam.employee.common.constants.AccountConstants.ACCOUNT_API_PATHS;
 import static cn.topiam.employee.common.constants.AnalysisConstants.ANALYSIS_GROUP_NAME;

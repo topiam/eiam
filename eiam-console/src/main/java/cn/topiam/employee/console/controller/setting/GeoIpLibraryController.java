@@ -17,6 +17,11 @@
  */
 package cn.topiam.employee.console.controller.setting;
 
+import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
 import cn.topiam.employee.audit.annotation.Audit;
 import cn.topiam.employee.audit.enums.EventType;
 import cn.topiam.employee.common.geo.GeoLocation;
@@ -27,15 +32,12 @@ import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.lock.Lock;
 import cn.topiam.employee.support.preview.Preview;
 import cn.topiam.employee.support.result.ApiRestResult;
+
+import lombok.AllArgsConstructor;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AllArgsConstructor;
-import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
 import static cn.topiam.employee.common.constants.ConfigBeanNameConstants.GEO_LOCATION;
 import static cn.topiam.employee.common.constants.SettingConstants.SETTING_PATH;
 import static cn.topiam.employee.core.setting.constant.GeoIpProviderConstants.IPADDRESS_SETTING_NAME;

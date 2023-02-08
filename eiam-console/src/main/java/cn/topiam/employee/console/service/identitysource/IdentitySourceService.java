@@ -17,6 +17,8 @@
  */
 package cn.topiam.employee.console.service.identitysource;
 
+import java.util.List;
+
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceEntity;
 import cn.topiam.employee.console.pojo.other.IdentitySourceConfigValidatorParam;
 import cn.topiam.employee.console.pojo.query.identity.IdentitySourceListQuery;
@@ -27,8 +29,6 @@ import cn.topiam.employee.console.pojo.save.identitysource.IdentitySourceCreateR
 import cn.topiam.employee.console.pojo.update.identity.IdentitySourceUpdateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
-
-import java.util.List;
 
 /**
  * <p>

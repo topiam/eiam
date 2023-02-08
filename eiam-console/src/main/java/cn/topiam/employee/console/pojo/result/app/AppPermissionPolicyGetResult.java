@@ -17,14 +17,16 @@
  */
 package cn.topiam.employee.console.pojo.result.app;
 
+import java.io.Serializable;
+
 import cn.topiam.employee.common.enums.PolicyEffect;
 import cn.topiam.employee.common.enums.PolicyObjectType;
 import cn.topiam.employee.common.enums.PolicySubjectType;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
+
 import lombok.Data;
 
-import java.io.Serializable;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 获取资源

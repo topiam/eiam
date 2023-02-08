@@ -17,13 +17,15 @@
  */
 package cn.topiam.employee.console.pojo.result.account;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import java.io.Serial;
 import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Data;
+
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 获取子组织

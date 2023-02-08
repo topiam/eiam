@@ -17,6 +17,15 @@
  */
 package cn.topiam.employee.console.service.identitysource.impl;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.alibaba.fastjson2.JSONObject;
+
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
@@ -43,16 +52,9 @@ import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.repository.page.domain.QueryDslRequest;
 import cn.topiam.employee.support.util.BeanUtils;
-import com.alibaba.fastjson2.JSONObject;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
-
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
 

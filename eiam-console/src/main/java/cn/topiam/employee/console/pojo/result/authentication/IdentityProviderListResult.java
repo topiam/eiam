@@ -17,11 +17,12 @@
  */
 package cn.topiam.employee.console.pojo.result.authentication;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serializable;
+
 import lombok.Data;
 
-import java.io.Serializable;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 社交认证源平台列表，带有元素字段，避免前端重复画页面，基本都是input

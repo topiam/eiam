@@ -17,13 +17,16 @@
  */
 package cn.topiam.employee.console.pojo.query.app;
 
-import cn.topiam.employee.common.enums.app.AppProtocol;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import java.io.Serializable;
+
 import org.springdoc.api.annotations.ParameterObject;
 
-import java.io.Serializable;
+import cn.topiam.employee.common.enums.app.AppProtocol;
+
+import lombok.Data;
+
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 查询应用列表入参

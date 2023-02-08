@@ -17,13 +17,14 @@
  */
 package cn.topiam.employee.console.pojo.update.setting;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
-import javax.validation.constraints.NotBlank;
 import java.io.Serial;
 import java.io.Serializable;
 
+import javax.validation.constraints.NotBlank;
+
+import lombok.Data;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
 
 /**

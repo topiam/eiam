@@ -17,6 +17,17 @@
  */
 package cn.topiam.employee.console.converter.identitysource;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
+import org.mapstruct.Mapper;
+import org.springframework.util.CollectionUtils;
+
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
+
 import cn.topiam.employee.common.entity.account.UserGroupEntity;
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceEventRecordEntity;
 import cn.topiam.employee.common.entity.identitysource.QIdentitySourceEventRecordEntity;
@@ -25,15 +36,6 @@ import cn.topiam.employee.console.pojo.result.account.UserGroupListResult;
 import cn.topiam.employee.console.pojo.result.identitysource.IdentitySourceEventRecordListResult;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.repository.page.domain.Page;
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
-import org.apache.commons.lang3.StringUtils;
-import org.mapstruct.Mapper;
-import org.springframework.util.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * 身份源事件记录转换器

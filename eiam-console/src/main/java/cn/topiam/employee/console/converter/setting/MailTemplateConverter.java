@@ -17,19 +17,20 @@
  */
 package cn.topiam.employee.console.converter.setting;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
 import cn.topiam.employee.common.entity.setting.MailTemplateEntity;
 import cn.topiam.employee.common.enums.MailType;
 import cn.topiam.employee.console.pojo.result.setting.EmailTemplateListResult;
 import cn.topiam.employee.console.pojo.result.setting.EmailTemplateResult;
 import cn.topiam.employee.console.pojo.save.setting.EmailCustomTemplateSaveParam;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-
-import java.util.ArrayList;
-import java.util.List;
+import static org.springframework.web.util.HtmlUtils.htmlUnescape;
 
 import static cn.topiam.employee.core.message.mail.MailUtils.readEmailContent;
-import static org.springframework.web.util.HtmlUtils.htmlUnescape;
 
 /**
  * 消息服务数据映射

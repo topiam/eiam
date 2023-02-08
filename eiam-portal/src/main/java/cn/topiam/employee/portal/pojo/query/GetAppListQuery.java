@@ -17,12 +17,14 @@
  */
 package cn.topiam.employee.portal.pojo.query;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-import org.springdoc.api.annotations.ParameterObject;
-
 import java.io.Serial;
 import java.io.Serializable;
+
+import org.springdoc.api.annotations.ParameterObject;
+
+import lombok.Data;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 查询应用列表

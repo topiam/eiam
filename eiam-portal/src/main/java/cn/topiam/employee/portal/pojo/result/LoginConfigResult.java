@@ -17,15 +17,17 @@
  */
 package cn.topiam.employee.portal.pojo.result;
 
-import cn.topiam.employee.common.enums.CaptchaProviderType;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-import lombok.Data;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+
+import cn.topiam.employee.common.enums.CaptchaProviderType;
+
+import lombok.Builder;
+import lombok.Data;
+
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * LoginConfigResult

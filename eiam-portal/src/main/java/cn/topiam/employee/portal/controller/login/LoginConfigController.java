@@ -17,16 +17,18 @@
  */
 package cn.topiam.employee.portal.controller.login;
 
-import cn.topiam.employee.portal.pojo.result.LoginConfigResult;
-import cn.topiam.employee.portal.service.LoginConfigService;
-import cn.topiam.employee.support.result.ApiRestResult;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import cn.topiam.employee.portal.pojo.result.LoginConfigResult;
+import cn.topiam.employee.portal.service.LoginConfigService;
+import cn.topiam.employee.support.result.ApiRestResult;
+
+import lombok.extern.slf4j.Slf4j;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import static cn.topiam.employee.common.constants.AuthorizeConstants.LOGIN_CONFIG;
 
 /**

@@ -17,14 +17,17 @@
  */
 package cn.topiam.employee.console.pojo.save.setting;
 
-import cn.topiam.employee.common.message.enums.MailProvider;
-import cn.topiam.employee.common.message.enums.MailSafetyType;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
-import javax.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
+
+import javax.validation.constraints.NotNull;
+
+import cn.topiam.employee.common.message.enums.MailProvider;
+import cn.topiam.employee.common.message.enums.MailSafetyType;
+
+import lombok.Data;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 保存邮件服务商配置入参

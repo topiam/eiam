@@ -17,17 +17,18 @@
  */
 package cn.topiam.employee.console.converter.app;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.util.CollectionUtils;
+
 import cn.topiam.employee.common.entity.app.AppAccountEntity;
 import cn.topiam.employee.common.entity.app.po.AppAccountPO;
 import cn.topiam.employee.console.pojo.result.app.AppAccountListResult;
 import cn.topiam.employee.console.pojo.save.app.AppAccountCreateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.springframework.util.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 应用账户映射

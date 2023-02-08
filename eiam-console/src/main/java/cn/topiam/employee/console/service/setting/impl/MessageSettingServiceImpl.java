@@ -17,6 +17,8 @@
  */
 package cn.topiam.employee.console.service.setting.impl;
 
+import org.springframework.stereotype.Service;
+
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
 import cn.topiam.employee.console.converter.setting.MessageSettingConverter;
@@ -26,8 +28,6 @@ import cn.topiam.employee.console.pojo.save.setting.SmsProviderSaveParam;
 import cn.topiam.employee.console.pojo.setting.SmsProviderConfigResult;
 import cn.topiam.employee.console.service.setting.MessageSettingService;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
-import org.springframework.stereotype.Service;
-
 import static cn.topiam.employee.common.constants.ConfigBeanNameConstants.MAIL_PROVIDER_SEND;
 import static cn.topiam.employee.common.constants.ConfigBeanNameConstants.SMS_PROVIDER_SEND;
 import static cn.topiam.employee.core.setting.constant.MessageSettingConstants.MESSAGE_PROVIDER_EMAIL;

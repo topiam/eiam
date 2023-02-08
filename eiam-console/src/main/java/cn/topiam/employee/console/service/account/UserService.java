@@ -17,6 +17,9 @@
  */
 package cn.topiam.employee.console.service.account;
 
+import java.io.Serializable;
+import java.util.List;
+
 import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.entity.account.query.UserListNotInGroupQuery;
 import cn.topiam.employee.common.entity.account.query.UserListQuery;
@@ -30,9 +33,6 @@ import cn.topiam.employee.console.pojo.update.account.ResetPasswordParam;
 import cn.topiam.employee.console.pojo.update.account.UserUpdateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
-
-import java.io.Serializable;
-import java.util.List;
 
 /**
  * <p>

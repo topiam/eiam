@@ -17,11 +17,13 @@
  */
 package cn.topiam.employee.console.pojo.result.app;
 
+import java.time.LocalDateTime;
+
 import cn.topiam.employee.common.enums.PolicySubjectType;
-import io.swagger.v3.oas.annotations.media.Schema;
+
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 应用访问授权策略结果

@@ -17,12 +17,8 @@
  */
 package cn.topiam.employee.portal.configuration;
 
-import cn.topiam.employee.authentication.captcha.CaptchaValidator;
-import cn.topiam.employee.authentication.captcha.NoneCaptchaProvider;
-import cn.topiam.employee.authentication.captcha.geetest.GeeTestCaptchaProviderConfig;
-import cn.topiam.employee.authentication.captcha.geetest.GeeTestCaptchaValidator;
-import cn.topiam.employee.common.constants.ConfigBeanNameConstants;
-import cn.topiam.employee.core.security.captcha.CaptchaProviderConfig;
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -30,8 +26,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Objects;
-
+import cn.topiam.employee.authentication.captcha.CaptchaValidator;
+import cn.topiam.employee.authentication.captcha.NoneCaptchaProvider;
+import cn.topiam.employee.authentication.captcha.geetest.GeeTestCaptchaProviderConfig;
+import cn.topiam.employee.authentication.captcha.geetest.GeeTestCaptchaValidator;
+import cn.topiam.employee.common.constants.ConfigBeanNameConstants;
+import cn.topiam.employee.core.security.captcha.CaptchaProviderConfig;
 import static cn.topiam.employee.common.enums.CaptchaProviderType.GEE_TEST;
 import static cn.topiam.employee.core.context.SettingContextHelp.getCaptchaProviderConfig;
 

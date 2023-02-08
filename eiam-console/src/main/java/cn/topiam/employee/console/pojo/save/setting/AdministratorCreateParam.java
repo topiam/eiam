@@ -17,10 +17,11 @@
  */
 package cn.topiam.employee.console.pojo.save.setting;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serializable;
+
 import lombok.Data;
 
-import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 权限创建参数

@@ -17,6 +17,18 @@
  */
 package cn.topiam.employee.portal.service.userdetail;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AccountExpiredException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
+
 import cn.topiam.employee.common.entity.account.UserDetailEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.enums.UserStatus;
@@ -26,17 +38,6 @@ import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.core.security.authorization.Roles;
 import cn.topiam.employee.core.security.userdetails.UserDetails;
 import cn.topiam.employee.core.security.userdetails.UserDetailsService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.AccountExpiredException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
 
 /**
  * UserDetailsServiceImpl

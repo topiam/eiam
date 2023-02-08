@@ -17,6 +17,28 @@
  */
 package cn.topiam.employee.console.controller.session;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
+import org.mapstruct.Mapper;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import cn.topiam.employee.audit.annotation.Audit;
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
@@ -33,33 +55,16 @@ import cn.topiam.employee.support.preview.Preview;
 import cn.topiam.employee.support.result.ApiRestResult;
 import cn.topiam.employee.support.util.HttpResponseUtils;
 import cn.topiam.employee.support.web.useragent.UserAgent;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.apache.commons.lang3.StringUtils;
-import org.mapstruct.Mapper;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.USERNAME;
 
 import static cn.topiam.employee.common.constants.SessionConstants.SESSION_PATH;
 import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIME_FORMATTER_PATTERN;
-import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.USERNAME;
 
 /**
  * 会话管理

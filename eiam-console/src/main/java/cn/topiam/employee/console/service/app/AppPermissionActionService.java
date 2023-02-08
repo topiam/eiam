@@ -17,10 +17,10 @@
  */
 package cn.topiam.employee.console.service.app;
 
+import java.util.List;
+
 import cn.topiam.employee.console.pojo.query.app.AppPermissionActionListQuery;
 import cn.topiam.employee.console.pojo.result.app.AppPermissionActionListResult;
-
-import java.util.List;
 
 /**
  * <p>

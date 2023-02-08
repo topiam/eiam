@@ -17,6 +17,21 @@
  */
 package cn.topiam.employee.console.service.account.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.stereotype.Service;
+
+import com.google.common.collect.Lists;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
@@ -36,22 +51,9 @@ import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.util.BeanUtils;
-import com.google.common.collect.Lists;
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.querydsl.QPageRequest;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
 

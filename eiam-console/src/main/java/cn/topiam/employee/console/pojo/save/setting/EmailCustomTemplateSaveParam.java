@@ -17,12 +17,14 @@
  */
 package cn.topiam.employee.console.pojo.save.setting;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
-import javax.validation.constraints.NotBlank;
 import java.io.Serial;
 import java.io.Serializable;
+
+import javax.validation.constraints.NotBlank;
+
+import lombok.Data;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 邮件模板配置更新参数

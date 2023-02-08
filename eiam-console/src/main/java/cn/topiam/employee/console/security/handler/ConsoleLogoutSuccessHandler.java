@@ -17,20 +17,21 @@
  */
 package cn.topiam.employee.console.security.handler;
 
-import cn.topiam.employee.core.context.ServerContextHelp;
-import cn.topiam.employee.support.result.ApiRestResult;
-import cn.topiam.employee.support.util.HttpResponseUtils;
-import cn.topiam.employee.support.util.HttpUrlUtils;
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
+import cn.topiam.employee.core.context.ServerContextHelp;
+import cn.topiam.employee.support.result.ApiRestResult;
+import cn.topiam.employee.support.util.HttpResponseUtils;
+import cn.topiam.employee.support.util.HttpUrlUtils;
 import static cn.topiam.employee.common.constants.AuthorizeConstants.FE_LOGIN;
 import static cn.topiam.employee.support.context.ServletContextHelp.acceptIncludeTextHtml;
 import static cn.topiam.employee.support.result.ApiRestResult.SUCCESS;

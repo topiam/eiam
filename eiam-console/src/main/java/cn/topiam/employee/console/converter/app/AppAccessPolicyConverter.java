@@ -17,16 +17,17 @@
  */
 package cn.topiam.employee.console.converter.app;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.springframework.util.CollectionUtils;
+
 import cn.topiam.employee.common.entity.app.AppAccessPolicyEntity;
 import cn.topiam.employee.common.entity.app.po.AppAccessPolicyPO;
 import cn.topiam.employee.console.pojo.result.app.AppAccessPolicyResult;
 import cn.topiam.employee.console.pojo.save.app.AppAccessPolicyCreateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
-import org.mapstruct.Mapper;
-import org.springframework.util.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 应用授权策略 Converter

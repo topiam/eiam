@@ -29,7 +29,7 @@ import org.opensaml.saml.saml2.core.impl.AttributeStatementBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cn.topiam.employee.core.protocol.Saml2SsoModel;
+import cn.topiam.employee.application.saml2.model.Saml2SsoModel;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -17,14 +17,18 @@
  */
 package cn.topiam.employee.console.pojo.save.setting;
 
-import cn.topiam.employee.common.geo.maxmind.enums.GeoLocationProvider;
-import com.alibaba.fastjson2.JSONObject;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
-import javax.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
+
+import javax.validation.constraints.NotNull;
+
+import com.alibaba.fastjson2.JSONObject;
+
+import cn.topiam.employee.common.geo.maxmind.enums.GeoLocationProvider;
+
+import lombok.Data;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 保存地理位置服务商配置入参

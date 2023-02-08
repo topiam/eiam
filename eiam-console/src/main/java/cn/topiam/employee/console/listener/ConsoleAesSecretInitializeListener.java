@@ -17,10 +17,9 @@
  */
 package cn.topiam.employee.console.listener;
 
-import cn.topiam.employee.common.entity.setting.SettingEntity;
-import cn.topiam.employee.common.repository.setting.SettingRepository;
-import cn.topiam.employee.support.trace.TraceUtils;
-import cn.topiam.employee.support.util.AesUtils;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.boot.SpringApplication;
@@ -31,9 +30,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.JdkIdGenerator;
 
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-
+import cn.topiam.employee.common.entity.setting.SettingEntity;
+import cn.topiam.employee.common.repository.setting.SettingRepository;
+import cn.topiam.employee.support.trace.TraceUtils;
+import cn.topiam.employee.support.util.AesUtils;
 import static cn.topiam.employee.common.constants.SettingConstants.AES_SECRET;
 import static cn.topiam.employee.support.constant.EiamConstants.COLON;
 import static cn.topiam.employee.support.lock.LockAspect.getTopiamLockKeyPrefix;

@@ -50,6 +50,8 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+
+import cn.topiam.employee.audit.context.AuditContext;
 import static cn.topiam.employee.protocol.oidc.util.EiamOAuth2Utils.getAuthenticatedClientElseThrowInvalidClient;
 
 /**
@@ -58,7 +60,7 @@ import static cn.topiam.employee.protocol.oidc.util.EiamOAuth2Utils.getAuthentic
  * @author TopIAM
  * Created by support@topiam.cn on  2022/10/27 22:48
  */
-@SuppressWarnings("AlibabaClassNamingShouldBeCamel")
+@SuppressWarnings({ "AlibabaClassNamingShouldBeCamel", "AlibabaMethodTooLong" })
 public class EiamOAuth2AuthorizationPasswordAuthenticationProvider extends
                                                                    DaoAuthenticationProvider {
     private static final Logger                               LOGGER              = LogManager
@@ -205,7 +207,8 @@ public class EiamOAuth2AuthorizationPasswordAuthenticationProvider extends
         Map<String, Object> additionalParameters = Collections.emptyMap();
 
         LOGGER.debug("returning OAuth2AccessTokenAuthenticationToken");
-
+        //放入审计上下文中
+        AuditContext.setAuthorization(authorization.getAttribute(Principal.class.getName()));
         return new OAuth2AccessTokenAuthenticationToken(registeredClient, clientPrincipal,
             accessToken, refreshToken, additionalParameters);
         // @formatter:on

@@ -17,15 +17,19 @@
  */
 package cn.topiam.employee.console.pojo.other;
 
-import cn.topiam.employee.common.enums.OrganizationType;
-import com.alibaba.excel.annotation.ExcelProperty;
-import com.alibaba.excel.annotation.write.style.ColumnWidth;
-import lombok.Data;
-import org.hibernate.validator.constraints.Length;
-
-import javax.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
+
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.Length;
+
+import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.write.style.ColumnWidth;
+
+import cn.topiam.employee.common.enums.OrganizationType;
+
+import lombok.Data;
 
 /**
  * 组织架构Excel

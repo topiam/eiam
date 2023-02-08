@@ -17,14 +17,17 @@
  */
 package cn.topiam.employee.console.pojo.query.app;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-import org.springdoc.api.annotations.ParameterObject;
-
-import javax.validation.constraints.NotEmpty;
 import java.io.Serial;
 import java.io.Serializable;
+
+import javax.validation.constraints.NotEmpty;
+
+import org.springdoc.api.annotations.ParameterObject;
+
+import lombok.Data;
+
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 查询权限列表入参

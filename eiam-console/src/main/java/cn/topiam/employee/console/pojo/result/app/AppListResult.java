@@ -17,13 +17,15 @@
  */
 package cn.topiam.employee.console.pojo.result.app;
 
+import java.io.Serializable;
+
 import cn.topiam.employee.common.enums.app.AppProtocol;
 import cn.topiam.employee.common.enums.app.AppType;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
+
 import lombok.Data;
 
-import java.io.Serializable;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 应用列表返回

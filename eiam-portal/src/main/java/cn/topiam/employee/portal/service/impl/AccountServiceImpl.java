@@ -17,6 +17,22 @@
  */
 package cn.topiam.employee.portal.service.impl;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.Executor;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.AsyncConfigurer;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.session.Session;
+import org.springframework.session.security.SpringSessionBackedSessionRegistry;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import cn.topiam.employee.common.entity.account.UserDetailEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.enums.MailType;
@@ -41,23 +57,8 @@ import cn.topiam.employee.portal.service.AccountService;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.context.ServletContextHelp;
 import cn.topiam.employee.support.util.BeanUtils;
+
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.AsyncConfigurer;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.session.Session;
-import org.springframework.session.security.SpringSessionBackedSessionRegistry;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.Executor;
-
 import static cn.topiam.employee.support.constant.EiamConstants.TOPIAM_BIND_MFA_SECRET;
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;

@@ -17,13 +17,15 @@
  */
 package cn.topiam.employee.portal.pojo.request;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
+
+import javax.validation.constraints.NotBlank;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import java.io.Serial;
-import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * @author TopIAM

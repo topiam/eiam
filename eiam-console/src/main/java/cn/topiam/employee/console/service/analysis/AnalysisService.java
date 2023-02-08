@@ -17,10 +17,10 @@
  */
 package cn.topiam.employee.console.service.analysis;
 
+import java.util.List;
+
 import cn.topiam.employee.console.pojo.query.analysis.AnalysisQuery;
 import cn.topiam.employee.console.pojo.result.analysis.*;
-
-import java.util.List;
 
 /**
  * 统计 service

@@ -17,13 +17,15 @@
  */
 package cn.topiam.employee.console.pojo.result.authentication;
 
-import cn.topiam.employee.authentication.common.config.IdentityProviderConfig;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import java.io.Serial;
 import java.io.Serializable;
+
+import cn.topiam.employee.authentication.common.config.IdentityProviderConfig;
+
+import lombok.Data;
+
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 认证源详情

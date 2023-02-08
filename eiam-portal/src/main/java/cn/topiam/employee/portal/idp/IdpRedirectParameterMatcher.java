@@ -17,15 +17,16 @@
  */
 package cn.topiam.employee.portal.idp;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+
 import cn.topiam.employee.authentication.dingtalk.filter.DingtalkOAuth2AuthorizationRequestRedirectFilter;
 import cn.topiam.employee.authentication.dingtalk.filter.DingtalkScanCodeAuthorizationRequestGetFilter;
 import cn.topiam.employee.authentication.qq.filter.QqOAuth2AuthorizationRequestRedirectFilter;
 import cn.topiam.employee.authentication.wechat.filter.WeChatScanCodeAuthorizationRequestRedirectFilter;
 import cn.topiam.employee.authentication.wechatwork.filter.WeChatWorkScanCodeAuthorizationRequestRedirectFilter;
-import org.springframework.security.web.util.matcher.OrRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * IDP重定向参数授权请求重定向匹配器

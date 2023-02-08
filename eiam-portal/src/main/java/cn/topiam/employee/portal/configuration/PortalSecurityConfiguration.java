@@ -17,6 +17,40 @@
  */
 package cn.topiam.employee.portal.configuration;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.ObjectPostProcessor;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.*;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.EiamOAuth2AuthorizationServerConfigurer;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.ExceptionTranslationFilter;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.session.security.web.authentication.SpringSessionRememberMeServices;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import cn.topiam.employee.audit.event.AuditEventPublish;
 import cn.topiam.employee.authentication.captcha.CaptchaValidator;
 import cn.topiam.employee.authentication.captcha.filter.CaptchaValidatorFilter;
@@ -62,41 +96,10 @@ import cn.topiam.employee.protocol.cas.idp.CasIdpConfigurer;
 import cn.topiam.employee.protocol.form.FormProtocolConfigurer;
 import cn.topiam.employee.protocol.oidc.token.EiamOpaqueTokenIntrospector;
 import cn.topiam.employee.protocol.saml2.idp.Saml2IdpConfigurer;
-import cn.topiam.employee.protocol.tsa.TsaProtocolConfigurer;
-import lombok.RequiredArgsConstructor;
-import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.ObjectPostProcessor;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.*;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
-import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
-import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.EiamOAuth2AuthorizationServerConfigurer;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.ExceptionTranslationFilter;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.OrRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.session.security.web.authentication.SpringSessionRememberMeServices;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import static org.springframework.boot.autoconfigure.security.StaticResourceLocation.*;
+import static org.springframework.security.config.Customizer.withDefaults;
 
 import static cn.topiam.employee.common.constants.AuthorizeConstants.*;
 import static cn.topiam.employee.common.constants.ConfigBeanNameConstants.*;
@@ -104,8 +107,6 @@ import static cn.topiam.employee.common.constants.SessionConstants.CURRENT_STATU
 import static cn.topiam.employee.core.setting.constant.SecuritySettingConstants.SECURITY_BASIC_REMEMBER_ME_VALID_TIME;
 import static cn.topiam.employee.core.setting.constant.SecuritySettingConstants.SECURITY_SESSION_MAXIMUM;
 import static cn.topiam.employee.support.constant.EiamConstants.*;
-import static org.springframework.boot.autoconfigure.security.StaticResourceLocation.*;
-import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
  * PortalSecurityConfiguration
@@ -300,38 +301,6 @@ public class PortalSecurityConfiguration {
         //@formatter:off
             //Form IDP 配置
             FormProtocolConfigurer<HttpSecurity> configurer = new FormProtocolConfigurer<>();
-            RequestMatcher endpointsMatcher = configurer.getEndpointsMatcher();
-            http.requestMatcher(endpointsMatcher)
-                    .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
-                    //异常处理
-                    .exceptionHandling(withExceptionConfigurerDefaults())
-                    //CSRF
-                    .csrf(withCsrfConfigurerDefaults(endpointsMatcher))
-                    //headers
-                    .headers(withHeadersConfigurerDefaults())
-                    //cors
-                    .cors(withCorsConfigurerDefaults())
-                    //会话管理器
-                    .sessionManagement(withSessionManagementConfigurerDefaults(settingRepository))
-                    .apply(configurer);
-            return http.build();
-            //@formatter:on
-    }
-
-    /**
-     * TsaProtocolSecurityFilterChain
-     *
-     * @param http {@link HttpSecurity}
-     * @return {@link SecurityFilterChain}
-     * @throws Exception Exception
-     */
-    @Order(6)
-    @Bean(value = TSA_PROTOCOL_SECURITY_FILTER_CHAIN)
-    @RefreshScope
-    public SecurityFilterChain tsaProtocolSecurityFilterChain(HttpSecurity http) throws Exception {
-        //@formatter:off
-            //TSA IDP 配置
-            TsaProtocolConfigurer<HttpSecurity> configurer = new TsaProtocolConfigurer<>();
             RequestMatcher endpointsMatcher = configurer.getEndpointsMatcher();
             http.requestMatcher(endpointsMatcher)
                     .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())

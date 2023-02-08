@@ -17,6 +17,9 @@
  */
 package cn.topiam.employee.portal.service.impl;
 
+import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.stereotype.Service;
+
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.repository.app.AppRepository;
 import cn.topiam.employee.core.security.util.SecurityUtils;
@@ -26,8 +29,6 @@ import cn.topiam.employee.portal.pojo.result.GetAppListResult;
 import cn.topiam.employee.portal.service.AppService;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
-import org.springframework.data.querydsl.QPageRequest;
-import org.springframework.stereotype.Service;
 
 /**
  * AppService
