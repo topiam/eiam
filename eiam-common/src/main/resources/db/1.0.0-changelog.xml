@@ -479,6 +479,7 @@
             </column>
             <column name="user_identity_type" remarks="CAS用户身份标识" type="VARCHAR(20)"/>
             <column name="client_service_url" remarks="客户端服务URL地址" type="TEXT"/>
+            <column name="service_ticket_expire_time" remarks="serviceTicket 过期时间（秒）" type="int"/>
             <column name="custom_response_attribute" remarks="CAS自定义校验响应" type="JSON"/>
             <column name="additional_config" remarks="额外配置" type="JSON"/>
             <column name="create_by" remarks="创建者" type="VARCHAR(64)">

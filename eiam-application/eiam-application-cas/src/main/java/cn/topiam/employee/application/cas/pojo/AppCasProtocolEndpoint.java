@@ -25,11 +25,11 @@ import lombok.Data;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
- * 协议端点域
- *
- * @author TopIAM
- * Created by support@topiam.cn on  2022/6/4 23:37
- */
+* 协议端点域
+*
+* @author TopIAM
+* Created by support@topiam.cn on  2022/6/4 23:37
+*/
 @Data
 @Schema(description = "协议端点")
 public class AppCasProtocolEndpoint implements Serializable {

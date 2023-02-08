@@ -116,6 +116,7 @@ public class CasStandardApplicationServiceImpl extends AbstractCasApplicationSer
         AppCasConfigEntity entity = cas.get();
         entity.setClientServiceUrl(model.getClientServerUrl());
         entity.setUserIdentityType(model.getUserIdentityType());
+        entity.setServiceTicketExpireTime(model.getServiceTicketExpireTime());
         appCasConfigRepository.save(entity);
 
     }
@@ -229,6 +230,7 @@ public class CasStandardApplicationServiceImpl extends AbstractCasApplicationSer
         AppCasConfigEntity casEntity = new AppCasConfigEntity();
         casEntity.setAppId(appEntity.getId());
         casEntity.setUserIdentityType(CasUserIdentityType.USER_USERNAME);
+        casEntity.setServiceTicketExpireTime(30);
         appCasConfigRepository.save(casEntity);
         return appEntity.getId().toString();
     }

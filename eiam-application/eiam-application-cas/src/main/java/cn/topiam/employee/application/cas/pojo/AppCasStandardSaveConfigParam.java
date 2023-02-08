@@ -66,4 +66,10 @@ public class AppCasStandardSaveConfigParam implements Serializable {
      */
     @Schema(name = "客户端服务URL")
     private String              clientServerUrl;
+
+    /**
+     * serviceTicket过期时间
+     */
+    @Schema(name = "serviceTicket过期时间")
+    private Integer             serviceTicketExpireTime;
 }

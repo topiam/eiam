@@ -65,4 +65,10 @@ public class AppCasConfigEntity extends BaseEntity<Long> {
     @Column(name = "client_service_url")
     private String              clientServiceUrl;
 
+    /**
+     * serviceTicket 过期时间（秒）
+     */
+    @Column(name = "service_ticket_expire_time")
+    private Integer             serviceTicketExpireTime;
+
 }
