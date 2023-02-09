@@ -38,10 +38,5 @@
             <artifactId>eiam-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch-x-content</artifactId>
-            <version>${elasticsearch.version}</version>
-        </dependency>
     </dependencies>
 </project>
