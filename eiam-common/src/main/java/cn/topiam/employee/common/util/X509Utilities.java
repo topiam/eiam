@@ -46,9 +46,9 @@ import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
  */
 public class X509Utilities {
 
-    public static final String BEGIN_CERT = "-----BEGIN CERTIFICATE-----\n";
+    public static final String BEGIN_CERT = "-----BEGIN CERTIFICATE-----";
     public static final String END_CERT   = "-----END CERTIFICATE-----";
-    public static final String BEGIN_KEY  = "-----BEGIN RSA PRIVATE KEY-----\n";
+    public static final String BEGIN_KEY  = "-----BEGIN RSA PRIVATE KEY-----";
     public static final String END_KEY    = "-----END RSA PRIVATE KEY-----";
 
     public static byte[] getDer(String combinedKeyAndCertPem, String begin, String end) {
@@ -65,7 +65,7 @@ public class X509Utilities {
 
     public static String keyCleanup(String pem) {
         return pem.replace(BEGIN_CERT, "").replace(END_CERT, "").replace(BEGIN_KEY, "")
-            .replace(END_KEY, "").replace("\n", "").trim();
+            .replace(END_KEY, "").replace("\n", "").trim().replace("\r","");
     }
 
     public static X509Certificate getCertificate(byte[] der) throws CertificateException {
