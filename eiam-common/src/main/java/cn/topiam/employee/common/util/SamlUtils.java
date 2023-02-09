@@ -189,14 +189,14 @@ public class SamlUtils {
         try {
             if (request.getMethod().equals(POST_METHOD)) {
                 HTTPPostDecoder decoder = new HTTPPostDecoder();
-                decoder.setHttpServletRequest(request);
+                decoder.setHttpServletRequestSupplier(() -> request);
                 decoder.initialize();
                 decoder.decode();
                 return decoder.getMessageContext();
             }
             //GET
             HTTPRedirectDeflateDecoder decoder = new HTTPRedirectDeflateDecoder();
-            decoder.setHttpServletRequest(request);
+            decoder.setHttpServletRequestSupplier(() -> request);
             decoder.initialize();
             decoder.decode();
             return decoder.getMessageContext();
