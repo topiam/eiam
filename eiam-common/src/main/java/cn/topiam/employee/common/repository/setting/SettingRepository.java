@@ -80,7 +80,7 @@ public interface SettingRepository extends LogicDeleteRepository<SettingEntity, 
      */
     @Modifying
     @Transactional(rollbackFor = Exception.class)
-    @Query(value = "UPDATE stting SET " + SOFT_DELETE_SET
+    @Query(value = "UPDATE setting SET " + SOFT_DELETE_SET
                    + " WHERE name_ = :name", nativeQuery = true)
     void deleteByName(@Param("name") String name);
 
@@ -91,7 +91,7 @@ public interface SettingRepository extends LogicDeleteRepository<SettingEntity, 
      */
     @Modifying
     @Transactional(rollbackFor = Exception.class)
-    @Query(value = "UPDATE stting SET " + SOFT_DELETE_SET
+    @Query(value = "UPDATE setting SET " + SOFT_DELETE_SET
                    + " WHERE name_ IN (:names)", nativeQuery = true)
     void deleteByNameIn(@Param("names") List<String> names);
 
