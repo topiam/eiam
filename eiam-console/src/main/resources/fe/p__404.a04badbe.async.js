@@ -15,4 +15,4 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-"use strict";(self.webpackChunktopiam_console=self.webpackChunktopiam_console||[]).push([[2571],{66354:function(i,n,t){t.r(n);var s=t(73838),a=t(8821),u=t(84530),o=t(63342),e=function(){return(0,o.jsx)(s.ZP,{status:"404",title:"404",subTitle:"Sorry, the page you visited does not exist.",extra:(0,o.jsx)(a.ZP,{type:"primary",onClick:function(){return u.history.push("/")},children:"Back Home"})})};n.default=e}}]);
+"use strict";(self.webpackChunktopiam_console=self.webpackChunktopiam_console||[]).push([[2571],{98546:function(i,n,t){t.r(n);var s=t(73838),a=t(8821),u=t(59787),o=t(63342),e=function(){return(0,o.jsx)(s.ZP,{status:"404",title:"404",subTitle:"Sorry, the page you visited does not exist.",extra:(0,o.jsx)(a.ZP,{type:"primary",onClick:function(){return u.history.push("/")},children:"Back Home"})})};n.default=e}}]);
