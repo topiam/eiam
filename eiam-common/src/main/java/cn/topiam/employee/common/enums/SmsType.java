@@ -110,10 +110,12 @@ public enum SmsType implements BaseEnum {
         this.category = category;
     }
 
+    @Override
     public String getCode() {
         return code;
     }
 
+    @Override
     public String getDesc() {
         return desc;
     }

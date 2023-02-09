@@ -19,6 +19,7 @@ package cn.topiam.employee.common.enums.app;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import cn.topiam.employee.common.enums.BaseEnum;
 import cn.topiam.employee.support.web.converter.EnumConvert;
 
 /**
@@ -27,27 +28,27 @@ import cn.topiam.employee.support.web.converter.EnumConvert;
  * @author TopIAM
  * Created by support@topiam.cn on  2022/5/22 23:49
  */
-public enum SamlNameIdValueType {
-                                 /**
-                                  * 用户名
-                                  */
-                                 USER_USERNAME("user.username"),
-                                 /**
-                                  * 姓名
-                                  */
-                                 USER_FULL_NAME("user.fullName"),
-                                 /**
-                                  * 昵称
-                                  */
-                                 USER_NICK_NAME("user.nickName"),
-                                 /**
-                                  * 邮箱
-                                  */
-                                 USER_EMAIL("user.email"),
-                                 /**
-                                  * 应用账户
-                                  */
-                                 APP_USERNAME("app_user.username");
+public enum SamlNameIdValueType implements BaseEnum {
+                                                     /**
+                                                      * 用户名
+                                                      */
+                                                     USER_USERNAME("user.username"),
+                                                     /**
+                                                      * 姓名
+                                                      */
+                                                     USER_FULL_NAME("user.fullName"),
+                                                     /**
+                                                      * 昵称
+                                                      */
+                                                     USER_NICK_NAME("user.nickName"),
+                                                     /**
+                                                      * 邮箱
+                                                      */
+                                                     USER_EMAIL("user.email"),
+                                                     /**
+                                                      * 应用账户
+                                                      */
+                                                     APP_USERNAME("app_user.username");
 
     @JsonValue
     private final String code;
@@ -56,8 +57,14 @@ public enum SamlNameIdValueType {
         this.code = code;
     }
 
+    @Override
     public String getCode() {
         return code;
+    }
+
+    @Override
+    public String getDesc() {
+        return null;
     }
 
     @EnumConvert

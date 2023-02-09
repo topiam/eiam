@@ -19,35 +19,37 @@ package cn.topiam.employee.identitysource.wechatwork.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import cn.topiam.employee.common.enums.BaseEnum;
+
 /**
  * 企业微信事件类型
  * @author TopIAM
  */
-public enum WeChatWorkEventType {
-                                 /**
-                                  * 用户变更-通讯录用户增加
-                                  */
-                                 USER_ADD_ORG("create_user", "通讯录用户增加"),
-                                 /**
-                                  * 通讯录用户更改
-                                  */
-                                 USER_MODIFY_ORG("update_user", "通讯录用户更改"),
-                                 /**
-                                  * 通讯录用户离职
-                                  */
-                                 USER_LEAVE_ORG("delete_user", "通讯录用户离职"),
-                                 /**
-                                  * 部门变更-通讯录企业部门创建
-                                  */
-                                 ORG_DEPT_CREATE("create_party", "通讯录企业部门创建"),
-                                 /**
-                                  * 通讯录企业部门修改
-                                  */
-                                 ORG_DEPT_MODIFY("update_party", "通讯录企业部门修改"),
-                                 /**
-                                  * 通讯录企业部门删除
-                                  */
-                                 ORG_DEPT_REMOVE("delete_party", "通讯录企业部门删除");
+public enum WeChatWorkEventType implements BaseEnum {
+                                                     /**
+                                                      * 用户变更-通讯录用户增加
+                                                      */
+                                                     USER_ADD_ORG("create_user", "通讯录用户增加"),
+                                                     /**
+                                                      * 通讯录用户更改
+                                                      */
+                                                     USER_MODIFY_ORG("update_user", "通讯录用户更改"),
+                                                     /**
+                                                      * 通讯录用户离职
+                                                      */
+                                                     USER_LEAVE_ORG("delete_user", "通讯录用户离职"),
+                                                     /**
+                                                      * 部门变更-通讯录企业部门创建
+                                                      */
+                                                     ORG_DEPT_CREATE("create_party", "通讯录企业部门创建"),
+                                                     /**
+                                                      * 通讯录企业部门修改
+                                                      */
+                                                     ORG_DEPT_MODIFY("update_party", "通讯录企业部门修改"),
+                                                     /**
+                                                      * 通讯录企业部门删除
+                                                      */
+                                                     ORG_DEPT_REMOVE("delete_party", "通讯录企业部门删除");
 
     /**
      * code
@@ -64,8 +66,14 @@ public enum WeChatWorkEventType {
         this.name = name;
     }
 
+    @Override
     public String getCode() {
         return code;
+    }
+
+    @Override
+    public String getDesc() {
+        return null;
     }
 
     public String getName() {

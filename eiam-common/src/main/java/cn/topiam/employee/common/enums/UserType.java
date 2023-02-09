@@ -72,6 +72,7 @@ public enum UserType implements BaseEnum {
         throw new NullPointerException("未获取到类型");
     }
 
+    @Override
     public String getCode() {
         return code;
     }
@@ -80,6 +81,7 @@ public enum UserType implements BaseEnum {
         this.code = code;
     }
 
+    @Override
     public String getDesc() {
         return desc;
     }

@@ -17,10 +17,9 @@
  */
 package cn.topiam.employee.common.message.enums;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import cn.topiam.employee.common.enums.BaseEnum;
 import cn.topiam.employee.support.web.converter.EnumConvert;
 
 /**
@@ -28,27 +27,26 @@ import cn.topiam.employee.support.web.converter.EnumConvert;
  *
  * @author TopIAM
  */
-public enum MailProvider implements Serializable {
+public enum MailProvider implements BaseEnum {
 
-                                                  /**
-                                                   * 自定义
-                                                   */
-                                                  CUSTOMIZE("customize", "自定义", null, null, null),
-                                                  /**
-                                                   * 腾讯企业邮
-                                                   */
-                                                  TENCENT("tencent", "腾讯企业邮", "smtp.exmail.qq.com",
-                                                          25, 465),
-                                                  /**
-                                                   * 阿里企业邮
-                                                   */
-                                                  ALIYUN("aliyun", "阿里企业邮", "smtp.mxhichina.com",
-                                                         25, 465),
-                                                  /**
-                                                   * 网易
-                                                   */
-                                                  NETEASE("netease", "网易企业邮", "smtp.163.com", 25,
-                                                          465);
+                                              /**
+                                               * 自定义
+                                               */
+                                              CUSTOMIZE("customize", "自定义", null, null, null),
+                                              /**
+                                               * 腾讯企业邮
+                                               */
+                                              TENCENT("tencent", "腾讯企业邮", "smtp.exmail.qq.com", 25,
+                                                      465),
+                                              /**
+                                               * 阿里企业邮
+                                               */
+                                              ALIYUN("aliyun", "阿里企业邮", "smtp.mxhichina.com", 25,
+                                                     465),
+                                              /**
+                                               * 网易
+                                               */
+                                              NETEASE("netease", "网易企业邮", "smtp.163.com", 25, 465);
 
     /**
      * code
@@ -80,8 +78,14 @@ public enum MailProvider implements Serializable {
         this.sslPort = sslPort;
     }
 
+    @Override
     public String getCode() {
         return code;
+    }
+
+    @Override
+    public String getDesc() {
+        return null;
     }
 
     public String getName() {

@@ -17,10 +17,9 @@
  */
 package cn.topiam.employee.core.security.password.enums;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import cn.topiam.employee.common.enums.BaseEnum;
 import cn.topiam.employee.support.web.converter.EnumConvert;
 
 /**
@@ -29,37 +28,36 @@ import cn.topiam.employee.support.web.converter.EnumConvert;
  * @author TopIAM
  * Created by support@topiam.cn on 2020/8/17 21:20
  */
-public enum PasswordComplexityRule implements Serializable {
-                                                            /**
-                                                             * 无密码规则
-                                                             */
-                                                            NONE("0", "任意密码"),
+public enum PasswordComplexityRule implements BaseEnum {
+                                                        /**
+                                                         * 无密码规则
+                                                         */
+                                                        NONE("0", "任意密码"),
 
-                                                            /**
-                                                             * 必须包含数字和字母
-                                                             */
-                                                            MUST_NUMBERS_AND_LETTERS("1",
-                                                                                     "必须包含数字和字母"),
-                                                            /**
-                                                             * 必须包含数字和大写字母
-                                                             */
-                                                            MUST_NUMBERS_AND_CAPITAL_LETTERS("2",
-                                                                                             "必须包含数字和大写字母"),
-                                                            /**
-                                                             * 必须包含数字、大写字母、小写字母、和特殊字符
-                                                             */
-                                                            MUST_CONTAIN_NUMBERS_UPPERCASE_LETTERS_LOWERCASE_LETTERS_AND_SPECIAL_CHARACTERS("3",
-                                                                                                                                            "必须包含数字、大写字母、小写字母、和特殊字符"),
-                                                            /**
-                                                             * 至少包含数字、字母、和特殊字符中的两种
-                                                             */
-                                                            CONTAIN_AT_LEAST_TWO_OF_NUMBERS_LETTERS_AND_SPECIAL_CHARACTERS("4",
-                                                                                                                           "至少包含数字、字母、和特殊字符中的两种"),
-                                                            /**
-                                                             * 至少包含数字、大写字母、小写字母、和特殊字符中的三种
-                                                             */
-                                                            CONTAIN_AT_LEAST_THREE_OF_NUMBERS_UPPERCASE_LETTERS_LOWERCASE_LETTERS_AND_SPECIAL_CHARACTERS("5",
-                                                                                                                                                         "至少包含数字、大写字母、小写字母、和特殊字符中的三种");
+                                                        /**
+                                                         * 必须包含数字和字母
+                                                         */
+                                                        MUST_NUMBERS_AND_LETTERS("1", "必须包含数字和字母"),
+                                                        /**
+                                                         * 必须包含数字和大写字母
+                                                         */
+                                                        MUST_NUMBERS_AND_CAPITAL_LETTERS("2",
+                                                                                         "必须包含数字和大写字母"),
+                                                        /**
+                                                         * 必须包含数字、大写字母、小写字母、和特殊字符
+                                                         */
+                                                        MUST_CONTAIN_NUMBERS_UPPERCASE_LETTERS_LOWERCASE_LETTERS_AND_SPECIAL_CHARACTERS("3",
+                                                                                                                                        "必须包含数字、大写字母、小写字母、和特殊字符"),
+                                                        /**
+                                                         * 至少包含数字、字母、和特殊字符中的两种
+                                                         */
+                                                        CONTAIN_AT_LEAST_TWO_OF_NUMBERS_LETTERS_AND_SPECIAL_CHARACTERS("4",
+                                                                                                                       "至少包含数字、字母、和特殊字符中的两种"),
+                                                        /**
+                                                         * 至少包含数字、大写字母、小写字母、和特殊字符中的三种
+                                                         */
+                                                        CONTAIN_AT_LEAST_THREE_OF_NUMBERS_UPPERCASE_LETTERS_LOWERCASE_LETTERS_AND_SPECIAL_CHARACTERS("5",
+                                                                                                                                                     "至少包含数字、大写字母、小写字母、和特殊字符中的三种");
 
     /**
      * code
@@ -76,10 +74,12 @@ public enum PasswordComplexityRule implements Serializable {
         this.desc = desc;
     }
 
+    @Override
     public String getCode() {
         return code;
     }
 
+    @Override
     public String getDesc() {
         return desc;
     }

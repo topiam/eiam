@@ -61,8 +61,8 @@ public class FeiShuConfigValidator implements
                 throw new ConstraintViolationException(validationResult.getConstraintViolations());
             }
 
-            cn.topiam.employee.identitysource.feishu.domain.request.GetAccessTokenRequest request = new GetAccessTokenRequest(
-                config.getAppId(), config.getAppSecret());
+            GetAccessTokenRequest request = new GetAccessTokenRequest(config.getAppId(),
+                config.getAppSecret());
             GetAccessTokenResponse response = postToken(request);
             if (response.getCode() != 0) {
                 throw new ApiCallException(response.getMsg());

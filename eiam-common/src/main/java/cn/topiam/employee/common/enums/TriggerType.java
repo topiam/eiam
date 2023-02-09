@@ -46,10 +46,12 @@ public enum TriggerType implements BaseEnum {
         this.desc = desc;
     }
 
+    @Override
     public String getCode() {
         return code;
     }
 
+    @Override
     public String getDesc() {
         return desc;
     }
