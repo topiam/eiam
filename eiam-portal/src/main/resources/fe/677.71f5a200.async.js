@@ -15,4 +15,4 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-"use strict";(self.webpackChunktopiam_portal=self.webpackChunktopiam_portal||[]).push([[297],{61430:function(u,r,a){a.r(r),a.d(r,{default:function(){return e}});var t=a(4393),o=a(99138),s=a(19847),n=a(85893),l=function(){return(0,n.jsx)(s._z,{children:(0,n.jsx)(t.Z,{children:(0,n.jsx)(o.Z,{banner:!0,description:"\u6B22\u8FCE\u4F7F\u7528 TopIAM \u4F01\u4E1A\u6570\u5B57\u8EAB\u4EFD\u7BA1\u63A7\u5E73\u53F0",type:"success"})})})},c=l,e=c}}]);
+"use strict";(self.webpackChunktopiam_portal=self.webpackChunktopiam_portal||[]).push([[677],{2677:function(l,n,t){t.r(n),t.d(n,{default:function(){return E}});var s=t(79685),u=t(84530),o=t(63342);function E(){var a=(0,u.useOutletContext)();return(0,o.jsx)(u.Outlet,{context:a})}}}]);
