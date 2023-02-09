@@ -61,9 +61,11 @@ import okhttp3.CertificatePinner;
  */
 public class CertUtils {
     private static final Logger logger     = LoggerFactory.getLogger(CertUtils.class);
-    public static final String  BEGIN_CERT = "-----BEGIN CERTIFICATE-----\n";
+
+    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+    public static final String  BEGIN_CERT = "-----BEGIN CERTIFICATE-----" + LINE_SEPARATOR;
     public static final String  END_CERT   = "-----END CERTIFICATE-----";
-    public static final String  BEGIN_KEY  = "-----BEGIN RSA PRIVATE KEY-----\n";
+    public static final String  BEGIN_KEY  = "-----BEGIN RSA PRIVATE KEY-----" + LINE_SEPARATOR;
     public static final String  END_KEY    = "-----END RSA PRIVATE KEY-----";
     static {
         Security.addProvider(new BouncyCastleProvider());
