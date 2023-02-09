@@ -118,6 +118,9 @@ public class AdministratorServiceImpl implements AdministratorService {
         }
         AdministratorEntity entity = administratorConverter
             .administratorCreateParamConvertToEntity(param);
+        //密码处理
+        String password = passwordEncoder.encode(entity.getPassword());
+        entity.setPassword(password);
         administratorRepository.save(entity);
         AuditContext.setTarget(Target.builder().id(entity.getId().toString())
             .name(entity.getUsername()).type(TargetType.ADMINISTRATOR)
