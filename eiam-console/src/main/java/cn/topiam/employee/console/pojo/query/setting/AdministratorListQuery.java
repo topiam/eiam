@@ -37,4 +37,14 @@ public class AdministratorListQuery {
      */
     @Parameter(description = "用户名")
     private String username;
+    /**
+     * phone
+     */
+    @Parameter(description = "手机号码")
+    private String phone;
+    /**
+     * email
+     */
+    @Parameter(description = "邮箱地址")
+    private String email;
 }

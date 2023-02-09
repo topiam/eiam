@@ -144,6 +144,8 @@ public interface AdministratorConverter {
         //查询条件
         //@formatter:off
         predicate = StringUtils.isBlank(query.getUsername()) ? predicate : ExpressionUtils.and(predicate, user.username.eq(query.getUsername()));
+        predicate = StringUtils.isBlank(query.getPhone()) ? predicate : ExpressionUtils.and(predicate, user.phone.like("%" + query.getPhone() + "%"));
+        predicate = StringUtils.isBlank(query.getEmail()) ? predicate : ExpressionUtils.and(predicate, user.email.like("%" + query.getEmail() + "%"));
         //@formatter:on
         return predicate;
     }
