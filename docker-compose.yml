@@ -12,7 +12,7 @@ services:
             REDIS_HOST: 192.168.56.107
             REDIS_PASSWORD: 12345678
         ports:
-            - 1898:1898
+            - "1898:1898"
         image: eiam-console
         restart: always
     eiam-openapi:
@@ -29,7 +29,7 @@ services:
         image: eiam-openapi
         restart: always
         ports:
-            - 1988:1988
+            - "1988:1988"
     eiam-portal:
         build:
             context: ./eiam-portal/
@@ -44,7 +44,7 @@ services:
         image: eiam-portal
         restart: always
         ports:
-            - 1989:1989
+            - "1989:1989"
     eiam-synchronizer:
         build:
             context: ./eiam-synchronizer/
@@ -59,4 +59,4 @@ services:
         image: eiam-synchronizer
         restart: always
         ports:
-            - 1986:1986
+            - "1986:1986"

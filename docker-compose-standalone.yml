@@ -85,7 +85,7 @@ services:
         <<: *public-config
         container_name: eiam-console
         ports:
-            - 1898:1898
+            - "1898:1898"
         image: eiam-console
         restart: always
         depends_on:
@@ -108,7 +108,7 @@ services:
         image: eiam-openapi
         restart: always
         ports:
-            - 1988:1988
+            - "1988:1988"
         depends_on:
             eiam-es:
                 condition: service_healthy
@@ -127,7 +127,7 @@ services:
         image: eiam-portal
         restart: always
         ports:
-            - 1989:1989
+            - "1989:1989"
         depends_on:
             eiam-es:
                 condition: service_healthy
@@ -146,7 +146,7 @@ services:
         image: eiam-synchronizer
         restart: always
         ports:
-            - 1986:1986
+            - "1986:1986"
         depends_on:
             eiam-es:
                 condition: service_healthy
@@ -159,7 +159,6 @@ services:
 networks:
     eiam-network:
         external: false
-        name: eiam-network
 volumes:
     eiam_es_data:
     eiam_db_data:
