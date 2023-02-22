@@ -171,7 +171,7 @@ application.yml文件依次修改以下配置
 
 * eiam-openapi (必选)
 * eiam-console (必选)
-* eiam-protal  (必选)
+* eiam-portal  (必选)
 * eiam-synchronizer（可选）
 
 > 项目启动没有依赖顺序
