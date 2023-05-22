@@ -35,6 +35,7 @@ import cn.topiam.employee.protocol.cas.idp.auth.CentralAuthenticationService;
 import cn.topiam.employee.protocol.cas.idp.endpoint.Cas10IdpValidateEndpointFilter;
 import cn.topiam.employee.protocol.cas.idp.endpoint.Cas30IdpValidateEndpointFilter;
 import cn.topiam.employee.protocol.cas.idp.endpoint.CasIdpSingleSignOnEndpointFilter;
+import cn.topiam.employee.protocol.cas.idp.endpoint.CasIdpSingleSignOutEndpointFilter;
 import cn.topiam.employee.protocol.cas.idp.filter.CasAuthorizationServerContextFilter;
 import cn.topiam.employee.protocol.cas.idp.util.CasUtils;
 import static cn.topiam.employee.protocol.cas.idp.util.CasUtils.*;
@@ -60,6 +61,11 @@ public class CasIdpConfigurer<B extends HttpSecurityBuilder<B>>
         http.addFilterAfter(new CasIdpSingleSignOnEndpointFilter(applicationServiceLoader,
             centralAuthenticationService), UsernamePasswordAuthenticationFilter.class);
 
+        //CAS 登出过滤器
+        http.addFilterAfter(
+            new CasIdpSingleSignOutEndpointFilter(applicationServiceLoader, sessionRegistry),
+            CasIdpSingleSignOnEndpointFilter.class);
+
         //cas 1.0 验证过滤器
         http.addFilterBefore(
             new Cas10IdpValidateEndpointFilter(applicationServiceLoader, sessionRegistry,
@@ -83,6 +89,7 @@ public class CasIdpConfigurer<B extends HttpSecurityBuilder<B>>
         requestMatchers.add(CasIdpSingleSignOnEndpointFilter.getRequestMatcher());
         requestMatchers.add(Cas30IdpValidateEndpointFilter.getRequestMatcher());
         requestMatchers.add(Cas10IdpValidateEndpointFilter.getRequestMatcher());
+        requestMatchers.add(CasIdpSingleSignOutEndpointFilter.getRequestMatcher());
         return new OrRequestMatcher(requestMatchers);
     }
 }
