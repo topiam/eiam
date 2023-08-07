@@ -18,6 +18,8 @@
 --------------------------
 
 ## 项目介绍
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftopiam%2Feiam.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftopiam%2Feiam?ref=badge_shield)
+
 
 **TopIAM** 数字身份管控平台，简称：EIAM（Employee Identity and Access Management），
 用于管理企业内员工账号、权限、身份认证、应用访问，帮助整合部署在本地或云端的内部办公系统、业务系统及三方 SaaS
@@ -208,6 +210,9 @@ application.yml文件依次修改以下配置
 ## License
 
 <img src='https://www.gnu.org/graphics/agplv3-with-text-162x68.png' alt="license">
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftopiam%2Feiam.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftopiam%2Feiam?ref=badge_large)
 
 ## 捐赠支持
 
