@@ -139,6 +139,10 @@ application.yml文件依次修改以下配置
 
 [![Star History Chart](https://api.star-history.com/svg?repos=topiam/eiam&type=Date)](https://star-history.com/#topiam/eiam&Date)
 
+## FOSSA Status
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftopiam%2Feiam.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftopiam%2Feiam?ref=badge_large)
+
 ## License
 
 <img src='https://www.gnu.org/graphics/agplv3-with-text-162x68.png' alt="license">
