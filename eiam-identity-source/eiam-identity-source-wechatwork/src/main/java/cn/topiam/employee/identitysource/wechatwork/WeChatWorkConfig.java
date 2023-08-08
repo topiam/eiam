@@ -1,6 +1,6 @@
 /*
- * eiam-identity-source-wechatwork - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-identity-source-wechatwork - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,13 +19,13 @@ package cn.topiam.employee.identitysource.wechatwork;
 
 import java.io.Serial;
 
-import javax.validation.constraints.NotEmpty;
-
 import cn.topiam.employee.identitysource.core.IdentitySourceConfig;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+
+import jakarta.validation.constraints.NotEmpty;
 
 /**
  * 企业微信配置

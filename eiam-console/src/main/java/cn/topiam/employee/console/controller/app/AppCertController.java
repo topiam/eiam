@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cn.topiam.employee.application.saml2.pojo.AppSaml2StandardConfigGetResult;
 import cn.topiam.employee.console.pojo.query.app.AppCertQuery;
 import cn.topiam.employee.console.pojo.result.app.AppCertListResult;
 import cn.topiam.employee.console.service.app.AppCertService;
@@ -36,7 +35,7 @@ import lombok.AllArgsConstructor;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import static cn.topiam.employee.common.constants.AppConstants.APP_PATH;
+import static cn.topiam.employee.common.constant.AppConstants.APP_PATH;
 
 /**
  * 应用证书
@@ -55,12 +54,12 @@ public class AppCertController {
      * 获取应用证书列表
      *
      * @param query {@link AppCertQuery}
-     * @return {@link AppSaml2StandardConfigGetResult}
+     * @return {@link AppCertListResult}
      */
     @Operation(summary = "获取应用证书列表")
     @GetMapping(value = "/list")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
-    public ApiRestResult<List<AppCertListResult>> getAppCertificateListResult(@Validated AppCertQuery query) {
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
+    public ApiRestResult<List<AppCertListResult>> getAppCertListResult(@Validated AppCertQuery query) {
         List<AppCertListResult> list = appCertService.getAppCertListResult(query);
         return ApiRestResult.<List<AppCertListResult>> builder().result(list).build();
     }

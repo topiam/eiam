@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,15 +25,14 @@ import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
@@ -51,6 +50,7 @@ import cn.topiam.employee.common.entity.account.query.UserListQuery;
 import cn.topiam.employee.common.enums.*;
 import cn.topiam.employee.common.repository.account.*;
 import cn.topiam.employee.console.converter.account.UserConverter;
+import cn.topiam.employee.console.pojo.result.account.BatchUserResult;
 import cn.topiam.employee.console.pojo.result.account.UserListResult;
 import cn.topiam.employee.console.pojo.result.account.UserLoginAuditListResult;
 import cn.topiam.employee.console.pojo.result.account.UserResult;
@@ -58,28 +58,31 @@ import cn.topiam.employee.console.pojo.save.account.UserCreateParam;
 import cn.topiam.employee.console.pojo.update.account.ResetPasswordParam;
 import cn.topiam.employee.console.pojo.update.account.UserUpdateParam;
 import cn.topiam.employee.console.service.account.UserService;
-import cn.topiam.employee.core.configuration.EiamSupportProperties;
 import cn.topiam.employee.core.message.MsgVariable;
 import cn.topiam.employee.core.message.mail.MailMsgEventPublish;
 import cn.topiam.employee.core.message.sms.SmsMsgEventPublish;
+import cn.topiam.employee.core.mq.UserMessagePublisher;
+import cn.topiam.employee.core.mq.UserMessageTag;
+import cn.topiam.employee.support.autoconfiguration.SupportProperties;
 import cn.topiam.employee.support.exception.BadParamsException;
 import cn.topiam.employee.support.exception.InfoValidityFailException;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
+import cn.topiam.employee.support.security.password.PasswordPolicyManager;
 import cn.topiam.employee.support.util.BeanUtils;
+import cn.topiam.employee.support.util.PhoneNumberUtils;
 import cn.topiam.employee.support.validation.annotation.ValidationPhone;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import static cn.topiam.employee.audit.enums.TargetType.USER;
 import static cn.topiam.employee.audit.enums.TargetType.USER_DETAIL;
-import static cn.topiam.employee.common.constants.AuditConstants.getAuditIndexPrefix;
-import static cn.topiam.employee.core.message.sms.SmsMsgEventPublish.PASSWORD;
+import static cn.topiam.employee.common.constant.AuditConstants.getAuditIndexPrefix;
 import static cn.topiam.employee.core.message.sms.SmsMsgEventPublish.USERNAME;
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
-import static cn.topiam.employee.support.util.PhoneUtils.getPhoneNumber;
+import static cn.topiam.employee.support.util.PhoneNumberUtils.getPhoneNumber;
 
 /**
  * <p>
@@ -144,13 +147,15 @@ public class UserServiceImpl implements UserService {
         String password = new String(
             Base64.getUrlDecoder().decode(param.getPassword().getBytes(StandardCharsets.UTF_8)),
             StandardCharsets.UTF_8);
-        password = passwordEncoder.encode(password);
-        userRepository.updateUserPassword(Long.valueOf(param.getId()), password,
+        // 校验密码
+        passwordPolicyManager.validate(userEntity, password);
+        String encryptionPassword = passwordEncoder.encode(password);
+        userRepository.updateUserPassword(Long.valueOf(param.getId()), encryptionPassword,
             LocalDateTime.now());
         //保存历史密码
         UserHistoryPasswordEntity userHistoryPassword = new UserHistoryPasswordEntity();
         userHistoryPassword.setUserId(String.valueOf(param.getId()));
-        userHistoryPassword.setPassword(password);
+        userHistoryPassword.setPassword(encryptionPassword);
         userHistoryPassword.setChangeTime(LocalDateTime.now());
         userHistoryPasswordRepository.save(userHistoryPassword);
         AuditContext.setTarget(Target.builder().id(param.getId()).type(TargetType.USER).build());
@@ -161,19 +166,15 @@ public class UserServiceImpl implements UserService {
                 .isNotEmpty(passwordResetConfig.getNoticeChannels())) {
             // 重置密码成功通知
             if (passwordResetConfig.getNoticeChannels().contains(MessageNoticeChannel.MAIL)) {
-                if (StringUtils.isNotEmpty(userEntity.getEmail())) {
-                    log.warn("不存在用户邮箱信息，未发送用户重置密码邮件。");
-                } else {
-                    Map<String, Object> parameter = new HashMap<>(16);
-                    parameter.put(PASSWORD, password);
-                    mailMsgEventPublish.publish(MailType.RESET_PASSWORD_CONFIRM,
-                        userEntity.getEmail(), parameter);
-                }
+                Map<String, Object> parameter = new HashMap<>(16);
+                parameter.put(MsgVariable.PASSWORD, password);
+                mailMsgEventPublish.publish(MailType.RESET_PASSWORD_CONFIRM, userEntity.getEmail(),
+                    parameter);
             }
             if (passwordResetConfig.getNoticeChannels().contains(MessageNoticeChannel.SMS)) {
                 LinkedHashMap<String, String> parameter = new LinkedHashMap<>();
                 parameter.put(USERNAME, userEntity.getUsername());
-                parameter.put(PASSWORD, password);
+                parameter.put(MsgVariable.PASSWORD, password);
                 smsMsgEventPublish.publish(SmsType.RESET_PASSWORD_SUCCESS, userEntity.getPhone(),
                     parameter);
             }
@@ -199,7 +200,12 @@ public class UserServiceImpl implements UserService {
             throw new TopIamException(AuditContext.getContent());
         }
         AuditContext.setTarget(Target.builder().id(id.toString()).type(TargetType.USER).build());
-        return userRepository.updateUserStatus(id, status) > 0;
+        boolean update = userRepository.updateUserStatus(id, status) > 0;
+        if (update) {
+            // 更新索引数据
+            userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE, String.valueOf(id));
+        }
+        return update;
     }
 
     /**
@@ -211,7 +217,11 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean createUser(UserCreateParam param) {
-        if (!ObjectUtils.isEmpty(param.getPhone()) && StringUtils.isNotEmpty(param.getPhone())) {
+        if (StringUtils.isBlank(param.getPhone()) && StringUtils.isBlank(param.getEmail())) {
+            throw new TopIamException("手机号或邮箱至少填写一个", HttpStatus.BAD_REQUEST);
+        }
+        //手机号
+        if (StringUtils.isNotEmpty(param.getPhone())) {
             if (!getPhoneNumber(param.getPhone()).matches(ValidationPhone.PHONE_REGEXP)) {
                 throw new InfoValidityFailException("手机号格式错误");
             }
@@ -220,9 +230,12 @@ public class UserServiceImpl implements UserService {
                 throw new InfoValidityFailException("手机号已存在");
             }
         }
-        Boolean validityEmail = userParamCheck(CheckValidityType.EMAIL, param.getEmail(), null);
-        if (!validityEmail) {
-            throw new InfoValidityFailException("邮箱已存在");
+        //邮箱
+        if (StringUtils.isNotEmpty(param.getEmail())) {
+            Boolean validityEmail = userParamCheck(CheckValidityType.EMAIL, param.getEmail(), null);
+            if (!validityEmail) {
+                throw new InfoValidityFailException("邮箱已存在");
+            }
         }
         Boolean validityUsername = userParamCheck(CheckValidityType.USERNAME, param.getUsername(),
             null);
@@ -231,6 +244,9 @@ public class UserServiceImpl implements UserService {
         }
         //用户信息
         UserEntity user = userConverter.userCreateParamConvertToUserEntity(param);
+        // 校验密码
+        passwordPolicyManager.validate(user, param.getPassword());
+        // 保存用户信息
         userRepository.save(user);
         //用户详情
         UserDetailEntity detail = userConverter.userCreateParamConvertToUserDetailEntity(param);
@@ -242,25 +258,29 @@ public class UserServiceImpl implements UserService {
         organizationMemberRepository.save(member);
         AuditContext.setTarget(Target.builder().type(USER).id(user.getId().toString()).build(),
             Target.builder().type(USER_DETAIL).id(detail.getId().toString()).build());
-
+        // 保存ES用户信息
+        userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE,
+            String.valueOf(user.getId()));
         // 发送短信和邮件的欢迎信息（密码通知）
         UserCreateParam.PasswordInitializeConfig passwordInitializeConfig = param
             .getPasswordInitializeConfig();
-        if (Objects.nonNull(passwordInitializeConfig) && passwordInitializeConfig.getEnableNotice()
+        if (Objects.nonNull(passwordInitializeConfig)
+            && Objects.nonNull(passwordInitializeConfig.getEnableNotice())
             && org.apache.commons.collections4.CollectionUtils
                 .isNotEmpty(passwordInitializeConfig.getNoticeChannels())) {
-            List<MessageNoticeChannel> channels = passwordInitializeConfig.getNoticeChannels();
-            if (channels.contains(MessageNoticeChannel.MAIL)) {
-                Map<String, Object> parameter = new HashMap<>(16);
-                parameter.put(MsgVariable.CLIENT_DESCRIPTION,
-                    "您的 TopIAM 账户的初始密码是【" + param.getPassword() + "】。");
-                mailMsgEventPublish.publish(MailType.WELCOME_MAIL, user.getEmail(), parameter);
-            }
-            if (channels.contains(MessageNoticeChannel.SMS)) {
-                LinkedHashMap<String, String> parameter = new LinkedHashMap<>();
-                parameter.put(USERNAME, user.getUsername());
-                parameter.put(PASSWORD, user.getPassword());
-                smsMsgEventPublish.publish(SmsType.WELCOME_SMS, user.getPhone(), parameter);
+            if (passwordInitializeConfig.getEnableNotice()) {
+                List<MessageNoticeChannel> channels = passwordInitializeConfig.getNoticeChannels();
+                if (channels.contains(MessageNoticeChannel.MAIL)) {
+                    Map<String, Object> parameter = new HashMap<>(16);
+                    parameter.put(MsgVariable.PASSWORD, param.getPassword());
+                    mailMsgEventPublish.publish(MailType.WELCOME_MAIL, user.getEmail(), parameter);
+                }
+                if (channels.contains(MessageNoticeChannel.SMS)) {
+                    LinkedHashMap<String, String> parameter = new LinkedHashMap<>();
+                    parameter.put(USERNAME, user.getUsername());
+                    parameter.put(MsgVariable.PASSWORD, param.getPassword());
+                    smsMsgEventPublish.publish(SmsType.WELCOME_SMS, user.getPhone(), parameter);
+                }
             }
         }
         return true;
@@ -293,7 +313,10 @@ public class UserServiceImpl implements UserService {
         UserResult userResult = userConverter.entityConvertToUserResult(userEntity,
             detail.orElse(null));
         if (Objects.nonNull(userEntity) && StringUtils.isNotEmpty(userEntity.getPhone())) {
-            userResult.setPhone(userEntity.getPhoneAreaCode() + userEntity.getPhone());
+            StringBuilder phoneAreaCode = new StringBuilder(
+                userEntity.getPhoneAreaCode().replace(PhoneNumberUtils.PLUS_SIGN, ""));
+            phoneAreaCode.insert(0, PhoneNumberUtils.PLUS_SIGN);
+            userResult.setPhone(phoneAreaCode + userEntity.getPhone());
         }
         return userResult;
     }
@@ -312,6 +335,18 @@ public class UserServiceImpl implements UserService {
             if (!phoneNumber.matches(ValidationPhone.PHONE_REGEXP)) {
                 throw new InfoValidityFailException("手机号格式错误");
             }
+            Boolean validityPhone = userParamCheck(CheckValidityType.PHONE, param.getPhone(),
+                Long.valueOf(param.getId()));
+            if (!validityPhone) {
+                throw new InfoValidityFailException("手机号已存在");
+            }
+        }
+        if (StringUtils.isNotBlank(param.getEmail())) {
+            Boolean validityEmail = userParamCheck(CheckValidityType.EMAIL, param.getEmail(),
+                Long.valueOf(param.getId()));
+            if (!validityEmail) {
+                throw new InfoValidityFailException("邮箱已存在");
+            }
         }
         //用户信息
         UserEntity toUserEntity = userConverter.userUpdateParamConvertToUserEntity(param);
@@ -326,7 +361,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         //用户详情
         UserDetailEntity detail = userDetailsRepository.findByUserId(Long.valueOf(param.getId()))
-            .orElse(new UserDetailEntity());
+            .orElse(new UserDetailEntity().setUserId(user.getId()));
         UserDetailEntity toUserDetailsEntity = userConverter
             .userUpdateParamConvertToUserDetailsEntity(param);
         toUserDetailsEntity.setId(detail.getId());
@@ -334,6 +369,9 @@ public class UserServiceImpl implements UserService {
         userDetailsRepository.save(detail);
         AuditContext.setTarget(Target.builder().type(USER).id(user.getId().toString()).build(),
             Target.builder().type(USER_DETAIL).id(detail.getId().toString()).build());
+        // 更新ES用户信息
+        userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE,
+            String.valueOf(user.getId()));
         return true;
     }
 
@@ -362,6 +400,8 @@ public class UserServiceImpl implements UserService {
         //删除用户组用户详情
         userGroupMemberRepository.deleteByUserId(Long.valueOf(id));
         AuditContext.setTarget(Target.builder().id(id).type(TargetType.USER).build());
+        // 删除ES用户信息
+        userMessagePublisher.sendUserChangeMessage(UserMessageTag.DELETE, id);
         return true;
     }
 
@@ -397,17 +437,16 @@ public class UserServiceImpl implements UserService {
     @Transactional(rollbackFor = Exception.class)
     public Boolean batchDeleteUser(String[] ids) {
         //删除用户
-        userRepository
-            .deleteAllById(Arrays.stream(ids).map(s -> Long.parseLong(s.trim())).toList());
+        List<Long> idList = Arrays.stream(ids).map(s -> Long.parseLong(s.trim())).toList();
+        userRepository.deleteAllById(idList);
         //删除用户详情
-        userDetailsRepository
-            .deleteAllByUserIds(Arrays.stream(ids).map(s -> Long.parseLong(s.trim())).toList());
+        userDetailsRepository.deleteAllByUserIds(idList);
         //删除组织用户关系
-        organizationMemberRepository
-            .deleteAllByUserId(Arrays.stream(ids).map(s -> Long.parseLong(s.trim())).toList());
+        organizationMemberRepository.deleteAllByUserId(idList);
         //删除用户组关系
-        userGroupMemberRepository
-            .deleteAllByUserId(Arrays.stream(ids).map(s -> Long.parseLong(s.trim())).toList());
+        userGroupMemberRepository.deleteAllByUserId(idList);
+        // 批量删除ES用户信息
+        userMessagePublisher.sendUserChangeMessage(UserMessageTag.DELETE, String.join(",", ids));
         return true;
     }
 
@@ -435,7 +474,8 @@ public class UserServiceImpl implements UserService {
         if (CheckValidityType.PHONE.equals(type)) {
             try {
                 //手机号未修改
-                if (StringUtils.equals(value, entity.getPhoneAreaCode() + entity.getPhone())) {
+                if (StringUtils.equals(value.replace(PhoneNumberUtils.PLUS_SIGN, ""),
+                    entity.getPhoneAreaCode() + entity.getPhone())) {
                     return true;
                 }
                 Phonenumber.PhoneNumber phoneNumber = PhoneNumberUtil.getInstance().parse(value,
@@ -468,15 +508,6 @@ public class UserServiceImpl implements UserService {
         return result;
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void deleteBatchUser(List<Long> removeIds) {
-        // 删除
-        if (!CollectionUtils.isEmpty(removeIds)) {
-            userRepository.deleteAllById(removeIds);
-        }
-    }
-
     /**
      * 查看用户登录日志
      *
@@ -487,14 +518,25 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<UserLoginAuditListResult> findUserLoginAuditList(Long id, PageModel pageModel) {
         //查询入参转查询条件
-        NativeSearchQuery nsq = userConverter.auditListRequestConvertToNativeSearchQuery(id,
-            pageModel);
+        NativeQuery nsq = userConverter.auditListRequestConvertToNativeQuery(id, pageModel);
         //查询列表
-        SearchHits<AuditElasticSearchEntity> search = elasticsearchRestTemplate.search(nsq,
+        SearchHits<AuditElasticSearchEntity> search = elasticsearchTemplate.search(nsq,
             AuditElasticSearchEntity.class, IndexCoordinates
-                .of(getAuditIndexPrefix(eiamSupportProperties.getDemo().isOpen()) + "*"));
+                .of(getAuditIndexPrefix(supportProperties.getAudit().getIndexPrefix() + "*")));
         //结果转返回结果
         return userConverter.searchHitsConvertToAuditListResult(search, pageModel);
+    }
+
+    /**
+     * 批量获取用户信息
+     *
+     * @param ids {@link List}
+     * @return {@link List}
+     */
+    @Override
+    public List<BatchUserResult> batchGetUser(List<Long> ids) {
+        List<UserEntity> list = userRepository.findAllById(ids);
+        return userConverter.entityConvertToBatchGetUserResult(list);
     }
 
     /**
@@ -510,60 +552,70 @@ public class UserServiceImpl implements UserService {
     /**
      * 用户数据映射器
      */
-    private final UserConverter                 userConverter;
+    private final UserConverter                     userConverter;
 
     /**
      * UserRepository
      */
-    private final UserRepository                userRepository;
+    private final UserRepository                    userRepository;
 
     /**
      * password encoder
      */
-    private final PasswordEncoder               passwordEncoder;
+    private final PasswordEncoder                   passwordEncoder;
 
     /**
      * 组织
      */
-    private final OrganizationRepository        organizationRepository;
+    private final OrganizationRepository            organizationRepository;
 
     /**
      * 组织成员
      */
-    private final OrganizationMemberRepository  organizationMemberRepository;
+    private final OrganizationMemberRepository      organizationMemberRepository;
 
     /**
      * 部门成员
      */
-    private final UserGroupMemberRepository     userGroupMemberRepository;
+    private final UserGroupMemberRepository         userGroupMemberRepository;
 
     /**
      * 用户详情Repository
      */
-    private final UserDetailRepository          userDetailsRepository;
+    private final UserDetailRepository              userDetailsRepository;
 
     /**
      * 修改密码历史Repository
      */
-    private final UserHistoryPasswordRepository userHistoryPasswordRepository;
+    private final UserHistoryPasswordRepository     userHistoryPasswordRepository;
 
     /**
-     * ElasticsearchRestTemplate
+     * ElasticsearchTemplate
      */
-    private final ElasticsearchRestTemplate     elasticsearchRestTemplate;
+    private final ElasticsearchTemplate             elasticsearchTemplate;
 
     /**
      * 邮件消息发布
      */
-    private final MailMsgEventPublish           mailMsgEventPublish;
+    private final MailMsgEventPublish               mailMsgEventPublish;
 
     /**
      * 短信消息发送
      */
-    private final SmsMsgEventPublish            smsMsgEventPublish;
+    private final SmsMsgEventPublish                smsMsgEventPublish;
 
     /**
      * EiamSupportProperties
      */
-    private final EiamSupportProperties         eiamSupportProperties;
+    private final SupportProperties                 supportProperties;
+
+    /**
+     * PasswordPolicyManager
+     */
+    private final PasswordPolicyManager<UserEntity> passwordPolicyManager;
+
+    /**
+     * MessagePublisher
+     */
+    private final UserMessagePublisher              userMessagePublisher;
 }

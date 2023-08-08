@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -42,7 +42,7 @@ public class OrganizationMemberCustomizedRepositoryImpl implements
     @Override
     public void batchSave(List<OrganizationMemberEntity> list) {
         jdbcTemplate.batchUpdate(
-            "INSERT INTO organization_member (id_, org_id, user_id,create_by,create_time,update_by,update_time,remark_) VALUES (?,?,?,?,?,?,?,?)",
+            "INSERT INTO organization_member (id_, org_id, user_id,create_by,create_time,update_by,update_time,remark_,is_deleted) VALUES (?,?,?,?,?,?,?,?,?)",
             new BatchPreparedStatementSetter() {
 
                 @Override
@@ -56,6 +56,7 @@ public class OrganizationMemberCustomizedRepositoryImpl implements
                     ps.setString(6, entity.getUpdateBy());
                     ps.setTimestamp(7, Timestamp.valueOf(entity.getUpdateTime()));
                     ps.setString(8, entity.getRemark());
+                    ps.setBoolean(9, false);
                 }
 
                 @Override

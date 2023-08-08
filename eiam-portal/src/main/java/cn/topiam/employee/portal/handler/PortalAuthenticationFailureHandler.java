@@ -1,6 +1,6 @@
 /*
- * eiam-portal - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-portal - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,10 +19,6 @@ package cn.topiam.employee.portal.handler;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,18 +27,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.WebAttributes;
 
-import cn.topiam.employee.common.enums.SecretType;
 import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
-import cn.topiam.employee.support.exception.enums.ExceptionStatus;
+import cn.topiam.employee.support.enums.SecretType;
 import cn.topiam.employee.support.result.ApiRestResult;
 import cn.topiam.employee.support.util.HttpResponseUtils;
-import static javax.servlet.RequestDispatcher.*;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import static org.springframework.boot.web.servlet.support.ErrorPageFilter.ERROR_REQUEST_URI;
 
 import static cn.topiam.employee.support.constant.EiamConstants.CAPTCHA_CODE_SESSION;
-import static cn.topiam.employee.support.context.ServletContextHelp.acceptIncludeTextHtml;
+import static cn.topiam.employee.support.context.ServletContextHelp.isHtmlRequest;
+import static cn.topiam.employee.support.exception.enums.ExceptionStatus.EX000101;
+
+import static jakarta.servlet.RequestDispatcher.*;
 
 /**
  * 认证失败
@@ -68,12 +68,14 @@ public class PortalAuthenticationFailureHandler implements
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                                         AuthenticationException exception) throws ServletException,
                                                                            IOException {
-        boolean isTextHtml = acceptIncludeTextHtml(request);
-        if (!isTextHtml) {
-            ApiRestResult.RestResultBuilder<String> message = ApiRestResult.<String> builder()
-                .status(ExceptionStatus.EX000101.getCode()).message(StringUtils
-                    .defaultString(exception.getMessage(), ExceptionStatus.EX000101.getMessage()));
-            ApiRestResult<String> result = message.build();
+        boolean isHtmlRequest = isHtmlRequest(request);
+        if (!isHtmlRequest) {
+            //@formatter:off
+            ApiRestResult.RestResultBuilder<String> builder = ApiRestResult.<String> builder()
+                    .status(EX000101.getCode())
+                    .message(StringUtils.defaultString(exception.getMessage(),EX000101.getMessage()));
+            //@formatter:on
+            ApiRestResult<String> result = builder.build();
             request.getSession().removeAttribute(SecretType.LOGIN.getKey());
             request.getSession().removeAttribute(CAPTCHA_CODE_SESSION);
             request.setAttribute(WebAttributes.AUTHENTICATION_EXCEPTION, exception);

@@ -1,6 +1,6 @@
 /*
- * eiam-authentication-dingtalk - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-authentication-dingtalk - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,11 +22,6 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
@@ -47,8 +42,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.alibaba.fastjson2.JSONObject;
 
 import cn.topiam.employee.authentication.dingtalk.DingTalkIdpOauthConfig;
-import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
+import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.RESPONSE_TYPE;
 
 import static cn.topiam.employee.authentication.common.IdentityProviderType.DINGTALK_OAUTH;
@@ -60,7 +60,7 @@ import static cn.topiam.employee.authentication.dingtalk.filter.DingtalkOauthAut
  * 微信扫码登录请求重定向过滤器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/20 20:22
+ * Created by support@topiam.cn on  2022/6/20 21:22
  */
 @SuppressWarnings("ALL")
 public class DingtalkOAuth2AuthorizationRequestRedirectFilter extends OncePerRequestFilter {
@@ -117,7 +117,7 @@ public class DingtalkOAuth2AuthorizationRequestRedirectFilter extends OncePerReq
         //构建授权请求
         OAuth2AuthorizationRequest.Builder builder = OAuth2AuthorizationRequest.authorizationCode()
             .clientId(config.getAppKey()).authorizationUri(URL_AUTHORIZE)
-            .redirectUri(getLoginUrl(optional.get().getCode()))
+            .redirectUri(getLoginUrl(optional.get().getCode())).scope("openid")
             .state(DEFAULT_STATE_GENERATOR.generateKey());
         builder.parameters(parameters -> {
             parameters.put(RESPONSE_TYPE, OAuth2ParameterNames.CODE);

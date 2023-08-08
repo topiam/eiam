@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,6 +20,10 @@ package cn.topiam.employee.common.repository.setting;
 import java.util.List;
 import java.util.Objects;
 
+import org.jetbrains.annotations.NotNull;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.support.repository.LogicDeleteRepository;
 import cn.topiam.employee.support.util.BeanUtils;
+import static cn.topiam.employee.common.constant.SettingConstants.SETTING_CACHE_NAME;
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
@@ -40,6 +45,7 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
  * Created by support@topiam.cn on 2020/12/5 22:09
  */
 @Repository
+@CacheConfig(cacheNames = { SETTING_CACHE_NAME })
 public interface SettingRepository extends LogicDeleteRepository<SettingEntity, Long> {
     /**
      * 根据KEY查询
@@ -47,6 +53,7 @@ public interface SettingRepository extends LogicDeleteRepository<SettingEntity, 
      * @param name {@link String}
      * @return {@link SettingEntity}
      */
+    @Cacheable(key = "#p0", unless = "#result==null")
     SettingEntity findByName(String name);
 
     /**
@@ -74,11 +81,28 @@ public interface SettingRepository extends LogicDeleteRepository<SettingEntity, 
     Boolean existsByName(String name);
 
     /**
+     * 根据ID删除
+     *
+     * @param id  {@link Long}
+     */
+    @Override
+    @CacheEvict(allEntries = true)
+    void deleteById(@NotNull Long id);
+
+    /**
+     * 删除全部
+     */
+    @Override
+    @CacheEvict(allEntries = true)
+    void deleteAll();
+
+    /**
      * 根据名称删除
      *
      * @param name {@link String}
      */
     @Modifying
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     @Query(value = "UPDATE setting SET " + SOFT_DELETE_SET
                    + " WHERE name_ = :name", nativeQuery = true)
@@ -90,6 +114,7 @@ public interface SettingRepository extends LogicDeleteRepository<SettingEntity, 
      * @param names {@link String}
      */
     @Modifying
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     @Query(value = "UPDATE setting SET " + SOFT_DELETE_SET
                    + " WHERE name_ IN (:names)", nativeQuery = true)
@@ -101,7 +126,7 @@ public interface SettingRepository extends LogicDeleteRepository<SettingEntity, 
      * @param list {@link List}
      * @return {@link Boolean}
      */
-    default Boolean saveConfig(List<SettingEntity> list) {
+    default Boolean save(List<SettingEntity> list) {
         for (SettingEntity setting : list) {
             SettingEntity type = findByName(setting.getName());
             if (Objects.isNull(type)) {
@@ -113,4 +138,15 @@ public interface SettingRepository extends LogicDeleteRepository<SettingEntity, 
         }
         return true;
     }
+
+    /**
+     * 保存
+     * @param entity must not be {@literal null}.
+     * @return {@link S}
+     * @param <S>
+     */
+    @NotNull
+    @Override
+    @CacheEvict(allEntries = true)
+    <S extends SettingEntity> S save(@NotNull S entity);
 }

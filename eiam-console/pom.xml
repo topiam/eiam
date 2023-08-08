@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    eiam-console - Employee Identity and Access Management Program
-    Copyright © 2020-2023 TopIAM (support@topiam.cn)
+    eiam-console - Employee Identity and Access Management
+    Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -24,7 +24,7 @@
     <parent>
         <groupId>cn.topiam</groupId>
         <artifactId>eiam</artifactId>
-        <version>1.0.0-beta1</version>
+        <version>1.0.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -99,18 +99,12 @@
                             <includes>
                                 <include>build/**</include>
                                 <include>yarn.lock</include>
-                                <include>src/.umi-production/**</include>
+                                <include>package-lock.json</include>
+                                <include>pnpm-lock.yaml</include>
+                                <include>yarn-error.log</include>
                             </includes>
                         </fileset>
                     </filesets>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${java.source.version}</source> <!-- depending on your project -->
-                    <target>${java.target.version}</target> <!-- depending on your project -->
                 </configuration>
             </plugin>
         </plugins>
@@ -128,4 +122,115 @@
             </resource>
         </resources>
     </build>
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <!--编译打包前端项目-->
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <version>${frontend-maven-plugin.version}</version>
+                        <configuration>
+                            <installDirectory>target</installDirectory>
+                            <workingDirectory>src/main/console-fe</workingDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>install node and pnpm</id>
+                                <goals>
+                                    <goal>install-node-and-pnpm</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <nodeVersion>v18.16.1</nodeVersion>
+                                    <pnpmVersion>v8.6.7</pnpmVersion>
+                                    <nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</nodeDownloadRoot>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>pnpm install</id>
+                                <goals>
+                                    <goal>pnpm</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <arguments>install</arguments>
+                                    <pnpmRegistryURL>https://registry.npm.taobao.org</pnpmRegistryURL>
+                                    <pnpmInheritsProxyConfigFromMaven>true</pnpmInheritsProxyConfigFromMaven>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>pnpm run build</id>
+                                <goals>
+                                    <goal>pnpm</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <arguments>run build:pre</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <!--编译打包前端项目-->
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <version>${frontend-maven-plugin.version}</version>
+                        <configuration>
+                            <installDirectory>target</installDirectory>
+                            <workingDirectory>src/main/console-fe</workingDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>install node and pnpm</id>
+                                <goals>
+                                    <goal>install-node-and-pnpm</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <nodeVersion>v18.16.1</nodeVersion>
+                                    <pnpmVersion>v8.6.7</pnpmVersion>
+                                    <nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</nodeDownloadRoot>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>pnpm install</id>
+                                <goals>
+                                    <goal>pnpm</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <arguments>install</arguments>
+                                    <pnpmRegistryURL>https://registry.npm.taobao.org</pnpmRegistryURL>
+                                    <pnpmInheritsProxyConfigFromMaven>true</pnpmInheritsProxyConfigFromMaven>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>pnpm run build</id>
+                                <goals>
+                                    <goal>pnpm</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <arguments>run build</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

@@ -1,6 +1,6 @@
 /*
- * eiam-portal - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-portal - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ import cn.topiam.employee.support.result.ApiRestResult;
 import lombok.extern.slf4j.Slf4j;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import static cn.topiam.employee.common.constants.AuthorizeConstants.LOGIN_CONFIG;
+import static cn.topiam.employee.common.constant.AuthorizeConstants.LOGIN_CONFIG;
 
 /**
  * 登录配置 Endpoint

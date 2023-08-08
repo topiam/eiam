@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,8 +21,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
-
 import com.alibaba.fastjson2.JSONObject;
 
 import cn.topiam.employee.common.entity.setting.config.SmsConfig;
@@ -32,12 +30,13 @@ import cn.topiam.employee.common.message.enums.SmsProvider;
 import lombok.Data;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * 保存短信服务商创建请求入参
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/7/31 19:34
+ * Created by support@topiam.cn on  2021/7/31 21:34
  */
 @Data
 @Schema(description = "保存短信验证服务入参")

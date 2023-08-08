@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -45,9 +45,10 @@ import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.record.*;
 
-import cn.topiam.employee.common.geo.GeoLocation;
-import cn.topiam.employee.common.geo.GeoLocationService;
 import cn.topiam.employee.support.constant.EiamConstants;
+import cn.topiam.employee.support.geo.GeoLocation;
+import cn.topiam.employee.support.geo.GeoLocationProvider;
+import cn.topiam.employee.support.geo.GeoLocationService;
 import cn.topiam.employee.support.util.IpUtils;
 
 import lombok.Getter;
@@ -57,22 +58,34 @@ import dev.failsafe.Failsafe;
 import dev.failsafe.RetryPolicy;
 import static cn.topiam.employee.common.geo.District.CITY_DISTRICT;
 import static cn.topiam.employee.common.geo.District.PROVINCE_DISTRICT;
-import static cn.topiam.employee.common.geo.maxmind.enums.GeoLocationProvider.MAXMIND;
 
 /**
  * GeoIp
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/26 19:26
+ * Created by support@topiam.cn on  2021/11/26 21:26
  */
 @Slf4j
 @Getter
 public class MaxmindGeoLocationServiceImpl implements GeoLocationService {
 
-    private final DatabaseReader        reader;
-    private final MaxmindProviderConfig maxmindProviderConfig;
-    private final RestTemplate          restTemplate;
-    private final Integer               MAX_RETRIES = 1999999999;
+    private final DatabaseReader            reader;
+    private final MaxmindProviderConfig     maxmindProviderConfig;
+    private final RestTemplate              restTemplate;
+    private final Integer                   MAX_RETRIES  = 1999999999;
+
+    public static final GeoLocationProvider MAXMIND      = new GeoLocationProvider("maxmind",
+        "MAXMIND");
+
+    /**
+     * 库文件下载地址
+     */
+    public static final String              DOWNLOAD_URL = "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=%s&suffix=tar.gz";
+
+    /**
+     * sha256校验文件下载地址
+     */
+    public static final String              SHA256_URL   = "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=%s&suffix=tar.gz.sha256";
 
     public MaxmindGeoLocationServiceImpl(MaxmindProviderConfig maxmindProviderConfig,
                                          RestTemplate restTemplate) throws IOException {
@@ -92,8 +105,9 @@ public class MaxmindGeoLocationServiceImpl implements GeoLocationService {
     @Override
     public GeoLocation getGeoLocation(String remote) {
         if (IpUtils.isInternalIp(remote)) {
-            GeoLocation geoLocation = new GeoLocation();
+            GeoLocation geoLocation = GeoLocation.builder().build();
             geoLocation.setIp(remote);
+            geoLocation.setProvider(MAXMIND);
             return geoLocation;
         }
         try {
@@ -112,27 +126,26 @@ public class MaxmindGeoLocationServiceImpl implements GeoLocationService {
             //大陆信息
             Continent continent = cityResponse.getContinent();
             //@formatter:off
-            return new GeoLocation()
-                .setIp(remote)
-                .setContinentCode(continent.getGeoNameId().toString())
-                .setContinentName(continent.getName())
-                .setCountryName(country.getName())
-                .setCountryCode(country.getGeoNameId().toString())
-                .setCityName(city.getName())
-                .setCityCode(StringUtils.defaultString(CITY_DISTRICT.get(city.getName()), String.valueOf(city.getGeoNameId())))
-                .setProvinceName(subdivision.getName())
-                .setProvinceCode(StringUtils.defaultString(PROVINCE_DISTRICT.get(subdivision.getName()), subdivision.getIsoCode()))
-                .setLongitude(location.getLongitude())
-                .setLatitude(location.getLatitude())
-                .setProvider(MAXMIND);
+            return GeoLocation.builder()
+                .ip(remote)
+                .continentCode(continent.getGeoNameId().toString())
+                .continentName(continent.getName())
+                .countryName(country.getName())
+                .countryCode(country.getGeoNameId().toString())
+                .cityName(city.getName())
+                .cityCode(StringUtils.defaultString(CITY_DISTRICT.get(city.getName()), String.valueOf(city.getGeoNameId())))
+                .provinceName(subdivision.getName())
+                .provinceCode(StringUtils.defaultString(PROVINCE_DISTRICT.get(subdivision.getName()), subdivision.getIsoCode()))
+                .longitude(location.getLongitude())
+                .latitude(location.getLatitude())
+                .provider(MAXMIND).build();
             //@formatter:on
         } catch (Exception e) {
             log.error("获取IP地理位置发生异常 IP:[{}], 异常: {}", remote, e.getMessage());
-            return new GeoLocation();
+            return GeoLocation.builder().build();
         }
     }
 
-    @Override
     public void download() {
         if (checkDbFileIsUpdate()) {
             //@formatter:off
@@ -143,7 +156,7 @@ public class MaxmindGeoLocationServiceImpl implements GeoLocationService {
                     .onFailure(event -> log.error("下载IP库发生网络异常"))
                     .onRetry(event -> log.error("下载IP库发生网络异常, 开始第: {} 次重试",event.getExecutionCount()))
                     .build();
-            ResponseEntity<byte[]> bytes = Failsafe.with(retryPolicy).get(() -> restTemplate.exchange(String.format(MAXMIND.getDownloadUrl(), maxmindProviderConfig.getSessionKey()), HttpMethod.GET, null, byte[].class));
+            ResponseEntity<byte[]> bytes = Failsafe.with(retryPolicy).get(() -> restTemplate.exchange(String.format(DOWNLOAD_URL, maxmindProviderConfig.getSessionKey()), HttpMethod.GET, null, byte[].class));
             //@formatter:on
             File path = new File(EiamConstants.IPADDRESS_FILE_DIRECTORY);
             try {
@@ -188,15 +201,21 @@ public class MaxmindGeoLocationServiceImpl implements GeoLocationService {
         return Failsafe.with(retryPolicy).get(() -> {
             File ipDb = new File(EiamConstants.IPADDRESS_FILE_TAR);
             if (ipDb.exists()) {
-                ResponseEntity<byte[]> sha256FileByte = restTemplate.exchange(
-                        String.format(MAXMIND.getSha256Url(),
-                                this.maxmindProviderConfig.getSessionKey()),
-                        HttpMethod.GET, null, byte[].class);
-                File sha256File = new File(EiamConstants.SHA256_FILE_PATH);
-                FileUtils.writeByteArrayToFile(sha256File,
-                        Objects.requireNonNull(sha256FileByte.getBody()));
-                String sha256 = FileUtils.readFileToString(sha256File, StandardCharsets.UTF_8);
-                return !checkFileSha256(ipDb, sha256.split(" ")[0]);
+                try {
+                    ResponseEntity<byte[]> sha256FileByte = restTemplate.exchange(
+                            String.format(SHA256_URL,
+                                    this.maxmindProviderConfig.getSessionKey()),
+                            HttpMethod.GET, null, byte[].class);
+                    File sha256File = new File(EiamConstants.SHA256_FILE_PATH);
+                    FileUtils.writeByteArrayToFile(sha256File,
+                            Objects.requireNonNull(sha256FileByte.getBody()));
+                    String sha256 = FileUtils.readFileToString(sha256File, StandardCharsets.UTF_8);
+                    return !checkFileSha256(ipDb, sha256.split(" ")[0]);
+                }
+                catch (Exception e) {
+                    log.error("检查MAXMIND更新异常: [{}]", e.getMessage(), e);
+                    return false;
+                }
             }
             return true;
         });

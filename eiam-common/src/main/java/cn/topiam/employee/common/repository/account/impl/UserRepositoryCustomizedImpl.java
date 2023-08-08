@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,31 +31,45 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHitsIterator;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
+import cn.topiam.employee.common.entity.account.UserElasticSearchEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
+import cn.topiam.employee.common.entity.account.po.UserEsPO;
 import cn.topiam.employee.common.entity.account.po.UserPO;
 import cn.topiam.employee.common.entity.account.query.UserListNotInGroupQuery;
 import cn.topiam.employee.common.entity.account.query.UserListQuery;
 import cn.topiam.employee.common.repository.account.UserRepositoryCustomized;
 import cn.topiam.employee.common.repository.account.impl.mapper.UserEntityMapper;
+import cn.topiam.employee.common.repository.account.impl.mapper.UserEsMapper;
 import cn.topiam.employee.common.repository.account.impl.mapper.UserPoMapper;
 
 import lombok.AllArgsConstructor;
-import static cn.topiam.employee.common.constants.AccountConstants.USER_CACHE_NAME;
+
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import static cn.topiam.employee.common.constant.AccountConstants.USER_CACHE_NAME;
 
 /**
  * User Repository Customized
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020/12/29 20:27
+ * Created by support@topiam.cn on  2020/12/29 21:27
  */
 @Repository
-@CacheConfig(cacheNames = { USER_CACHE_NAME })
 @AllArgsConstructor
+@CacheConfig(cacheNames = { USER_CACHE_NAME })
 public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
 
     /**
@@ -68,12 +83,12 @@ public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
     @Override
     public Page<UserPO> getUserList(UserListQuery query, Pageable pageable) {
         //@formatter:off
-        StringBuilder builder = new StringBuilder("SELECT `user`.id_, `user`.username_,`user`.password_, `user`.email_, `user`.phone_,`user`.phone_area_code, `user`.full_name ,`user`.nick_name, `user`.avatar_ , `user`.status_, `user`.data_origin, `user`.email_verified, `user`.phone_verified, `user`.shared_secret, `user`.totp_bind , `user`.auth_total, `user`.last_auth_ip, `user`.last_auth_time, `user`.expand_, `user`.external_id , `user`.expire_date,`user`.create_by, `user`.create_time, `user`.update_by , `user`.update_time, `user`.remark_, group_concat(organization_.display_path) AS org_display_path FROM `user` INNER JOIN `organization_member` ON (`user`.id_ = organization_member.user_id) INNER JOIN `organization` organization_ ON (organization_.id_ = organization_member.org_id) WHERE `user`.is_deleted = 0");
+        StringBuilder builder = new StringBuilder("SELECT `user`.id_, `user`.username_,`user`.password_, `user`.email_, `user`.phone_,`user`.phone_area_code, `user`.full_name ,`user`.nick_name, `user`.avatar_ , `user`.status_, `user`.data_origin, `user`.email_verified, `user`.phone_verified, `user`.auth_total, `user`.last_auth_ip, `user`.last_auth_time, `user`.expand_, `user`.external_id , `user`.expire_date,`user`.create_by, `user`.create_time, `user`.update_by , `user`.update_time, `user`.remark_, group_concat(organization_.display_path) AS org_display_path FROM `user` INNER JOIN `organization_member` ON (`user`.id_ = organization_member.user_id) INNER JOIN `organization` organization_ ON (organization_.id_ = organization_member.org_id) WHERE `user`.is_deleted = 0");
         //组织条件
-        if (StringUtils.isNoneBlank(query.getOrganizationId())) {
-            //包含子节点
+        if (StringUtils.isNotBlank(query.getOrganizationId())) {
             if (Boolean.TRUE.equals(query.getInclSubOrganization())) {
-                builder.append(" AND FIND_IN_SET('").append(query.getOrganizationId()).append("', REPLACE(organization_.path_, '/', ','))> 0");
+                //包含子节点
+                builder.append(" AND FIND_IN_SET('").append(query.getOrganizationId()).append("', REPLACE(organization_.path_, '/', ',')) > 0");
             }
             else {
                 builder.append(" AND organization_.id_ = '").append(query.getOrganizationId()).append("'");
@@ -128,51 +143,49 @@ public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
     public Page<UserPO> getUserListNotInGroupId(UserListNotInGroupQuery query, Pageable pageable) {
         //@formatter:off
         StringBuilder builder = new StringBuilder(
-            """
-                    SELECT
-                                    	`user`.id_,
-                                    	`user`.username_,
-                                    	`user`.password_,
-                                    	`user`.email_,
-                                    	`user`.phone_,
-                                    	`user`.phone_area_code,
-                                    	`user`.full_name,
-                                    	`user`.nick_name,
-                                    	`user`.avatar_,
-                                    	`user`.status_,
-                                    	`user`.data_origin,
-                                    	`user`.email_verified,
-                                    	`user`.phone_verified,
-                                    	`user`.shared_secret,
-                                    	`user`.totp_bind,
-                                    	`user`.auth_total,
-                                    	`user`.last_auth_ip,
-                                    	`user`.last_auth_time,
-                                    	`user`.expand_,
-                                    	`user`.external_id,
-                                    	`user`.expire_date,
-                                    	`user`.create_by,
-                                    	`user`.create_time,
-                                    	`user`.update_by,
-                                    	`user`.update_time,
-                                    	`user`.remark_,
-                                    	group_concat( organization_.display_path ) AS org_display_path
-                                    FROM `user`
-                                    LEFT JOIN `organization_member` ON ( `user`.id_ = organization_member.user_id AND organization_member.is_deleted = '0' )
-                                    LEFT JOIN `organization` organization_ ON ( organization_.id_ = organization_member.org_id AND organization_.is_deleted = '0' )
-                                    WHERE
-                                        user.is_deleted = 0 AND
-                                    	user.id_ NOT IN (
-                                    	SELECT
-                                    		u.id_
-                                    	FROM
-                                    		user u
-                                    		INNER JOIN user_group_member ugm ON ugm.user_id = u.id_
-                                    		INNER JOIN user_group ug ON ug.id_ = ugm.group_id
-                                    	WHERE
-                                    	u.is_deleted = '0'
-                                    	AND ug.id_ = '%s' AND ugm.group_id = '%s')
-                    """.formatted(query.getId(), query.getId()));
+                """
+                        SELECT
+                                            `user`.id_,
+                                            `user`.username_,
+                                            `user`.password_,
+                                            `user`.email_,
+                                            `user`.phone_,
+                                            `user`.phone_area_code,
+                                            `user`.full_name,
+                                            `user`.nick_name,
+                                            `user`.avatar_,
+                                            `user`.status_,
+                                            `user`.data_origin,
+                                            `user`.email_verified,
+                                            `user`.phone_verified,
+                                            `user`.auth_total,
+                                            `user`.last_auth_ip,
+                                            `user`.last_auth_time,
+                                            `user`.expand_,
+                                            `user`.external_id,
+                                            `user`.expire_date,
+                                            `user`.create_by,
+                                            `user`.create_time,
+                                            `user`.update_by,
+                                            `user`.update_time,
+                                            `user`.remark_,
+                                            group_concat( organization_.display_path ) AS org_display_path
+                                        FROM `user`
+                                        LEFT JOIN `organization_member` ON ( `user`.id_ = organization_member.user_id AND organization_member.is_deleted = '0' )
+                                        LEFT JOIN `organization` organization_ ON ( organization_.id_ = organization_member.org_id AND organization_.is_deleted = '0' )
+                                        WHERE
+                                            user.is_deleted = 0 AND
+                                            user.id_ NOT IN (
+                                            SELECT
+                                                u.id_
+                                            FROM
+                                                user u
+                                                INNER JOIN user_group_member ugm ON ugm.user_id = u.id_
+                                                INNER JOIN user_group ug ON ug.id_ = ugm.group_id
+                                            WHERE
+                                            u.is_deleted = '0' AND ugm.is_deleted = '0'
+                                            AND ug.id_ = '%s' AND ugm.group_id = '%s')
+                        """.formatted(query.getId(), query.getId()));
         if (StringUtils.isNoneBlank(query.getKeyword())) {
             builder.append(" AND  user.username_ LIKE '%").append(query.getKeyword()).append("%'");
             builder.append(" OR  user.full_name LIKE '%").append(query.getKeyword()).append("%'");
@@ -202,7 +215,7 @@ public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
     @Override
     public List<UserEntity> findAllByOrgId(String organizationId) {
         return jdbcTemplate.query(
-            "SELECT `user`.id_, `user`.username_, user.password_,`user`.email_, `user`.phone_,user.phone_area_code,  `user`.full_name ,`user`.nick_name ,`user`.avatar_ , `user`.status_, `user`.data_origin, `user`.email_verified, `user`.shared_secret, `user`.totp_bind , `user`.auth_total, `user`.last_auth_ip, `user`.last_auth_time, `user`.expand_, `user`.external_id , `user`.expire_date,`user`.identity_source_id, `user`.create_by, `user`.create_time, `user`.update_by, `user`.update_time , `user`.remark_ FROM `user` INNER JOIN `organization_member` ON `user`.id_ = organization_member.user_id INNER JOIN `organization` organization_ ON organization_.id_ = organization_member.org_id WHERE 1 = 1 AND organization_.id_ = '"
+            "SELECT `user`.id_, `user`.username_, user.password_,`user`.email_, `user`.phone_,user.phone_area_code,  `user`.full_name ,`user`.nick_name ,`user`.avatar_ , `user`.status_, `user`.data_origin, `user`.email_verified, `user`.auth_total, `user`.last_auth_ip, `user`.last_auth_time, `user`.expand_, `user`.external_id , `user`.expire_date,`user`.identity_source_id, `user`.create_by, `user`.create_time, `user`.update_by, `user`.update_time , `user`.remark_ FROM `user` INNER JOIN `organization_member` ON `user`.id_ = organization_member.user_id INNER JOIN `organization` organization_ ON organization_.id_ = organization_member.org_id WHERE 1 = 1 AND organization_.id_ = '"
                                   + organizationId + "'" + "GROUP BY `user`.id_",
             new UserEntityMapper());
     }
@@ -218,7 +231,7 @@ public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
     public List<UserEntity> findAllByOrgIdAndIdentitySourceId(String organizationId,
                                                               Long identitySourceId) {
         return jdbcTemplate.query(
-            "SELECT `user`.id_, `user`.username_, user.password_,`user`.email_, `user`.phone_,user.phone_area_code,  `user`.full_name ,`user`.nick_name ,`user`.avatar_ , `user`.status_, `user`.data_origin, `user`.email_verified, `user`.shared_secret, `user`.totp_bind , `user`.auth_total, `user`.last_auth_ip, `user`.last_auth_time, `user`.expand_, `user`.external_id , `user`.expire_date,`user`.identity_source_id , `user`.create_by, `user`.create_time, `user`.update_by, `user`.update_time , `user`.remark_ FROM `user` INNER JOIN `organization_member` ON `user`.id_ = organization_member.user_id INNER JOIN `organization` organization_ ON organization_.id_ = organization_member.org_id WHERE 1 = 1 AND organization_.id_ = '"
+            "SELECT `user`.id_, `user`.username_, user.password_,`user`.email_, `user`.phone_,user.phone_area_code,  `user`.full_name ,`user`.nick_name ,`user`.avatar_ , `user`.status_, `user`.data_origin, `user`.email_verified , `user`.auth_total, `user`.last_auth_ip, `user`.last_auth_time, `user`.expand_, `user`.external_id , `user`.expire_date,`user`.identity_source_id , `user`.create_by, `user`.create_time, `user`.update_by, `user`.update_time , `user`.remark_ FROM `user` INNER JOIN `organization_member` ON `user`.id_ = organization_member.user_id INNER JOIN `organization` organization_ ON organization_.id_ = organization_member.org_id WHERE 1 = 1 AND organization_.id_ = '"
                                   + organizationId + "' AND user.identity_source_id = '"
                                   + identitySourceId + "' GROUP BY `user`.id_",
             new UserEntityMapper());
@@ -235,7 +248,7 @@ public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
     public List<UserPO> findAllByOrgExternalIdAndIdentitySourceId(String externalId,
                                                                   Long identitySourceId) {
         return jdbcTemplate.query(
-            "SELECT `user`.id_, `user`.username_, user.password_,`user`.email_, `user`.phone_,user.phone_area_code,  `user`.full_name ,`user`.nick_name ,`user`.avatar_ , `user`.status_, `user`.data_origin, `user`.email_verified,`user`.phone_verified, `user`.shared_secret, `user`.totp_bind , `user`.auth_total, `user`.last_auth_ip, `user`.last_auth_time, `user`.expand_, `user`.external_id , `user`.expire_date, `user`.create_by, `user`.create_time, `user`.update_by, `user`.update_time , `user`.remark_ FROM `user` INNER JOIN `organization_member` ON `user`.id_ = organization_member.user_id INNER JOIN `organization` organization_ ON organization_.id_ = organization_member.org_id WHERE 1 = 1 AND organization_.id_ = '"
+            "SELECT `user`.id_, `user`.username_, user.password_,`user`.email_, `user`.phone_,user.phone_area_code,  `user`.full_name ,`user`.nick_name ,`user`.avatar_ , `user`.status_, `user`.data_origin, `user`.email_verified,`user`.phone_verified,  `user`.auth_total, `user`.last_auth_ip, `user`.last_auth_time, `user`.expand_, `user`.external_id , `user`.expire_date, `user`.create_by, `user`.create_time, `user`.update_by, `user`.update_time , `user`.remark_ FROM `user` INNER JOIN `organization_member` ON `user`.id_ = organization_member.user_id INNER JOIN `organization` organization_ ON organization_.id_ = organization_member.org_id WHERE 1 = 1 AND organization_.id_ = '"
                                   + externalId + "' AND user.identity_source_id = '"
                                   + identitySourceId + "' GROUP BY `user`.id_",
             new UserPoMapper());
@@ -244,7 +257,7 @@ public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
     @Override
     public List<UserEntity> findAllByOrgIdNotExistAndIdentitySourceId(Long identitySourceId) {
         return jdbcTemplate.query(
-            "SELECT * FROM(SELECT `user`.id_, `user`.username_, user.password_, `user`.email_, `user`.phone_, `user`.phone_area_code, `user`.full_name, `user`.nick_name, `user`.avatar_, `user`.status_, `user`.data_origin, user.identity_source_id,`user`.email_verified, `user`.shared_secret, `user`.totp_bind, `user`.auth_total, `user`.last_auth_ip, `user`.last_auth_time, `user`.expand_, `user`.external_id, `user`.expire_date, `user`.create_by, `user`.create_time, `user`.update_by, `user`.update_time, `user`.remark_ FROM `user` LEFT JOIN `organization_member` ON `user`.id_ = organization_member.user_id LEFT JOIN `organization` organization_ ON organization_.id_ = organization_member.org_id WHERE `organization_member`.user_id IS NULL) user WHERE user.identity_source_id = '"
+            "SELECT * FROM(SELECT `user`.id_, `user`.username_, user.password_, `user`.email_, `user`.phone_, `user`.phone_area_code, `user`.full_name, `user`.nick_name, `user`.avatar_, `user`.status_, `user`.data_origin, user.identity_source_id,`user`.email_verified, `user`.auth_total, `user`.last_auth_ip, `user`.last_auth_time, `user`.expand_, `user`.external_id, `user`.expire_date, `user`.create_by, `user`.create_time, `user`.update_by, `user`.update_time, `user`.remark_ FROM `user` LEFT JOIN `organization_member` ON `user`.id_ = organization_member.user_id LEFT JOIN `organization` organization_ ON organization_.id_ = organization_member.org_id WHERE `organization_member`.user_id IS NULL) user WHERE user.identity_source_id = '"
                                   + identitySourceId + "'" + "GROUP BY `user`.id_",
             new UserEntityMapper());
     }
@@ -259,47 +272,46 @@ public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
     public void batchSave(List<UserEntity> list) {
         //@formatter:off
         jdbcTemplate.batchUpdate(
-            "INSERT INTO user (id_, username_, password_, email_, phone_, phone_area_code, full_name,nick_name, avatar_, external_id, expire_date, status_, email_verified, phone_verified,shared_secret, auth_total,last_auth_ip,last_auth_time,expand_,data_origin,identity_source_id,totp_bind,last_update_password_time ,create_by,create_time,update_by,update_time,remark_) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ",
-            new BatchPreparedStatementSetter() {
+                "INSERT INTO user (id_, username_, password_, email_, phone_, phone_area_code, full_name,nick_name, avatar_, external_id, expire_date, status_, email_verified, phone_verified, auth_total,last_auth_ip,last_auth_time,expand_,data_origin,identity_source_id,last_update_password_time ,create_by,create_time,update_by,update_time,remark_,is_deleted) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ",
+                new BatchPreparedStatementSetter() {
 
-                @Override
-                public void setValues(@NotNull PreparedStatement ps, int i) throws SQLException {
-                    UserEntity entity = list.get(i);
-                    ps.setLong(1, entity.getId());
-                    ps.setString(2, entity.getUsername());
-                    ps.setString(3, entity.getPassword());
-                    ps.setObject(4, StringUtils.isBlank(entity.getEmail())?null:entity.getEmail());
-                    ps.setObject(5, StringUtils.isBlank(entity.getPhone())?null:entity.getPhone());
-                    ps.setString(6, entity.getPhoneAreaCode());
-                    ps.setString(7, entity.getFullName());
-                    ps.setString(8, entity.getNickName());
-                    ps.setString(9, entity.getAvatar());
-                    ps.setString(10, entity.getExternalId());
-                    ps.setDate(11, Date.valueOf(entity.getExpireDate()));
-                    ps.setString(12, entity.getStatus().getCode());
-                    ps.setBoolean(13, !Objects.isNull(entity.getEmailVerified()) && entity.getEmailVerified());
-                    ps.setBoolean(14, !Objects.isNull(entity.getPhoneVerified()) && entity.getPhoneVerified());
-                    ps.setString(15, entity.getSharedSecret());
-                    ps.setLong(16, Objects.isNull(entity.getAuthTotal())?0L:entity.getAuthTotal());
-                    ps.setString(17, entity.getLastAuthIp());
-                    ps.setTimestamp(18, !Objects.isNull(entity.getLastAuthTime()) ? Timestamp.valueOf(entity.getLastAuthTime()) : null);
-                    ps.setString(19, entity.getExpand());
-                    ps.setString(20, entity.getDataOrigin().getCode());
-                    ps.setObject(21, entity.getIdentitySourceId());
-                    ps.setBoolean(22, !Objects.isNull(entity.getTotpBind()) && entity.getTotpBind());
-                    ps.setTimestamp(23, !Objects.isNull(entity.getLastUpdatePasswordTime())?Timestamp.valueOf(entity.getLastUpdatePasswordTime()):null);
-                    ps.setString(24, entity.getCreateBy());
-                    ps.setTimestamp(25, Timestamp.valueOf(entity.getCreateTime()));
-                    ps.setString(26, entity.getUpdateBy());
-                    ps.setTimestamp(27, Timestamp.valueOf(entity.getUpdateTime()));
-                    ps.setString(28, entity.getRemark());
-                }
+                    @Override
+                    public void setValues(@NotNull PreparedStatement ps, int i) throws SQLException {
+                        UserEntity entity = list.get(i);
+                        ps.setLong(1, entity.getId());
+                        ps.setString(2, entity.getUsername());
+                        ps.setString(3, entity.getPassword());
+                        ps.setObject(4, StringUtils.isBlank(entity.getEmail())?null:entity.getEmail());
+                        ps.setObject(5, StringUtils.isBlank(entity.getPhone())?null:entity.getPhone());
+                        ps.setString(6, entity.getPhoneAreaCode());
+                        ps.setString(7, entity.getFullName());
+                        ps.setString(8, entity.getNickName());
+                        ps.setString(9, entity.getAvatar());
+                        ps.setString(10, entity.getExternalId());
+                        ps.setDate(11, Date.valueOf(entity.getExpireDate()));
+                        ps.setString(12, entity.getStatus().getCode());
+                        ps.setBoolean(13, !Objects.isNull(entity.getEmailVerified()) && entity.getEmailVerified());
+                        ps.setBoolean(14, !Objects.isNull(entity.getPhoneVerified()) && entity.getPhoneVerified());
+                        ps.setLong(15, Objects.isNull(entity.getAuthTotal())?0L:entity.getAuthTotal());
+                        ps.setString(16, entity.getLastAuthIp());
+                        ps.setTimestamp(17, !Objects.isNull(entity.getLastAuthTime()) ? Timestamp.valueOf(entity.getLastAuthTime()) : null);
+                        ps.setString(18, entity.getExpand());
+                        ps.setString(19, entity.getDataOrigin().getCode());
+                        ps.setObject(20, entity.getIdentitySourceId());
+                        ps.setTimestamp(21, !Objects.isNull(entity.getLastUpdatePasswordTime())?Timestamp.valueOf(entity.getLastUpdatePasswordTime()):null);
+                        ps.setString(22, entity.getCreateBy());
+                        ps.setTimestamp(23, Timestamp.valueOf(entity.getCreateTime()));
+                        ps.setString(24, entity.getUpdateBy());
+                        ps.setTimestamp(25, Timestamp.valueOf(entity.getUpdateTime()));
+                        ps.setString(26, entity.getRemark());
+                        ps.setBoolean(27,false);
+                    }
 
-                @Override
-                public int getBatchSize() {
-                    return list.size();
-                }
-            });
+                    @Override
+                    public int getBatchSize() {
+                        return list.size();
+                    }
+                });
         //@formatter:on
     }
 
@@ -308,11 +320,11 @@ public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
     public void batchUpdate(List<UserEntity> list) {
         //@formatter:off
         jdbcTemplate.batchUpdate(
-            "UPDATE user SET  username_=?, password_=?, email_=?, phone_=?, phone_area_code=?,full_name=?,nick_name=?, avatar_=?, external_id=?, expire_date=?, status_=?, email_verified=?, phone_verified=?,shared_secret=?, auth_total=?,last_auth_ip=?,last_auth_time=?,expand_=?,data_origin=?,identity_source_id=?,totp_bind=?,last_update_password_time =?,create_by=?,create_time=?,update_by=?,update_time=?,remark_=? WHERE  id_=?",
-            new BatchPreparedStatementSetter() {
+                "UPDATE user SET  username_=?, password_=?, email_=?, phone_=?, phone_area_code=?,full_name=?,nick_name=?, avatar_=?, external_id=?, expire_date=?, status_=?, email_verified=?, phone_verified=?, auth_total=?,last_auth_ip=?,last_auth_time=?,expand_=?,data_origin=?,identity_source_id=?,last_update_password_time =?,create_by=?,create_time=?,update_by=?,update_time=?,remark_=? WHERE  id_=?",
+                new BatchPreparedStatementSetter() {
 
-                @Override
-                public void setValues(@NotNull PreparedStatement ps, int i) throws SQLException {
+                    @Override
+                    public void setValues(@NotNull PreparedStatement ps, int i) throws SQLException {
                         UserEntity entity = list.get(i);
                         ps.setString(1, entity.getUsername());
                         ps.setString(2, entity.getPassword());
@@ -327,33 +339,150 @@ public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
                         ps.setString(11, entity.getStatus().getCode());
                         ps.setBoolean(12, !Objects.isNull(entity.getEmailVerified()) && entity.getEmailVerified());
                         ps.setBoolean(13, !Objects.isNull(entity.getPhoneVerified()) && entity.getPhoneVerified());
-                        ps.setString(14, entity.getSharedSecret());
-                        ps.setLong(15, entity.getAuthTotal());
-                        ps.setString(16, entity.getLastAuthIp());
-                        ps.setTimestamp(17, !Objects.isNull(entity.getLastAuthTime()) ? Timestamp.valueOf(entity.getLastAuthTime()) : null);
-                        ps.setString(18, entity.getExpand());
-                        ps.setString(19, entity.getDataOrigin().getCode());
-                        ps.setObject(20, entity.getIdentitySourceId());
-                        ps.setBoolean(21, !Objects.isNull(entity.getTotpBind()) && entity.getTotpBind());
-                        ps.setTimestamp(22, !Objects.isNull(entity.getLastUpdatePasswordTime())?Timestamp.valueOf(entity.getLastUpdatePasswordTime()):null);
-                        ps.setString(23, entity.getCreateBy());
-                        ps.setTimestamp(24, Timestamp.valueOf(entity.getCreateTime()));
-                        ps.setString(25, entity.getUpdateBy());
-                        ps.setTimestamp(26, Timestamp.valueOf(entity.getUpdateTime()));
-                        ps.setString(27, entity.getRemark());
-                        ps.setLong(28, entity.getId());
-                }
+                        ps.setLong(14, entity.getAuthTotal());
+                        ps.setString(15, entity.getLastAuthIp());
+                        ps.setTimestamp(16, !Objects.isNull(entity.getLastAuthTime()) ? Timestamp.valueOf(entity.getLastAuthTime()) : null);
+                        ps.setString(17, entity.getExpand());
+                        ps.setString(18, entity.getDataOrigin().getCode());
+                        ps.setObject(19, entity.getIdentitySourceId());
+                        ps.setTimestamp(20, !Objects.isNull(entity.getLastUpdatePasswordTime())?Timestamp.valueOf(entity.getLastUpdatePasswordTime()):null);
+                        ps.setString(21, entity.getCreateBy());
+                        ps.setTimestamp(22, Timestamp.valueOf(entity.getCreateTime()));
+                        ps.setString(23, entity.getUpdateBy());
+                        ps.setTimestamp(24, Timestamp.valueOf(entity.getUpdateTime()));
+                        ps.setString(25, entity.getRemark());
+                        ps.setLong(26, entity.getId());
+                    }
 
-                @Override
-                public int getBatchSize() {
-                    return list.size();
-                }
-            });
+                    @Override
+                    public int getBatchSize() {
+                        return list.size();
+                    }
+                });
         //@formatter:on
+    }
+
+    @Override
+
+    public List<UserEsPO> getUserList(List<String> idList) {
+        //@formatter:off
+        String whereUserId = "";
+        if (!CollectionUtils.isEmpty(idList)) {
+            if (idList.size() > 1) {
+                whereUserId =  "AND `user`.id_ IN ('%s')".formatted(String.join("','", idList));
+            }
+            else {
+                whereUserId =  "AND `user`.id_ = '%s'".formatted(idList.get(0));
+            }
+        }
+        String sql = """
+                SELECT
+                    `user`.id_,
+                    `user`.username_,
+                    `user`.email_,
+                    `user`.phone_,
+                    `user`.phone_area_code,
+                    `user`.full_name,
+                    `user`.nick_name,
+                    `user`.avatar_,
+                    `user`.status_,
+                    `user`.data_origin,
+                    `user`.email_verified,
+                    `user`.phone_verified,
+                    `user`.auth_total,
+                    `user`.last_auth_ip,
+                    `user`.last_auth_time,
+                    `user`.expand_,
+                    `user`.external_id,
+                    `user`.expire_date,
+                    `user`.create_by,
+                    `user`.create_time,
+                    `user`.update_by,
+                    `user`.update_time,
+                    `user`.remark_,
+                    `user`.identity_source_id,
+                    `user`.last_update_password_time,
+                    `user_detail`.id_type,
+                    `user_detail`.id_card,
+                    `user_detail`.website_,
+                    `user_detail`.address_,
+                    GROUP_CONCAT( DISTINCT `organization_member`.org_id SEPARATOR ',' ) AS organization_ids,
+                    CONCAT( '{', GROUP_CONCAT( DISTINCT CONCAT( '"', user_group.id_, '": "', user_group.name_, '"' ) SEPARATOR ',' ), '}' ) AS user_groups
+                FROM
+                    `user`
+                    LEFT JOIN `user_detail` ON `user`.id_ = user_detail.user_id
+                    AND user_detail.is_deleted = '0'
+                    LEFT JOIN `organization_member` ON `user`.id_ = organization_member.user_id
+                    AND organization_member.is_deleted = '0'
+                    LEFT JOIN `user_group_member` ON `user`.id_ = user_group_member.user_id
+                    AND user_group_member.is_deleted = '0'
+                    LEFT JOIN `user_group` ON `user_group`.id_ = user_group_member.group_id
+                    AND user_group.is_deleted = '0'
+                WHERE
+                    `user`.is_deleted = 0 %s
+                GROUP BY
+                    `user`.id_,
+                    `user`.username_,
+                    `user`.email_,
+                    `user`.phone_,
+                    `user`.phone_area_code,
+                    `user`.full_name,
+                    `user`.nick_name,
+                    `user`.avatar_,
+                    `user`.status_,
+                    `user`.data_origin,
+                    `user`.email_verified,
+                    `user`.phone_verified,
+                    `user`.auth_total,
+                    `user`.last_auth_ip,
+                    `user`.last_auth_time,
+                    `user`.expand_,
+                    `user`.external_id,
+                    `user`.expire_date,
+                    `user`.create_by,
+                    `user`.create_time,
+                    `user`.update_by,
+                    `user`.update_time,
+                    `user`.remark_,
+                    `user`.identity_source_id,
+                    `user`.last_update_password_time
+        """.formatted(whereUserId);
+        //@formatter:on
+        return jdbcTemplate.query(sql, new UserEsMapper());
+    }
+
+    @Override
+    public List<UserElasticSearchEntity> getAllUserElasticSearchEntity(IndexCoordinates userIndex) {
+        return getAllUserElasticSearchEntity(userIndex,
+            QueryBuilders.matchAll().build()._toQuery());
+    }
+
+    @Override
+    public List<UserElasticSearchEntity> getAllUserElasticSearchEntity(IndexCoordinates userIndex,
+                                                                       Query query) {
+        if (!elasticsearchTemplate.indexOps(userIndex).exists()) {
+            return null;
+        }
+        NativeQuery searchQuery = new NativeQueryBuilder().withQuery(query)
+            // 设置每页数据量
+            .withPageable(PageRequest.of(0, 2000)).build();
+        List<UserElasticSearchEntity> userElasticSearchEntityList = new ArrayList<>();
+        SearchHitsIterator<UserElasticSearchEntity> searchScrollHits = elasticsearchTemplate
+            .searchForStream(searchQuery, UserElasticSearchEntity.class, userIndex);
+        while (searchScrollHits.hasNext()) {
+            SearchHit<UserElasticSearchEntity> next = searchScrollHits.next();
+            userElasticSearchEntityList.add(next.getContent());
+        }
+        return userElasticSearchEntityList;
     }
 
     /**
      * JdbcTemplate
      */
-    private final JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate          jdbcTemplate;
+
+    /**
+     * ElasticsearchTemplate
+     */
+    private final ElasticsearchTemplate elasticsearchTemplate;
 }

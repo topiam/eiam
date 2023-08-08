@@ -1,6 +1,6 @@
 /*
- * eiam-authentication-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-authentication-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,8 +17,8 @@
  */
 package cn.topiam.employee.authentication.common.service;
 
-import cn.topiam.employee.authentication.common.modal.IdpUser;
-import cn.topiam.employee.core.security.userdetails.UserDetails;
+import cn.topiam.employee.authentication.common.authentication.IdpUserDetails;
+import cn.topiam.employee.support.security.userdetails.UserDetails;
 
 /**
  * UserIdpService
@@ -35,33 +35,25 @@ public interface UserIdpService {
      * @param providerId {@link  String}
      * @return {@link  Boolean}
      */
-    Boolean checkUserIdpIsAlreadyBind(String openId, String providerId);
-
-    /**
-     * 是否自动绑定
-     *
-     * @param providerId {@link  String} 提供商ID
-     * @return {@link  Boolean}
-     */
-    Boolean isAutoBindUserIdp(String providerId);
+    Boolean checkIdpUserIsExistBind(String openId, String providerId);
 
     /**
      * 绑定
      *
      * @param accountId   {@link  String} 账户ID
-     * @param idpUser   {@link  IdpUser} 用户信息
+     * @param idpUserDetails   {@link  IdpUserDetails} 用户信息
      * @return {@link  Boolean}
      */
-    Boolean bindUserIdp(String accountId, IdpUser idpUser);
+    Boolean bindUserIdp(String accountId, IdpUserDetails idpUserDetails);
 
     /**
      * 更新账户信息
      *
-     * @param idpUser   {@link IdpUser} 用户信息
+     * @param idpUserDetails   {@link IdpUserDetails} 用户信息
      * @param providerId {@link  String} 提供商ID
      * @return {@link  Boolean}
      */
-    Boolean updateUser(IdpUser idpUser, String providerId);
+    Boolean updateUser(IdpUserDetails idpUserDetails, String providerId);
 
     /**
      * 获取用户详情

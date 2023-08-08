@@ -1,6 +1,6 @@
 /*
- * eiam-identity-source-dingtalk - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-identity-source-dingtalk - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,8 +17,6 @@
  */
 package cn.topiam.employee.identitysource.dingtalk;
 
-import javax.validation.ConstraintViolationException;
-
 import org.apache.commons.lang3.StringUtils;
 
 import com.aliyun.dingtalkcontact_1_0.models.GetOrgAuthInfoHeaders;
@@ -33,9 +31,11 @@ import com.aliyun.teautil.models.RuntimeOptions;
 import cn.topiam.employee.identitysource.core.IdentitySourceConfigValidator;
 import cn.topiam.employee.identitysource.core.exception.ApiCallException;
 import cn.topiam.employee.identitysource.dingtalk.client.AbstractDingTalkClient;
-import cn.topiam.employee.support.validation.ValidationHelp;
+import cn.topiam.employee.support.validation.ValidationUtils;
 
 import lombok.extern.slf4j.Slf4j;
+
+import jakarta.validation.ConstraintViolationException;
 
 /**
  * 钉钉身份源客户端配置验证器
@@ -50,10 +50,10 @@ public class DingTalkConfigValidator implements IdentitySourceConfigValidator<Di
     @Override
     public Boolean validate(DingTalkConfig config) {
         try {
-            ValidationHelp.ValidationResult<DingTalkConfig> validationResult = ValidationHelp
+            ValidationUtils.ValidationResult<DingTalkConfig> validationResult = ValidationUtils
                 .validateEntity(config);
             if (validationResult.isHasErrors()) {
-                log.error("校验钉钉配置失败:{}", validationResult.getMessage());
+                log.error("校验钉钉配置失败：{}", validationResult.getMessage());
                 throw new ConstraintViolationException(validationResult.getConstraintViolations());
             }
             //获取 AccessToken

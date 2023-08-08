@@ -1,6 +1,6 @@
 /*
- * eiam-audit - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-audit - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,8 +19,9 @@ package cn.topiam.employee.audit.event.type;
 
 import java.util.List;
 
-import cn.topiam.employee.common.enums.UserType;
-import static cn.topiam.employee.audit.event.type.Resource.APP_RESOURCE;
+import cn.topiam.employee.audit.event.Type;
+import cn.topiam.employee.support.security.userdetails.UserType;
+import static cn.topiam.employee.audit.event.ConsoleResource.APP_RESOURCE;
 
 /**
  * 应用资源
@@ -29,16 +30,7 @@ import static cn.topiam.employee.audit.event.type.Resource.APP_RESOURCE;
  * Created by support@topiam.cn on  2021/11/24 23:00
  */
 public class AppEventType {
-    /**
-     * 单点登录
-     */
-    public static Type APP_SSO                         = new Type("eiam:event:app:sso", "单点登录",
-        APP_RESOURCE, List.of(UserType.USER));
-    /**
-     * 退出应用
-     */
-    public static Type SIGN_OUT_APP                    = new Type("eiam:event:app:login", "退出应用",
-        APP_RESOURCE, List.of(UserType.USER));
+
     /**
      * 添加应用
      */
@@ -74,13 +66,13 @@ public class AppEventType {
      * 应用访问授权
      */
     public static Type APP_ACCESS_POLICY               = new Type("eiam:event:app:access_policy",
-        "应用访问授权", APP_RESOURCE, List.of(UserType.ADMIN));
+        "添加应用访问授权", APP_RESOURCE, List.of(UserType.ADMIN));
 
     /**
      * 删除访问授权
      */
-    public static Type APP_DELETE_ACCESS_POLICY        = new Type(
-        "eiam:event:app:delete_access_policy", "应用访问授权", APP_RESOURCE, List.of(UserType.ADMIN));
+    public static Type APP_CANCEL_ACCESS_POLICY        = new Type(
+        "eiam:event:app:cancel_access_policy", "取消应用访问授权", APP_RESOURCE, List.of(UserType.ADMIN));
 
     /**
      * 添加应用账户

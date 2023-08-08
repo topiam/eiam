@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,24 +17,22 @@
  */
 package cn.topiam.employee.common.message.mail;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-
-import cn.topiam.employee.common.crypto.EncryptContextHelp;
+import cn.topiam.employee.common.jackjson.encrypt.JsonPropertyEncrypt;
 import cn.topiam.employee.common.message.enums.MailProvider;
 import cn.topiam.employee.common.message.enums.MailSafetyType;
 
-import lombok.Builder;
 import lombok.Data;
+
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * MailProviderConfig
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/10/1 19:10
+ * Created by support@topiam.cn on  2021/10/1 21:10
  */
 @Data
-@Builder
 public class MailProviderConfig {
     public MailProviderConfig() {
     }
@@ -83,9 +81,6 @@ public class MailProviderConfig {
      * 密码
      */
     @NotEmpty(message = "密码不能为空")
+    @JsonPropertyEncrypt
     private String         secret;
-
-    public String getDecryptSecret() {
-        return EncryptContextHelp.decrypt(this.secret);
-    }
 }

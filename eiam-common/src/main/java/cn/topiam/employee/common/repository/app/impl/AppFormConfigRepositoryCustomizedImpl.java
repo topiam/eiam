@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,7 @@ import cn.topiam.employee.common.repository.app.AppFormConfigRepositoryCustomize
 import cn.topiam.employee.common.repository.app.impl.mapper.AppFormConfigPoMapper;
 
 import lombok.AllArgsConstructor;
-import static cn.topiam.employee.common.constants.ProtocolConstants.FORM_CONFIG_CACHE_NAME;
+import static cn.topiam.employee.common.constant.ProtocolConstants.FORM_CONFIG_CACHE_NAME;
 
 /**
  *
@@ -52,7 +52,7 @@ public class AppFormConfigRepositoryCustomizedImpl implements AppFormConfigRepos
                 app.client_secret
             FROM
                 app
-                LEFT JOIN app_form_config afc ON app.id_ = afc.app_id AND afc.is_deleted = '0'
+                INNER JOIN app_form_config afc ON app.id_ = afc.app_id AND afc.is_deleted = '0'
             WHERE
                 app.is_deleted = '0'
             """;

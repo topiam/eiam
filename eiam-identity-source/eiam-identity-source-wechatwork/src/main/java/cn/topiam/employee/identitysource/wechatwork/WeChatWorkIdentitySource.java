@@ -1,6 +1,6 @@
 /*
- * eiam-identity-source-wechatwork - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-identity-source-wechatwork - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,8 +23,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -55,11 +53,13 @@ import cn.topiam.employee.support.exception.BadParamsException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 /**
  * 企业微信
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/9/21 19:59
+ * Created by support@topiam.cn on  2022/9/21 21:59
  */
 @Slf4j
 @SuppressWarnings("AlibabaSwitchStatement")
@@ -73,18 +73,18 @@ public class WeChatWorkIdentitySource extends AbstractDefaultIdentitySource<WeCh
      * 企业微信事件回调事件
      *
      * @param request  {@link  HttpServletRequest}
-     * @param response {@link  HttpServletRequest}
+     * @param body {@link  String}
      * @return {@link  ResponseEntity}
      */
     @Override
-    public Object event(HttpServletRequest request, HttpServletResponse response) {
+    public Object event(HttpServletRequest request, String body) {
         LocalDateTime eventTime = LocalDateTime.now();
         Map<String, Object> params = RequestUtils.getParams(request);
         WeChatWorkRequest weWorkResult = null;
         try {
             if (RequestMethod.POST.name().equals(request.getMethod())) {
                 try {
-                    weWorkResult = RequestUtils.getXml(request, WeChatWorkRequest.class);
+                    weWorkResult = RequestUtils.getXml(body, WeChatWorkRequest.class);
                 } catch (JAXBException e) {
                     log.error("企业微信身份源 [{}] 事件回调入参转换异常: {}", getId(), e.getMessage());
                     throw new BadParamsException("企业微信事件回调数据转换异常: " + e.getMessage());
@@ -94,7 +94,7 @@ public class WeChatWorkIdentitySource extends AbstractDefaultIdentitySource<WeCh
             log.debug("企业微信身份源 [{}] 事件回调入参: {}, {}", getId(), params, weWorkResult);
             String result = eventCallBack(eventTime, params, weWorkResult);
             log.debug("企业微信身份源 [{}] 事件回调返回: {}", getId(), JSON.toJSONString(result));
-            return ResponseEntity.ok(result);
+            return result;
         } catch (Exception e) {
             log.error("企业微信回调通知异常: 身份源id: [{}], 入参: [{}, {}], 异常信息: [{}]", getId(), params,
                 weWorkResult, e.getMessage(), e);
@@ -221,7 +221,7 @@ public class WeChatWorkIdentitySource extends AbstractDefaultIdentitySource<WeCh
      * 事件回调DTO
      *
      * @author TopIAM
-     * Created by support@topiam.cn on  2022/9/21 19:59
+     * Created by support@topiam.cn on  2022/9/21 21:59
      */
     @Data
     @XmlRootElement(name = "xml")
@@ -255,7 +255,7 @@ public class WeChatWorkIdentitySource extends AbstractDefaultIdentitySource<WeCh
      * 企业微信事件回调入参
      *
      * @author TopIAM
-     * Created by support@topiam.cn on  2022/9/21 19:59
+     * Created by support@topiam.cn on  2022/9/21 21:59
      */
     @Data
     @XmlRootElement(name = "xml")

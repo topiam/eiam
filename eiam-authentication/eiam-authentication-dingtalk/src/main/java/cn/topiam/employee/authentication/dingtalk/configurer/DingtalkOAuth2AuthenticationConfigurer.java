@@ -1,6 +1,6 @@
 /*
- * eiam-authentication-dingtalk - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-authentication-dingtalk - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,7 +17,7 @@
  */
 package cn.topiam.employee.authentication.dingtalk.configurer;
 
-import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
@@ -38,8 +38,8 @@ import cn.topiam.employee.common.repository.authentication.IdentityProviderRepos
  * Created by support@topiam.cn on  2021/9/10 22:58
  */
 @SuppressWarnings("AlibabaClassNamingShouldBeCamel")
-public final class DingtalkOAuth2AuthenticationConfigurer<H extends HttpSecurityBuilder<H>> extends
-                                                         AbstractAuthenticationFilterConfigurer<H, DingtalkOAuth2AuthenticationConfigurer<H>, DingtalkOauthAuthenticationFilter> {
+public final class DingtalkOAuth2AuthenticationConfigurer extends
+                                                          AbstractAuthenticationFilterConfigurer<HttpSecurity, DingtalkOAuth2AuthenticationConfigurer, DingtalkOauthAuthenticationFilter> {
     private final IdentityProviderRepository identityProviderRepository;
     private final UserIdpService             userIdpService;
 
@@ -64,7 +64,7 @@ public final class DingtalkOAuth2AuthenticationConfigurer<H extends HttpSecurity
     }
 
     @Override
-    public void init(H http) throws Exception {
+    public void init(HttpSecurity http) throws Exception {
         //钉钉登录认证
         DingtalkOauthAuthenticationFilter loginAuthenticationFilter = new DingtalkOauthAuthenticationFilter(
             identityProviderRepository, userIdpService);
@@ -75,7 +75,7 @@ public final class DingtalkOAuth2AuthenticationConfigurer<H extends HttpSecurity
     }
 
     @Override
-    public void configure(H http) throws Exception {
+    public void configure(HttpSecurity http) throws Exception {
         //钉钉请求重定向
         DingtalkOAuth2AuthorizationRequestRedirectFilter requestRedirectFilter = new DingtalkOAuth2AuthorizationRequestRedirectFilter(
             identityProviderRepository);
@@ -88,5 +88,11 @@ public final class DingtalkOAuth2AuthenticationConfigurer<H extends HttpSecurity
         return new OrRequestMatcher(
             DingtalkOAuth2AuthorizationRequestRedirectFilter.getRequestMatcher(),
             DingtalkOauthAuthenticationFilter.getRequestMatcher());
+    }
+
+    public static DingtalkOAuth2AuthenticationConfigurer dingtalkOAuth2(IdentityProviderRepository identityProviderRepository,
+                                                                        UserIdpService userIdpService) {
+        return new DingtalkOAuth2AuthenticationConfigurer(identityProviderRepository,
+            userIdpService);
     }
 }

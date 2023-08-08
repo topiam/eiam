@@ -1,6 +1,6 @@
 /*
- * eiam-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,23 +19,36 @@ package cn.topiam.employee.core.security.password.task.impl;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import cn.topiam.employee.common.entity.account.UserEntity;
+import com.google.common.collect.Lists;
+
+import cn.topiam.employee.common.entity.account.UserElasticSearchEntity;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.enums.UserStatus;
 import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
+import cn.topiam.employee.core.mq.UserMessagePublisher;
+import cn.topiam.employee.core.mq.UserMessageTag;
 import cn.topiam.employee.core.security.password.task.PasswordExpireTask;
+import cn.topiam.employee.support.autoconfiguration.SupportProperties;
+import cn.topiam.employee.support.lock.Lock;
 import cn.topiam.employee.support.trace.Trace;
 
 import lombok.RequiredArgsConstructor;
+
+import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
 import static cn.topiam.employee.core.setting.constant.PasswordPolicySettingConstants.PASSWORD_POLICY_DEFAULT_SETTINGS;
 import static cn.topiam.employee.core.setting.constant.PasswordPolicySettingConstants.PASSWORD_POLICY_VALID_DAYS;
 
@@ -53,30 +66,48 @@ public class PasswordExpireLockTask implements PasswordExpireTask {
     /**
      * 锁定密码过期用户
      */
+    @Lock(throwException = false)
     @Trace
     @Scheduled(cron = "0 0 0 * * ?")
     @Override
     public void execute() {
+        long start = System.currentTimeMillis();
         logger.info("密码过期锁定用户任务开始");
         int expireDays = getExpireDays();
-        //1、根据提醒时间，分页查询即将要过期的密码
-        List<UserEntity> list = userRepository.findPasswordExpireUser(expireDays);
-        Iterator<UserEntity> iterator = list.iterator();
-        logger.info("密码过期待锁定用户数量为:{}个", list.size());
-        while (list.size() > 0) {
-            UserEntity entity = iterator.next();
+        // 查询非密码过期锁定和过期锁定用户信息
+        Query query = QueryBuilders.terms(builder -> {
+            builder.terms(new TermsQueryField.Builder().value(
+                Lists.newArrayList(FieldValue.of(UserStatus.PASSWORD_EXPIRED_LOCKED.getCode()),
+                    FieldValue.of(UserStatus.EXPIRED_LOCKED.getCode())))
+                .build());
+            builder.field("status");
+            return builder;
+        });
+        List<UserElasticSearchEntity> userElasticSearchList = userRepository
+            .getAllUserElasticSearchEntity(
+                IndexCoordinates.of(supportProperties.getUser().getIndexPrefix()), query);
+        List<String> lockedUserIdList = new ArrayList<>();
+        Iterator<UserElasticSearchEntity> iterator = userElasticSearchList.iterator();
+        logger.info("密码过期待锁定用户数量为:{}个", userElasticSearchList.size());
+        while (!userElasticSearchList.isEmpty()) {
+            UserElasticSearchEntity entity = iterator.next();
             //获取到期日期
             LocalDateTime expiredDate = entity.getLastUpdatePasswordTime().atOffset(ZoneOffset.MAX)
                 .plusDays(expireDays).toLocalDateTime();
             if (LocalDateTime.now().isBefore(expiredDate)) {
-                entity.setStatus(UserStatus.PASS_WORD_EXPIRED_LOCKED);
-                userRepository.save(entity);
-                logger.info("锁定密码过期用户:{}", entity.getUsername());
+                lockedUserIdList.add(entity.getId());
+                userRepository.updateUserStatus(Long.valueOf(entity.getId()),
+                    UserStatus.PASSWORD_EXPIRED_LOCKED);
+                logger.info("锁定密码过期用户：{}", entity.getUsername());
                 iterator.remove();
             }
-            iterator = list.iterator();
+            iterator = userElasticSearchList.iterator();
         }
-        logger.info("密码过期锁定用户任务结束");
+        // 推送es用户消息
+        userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE,
+            String.join(",", lockedUserIdList));
+        logger.info("密码过期锁定用户任务结束: 冻结用户数量[{}], 耗时:[{}]s", lockedUserIdList.size(),
+            (System.currentTimeMillis() - start) / 1000);
     }
 
     /**
@@ -95,11 +126,21 @@ public class PasswordExpireLockTask implements PasswordExpireTask {
     /**
      * 设置
      */
-    private final SettingRepository settingRepository;
+    private final SettingRepository    settingRepository;
 
     /**
      * UserRepository
      */
-    private final UserRepository    userRepository;
+    private final UserRepository       userRepository;
+
+    /**
+     * SupportProperties
+     */
+    private final SupportProperties    supportProperties;
+
+    /**
+     * UserMessagePublisher
+     */
+    private final UserMessagePublisher userMessagePublisher;
 
 }

@@ -1,6 +1,6 @@
 /*
- * eiam-authentication-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-authentication-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,5 +28,11 @@ public final class AuthenticationConstants {
     /**
      * 提供商ID
      */
-    public static final String PROVIDER_CODE = "providerId";
+    public static final String PROVIDER_CODE                              = "providerId";
+
+    public static final String INVALID_STATE_PARAMETER_ERROR_CODE         = "invalid_state_parameter";
+    public static final String INVALID_NONCE_PARAMETER_ERROR_CODE         = "invalid_nonce_parameter";
+    public static final String INVALID_CODE_PARAMETER_ERROR_CODE          = "invalid_code_parameter";
+
+    public static final String AUTHORIZATION_REQUEST_NOT_FOUND_ERROR_CODE = "authorization_request_not_found";
 }

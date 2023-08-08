@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,14 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Lists;
 
@@ -47,30 +44,11 @@ import lombok.AllArgsConstructor;
  * App Repository Customized
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020/12/29 20:27
+ * Created by support@topiam.cn on  2020/12/29 21:27
  */
 @Repository
 @AllArgsConstructor
 public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
-
-    /**
-     * 更新应用状态
-     *
-     * @param id      {@link  Long}
-     * @param enabled {@link  Boolean}
-     * @return {@link  Boolean}
-     */
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Integer updateAppStatus(Long id, Boolean enabled) {
-        StringBuffer builder = new StringBuffer("UPDATE app SET is_enabled=？where id_=?");
-        //@formatter:on
-        try {
-            return jdbcTemplate.queryForObject(builder.toString(), Integer.class, enabled, id);
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
-    }
 
     /**
      * 获取我的应用列表
@@ -129,11 +107,6 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
             Integer.class);
         return new PageImpl<>(list, pageable, count);
     }
-
-    /**
-     * JdbcTemplate
-     */
-    private final JdbcTemplate                 jdbcTemplate;
 
     /**
      * NamedParameterJdbcTemplate

@@ -1,6 +1,6 @@
 /*
- * eiam-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -36,11 +36,11 @@ import cn.topiam.employee.support.context.ApplicationContextHelp;
  * @author TopIAM
  * Created by support@topiam.cn on  2022/8/13 21:50
  */
-public class UserUtils {
+public final class UserUtils {
     private static final Logger logger = LoggerFactory.getLogger(UserUtils.class);
 
     public static UserEntity getUser() {
-        return getUser(SecurityUtils.getCurrentUserId());
+        return getUser(cn.topiam.employee.support.security.util.SecurityUtils.getCurrentUserId());
     }
 
     public static UserEntity getUser(String userId) {
@@ -55,7 +55,8 @@ public class UserUtils {
     }
 
     public static UserDetailEntity getUserDetails() {
-        return getUserDetails(SecurityUtils.getCurrentUserId());
+        return getUserDetails(
+            cn.topiam.employee.support.security.util.SecurityUtils.getCurrentUserId());
     }
 
     public static UserDetailEntity getUserDetails(String userId) {

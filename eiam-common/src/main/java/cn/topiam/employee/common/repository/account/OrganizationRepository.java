@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jetbrains.annotations.NotNull;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -32,8 +35,10 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.account.OrganizationEntity;
+import cn.topiam.employee.common.entity.app.AppAccountEntity;
 import cn.topiam.employee.common.enums.DataOrigin;
 import cn.topiam.employee.support.repository.LogicDeleteRepository;
+import static cn.topiam.employee.common.constant.AccountConstants.ORG_CACHE_NAME;
 
 /**
  * <p>
@@ -44,6 +49,7 @@ import cn.topiam.employee.support.repository.LogicDeleteRepository;
  * Created by support@topiam.cn on  2020-08-09
  */
 @Repository
+@CacheConfig(cacheNames = { ORG_CACHE_NAME })
 public interface OrganizationRepository extends LogicDeleteRepository<OrganizationEntity, String>,
                                         JpaSpecificationExecutor<OrganizationEntity>,
                                         QuerydslPredicateExecutor<OrganizationRepository>,
@@ -71,6 +77,7 @@ public interface OrganizationRepository extends LogicDeleteRepository<Organizati
      * @param parentId {@link String}
      * @return {@link OrganizationEntity}
      */
+    @Cacheable(key = "'child:'+#p0", unless = "#result==null")
     List<OrganizationEntity> findByParentId(String parentId);
 
     /**
@@ -79,7 +86,28 @@ public interface OrganizationRepository extends LogicDeleteRepository<Organizati
      * @param parentId {@link String}
      * @return {@link OrganizationEntity}
      */
+    @Cacheable(key = "'child_asc:'+#p0", unless = "#result==null || #result.isEmpty()")
     List<OrganizationEntity> findByParentIdOrderByOrderAsc(String parentId);
+
+    /**
+     * findById
+     *
+     * @param id {@link String}
+     * @return {@link Optional}
+     */
+    @NotNull
+    @Override
+    @Cacheable(key = "#p0", unless = "#result==null")
+    Optional<OrganizationEntity> findById(@NotNull String id);
+
+    /**
+     * deleteById
+     *
+     * @param id {@link String}
+     */
+    @Override
+    @CacheEvict(allEntries = true)
+    void deleteById(@NotNull String id);
 
     /**
      * 移动组织机构
@@ -89,6 +117,7 @@ public interface OrganizationRepository extends LogicDeleteRepository<Organizati
      */
     @Transactional(rollbackFor = Exception.class)
     @Modifying
+    @CacheEvict(allEntries = true)
     @Query(value = "UPDATE OrganizationEntity SET parentId =:parentId  WHERE id =:id")
     void moveOrganization(@Param(value = "id") String id,
                           @Param(value = "parentId") String parentId);
@@ -101,6 +130,7 @@ public interface OrganizationRepository extends LogicDeleteRepository<Organizati
      */
     @Transactional(rollbackFor = Exception.class)
     @Modifying
+    @CacheEvict(allEntries = true)
     @Query(value = "UPDATE OrganizationEntity set leaf =:isLeaf WHERE id =:id")
     void updateIsLeaf(@Param(value = "id") String id, @Param(value = "isLeaf") Boolean isLeaf);
 
@@ -112,6 +142,7 @@ public interface OrganizationRepository extends LogicDeleteRepository<Organizati
      * @return {@link  Integer}
      */
     @Modifying
+    @CacheEvict(allEntries = true)
     @Query(value = "UPDATE OrganizationEntity set enabled =:status WHERE id =:id")
     Integer updateStatus(@Param(value = "id") String id, @Param(value = "status") Boolean status);
 
@@ -121,7 +152,7 @@ public interface OrganizationRepository extends LogicDeleteRepository<Organizati
      * @param keyWord {@link String}
      * @return {@link OrganizationEntity}
      */
-    @Query(value = "FROM OrganizationEntity WHERE name LIKE %:keyWord% OR code LIKE %:keyWord%")
+    @Query(value = "FROM OrganizationEntity WHERE name LIKE :keyWord OR code LIKE :keyWord")
     List<OrganizationEntity> findByNameLikeOrCodeLike(@Param(value = "keyWord") String keyWord);
 
     /**
@@ -205,4 +236,46 @@ public interface OrganizationRepository extends LogicDeleteRepository<Organizati
     @NotNull
     @Query(value = "SELECT * FROM organization WHERE id_ = :id", nativeQuery = true)
     Optional<OrganizationEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") String id);
+
+    /**
+     * 查询子部门id
+     *
+     * @param parentIds {@link List}
+     */
+    @Query(value = """
+            WITH RECURSIVE org ( id_, parent_id ) AS (
+                SELECT
+                    id_,
+                    parent_id
+                FROM
+                    organization
+                WHERE
+                    is_deleted = '0'
+                    AND parent_id IN ( :parentIds ) UNION ALL
+                SELECT
+                    o.id_,
+                    o.parent_id
+                FROM
+                    organization o
+                    JOIN org ON o.is_deleted = '0'
+                    AND o.parent_id = org.id_
+                ) SELECT
+                id_
+            FROM
+                org
+            """, nativeQuery = true)
+    @Cacheable(key = "'childs:'+#p0", unless = "#result==null")
+    List<String> getChildIdList(@Param("parentIds") List<String> parentIds);
+
+    /**
+     * save
+     *
+     * @param entity must not be {@literal null}.
+     * @param <S>    {@link S}
+     * @return {@link AppAccountEntity}
+     */
+    @NotNull
+    @Override
+    @CacheEvict(allEntries = true)
+    <S extends OrganizationEntity> S save(@NotNull S entity);
 }

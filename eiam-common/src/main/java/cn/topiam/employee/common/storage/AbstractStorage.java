@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,14 +17,15 @@
  */
 package cn.topiam.employee.common.storage;
 
+import java.io.InputStream;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/10 20:36
+ * Created by support@topiam.cn on  2021/11/10 21:36
  */
 public class AbstractStorage implements Storage {
     protected StorageConfig    config;
@@ -39,22 +40,23 @@ public class AbstractStorage implements Storage {
     /**
      * 判断域名是否为https
      *
-     * @param url
-     * @return
+     * @param url {@link String}
+     * @return {@link Boolean}
      */
     public boolean getUrlSecure(String url) {
         return "https:".equals(url.split("//")[0]);
     }
 
-    public String getFileName(String fileName, MultipartFile file) {
+    public String getFileName(String fileName) {
         if (StringUtils.isBlank(fileName)) {
-            fileName = file.getOriginalFilename();
+            fileName = "";
         }
         return UUID.randomUUID().toString().replace(JOINER, "").toLowerCase() + JOINER + fileName;
     }
 
     @Override
-    public String upload(String fileName, MultipartFile file) throws StorageProviderException {
+    public String upload(@NotNull String fileName,
+                         InputStream inputStream) throws StorageProviderException {
         return null;
     }
 

@@ -1,6 +1,6 @@
 /*
- * eiam-portal - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-portal - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,11 +29,12 @@ import cn.topiam.employee.application.ApplicationService;
 import cn.topiam.employee.application.ApplicationServiceLoader;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.enums.app.AppProtocol;
+import cn.topiam.employee.core.help.ServerHelp;
 import cn.topiam.employee.portal.constant.PortalConstants;
 import cn.topiam.employee.portal.pojo.result.GetAppListResult;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.repository.page.domain.Page;
-import static cn.topiam.employee.common.constants.ProtocolConstants.APP_CODE_VARIABLE;
+import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CODE_VARIABLE;
 import static cn.topiam.employee.common.enums.app.InitLoginType.PORTAL_OR_APP;
 
 /**
@@ -64,7 +65,7 @@ public interface AppConverter {
            result.setInitLoginType(entity.getInitLoginType());
            //登录发起URL
            if (PORTAL_OR_APP.equals(entity.getInitLoginType())){
-               result.setInitLoginUrl(StringUtils.defaultString(entity.getInitLoginUrl(), getIdpInitUrl(entity.getProtocol(), entity.getCode())));
+               result.setInitLoginUrl(StringUtils.defaultIfBlank(entity.getInitLoginUrl(), getIdpInitUrl(entity.getProtocol(), entity.getCode())));
            }
            result.setIcon(entity.getIcon());
            //图标未配置，所以先从模版中拿
@@ -102,25 +103,20 @@ public interface AppConverter {
      * @return {@link String}
      */
     private String getIdpInitUrl(AppProtocol protocol, String appCode) {
-        //SAML2
-        if (AppProtocol.SAML2.equals(protocol)) {
-            return PortalConstants.IDP_SAML2_SSO_INITIATOR.replace(APP_CODE_VARIABLE, appCode);
-        }
         //OAuth2
         if (AppProtocol.OIDC.equals(protocol)) {
-            return PortalConstants.IDP_OAUTH2_SSO_INITIATOR.replace(APP_CODE_VARIABLE, appCode);
+            return ServerHelp.getPortalPublicBaseUrl()
+                   + PortalConstants.IDP_OAUTH2_SSO_INITIATOR.replace(APP_CODE_VARIABLE, appCode);
         }
         //Form
         if (AppProtocol.FORM.equals(protocol)) {
-            return PortalConstants.IDP_FORM_SSO_INITIATOR.replace(APP_CODE_VARIABLE, appCode);
+            return ServerHelp.getPortalPublicBaseUrl()
+                   + PortalConstants.IDP_FORM_SSO_INITIATOR.replace(APP_CODE_VARIABLE, appCode);
         }
         //JWT
         if (AppProtocol.JWT.equals(protocol)) {
-            return PortalConstants.IDP_JWT_SSO_INITIATOR.replace(APP_CODE_VARIABLE, appCode);
-        }
-        //CAS
-        if (AppProtocol.CAS.equals(protocol)) {
-            return PortalConstants.IDP_CAS_SSO_INITIATOR.replace(APP_CODE_VARIABLE, appCode);
+            return ServerHelp.getPortalPublicBaseUrl()
+                   + PortalConstants.IDP_JWT_SSO_INITIATOR.replace(APP_CODE_VARIABLE, appCode);
         }
         return null;
     }

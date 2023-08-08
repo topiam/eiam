@@ -1,6 +1,6 @@
 /*
- * eiam-audit - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-audit - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,16 +19,16 @@ package cn.topiam.employee.audit.entity;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.Setting;
 
 import lombok.Builder;
 import lombok.Data;
-import static org.springframework.data.elasticsearch.annotations.DateFormat.date_hour_minute_second_millis;
 
 /**
  * 审计elasticsearch实体
@@ -38,6 +38,8 @@ import static org.springframework.data.elasticsearch.annotations.DateFormat.date
  */
 @Data
 @Builder
+@Document(indexName = "#{@auditDynamicIndexName.getIndexName()}")
+@Setting(replicas = 0)
 public class AuditElasticSearchEntity implements Serializable {
 
     @Serial
@@ -88,11 +90,5 @@ public class AuditElasticSearchEntity implements Serializable {
      */
     @Field(type = FieldType.Object, name = "geo_location")
     private GeoLocation       geoLocation;
-
-    /**
-     * 时间戳
-     */
-    @Field(type = FieldType.Date, name = "@timestamp", format = date_hour_minute_second_millis)
-    private Instant           timestamp;
 
 }

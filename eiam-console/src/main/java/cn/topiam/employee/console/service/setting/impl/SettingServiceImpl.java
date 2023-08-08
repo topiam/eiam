@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,8 +19,6 @@ package cn.topiam.employee.console.service.setting.impl;
 
 import java.util.List;
 import java.util.Objects;
-
-import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
@@ -87,7 +85,6 @@ public class SettingServiceImpl implements SettingService {
      * @return {@link Boolean}
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public Boolean removeSetting(String name) {
         settingsRepository.deleteByName(name);
         return Boolean.TRUE;
@@ -97,4 +94,5 @@ public class SettingServiceImpl implements SettingService {
      * SettingRepository
      */
     private final SettingRepository settingsRepository;
+
 }

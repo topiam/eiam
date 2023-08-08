@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -97,9 +97,10 @@ public class MailTemplateServiceImpl extends SettingServiceImpl implements MailT
             BeanUtils.merge(entity, template, LAST_MODIFIED_BY, LAST_MODIFIED_TIME);
             return mailTemplateRepository.save(template);
         }
-        AuditContext
-            .setTarget(Target.builder().id(type.getCode()).type(TargetType.MAIL_TEMPLATE).build());
-        return mailTemplateRepository.save(entity);
+        entity = mailTemplateRepository.save(entity);
+        AuditContext.setTarget(
+            Target.builder().id(entity.getId().toString()).type(TargetType.MAIL_TEMPLATE).build());
+        return entity;
     }
 
     /**
@@ -138,8 +139,7 @@ public class MailTemplateServiceImpl extends SettingServiceImpl implements MailT
         //从枚举类获取信息
         List<MailType> values = Arrays.asList(MailType.values());
         //从数据库获取
-        List<MailTemplateEntity> lists = (List<MailTemplateEntity>) mailTemplateRepository
-            .findAll();
+        List<MailTemplateEntity> lists = mailTemplateRepository.findAll();
         return messageDataConverter.mailTemplateTypeConvertToEmailTemplateListResult(values, lists);
     }
 

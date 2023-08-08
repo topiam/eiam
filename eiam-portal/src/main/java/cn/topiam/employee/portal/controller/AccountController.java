@@ -1,6 +1,6 @@
 /*
- * eiam-portal - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-portal - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,19 +17,24 @@
  */
 package cn.topiam.employee.portal.controller;
 
+import java.util.List;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import cn.topiam.employee.core.security.decrypt.DecryptRequestBody;
+import cn.topiam.employee.audit.annotation.Audit;
+import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.portal.pojo.request.*;
-import cn.topiam.employee.portal.pojo.result.PrepareBindMfaResult;
+import cn.topiam.employee.portal.pojo.result.BoundIdpListResult;
 import cn.topiam.employee.portal.service.AccountService;
 import cn.topiam.employee.support.result.ApiRestResult;
+import cn.topiam.employee.support.web.decrypt.DecryptRequestBody;
 
 import lombok.AllArgsConstructor;
 
 import io.swagger.v3.oas.annotations.Operation;
-import static cn.topiam.employee.support.constant.EiamConstants.API_PATH;
+import io.swagger.v3.oas.annotations.Parameter;
+import static cn.topiam.employee.portal.constant.PortalConstants.*;
 
 /**
  * 账户管理
@@ -39,7 +44,7 @@ import static cn.topiam.employee.support.constant.EiamConstants.API_PATH;
  */
 @RestController
 @AllArgsConstructor
-@RequestMapping(value = API_PATH + "/account")
+@RequestMapping(value = ACCOUNT_PATH)
 public class AccountController {
 
     /**
@@ -47,6 +52,7 @@ public class AccountController {
      *
      * @return {@link  ApiRestResult}
      */
+    @Audit(type = EventType.MODIFY_ACCOUNT_INFO_PORTAL)
     @Operation(summary = "修改账户信息")
     @PutMapping("/change_info")
     public ApiRestResult<Boolean> changeInfo(@DecryptRequestBody @RequestBody @Validated UpdateUserInfoRequest param) {
@@ -55,10 +61,23 @@ public class AccountController {
     }
 
     /**
+     * 准备修改密码
+     *
+     * @return {@link  ApiRestResult}
+     */
+    @Audit(type = EventType.PREPARE_MODIFY_PASSWORD)
+    @Operation(summary = "准备修改账户密码")
+    @PostMapping("/prepare_change_password")
+    public ApiRestResult<Boolean> prepareChangePassword(@DecryptRequestBody @RequestBody @Validated PrepareChangePasswordRequest param) {
+        return ApiRestResult.ok(accountService.prepareChangePassword(param));
+    }
+
+    /**
      * 修改密码
      *
      * @return {@link  ApiRestResult}
      */
+    @Audit(type = EventType.MODIFY_USER_PASSWORD_PORTAL)
     @Operation(summary = "修改账户密码")
     @PutMapping("/change_password")
     public ApiRestResult<Boolean> changePassword(@DecryptRequestBody @RequestBody @Validated ChangePasswordRequest param) {
@@ -70,6 +89,7 @@ public class AccountController {
      *
      * @return {@link  ApiRestResult}
      */
+    @Audit(type = EventType.PREPARE_MODIFY_PHONE)
     @Operation(summary = "准备修改手机")
     @PostMapping("/prepare_change_phone")
     public ApiRestResult<Boolean> prepareChangePhone(@DecryptRequestBody @RequestBody @Validated PrepareChangePhoneRequest param) {
@@ -81,6 +101,7 @@ public class AccountController {
      *
      * @return {@link  ApiRestResult}
      */
+    @Audit(type = EventType.MODIFY_USER_PHONE_PORTAL)
     @Operation(summary = "修改手机")
     @PutMapping("/change_phone")
     public ApiRestResult<Boolean> changePhone(@RequestBody @Validated ChangePhoneRequest param) {
@@ -92,6 +113,7 @@ public class AccountController {
      *
      * @return {@link  ApiRestResult}
      */
+    @Audit(type = EventType.PREPARE_MODIFY_EMAIL)
     @Operation(summary = "准备修改邮箱")
     @PostMapping("/prepare_change_email")
     public ApiRestResult<Boolean> prepareChangeEmail(@DecryptRequestBody @RequestBody @Validated PrepareChangeEmailRequest param) {
@@ -103,6 +125,7 @@ public class AccountController {
      *
      * @return {@link  ApiRestResult}
      */
+    @Audit(type = EventType.MODIFY_USER_EMAIL_PORTAL)
     @Operation(summary = "修改邮箱")
     @PutMapping("/change_email")
     public ApiRestResult<Boolean> changeEmail(@RequestBody @Validated ChangeEmailRequest param) {
@@ -110,36 +133,60 @@ public class AccountController {
     }
 
     /**
-     * 准备绑定MFA
+     * 忘记密码发送验证码
      *
      * @return {@link  ApiRestResult}
      */
-    @Operation(summary = "准备绑定MFA")
-    @PostMapping("/prepare_bind_totp")
-    public ApiRestResult<PrepareBindMfaResult> prepareBindTotp(@DecryptRequestBody @RequestBody @Validated PrepareBindTotpRequest param) {
-        return ApiRestResult.ok(accountService.prepareBindTotp(param));
+    @Operation(summary = "忘记密码发送验证码")
+    @GetMapping(FORGET_PASSWORD_CODE)
+    public ApiRestResult<Boolean> forgetPasswordCode(@Parameter(description = "验证码接收者（邮箱/手机号）") @RequestParam String recipient) {
+        return ApiRestResult.ok(accountService.forgetPasswordCode(recipient));
     }
 
     /**
-     * 绑定 TOTP
+     * 忘记密码预认证
      *
      * @return {@link  ApiRestResult}
      */
-    @Operation(summary = "绑定 TOTP")
-    @PostMapping("/bind_totp")
-    public ApiRestResult<Boolean> bindTotp(@DecryptRequestBody @RequestBody @Validated BindTotpRequest param) {
-        return ApiRestResult.ok(accountService.bindTotp(param));
+    @Operation(summary = "忘记密码预认证")
+    @PostMapping(PREPARE_FORGET_PASSWORD)
+    public ApiRestResult<Boolean> prepareForgetPassword(@DecryptRequestBody @RequestBody @Validated PrepareForgetPasswordRequest param) {
+        return ApiRestResult
+            .ok(accountService.prepareForgetPassword(param.getRecipient(), param.getCode()));
     }
 
     /**
-     * 解绑 TOTP
+     * 忘记密码
      *
      * @return {@link  ApiRestResult}
      */
-    @Operation(summary = "解绑 TOTP")
-    @PutMapping("/unbind_totp")
-    public ApiRestResult<Boolean> unbindTotp() {
-        return ApiRestResult.ok(accountService.unbindTotp());
+    @Operation(summary = "忘记密码")
+    @PutMapping(FORGET_PASSWORD)
+    public ApiRestResult<Boolean> forgetPassword(@DecryptRequestBody @RequestBody @Validated ForgetPasswordRequest forgetPasswordRequest) {
+        return ApiRestResult.ok(accountService.forgetPassword(forgetPasswordRequest));
+    }
+
+    /**
+     * 查询账号绑定
+     *
+     * @return {@link  ApiRestResult}
+     */
+    @Operation(summary = "查询已绑定IDP")
+    @GetMapping("/bound_idp")
+    public ApiRestResult<List<BoundIdpListResult>> getBoundIdpList() {
+        return ApiRestResult.ok(accountService.getBoundIdpList());
+    }
+
+    /**
+     * 解除账号绑定
+     *
+     * @return {@link  ApiRestResult}
+     */
+    @Audit(type = EventType.UNBIND_IDP_USER)
+    @Operation(summary = "IDP账号解绑")
+    @DeleteMapping("/unbind_idp/{id}")
+    public ApiRestResult<Boolean> unbindIdp(@Parameter(description = "IDP ID") @PathVariable("id") String id) {
+        return ApiRestResult.ok(accountService.unbindIdp(id));
     }
 
     /**

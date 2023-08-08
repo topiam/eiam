@@ -1,6 +1,6 @@
 /*
- * eiam-application-form - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-application-form - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,7 +19,6 @@ package cn.topiam.employee.application.form;
 
 import cn.topiam.employee.application.ApplicationService;
 import cn.topiam.employee.application.form.model.FormProtocolConfig;
-import cn.topiam.employee.common.entity.app.AppAccountEntity;
 
 /**
  * 应用接口
@@ -36,13 +35,4 @@ public interface FormApplicationService extends ApplicationService {
      * @return {@link FormProtocolConfig}
      */
     FormProtocolConfig getProtocolConfig(String appCode);
-
-    /**
-     * 获取应用用户信息
-     *
-     * @param appId {@link Long}
-     * @param userId {@link Long}
-     * @return {@link FormProtocolConfig}
-     */
-    AppAccountEntity getAppAccount(Long appId, Long userId);
 }

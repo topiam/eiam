@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,33 +17,33 @@
  */
 package cn.topiam.employee.console.configuration;
 
-import org.springdoc.core.GroupedOpenApi;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 import cn.topiam.employee.EiamConsoleApplication;
-import cn.topiam.employee.common.constants.AuthenticationConstants;
+import cn.topiam.employee.common.constant.AuthnConstants;
 import cn.topiam.employee.support.util.AppVersionUtils;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
-import static cn.topiam.employee.common.constants.AccountConstants.ACCOUNT_API_DOC_GROUP_NAME;
-import static cn.topiam.employee.common.constants.AccountConstants.ACCOUNT_API_PATHS;
-import static cn.topiam.employee.common.constants.AnalysisConstants.ANALYSIS_GROUP_NAME;
-import static cn.topiam.employee.common.constants.AnalysisConstants.ANALYSIS_PATH;
-import static cn.topiam.employee.common.constants.AppConstants.APP_GROUP_NAME;
-import static cn.topiam.employee.common.constants.AppConstants.APP_PATH;
-import static cn.topiam.employee.common.constants.AuthenticationConstants.AUTHENTICATION_PATH;
-import static cn.topiam.employee.common.constants.SettingConstants.SETTING_GROUP_NAME;
-import static cn.topiam.employee.common.constants.SettingConstants.SETTING_PATH;
+import static cn.topiam.employee.common.constant.AccountConstants.ACCOUNT_API_DOC_GROUP_NAME;
+import static cn.topiam.employee.common.constant.AccountConstants.ACCOUNT_API_PATHS;
+import static cn.topiam.employee.common.constant.AnalysisConstants.ANALYSIS_GROUP_NAME;
+import static cn.topiam.employee.common.constant.AnalysisConstants.ANALYSIS_PATH;
+import static cn.topiam.employee.common.constant.AppConstants.APP_GROUP_NAME;
+import static cn.topiam.employee.common.constant.AppConstants.APP_PATH;
+import static cn.topiam.employee.common.constant.AuthnConstants.AUTHN_PATH;
+import static cn.topiam.employee.common.constant.SettingConstants.SETTING_GROUP_NAME;
+import static cn.topiam.employee.common.constant.SettingConstants.SETTING_PATH;
 
 /**
  * ApiConfiguration
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2019/5/16 20:28
+ * Created by support@topiam.cn on 2019/5/16 21:28
  */
 @Configuration
 public class ConsoleApiConfiguration {
@@ -81,8 +81,8 @@ public class ConsoleApiConfiguration {
      */
     @Bean
     public GroupedOpenApi authenticationRestApi() {
-        return GroupedOpenApi.builder().group(AuthenticationConstants.AUTHENTICATION_GROUP_NAME)
-            .pathsToMatch(AUTHENTICATION_PATH + "/**").build();
+        return GroupedOpenApi.builder().group(AuthnConstants.AUTHENTICATION_GROUP_NAME)
+            .pathsToMatch(AUTHN_PATH + "/**").build();
     }
 
     /**

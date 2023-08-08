@@ -1,6 +1,6 @@
 /*
- * eiam-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cn.topiam.employee.core.security.password.enums.PasswordComplexityRule;
+import cn.topiam.employee.support.security.password.enums.PasswordComplexityRule;
 
 /**
  * 密码策略常量
@@ -128,8 +128,6 @@ public final class PasswordPolicySettingConstants {
         PASSWORD_POLICY_KEYS.add(PASSWORD_POLICY_VALID_DAYS);
         //密码过期提醒时间
         PASSWORD_POLICY_KEYS.add(PASSWORD_POLICY_VALID_WARN_BEFORE_DAYS);
-        //自定义弱密码
-        PASSWORD_POLICY_KEYS.add(PASSWORD_POLICY_CUSTOM_WEAK_PASSWORD);
     }
 
     /**

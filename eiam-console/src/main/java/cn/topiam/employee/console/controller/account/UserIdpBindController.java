@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,13 +25,13 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.AllArgsConstructor;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import static cn.topiam.employee.common.constants.AccountConstants.USER_PATH;
+import static cn.topiam.employee.common.constant.AccountConstants.USER_PATH;
 
 /**
  * 用户身份提供商绑定
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/4 19:06
+ * Created by support@topiam.cn on  2022/6/4 21:06
  */
 @Validated
 @Tag(name = "用户身份提供商绑定关系")

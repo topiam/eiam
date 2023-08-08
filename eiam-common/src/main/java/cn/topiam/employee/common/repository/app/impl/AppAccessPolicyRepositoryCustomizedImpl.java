@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -18,6 +18,7 @@
 package cn.topiam.employee.common.repository.app.impl;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -30,8 +31,10 @@ import org.springframework.stereotype.Repository;
 import cn.topiam.employee.common.entity.account.query.UserListQuery;
 import cn.topiam.employee.common.entity.app.po.AppAccessPolicyPO;
 import cn.topiam.employee.common.entity.app.query.AppAccessPolicyQuery;
+import cn.topiam.employee.common.enums.app.AuthorizationType;
 import cn.topiam.employee.common.repository.app.AppAccessPolicyRepositoryCustomized;
 import cn.topiam.employee.common.repository.app.impl.mapper.AppAccessPolicyPoMapper;
+import cn.topiam.employee.support.exception.TopIamException;
 
 import lombok.AllArgsConstructor;
 
@@ -39,7 +42,7 @@ import lombok.AllArgsConstructor;
  * AppPolicy Repository Customized
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020/12/29 20:27
+ * Created by support@topiam.cn on  2020/12/29 21:27
  */
 @Repository
 @AllArgsConstructor
@@ -70,10 +73,8 @@ public class AppAccessPolicyRepositoryCustomizedImpl implements
                 	app.protocol_ AS app_protocol
                 FROM
                 	app_access_policy a
-                	LEFT JOIN app ON a.app_id = app.id_ AND app.is_deleted = '0'
-                LEFT JOIN
-                """);
-        builder.append("""
+                	INNER JOIN app ON a.app_id = app.id_ AND app.is_deleted = '0'
+                INNER JOIN
                 ( SELECT
                 	id_,
                 	name_,
@@ -103,14 +104,21 @@ public class AppAccessPolicyRepositoryCustomizedImpl implements
         if (StringUtils.isNotEmpty(query.getSubjectName())) {
             builder.append(" AND subject.name_ like '%").append(query.getSubjectName()).append("%'");
         }
+
         //主体ID
         if (StringUtils.isNotBlank(query.getSubjectId())) {
             builder.append(" AND a.subject_id = '").append(query.getSubjectId()).append("'");
+        } else {
+            if (StringUtils.isEmpty(query.getAppId())) {
+                throw new TopIamException("主体ID不能为空");
+            }
         }
-        //应用ID
-        if (StringUtils.isNotEmpty(query.getAppId())) {
+
+        if(StringUtils.isNotBlank(query.getAppId())){
+            //应用ID
             builder.append(" AND a.app_id = '").append(query.getAppId()).append("'");
         }
+
         //应用名称
         if (StringUtils.isNotBlank(query.getAppName())) {
             builder.append(" AND app.name_ like '%").append(query.getAppName()).append("'");
@@ -126,6 +134,42 @@ public class AppAccessPolicyRepositoryCustomizedImpl implements
         //@formatter:on
         Integer count = jdbcTemplate.queryForObject(countSql, Integer.class);
         return new PageImpl<>(list, pageable, count);
+    }
+
+    /**
+     * 用户是否允许访问应用
+     *
+     * @param appId  {@link Long}
+     * @param userId {@link Long}
+     * @return {@link Boolean}
+     */
+    @Override
+    public Boolean hasAllowAccess(Long appId, Long userId) {
+        //@formatter:off
+        String builder = """
+                SELECT
+                	count(*) as count
+                FROM
+                    app LEFT JOIN
+                	app_access_policy aap ON app.id_ = aap.app_id AND aap.is_deleted = '0'
+                	WHERE app.id_ = '%s' AND app.is_deleted = '0' AND (app.authorization_type = '%s'
+                	 OR (aap.subject_id IN (
+                        SELECT
+                            id_
+                        FROM
+                            user_group_member
+                        WHERE user_id = '%3$s'
+                         UNION ALL
+                        SELECT
+                        	id_
+                        FROM
+                        	organization_member
+                        WHERE user_id = '%3$s')
+                      OR aap.subject_id = '%3$s'))
+                """.formatted(appId, AuthorizationType.ALL_ACCESS.getCode(), userId);
+        //@formatter:on
+        Integer count = jdbcTemplate.queryForObject(builder, Integer.class);
+        return !Objects.isNull(count) && count > 0;
     }
 
     /**

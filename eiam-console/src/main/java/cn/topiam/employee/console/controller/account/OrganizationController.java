@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,12 +25,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import cn.topiam.employee.audit.annotation.Audit;
-import cn.topiam.employee.audit.enums.EventType;
-import cn.topiam.employee.common.constants.AccountConstants;
-import cn.topiam.employee.console.pojo.result.account.OrganizationChildResult;
-import cn.topiam.employee.console.pojo.result.account.OrganizationResult;
-import cn.topiam.employee.console.pojo.result.account.OrganizationRootResult;
-import cn.topiam.employee.console.pojo.result.account.OrganizationTreeResult;
+import cn.topiam.employee.audit.event.type.EventType;
+import cn.topiam.employee.common.constant.AccountConstants;
+import cn.topiam.employee.console.pojo.result.account.*;
 import cn.topiam.employee.console.pojo.save.account.OrganizationCreateParam;
 import cn.topiam.employee.console.pojo.update.account.OrganizationUpdateParam;
 import cn.topiam.employee.console.service.account.OrganizationService;
@@ -40,12 +37,13 @@ import cn.topiam.employee.support.result.ApiRestResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * 系统账户-组织架构
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2020/7/11 19:18
+ * Created by support@topiam.cn on 2020/7/11 21:18
  */
 @Validated
 @Tag(name = "组织架构")
@@ -64,7 +62,7 @@ public class OrganizationController {
     @PostMapping(value = "/create")
     @Audit(type = EventType.CREATE_ORG)
     @Operation(summary = "创建组织")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> createOrganization(@RequestBody @Validated OrganizationCreateParam param) {
         return ApiRestResult.<Boolean> builder().result(organizationService.createOrg(param))
             .build();
@@ -81,7 +79,7 @@ public class OrganizationController {
     @Operation(summary = "修改组织")
     @Audit(type = EventType.UPDATE_ORG)
     @PutMapping(value = "/update")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> updateOrganization(@RequestBody @Validated OrganizationUpdateParam param) {
         return ApiRestResult.<Boolean> builder().result(organizationService.updateOrg(param))
             .build();
@@ -98,26 +96,9 @@ public class OrganizationController {
     @Operation(summary = "删除组织")
     @Audit(type = EventType.DELETE_ORG)
     @DeleteMapping(value = "/delete/{id}")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> deleteOrganization(@PathVariable(value = "id") String id) {
         return ApiRestResult.<Boolean> builder().result(organizationService.deleteOrg(id)).build();
-    }
-
-    /**
-     * 删除组织架构
-     *
-     * @param ids {@link String}
-     * @return {@link Boolean}
-     */
-    @Lock
-    @Preview
-    @Operation(summary = "批量删除组织")
-    @Audit(type = EventType.DELETE_ORG)
-    @DeleteMapping(value = "/batch_delete")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
-    public ApiRestResult<Boolean> batchDeleteOrganization(String[] ids) {
-        return ApiRestResult.<Boolean> builder().result(organizationService.batchDeleteOrg(ids))
-            .build();
     }
 
     /**
@@ -130,7 +111,7 @@ public class OrganizationController {
     @Preview
     @Operation(summary = "启用组织")
     @PutMapping(value = "/enable/{id}")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> enableOrganization(@PathVariable(value = "id") String id) {
         return ApiRestResult.<Boolean> builder()
             .result(organizationService.updateStatus(id, Boolean.TRUE)).build();
@@ -146,7 +127,7 @@ public class OrganizationController {
     @Preview
     @Operation(summary = "禁用组织")
     @PutMapping(value = "/disable/{id}")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> disableOrganization(@PathVariable(value = "id") String id) {
         return ApiRestResult.<Boolean> builder()
             .result(organizationService.updateStatus(id, Boolean.FALSE)).build();
@@ -164,7 +145,7 @@ public class OrganizationController {
     @Operation(summary = "移动组织")
     @Audit(type = EventType.MOVE_ORGANIZATION)
     @PutMapping(value = "/move")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> moveOrganization(@RequestParam(value = "id") String id,
                                                    @RequestParam(value = "parentId") String parentId) {
         return ApiRestResult.<Boolean> builder()
@@ -178,7 +159,7 @@ public class OrganizationController {
      */
     @GetMapping(value = "/get_root")
     @Operation(summary = "获取根组织")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<OrganizationRootResult> getRootOrganization() {
         OrganizationRootResult result = organizationService.getRootOrganization();
         return ApiRestResult.<OrganizationRootResult> builder().result(result).build();
@@ -191,7 +172,7 @@ public class OrganizationController {
      */
     @GetMapping(value = "/get_child")
     @Operation(summary = "获取下级组织")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<List<OrganizationChildResult>> getChildOrganization(@RequestParam(value = "parentId") String parentId) {
         List<OrganizationChildResult> list = organizationService.getChildOrganization(parentId);
         return ApiRestResult.<List<OrganizationChildResult>> builder().result(list).build();
@@ -204,7 +185,7 @@ public class OrganizationController {
      */
     @GetMapping(value = "/filter_tree")
     @Operation(summary = "获取下级组织")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<List<OrganizationTreeResult>> filterOrganizationTree(@RequestParam(value = "keyWord") String keyWord) {
         List<OrganizationTreeResult> list = organizationService.filterOrganizationTree(keyWord);
         return ApiRestResult.<List<OrganizationTreeResult>> builder().result(list).build();
@@ -218,10 +199,25 @@ public class OrganizationController {
      */
     @Operation(summary = "获取组织信息")
     @GetMapping(value = "/get/{id}")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<OrganizationResult> getOrganization(@PathVariable(value = "id") String id) {
         OrganizationResult result = organizationService.getOrganization(id);
         return ApiRestResult.<OrganizationResult> builder().result(result).build();
+    }
+
+    /**
+     * 批量获取组织信息
+     *
+     * @param ids {@link List}
+     * @return {@link BatchOrganizationResult}
+     */
+    @Validated
+    @Operation(summary = "批量获取组织信息")
+    @GetMapping(value = "/batch_get")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
+    public ApiRestResult<List<BatchOrganizationResult>> batchGetOrganization(@RequestParam(value = "ids", required = false) @NotNull(message = "组织ID不能为空") List<String> ids) {
+        List<BatchOrganizationResult> result = organizationService.batchGetOrganization(ids);
+        return ApiRestResult.<List<BatchOrganizationResult>> builder().result(result).build();
     }
 
     /**

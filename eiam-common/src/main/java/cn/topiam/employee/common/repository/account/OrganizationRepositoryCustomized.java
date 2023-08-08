@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,7 +19,10 @@ package cn.topiam.employee.common.repository.account;
 
 import java.util.List;
 
+import com.querydsl.core.types.dsl.NumberExpression;
+
 import cn.topiam.employee.common.entity.account.OrganizationEntity;
+import cn.topiam.employee.common.entity.account.po.OrganizationPO;
 
 /**
  * @author TopIAM
@@ -40,4 +43,21 @@ public interface OrganizationRepositoryCustomized {
      * @param list {@link List}
      */
     void batchUpdate(List<OrganizationEntity> list);
+
+    /**
+     * 获取组织列表
+     *
+     * @param idList {@link  List}
+     * @return {@link List}
+     */
+    List<OrganizationPO> getOrganizationList(List<String> idList);
+
+    /**
+     * 查询组织成员数量或id
+     *
+     * @param orgId {@link  String}
+     * @param orgId {@link  NumberExpression}
+     * @return {@link  List}
+     */
+    List<Long> getOrgMemberList(String orgId, NumberExpression<Long> expression);
 }

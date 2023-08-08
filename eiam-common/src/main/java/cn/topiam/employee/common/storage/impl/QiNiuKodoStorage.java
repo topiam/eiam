@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,9 +17,11 @@
  */
 package cn.topiam.employee.common.storage.impl;
 
-import javax.validation.constraints.NotEmpty;
+import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
-import org.springframework.web.multipart.MultipartFile;
+import org.jetbrains.annotations.NotNull;
 
 import com.alibaba.fastjson2.JSON;
 import com.qiniu.common.QiniuException;
@@ -31,7 +33,7 @@ import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
 
-import cn.topiam.employee.common.crypto.Encrypt;
+import cn.topiam.employee.common.jackjson.encrypt.JsonPropertyEncrypt;
 import cn.topiam.employee.common.storage.AbstractStorage;
 import cn.topiam.employee.common.storage.StorageConfig;
 import cn.topiam.employee.common.storage.StorageProviderException;
@@ -40,11 +42,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 
+import jakarta.validation.constraints.NotEmpty;
+
 /**
  * 七牛kodo
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/10 20:33
+ * Created by support@topiam.cn on  2021/11/10 21:33
  */
 @Slf4j
 public class QiNiuKodoStorage extends AbstractStorage {
@@ -85,18 +89,19 @@ public class QiNiuKodoStorage extends AbstractStorage {
     //    }
 
     @Override
-    public String upload(String fileName, MultipartFile file) throws StorageProviderException {
+    public String upload(@NotNull String fileName,
+                         InputStream inputStream) throws StorageProviderException {
         try {
-            super.upload(fileName, file);
+            super.upload(fileName, inputStream);
             Auth auth = Auth.create(qiNiuConfig.getAccessKey(), qiNiuConfig.getSecretKey());
             String upToken = auth.uploadToken(qiNiuConfig.getBucket());
-            Response response = uploadManager.put(file.getBytes(),
-                qiNiuConfig.getLocation() + SEPARATOR + getFileName(fileName, file), upToken, null,
-                null, true);
+            Response response = uploadManager.put(inputStream,
+                qiNiuConfig.getLocation() + SEPARATOR + getFileName(fileName), upToken, null, null);
             //解析上传成功的结果
             DefaultPutRet putRet = JSON.parseObject(response.bodyString(), DefaultPutRet.class);
             log.info("qi niu upload response: {}", putRet);
-            return qiNiuConfig.getDomain() + SEPARATOR + putRet.key;
+            return qiNiuConfig.getDomain() + SEPARATOR
+                   + URLEncoder.encode(putRet.key, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         } catch (QiniuException ex) {
             Response r = ex.response;
             log.error("qi niu upload fail response: {}", r.toString());
@@ -145,7 +150,7 @@ public class QiNiuKodoStorage extends AbstractStorage {
         /**
          * SecretKey
          */
-        @Encrypt
+        @JsonPropertyEncrypt
         @NotEmpty(message = "SecretKey不能为空")
         private String secretKey;
         /**

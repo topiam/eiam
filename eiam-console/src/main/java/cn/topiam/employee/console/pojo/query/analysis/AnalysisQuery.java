@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,15 +21,14 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.Period;
 
-import javax.validation.constraints.NotNull;
-
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.Data;
 import lombok.Getter;
 
+import co.elastic.clients.elasticsearch._types.aggregations.CalendarInterval;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIME_FORMATTER_PATTERN;
 
 /**
@@ -70,20 +69,20 @@ public class AnalysisQuery implements Serializable {
                           /**
                            * HOUR
                            */
-                          HOUR(DateHistogramInterval.HOUR, "HH时"),
+                          HOUR(CalendarInterval.Hour, "HH时"),
                           /**
                            * DAY
                            */
-                          DAY(DateHistogramInterval.DAY, "dd日"),
+                          DAY(CalendarInterval.Day, "dd日"),
                           /**
                            * MONTH
                            */
-                          MONTH(DateHistogramInterval.MONTH, "MM月");
+                          MONTH(CalendarInterval.Month, "MM月");
 
-        private final DateHistogramInterval type;
-        private final String                format;
+        private final CalendarInterval type;
+        private final String           format;
 
-        Interval(DateHistogramInterval type, String format) {
+        Interval(CalendarInterval type, String format) {
             this.type = type;
             this.format = format;
         }

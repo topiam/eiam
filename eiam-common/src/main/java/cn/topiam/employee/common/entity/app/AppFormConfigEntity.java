@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,11 @@ package cn.topiam.employee.common.entity.app;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.Where;
 
-import org.hibernate.annotations.*;
-
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
-
+import cn.topiam.employee.common.enums.app.FormEncryptType;
 import cn.topiam.employee.common.enums.app.FormSubmitType;
 import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
 
@@ -37,7 +34,11 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
@@ -54,8 +55,6 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
 @Accessors(chain = true)
 @Table(name = "app_form_config")
 @SQLDelete(sql = "update app_form_config set " + SOFT_DELETE_SET + " where id_ = ?")
-@SQLDeleteAll(sql = "update app_form_config set " + SOFT_DELETE_SET + " where id_ = ?")
-@TypeDef(name = "json", typeClass = JsonStringType.class)
 @Where(clause = SOFT_DELETE_WHERE)
 public class AppFormConfigEntity extends LogicDeleteEntity<Long> {
 
@@ -84,6 +83,30 @@ public class AppFormConfigEntity extends LogicDeleteEntity<Long> {
     private String           passwordField;
 
     /**
+     * 登录密码加密类型
+     */
+    @Column(name = "password_encrypt_type")
+    private FormEncryptType  passwordEncryptType;
+
+    /**
+     * 登录密码加密秘钥
+     */
+    @Column(name = "password_encrypt_key")
+    private String           passwordEncryptKey;
+
+    /**
+     * 用户名加密类型
+     */
+    @Column(name = "username_encrypt_type")
+    private FormEncryptType  usernameEncryptType;
+
+    /**
+     * 用户名加密秘钥
+     */
+    @Column(name = "username_encrypt_key")
+    private String           usernameEncryptKey;
+
+    /**
      * 登录提交方式
      */
     @Column(name = "submit_type")
@@ -93,7 +116,7 @@ public class AppFormConfigEntity extends LogicDeleteEntity<Long> {
      * 登录其他信息
      */
     @Column(name = "other_field")
-    @Type(type = "json")
+    @Type(JsonType.class)
     private List<OtherField> otherField;
 
     @Data

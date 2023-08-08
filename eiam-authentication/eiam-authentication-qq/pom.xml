@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    eiam-authentication-qq - Employee Identity and Access Management Program
-    Copyright © 2020-2023 TopIAM (support@topiam.cn)
+    eiam-authentication-qq - Employee Identity and Access Management
+    Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -24,7 +24,7 @@
     <parent>
         <artifactId>eiam-authentication</artifactId>
         <groupId>cn.topiam</groupId>
-        <version>1.0.0-beta1</version>
+        <version>1.0.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>

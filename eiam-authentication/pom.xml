@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    eiam-authentication - Employee Identity and Access Management Program
-    Copyright © 2020-2023 TopIAM (support@topiam.cn)
+    eiam-authentication - Employee Identity and Access Management
+    Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -24,13 +24,14 @@
     <parent>
         <groupId>cn.topiam</groupId>
         <artifactId>eiam</artifactId>
-        <version>1.0.0-beta1</version>
+        <version>1.0.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>eiam-authentication</artifactId>
     <packaging>pom</packaging>
+
     <modules>
         <module>eiam-authentication-core</module>
         <module>eiam-authentication-dingtalk</module>
@@ -38,10 +39,9 @@
         <module>eiam-authentication-qq</module>
         <module>eiam-authentication-wechat</module>
         <module>eiam-authentication-wechatwork</module>
-        <module>eiam-authentication-sms</module>
-        <module>eiam-authentication-mfa</module>
-        <module>eiam-authentication-captcha</module>
         <module>eiam-authentication-all</module>
+        <module>eiam-authentication-mail</module>
+        <module>eiam-authentication-sms</module>
     </modules>
 
     <dependencies>

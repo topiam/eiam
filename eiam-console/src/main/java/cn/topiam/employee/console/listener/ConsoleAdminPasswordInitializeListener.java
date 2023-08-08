@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,17 +31,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.annotation.Order;
 import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.JdkIdGenerator;
+import org.springframework.util.AlternativeJdkIdGenerator;
 
 import cn.topiam.employee.common.entity.setting.AdministratorEntity;
 import cn.topiam.employee.common.enums.UserStatus;
 import cn.topiam.employee.common.repository.setting.AdministratorRepository;
 import cn.topiam.employee.support.trace.TraceUtils;
-import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_ADMIN_USERNAME;
+import static cn.topiam.employee.console.access.DefaultAdministratorConstants.DEFAULT_ADMIN_USERNAME;
 import static cn.topiam.employee.support.lock.LockAspect.getTopiamLockKeyPrefix;
 import static cn.topiam.employee.support.util.CreateFileUtil.createFile;
 
@@ -51,6 +52,7 @@ import static cn.topiam.employee.support.util.CreateFileUtil.createFile;
  * @author TopIAM
  * Created by support@topiam.cn on  2022/11/26 21:44
  */
+@Order(2)
 @Component
 public class ConsoleAdminPasswordInitializeListener implements
                                                     ApplicationListener<ContextRefreshedEvent> {
@@ -64,7 +66,7 @@ public class ConsoleAdminPasswordInitializeListener implements
     @Transactional(rollbackFor = Exception.class)
     public void onApplicationEvent(@NonNull ContextRefreshedEvent contextRefreshedEvent) {
         //@formatter:off
-        String traceId = jdkIdGenerator.generateId().toString();
+        String traceId = idGenerator.generateId().toString();
         TraceUtils.put(traceId);
         RLock lock = redissonClient.getLock(getTopiamLockKeyPrefix());
         boolean tryLock = false;
@@ -73,7 +75,7 @@ public class ConsoleAdminPasswordInitializeListener implements
              if (tryLock){
                  Optional<AdministratorEntity> optional = administratorRepository.findByUsername(DEFAULT_ADMIN_USERNAME);
                  if (optional.isEmpty()) {
-                     String initPassword = jdkIdGenerator.generateId().toString().replace("-", "").toLowerCase(Locale.ENGLISH);
+                     String initPassword = idGenerator.generateId().toString().replace("-", "").toLowerCase(Locale.ENGLISH);
                      createFile(getInitialAdminPasswordFilePath());
                      BufferedWriter stream = new BufferedWriter(new FileWriter(getInitialAdminPasswordFilePath()));
                      //清空
@@ -120,7 +122,8 @@ public class ConsoleAdminPasswordInitializeListener implements
      * @param username {@link String}
      * @param password {@link String}
      */
-    private void saveInitAdministrator(String username, String password) {
+    @Transactional(rollbackFor = Exception.class)
+    public void saveInitAdministrator(String username, String password) {
         AdministratorEntity administrator = new AdministratorEntity();
         administrator.setUsername(username);
         administrator.setPassword(passwordEncoder.encode(password));
@@ -148,13 +151,13 @@ public class ConsoleAdminPasswordInitializeListener implements
         return path + "initialAdminPassword";
     }
 
-    private final JdkIdGenerator          jdkIdGenerator = new JdkIdGenerator();
+    private final AlternativeJdkIdGenerator idGenerator = new AlternativeJdkIdGenerator();
 
-    private final AdministratorRepository administratorRepository;
+    private final AdministratorRepository   administratorRepository;
 
-    private final PasswordEncoder         passwordEncoder;
+    private final PasswordEncoder           passwordEncoder;
 
-    private final RedissonClient          redissonClient;
+    private final RedissonClient            redissonClient;
 
     public ConsoleAdminPasswordInitializeListener(AdministratorRepository administratorRepository,
                                                   PasswordEncoder passwordEncoder,

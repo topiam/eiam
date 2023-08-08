@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,13 +19,14 @@ package cn.topiam.employee.common.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import cn.topiam.employee.support.enums.BaseEnum;
 import cn.topiam.employee.support.web.converter.EnumConvert;
 
 /**
  * 消息类型
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/25 19:19
+ * Created by support@topiam.cn on  2021/9/25 21:19
  */
 public enum MessageNoticeChannel implements BaseEnum {
                                                       /**
@@ -66,7 +67,7 @@ public enum MessageNoticeChannel implements BaseEnum {
      * 获取类型
      *
      * @param code {@link String}
-     * @return {@link OrganizationType}
+     * @return {@link MessageNoticeChannel}
      */
     @EnumConvert
     public static MessageNoticeChannel getType(String code) {

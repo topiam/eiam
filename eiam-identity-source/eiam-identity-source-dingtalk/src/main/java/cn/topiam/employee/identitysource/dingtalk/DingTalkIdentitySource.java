@@ -1,6 +1,6 @@
 /*
- * eiam-identity-source-dingtalk - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-identity-source-dingtalk - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,9 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
@@ -51,11 +48,13 @@ import cn.topiam.employee.identitysource.dingtalk.util.DingTalkEventCryptoUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 /**
  * 钉钉
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/9/21 19:59
+ * Created by support@topiam.cn on  2022/9/21 21:59
  */
 @Slf4j
 public class DingTalkIdentitySource extends AbstractDefaultIdentitySource<DingTalkConfig> {
@@ -72,15 +71,13 @@ public class DingTalkIdentitySource extends AbstractDefaultIdentitySource<DingTa
      * @see [book events](https://open.dingtalk.com/document/orgapp-server/address-book-events)
      *
      * @param request  {@link HttpServletRequest}
-     * @param response {@link HttpServletResponse}
      */
     @Override
-    public Object event(HttpServletRequest request, HttpServletResponse response) {
+    public Object event(HttpServletRequest request, String body) {
         LocalDateTime eventTime = LocalDateTime.now();
         Map<String, Object> params = RequestUtils.getParams(request);
-        String json = RequestUtils.getBody(request);
-        if (StringUtils.isNoneBlank(json)) {
-            String encrypt = JSON.parseObject(json).getString(ENCRYPT);
+        if (StringUtils.isNoneBlank(body)) {
+            String encrypt = JSON.parseObject(body).getString(ENCRYPT);
             log.info("钉钉身份源 [{}] 回调入参: {}, encrypt: {}", getId(), JSON.toJSONString(params),
                 encrypt);
             Object result = eventCallBack(eventTime, params, encrypt);

@@ -1,6 +1,6 @@
 /*
- * eiam-application-jwt - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-application-jwt - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -34,7 +34,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * Created by support@topiam.cn on  2022/5/31 22:46
  */
 @Data
-@Schema(description = "JWT 配置返回结果")
+@Schema(description = "JWT 配置返回响应")
 public class AppJwtGetResult implements Serializable {
     /**
      * SSO 发起方

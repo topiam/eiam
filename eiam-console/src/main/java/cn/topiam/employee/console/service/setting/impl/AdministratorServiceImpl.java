@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,14 +26,19 @@ import java.util.Optional;
 import java.util.concurrent.Executor;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.session.Session;
-import org.springframework.session.security.SpringSessionBackedSessionRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 
@@ -52,18 +57,16 @@ import cn.topiam.employee.console.pojo.result.setting.AdministratorResult;
 import cn.topiam.employee.console.pojo.save.setting.AdministratorCreateParam;
 import cn.topiam.employee.console.pojo.update.setting.AdministratorUpdateParam;
 import cn.topiam.employee.console.service.setting.AdministratorService;
-import cn.topiam.employee.core.security.session.SessionDetails;
-import cn.topiam.employee.core.security.session.TopIamSessionBackedSessionRegistry;
-import cn.topiam.employee.core.security.util.SecurityUtils;
 import cn.topiam.employee.support.exception.InfoValidityFailException;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
-import cn.topiam.employee.support.util.BeanUtils;
+import cn.topiam.employee.support.util.PhoneNumberUtils;
+import cn.topiam.employee.support.validation.annotation.ValidationPhone;
 
 import lombok.extern.slf4j.Slf4j;
-import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
-import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
+import static cn.topiam.employee.console.access.DefaultAdministratorConstants.DEFAULT_ADMIN_USERNAME;
+import static cn.topiam.employee.support.util.PhoneNumberUtils.getPhoneNumber;
 
 /**
  * @author TopIAM
@@ -99,33 +102,40 @@ public class AdministratorServiceImpl implements AdministratorService {
      * @return {@link Boolean}
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean createAdministrator(AdministratorCreateParam param) {
-        // 判断用户名、手机号、邮箱是否存在
-        Boolean validityPhone = administratorParamCheck(CheckValidityType.PHONE, param.getPhone(),
-            null);
-        if (!validityPhone) {
-            throw new InfoValidityFailException("手机号已存在");
+        //@formatter:off
+        if (StringUtils.isBlank(param.getPhone()) && StringUtils.isBlank(param.getEmail())) {
+            throw new TopIamException("手机号或邮箱至少填写一个", HttpStatus.BAD_REQUEST);
         }
-        Boolean validityEmail = administratorParamCheck(CheckValidityType.EMAIL, param.getEmail(),
-            null);
-        if (!validityEmail) {
-            throw new InfoValidityFailException("邮箱已存在");
+        //手机号
+        if (StringUtils.isNotEmpty(param.getPhone())) {
+            if (!getPhoneNumber(param.getPhone()).matches(ValidationPhone.PHONE_REGEXP)) {
+                throw new InfoValidityFailException("手机号格式错误");
+            }
+            Boolean validityPhone = administratorParamCheck(CheckValidityType.PHONE, param.getPhone(), null);
+            if (!validityPhone) {
+                throw new InfoValidityFailException("手机号已存在");
+            }
         }
-        Boolean validityUsername = administratorParamCheck(CheckValidityType.USERNAME,
-            param.getUsername(), null);
+        //邮箱
+        if (StringUtils.isNotEmpty(param.getEmail())) {
+            Boolean validityEmail = administratorParamCheck(CheckValidityType.EMAIL, param.getEmail(), null);
+            if (!validityEmail) {
+                throw new InfoValidityFailException("邮箱已存在");
+            }
+        }
+        Boolean validityUsername = administratorParamCheck(CheckValidityType.USERNAME, param.getUsername(), null);
         if (!validityUsername) {
             throw new InfoValidityFailException("用户名已存在");
         }
-        AdministratorEntity entity = administratorConverter
-            .administratorCreateParamConvertToEntity(param);
-        //密码处理
-        String password = passwordEncoder.encode(entity.getPassword());
-        entity.setPassword(password);
+        AdministratorEntity entity = administratorConverter.administratorCreateParamConvertToEntity(param);
         administratorRepository.save(entity);
         AuditContext.setTarget(Target.builder().id(entity.getId().toString())
             .name(entity.getUsername()).type(TargetType.ADMINISTRATOR)
             .typeName(TargetType.ADMINISTRATOR.getDesc()).build());
         return true;
+        //@formatter:on
     }
 
     /**
@@ -135,18 +145,17 @@ public class AdministratorServiceImpl implements AdministratorService {
      * @return {@link Boolean}
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean updateAdministrator(AdministratorUpdateParam param) {
-        AdministratorEntity source = administratorConverter
-            .administratorUpdateParamConvertToEntity(param);
-        AdministratorEntity target = administratorRepository.findById(Long.valueOf(param.getId()))
-            .orElse(new AdministratorEntity());
-        AuditContext.setContent(source.getUsername());
-        BeanUtils.merge(source, target, LAST_MODIFIED_TIME, LAST_MODIFIED_BY);
-        administratorRepository.save(target);
-        AuditContext.setTarget(Target.builder().id(target.getId().toString())
-            .name(target.getUsername()).type(TargetType.ADMINISTRATOR)
+        //@formatter:off
+        AdministratorEntity entity = administratorRepository.findById(Long.valueOf(param.getId())).orElseThrow(() -> new TopIamException("管理员信息不存在"));
+        AuditContext.setContent(entity.getUsername());
+        administratorRepository.save(administratorConverter.administratorUpdateParamConvertToEntity(param, entity));
+        AuditContext.setTarget(Target.builder().id(entity.getId().toString())
+            .name(entity.getUsername()).type(TargetType.ADMINISTRATOR)
             .typeName(TargetType.ADMINISTRATOR.getDesc()).build());
         return true;
+        //@formatter:on
     }
 
     /**
@@ -158,23 +167,17 @@ public class AdministratorServiceImpl implements AdministratorService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean deleteAdministrator(String id) {
-        Optional<AdministratorEntity> optional = administratorRepository.findById(Long.valueOf(id));
-        //管理员不存在
-        if (optional.isEmpty()) {
-            AuditContext.setContent("删除失败，管理员不存在");
-            log.warn(AuditContext.getContent());
-            throw new TopIamException("操作失败");
-        }
-        long count = administratorRepository.count();
-        if (count == 1) {
-            AuditContext.setContent("禁止删除，系统必须存在一个管理员");
+        AdministratorEntity administratorEntity = getAdministrator(id, "删除失败，管理员不存在");
+        if (administratorEntity.getUsername().equals(DEFAULT_ADMIN_USERNAME)) {
+            AuditContext.setContent("默认超级管理员禁止删除");
             log.warn(AuditContext.getContent());
             throw new TopIamException("操作失败");
         }
         //执行删除
         administratorRepository.deleteById(Long.valueOf(id));
-        AuditContext
-            .setTarget(Target.builder().id(id.toString()).type(TargetType.ADMINISTRATOR).build());
+        AuditContext.setTarget(Target.builder().id(id).type(TargetType.ADMINISTRATOR).build());
+        // 下线登录中已删除的管理员
+        removeSession(administratorEntity.getUsername());
         return true;
     }
 
@@ -187,17 +190,33 @@ public class AdministratorServiceImpl implements AdministratorService {
      */
     @Override
     public Boolean updateAdministratorStatus(String id, UserStatus status) {
+        AdministratorEntity administratorEntity = getAdministrator(id,
+            status.getDesc() + "失败，管理员不存在");
+        AuditContext.setContent(administratorEntity.getUsername());
         Optional<AdministratorEntity> optional = administratorRepository.findById(Long.valueOf(id));
-        optional.ifPresent(
-            administratorEntity -> AuditContext.setContent(administratorEntity.getUsername()));
-        long count = administratorRepository.count();
-        if (count == 1 && !status.equals(UserStatus.ENABLE)) {
-            log.warn("禁止删除，当前系统只存在一个管理员");
+        if (optional.isPresent() && optional.get().getUsername().equals(DEFAULT_ADMIN_USERNAME)) {
+            log.warn("默认超级管理员禁止禁用");
             throw new RuntimeException("操作失败");
         }
         administratorRepository.updateStatus(id, status.getCode());
         AuditContext.setTarget(Target.builder().id(id).type(TargetType.ADMINISTRATOR).build());
+        if (UserStatus.DISABLE == status) {
+            // 下线登录中已禁用的管理员
+            removeSession(administratorEntity.getUsername());
+        }
         return true;
+    }
+
+    @NotNull
+    private AdministratorEntity getAdministrator(String id, String message) {
+        Optional<AdministratorEntity> optional = administratorRepository.findById(Long.valueOf(id));
+        //管理员不存在
+        if (optional.isEmpty()) {
+            AuditContext.setContent(message);
+            log.warn(AuditContext.getContent());
+            throw new TopIamException("操作失败");
+        }
+        return optional.get();
     }
 
     /**
@@ -209,33 +228,31 @@ public class AdministratorServiceImpl implements AdministratorService {
      */
     @Override
     public Boolean resetAdministratorPassword(String id, String password) {
-        Optional<AdministratorEntity> optional = administratorRepository.findById(Long.valueOf(id));
-        //管理员不存在
-        if (optional.isEmpty()) {
-            AuditContext.setContent("删除失败，管理员不存在");
-            log.warn(AuditContext.getContent());
-            throw new TopIamException("操作失败");
-        }
+        AdministratorEntity entity = getAdministrator(id, "重置密码失败，管理员不存在");
         password = new String(
             Base64.getUrlDecoder().decode(password.getBytes(StandardCharsets.UTF_8)),
             StandardCharsets.UTF_8);
         password = passwordEncoder.encode(password);
         administratorRepository.updatePassword(id, password);
         AuditContext.setTarget(Target.builder().id(id).type(TargetType.ADMINISTRATOR).build());
+        // 下线登录中已重置密码的管理员
+        removeSession(entity.getUsername());
+        return true;
+    }
+
+    /**
+     * 下线管理员
+     *
+     * @param username {@link String}
+     */
+    private void removeSession(String username) {
         //异步下线所有用户
-        String username = SecurityUtils.getCurrentUserName();
         executor.execute(() -> {
             //@formatter:off
-            if (sessionRegistry instanceof TopIamSessionBackedSessionRegistry) {
-                List<Object> principals = ((TopIamSessionBackedSessionRegistry<? extends Session>) sessionRegistry).getPrincipals(username);
-                principals.forEach(i -> {
-                    if (i instanceof SessionDetails) {
-                        sessionRegistry.removeSessionInformation(((SessionDetails) i).getSessionId());
-                    }
-                });
-            }
+            List<SessionInformation> sessions = sessionRegistry.getAllSessions(username,false);
+            sessions.forEach(SessionInformation::expireNow);
+            //@formatter:on
         });
-        return true;
     }
 
     /**
@@ -265,11 +282,23 @@ public class AdministratorServiceImpl implements AdministratorService {
         }
         //手机号
         if (CheckValidityType.PHONE.equals(type)) {
-            if (StringUtils.equals(entity.getPhone(), value)) {
-                return true;
+            try {
+                //手机号未修改
+                if (StringUtils.equals(value.replace(PhoneNumberUtils.PLUS_SIGN, ""),
+                    entity.getPhoneAreaCode() + entity.getPhone())) {
+                    return true;
+                }
+                Phonenumber.PhoneNumber phoneNumber = PhoneNumberUtil.getInstance().parse(value,
+                    "CN");
+                BooleanExpression eq = administrator.phone
+                    .eq(String.valueOf(phoneNumber.getNationalNumber()))
+                    .and(administrator.phoneAreaCode
+                        .eq(String.valueOf(phoneNumber.getCountryCode())));
+                result = !administratorRepository.exists(eq);
+            } catch (NumberParseException e) {
+                log.error("校验手机号发生异常", e);
+                throw new TopIamException("校验手机号发生异常");
             }
-            BooleanExpression eq = administrator.phone.eq(value);
-            result = !administratorRepository.exists(eq);
         }
         //用户名
         if (CheckValidityType.USERNAME.equals(type)) {
@@ -282,16 +311,16 @@ public class AdministratorServiceImpl implements AdministratorService {
         return result;
     }
 
-
     /**
      * 更新认证成功信息
      *
-     * @param id {@link String}
-     * @param ip {@link String}
+     * @param id        {@link String}
+     * @param ip        {@link String}
      * @param loginTime {@link LocalDateTime}
      */
+    @Override
     public Boolean updateAuthSucceedInfo(String id, String ip, LocalDateTime loginTime) {
-        administratorRepository.updateAuthSucceedInfo(id,ip,loginTime);
+        administratorRepository.updateAuthSucceedInfo(id, ip, loginTime);
         return true;
     }
 
@@ -303,21 +332,28 @@ public class AdministratorServiceImpl implements AdministratorService {
      */
     @Override
     public AdministratorResult getAdministrator(String id) {
-        AdministratorEntity entity = administratorRepository.findById(Long.valueOf(id))
-                .orElse(null);
-        return administratorConverter.entityConvertToAdministratorDetailsResult(entity);
+        AdministratorEntity administrator = administratorRepository.findById(Long.valueOf(id))
+            .orElse(null);
+        AdministratorResult result = administratorConverter
+            .entityConvertToAdministratorDetailsResult(administrator);
+        if (Objects.nonNull(administrator) && StringUtils.isNotEmpty(administrator.getPhone())) {
+            StringBuilder phoneAreaCode = new StringBuilder(
+                administrator.getPhoneAreaCode().replace(PhoneNumberUtils.PLUS_SIGN, ""));
+            phoneAreaCode.insert(0, PhoneNumberUtils.PLUS_SIGN);
+            result.setPhone(phoneAreaCode + administrator.getPhone());
+        }
+        return result;
     }
-
 
     /**
      * Executor
      */
-    private final Executor executor;
+    private final Executor                executor;
 
     /**
      * AdministratorConverter
      */
-    private final AdministratorConverter administratorConverter;
+    private final AdministratorConverter  administratorConverter;
 
     /**
      * AdministratorRepository
@@ -327,14 +363,18 @@ public class AdministratorServiceImpl implements AdministratorService {
     /**
      * PasswordEncoder
      */
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder         passwordEncoder;
 
     /**
      * SessionRegistry
      */
-    private final SpringSessionBackedSessionRegistry<? extends Session> sessionRegistry;
+    private final SessionRegistry         sessionRegistry;
 
-    public AdministratorServiceImpl(AdministratorConverter administratorConverter, AdministratorRepository administratorRepository, PasswordEncoder passwordEncoder, AsyncConfigurer asyncConfigurer, SpringSessionBackedSessionRegistry<? extends Session> sessionRegistry) {
+    public AdministratorServiceImpl(AdministratorConverter administratorConverter,
+                                    AdministratorRepository administratorRepository,
+                                    PasswordEncoder passwordEncoder,
+                                    AsyncConfigurer asyncConfigurer,
+                                    SessionRegistry sessionRegistry) {
         this.administratorConverter = administratorConverter;
         this.administratorRepository = administratorRepository;
         this.passwordEncoder = passwordEncoder;

@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import cn.topiam.employee.audit.annotation.Audit;
-import cn.topiam.employee.audit.enums.EventType;
+import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.common.enums.MailType;
 import cn.topiam.employee.console.pojo.result.setting.EmailTemplateListResult;
 import cn.topiam.employee.console.pojo.result.setting.EmailTemplateResult;
@@ -40,7 +40,7 @@ import lombok.AllArgsConstructor;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import static cn.topiam.employee.common.constants.SettingConstants.SETTING_PATH;
+import static cn.topiam.employee.common.constant.SettingConstants.SETTING_PATH;
 
 /**
  * 邮件配置
@@ -64,7 +64,7 @@ public class MailTemplateController {
     @Validated
     @GetMapping(value = "/list")
     @Operation(summary = "获取邮件模板列表")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<List<EmailTemplateListResult>> getEmailTemplateList() {
         List<EmailTemplateListResult> list = templateService.getEmailTemplateList();
         return ApiRestResult.<List<EmailTemplateListResult>> builder().result(list).build();
@@ -78,7 +78,7 @@ public class MailTemplateController {
      */
     @Operation(summary = "获取邮件模板信息")
     @GetMapping(value = "/{type}")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<EmailTemplateResult> getEmailTemplate(@PathVariable(value = "type") String type) {
         MailType templateType = MailType.getType(type);
         EmailTemplateResult result = templateService.getEmailTemplate(templateType);
@@ -94,9 +94,9 @@ public class MailTemplateController {
     @Lock
     @Preview
     @PutMapping(value = "/save_custom/{type}")
-    @Audit(type = EventType.SAVE_GEO_LOCATION_SERVICE)
+    @Audit(type = EventType.SAVE_MAIL_TEMPLATE)
     @Operation(summary = "保存邮件模板")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> saveCustomEmailTemplate(@PathVariable(value = "type") String type,
                                                           @RequestBody @Validated EmailCustomTemplateSaveParam param) {
         MailType templateType = MailType.getType(type);
@@ -114,7 +114,7 @@ public class MailTemplateController {
     @Preview
     @PutMapping(value = "/disable_custom/{type}")
     @Operation(summary = "禁用自定义邮件模板")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> disableCustomEmailTemplate(@PathVariable(value = "type") String type) {
         templateService.disableCustomEmailTemplate(MailType.getType(type));
         return ApiRestResult.ok();

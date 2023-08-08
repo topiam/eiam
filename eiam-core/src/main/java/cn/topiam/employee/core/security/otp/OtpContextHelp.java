@@ -1,6 +1,6 @@
 /*
- * eiam-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,9 +17,9 @@
  */
 package cn.topiam.employee.core.security.otp;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -38,9 +38,8 @@ import cn.topiam.employee.core.message.mail.MailMsgEventPublish;
 import cn.topiam.employee.core.message.sms.SmsMsgEventPublish;
 import cn.topiam.employee.support.exception.TopIamException;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import static cn.topiam.employee.core.context.SettingContextHelp.getCodeValidTime;
+import static cn.topiam.employee.core.help.SettingHelp.getCodeValidTime;
 import static cn.topiam.employee.core.message.MsgVariable.TIME_TO_LIVE;
 import static cn.topiam.employee.support.constant.EiamConstants.COLON;
 
@@ -52,8 +51,8 @@ import static cn.topiam.employee.support.constant.EiamConstants.COLON;
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class OtpContextHelp {
+
     /**
      * 发送
      *
@@ -72,15 +71,15 @@ public class OtpContextHelp {
             String code = RandomStringUtils.randomNumeric(6);
             RScoredSortedSet<String> verifyCodeScored = redissonClient
                 .getScoredSortedSet(getRedisKey(OTP_CODE_VALUE_PREFIX, recipient, type, channel));
-            //过期时间
-            Instant expireTime = Instant.now().plus(getCodeValidTime(), ChronoUnit.MINUTES);
-            verifyCodeScored.expire(expireTime);
             try {
                 removeExpireOtpCode(verifyCodeScored);
+                // 过期时间
+                Instant expireTime = Instant.now().plus(getCodeValidTime(), ChronoUnit.MINUTES);
                 // 验证码
                 verifyCodeScored.add(expireTime.getEpochSecond(), code);
+                verifyCodeScored.expire(expireTime);
                 // 发送间隔（默认1分钟）
-                intervalBucket.set(true, TIME_TO_LIVE, TimeUnit.MINUTES);
+                intervalBucket.set(true, Duration.ofMinutes(TIME_TO_LIVE));
                 if (channel == MessageNoticeChannel.MAIL) {
                     // 发送邮件
                     mailMsgEventPublish.publishVerifyCode(recipient, MailType.getType(type), code);
@@ -89,6 +88,12 @@ public class OtpContextHelp {
                     // 发送短信
                     smsMsgEventPublish.publishVerifyCode(recipient, SmsType.getType(type), code);
                 }
+                // 验证次数
+                RAtomicLong verifyCodeFrequency = redissonClient.getAtomicLong(
+                    getRedisKey(OTP_CODE_CHECK_COUNT_PREFIX, recipient, type, channel));
+                // 验证次数初始化为0
+                verifyCodeFrequency.set(0);
+                verifyCodeFrequency.expire(expireTime);
             } catch (Exception e) {
                 //发送失败，删除
                 verifyCodeScored.deleteAsync();
@@ -130,8 +135,10 @@ public class OtpContextHelp {
     public Boolean checkOtp(String type, MessageNoticeChannel channel, String recipient,
                             String verifyCode) {
 
+        // 验证码
         RScoredSortedSet<String> verifyCodeScored = redissonClient
             .getScoredSortedSet(getRedisKey(OTP_CODE_VALUE_PREFIX, recipient, type, channel));
+        // 验证次数
         RAtomicLong verifyCodeFrequency = redissonClient
             .getAtomicLong(getRedisKey(OTP_CODE_CHECK_COUNT_PREFIX, recipient, type, channel));
         if (!verifyCodeScored.isExists()) {
@@ -140,24 +147,38 @@ public class OtpContextHelp {
         }
         if (verifyCodeFrequency.isExists()) {
             long frequency = verifyCodeFrequency.incrementAndGet();
+            // 验证次数超过阀值
             if (frequency > FREQUENCY_THRESHOLD) {
-                // 删除验证码
-                verifyCodeScored.deleteAsync();
-                verifyCodeFrequency.deleteAsync();
+                // 清空验证码和验证次数
+                removeVerifyCode(verifyCodeScored, verifyCodeFrequency);
                 log.error("类型 [{}] 接受者 [{}]，超出验证次数", type, recipient);
                 return false;
             }
         } else {
-            verifyCodeFrequency.set(1);
+            return false;
         }
         removeExpireOtpCode(verifyCodeScored);
         // 检查验证码
-        if (!verifyCodeScored.contains(verifyCode)
-            && verifyCodeScored.getScore(verifyCode) < getCurrentTime()) {
+        if (!verifyCodeScored.contains(verifyCode)) {
             log.error("类型 [{}] 接受者 [{}]，验证码不匹配或已过期", type, recipient);
             return false;
         }
+        // 验证成功，删除验证码和验证次数
+        removeVerifyCode(verifyCodeScored, verifyCodeFrequency);
         return true;
+    }
+
+    /**
+     * 删除验证码和频次
+     *
+     * @param verifyCodeScored {@link RScoredSortedSet<String>}
+     * @param verifyCodeFrequency {@link RAtomicLong}
+     */
+    private static void removeVerifyCode(RScoredSortedSet<String> verifyCodeScored,
+                                         RAtomicLong verifyCodeFrequency) {
+        // 删除验证码
+        verifyCodeScored.deleteAsync();
+        verifyCodeFrequency.deleteAsync();
     }
 
     /**
@@ -217,4 +238,12 @@ public class OtpContextHelp {
      * CacheProperties
      */
     private final CacheProperties     cacheProperties;
+
+    public OtpContextHelp(RedissonClient redissonClient, MailMsgEventPublish mailMsgEventPublish,
+                          SmsMsgEventPublish smsMsgEventPublish, CacheProperties cacheProperties) {
+        this.redissonClient = redissonClient;
+        this.mailMsgEventPublish = mailMsgEventPublish;
+        this.smsMsgEventPublish = smsMsgEventPublish;
+        this.cacheProperties = cacheProperties;
+    }
 }

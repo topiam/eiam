@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,7 +37,7 @@ import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.enums.DataOrigin;
 import cn.topiam.employee.common.enums.UserStatus;
 import cn.topiam.employee.support.repository.LogicDeleteRepository;
-import static cn.topiam.employee.common.constants.AccountConstants.USER_CACHE_NAME;
+import static cn.topiam.employee.common.constant.AccountConstants.USER_CACHE_NAME;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
 /**
@@ -122,10 +122,10 @@ public interface UserRepository extends LogicDeleteRepository<UserEntity, Long>,
     /**
      * 根据邮件查询用户信息
      *
-     * @param username {@link String}
+     * @param email {@link String}
      * @return {@link UserEntity}
      */
-    UserEntity findByEmail(String username);
+    UserEntity findByEmail(String email);
 
     /**
      * 根据扩展ID查询用户信息
@@ -227,21 +227,6 @@ public interface UserRepository extends LogicDeleteRepository<UserEntity, Long>,
     @Query(value = "SELECT * FROM `user` WHERE expire_date <= CURDATE() and status_ != 'expired_locked' AND "
                    + SOFT_DELETE_WHERE, nativeQuery = true)
     List<UserEntity> findExpireUser();
-
-    /**
-     * 更新用户共享密钥
-     *
-     * @param id {@link Long}
-     * @param sharedSecret {@link String}
-     * @param totpBind {@link Boolean}
-     * @return {@link Integer}
-     */
-    @CacheEvict(allEntries = true)
-    @Modifying
-    @Query(value = "update UserEntity set sharedSecret=:sharedSecret, totpBind=:totpBind where id=:id")
-    Integer updateUserSharedSecretAndTotpBind(@Param(value = "id") Long id,
-                                              @Param(value = "sharedSecret") String sharedSecret,
-                                              @Param(value = "totpBind") Boolean totpBind);
 
     /**
      * 根据用户名查询全部

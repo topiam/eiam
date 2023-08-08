@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,11 +24,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,14 +40,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import cn.topiam.employee.audit.annotation.Audit;
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
-import cn.topiam.employee.audit.enums.EventType;
 import cn.topiam.employee.audit.enums.TargetType;
-import cn.topiam.employee.common.enums.UserType;
-import cn.topiam.employee.common.geo.GeoLocation;
-import cn.topiam.employee.core.security.session.SessionDetails;
-import cn.topiam.employee.core.security.session.TopIamSessionBackedSessionRegistry;
-import cn.topiam.employee.core.security.util.SecurityUtils;
+import cn.topiam.employee.audit.event.type.EventType;
+import cn.topiam.employee.core.security.session.ClusterSessionRegistryImpl;
+import cn.topiam.employee.core.security.session.Session;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.geo.GeoLocation;
 import cn.topiam.employee.support.lock.Lock;
 import cn.topiam.employee.support.preview.Preview;
 import cn.topiam.employee.support.result.ApiRestResult;
@@ -61,9 +57,11 @@ import lombok.experimental.Accessors;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.USERNAME;
 
-import static cn.topiam.employee.common.constants.SessionConstants.SESSION_PATH;
+import static cn.topiam.employee.common.constant.SessionConstants.SESSION_PATH;
 import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIME_FORMATTER_PATTERN;
 
 /**
@@ -80,41 +78,32 @@ public class SessionManageEndpoint {
      * list
      *
      * @param req  {@link HttpServletRequest}
-     * @param resp {@link HttpServletResponse}
      * @return {@link ApiRestResult}
      */
     @Operation(summary = "在线会话")
     @GetMapping("/list")
-    public ApiRestResult<List<OnlineSession>> list(HttpServletRequest req,
-                                                   HttpServletResponse resp) {
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
+    public ApiRestResult<List<OnlineSession>> list(HttpServletRequest req) {
         List<OnlineSession> list = new ArrayList<>();
-        List<Object> principals = new ArrayList<>();
+        List<Object> principals;
         SessionRegistry registry = ApplicationContextHelp.getBean(SessionRegistry.class);
-        if (registry instanceof TopIamSessionBackedSessionRegistry) {
-            //普通用户只能看自己的会话
-            if (SecurityUtils.getCurrentUser().getUserType().equals(UserType.USER)) {
-                principals = ((TopIamSessionBackedSessionRegistry<?>) (registry))
-                    .getPrincipals(SecurityUtils.getCurrentUser().getUsername());
-            }
-            //管理员看所有
-            if (SecurityUtils.getCurrentUser().getUserType().equals(UserType.ADMIN)) {
-                //根据用户查询
-                if (StringUtils.isNoneBlank(req.getParameter(USERNAME))) {
-                    principals = ((TopIamSessionBackedSessionRegistry<?>) (registry))
-                        .getPrincipals(req.getParameter(USERNAME));
-                } else {
-                    principals = registry.getAllPrincipals();
-                }
+        if (registry instanceof ClusterSessionRegistryImpl) {
+            //根据用户查询
+            if (StringUtils.isNoneBlank(req.getParameter(USERNAME))) {
+                principals = ((ClusterSessionRegistryImpl<?>) (registry))
+                    .getSessionList(req.getParameter(USERNAME));
+            } else {
+                principals = registry.getAllPrincipals();
             }
             //封装数据
             principals.forEach(principal -> {
-                if (principal instanceof SessionDetails) {
+                if (principal instanceof Session) {
                     //过滤掉当前用户的会话
-                    if (!((SessionDetails) principal).getSessionId()
-                        .equals(req.getSession().getId()) || true) {
+                    if (!((Session) principal).getSessionId()
+                        .equals(req.getSession(false).getId())) {
                         //@formatter:off
                         OnlineUserConverter userConverter = ApplicationContextHelp.getBean(OnlineUserConverter.class);
-                        OnlineSession user = userConverter.sessionDetailsToOnlineSession(((SessionDetails) principal));
+                        OnlineSession user = userConverter.sessionDetailsToOnlineSession(((Session) principal));
                         list.add(user);
                         //@formatter:on
                     }
@@ -138,6 +127,7 @@ public class SessionManageEndpoint {
     @Operation(summary = "下线会话")
     @Audit(type = EventType.DOWN_LINE_SESSION)
     @DeleteMapping("/remove")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> remove(HttpServletRequest req, HttpServletResponse resp) {
         String sessionIds = req.getParameter("sessionIds");
         //session id blank
@@ -148,9 +138,8 @@ public class SessionManageEndpoint {
         String[] ids = sessionIds.split(",");
         Arrays.stream(ids).forEach((i) -> {
             //如果sessionId等于当前操作用户sessionId不操作
-            if (!req.getSession().getId().equals(i)) {
-                AuditContext
-                    .setTarget(Target.builder().id(i.toString()).type(TargetType.SESSION).build());
+            if (!req.getSession(false).getId().equals(i)) {
+                AuditContext.setTarget(Target.builder().id(i).type(TargetType.SESSION).build());
                 registry.removeSessionInformation(i);
             }
         });
@@ -222,31 +211,31 @@ interface OnlineUserConverter {
     /**
      * 系统用户转在线会话
      *
-     * @param sessionDetails {@link SessionDetails}
+     * @param session {@link Session}
      * @return {@link OnlineSession}
      */
-    default OnlineSession sessionDetailsToOnlineSession(SessionDetails sessionDetails) {
-        if (sessionDetails == null) {
+    default OnlineSession sessionDetailsToOnlineSession(Session session) {
+        if (session == null) {
             return null;
         }
 
         OnlineSession onlineSession = new OnlineSession();
         //ID
-        onlineSession.setId(sessionDetails.getId());
+        onlineSession.setId(session.getId());
         //用户名
-        onlineSession.setUsername(sessionDetails.getUsername());
+        onlineSession.setUsername(session.getUsername());
         //session id
-        onlineSession.setSessionId(sessionDetails.getSessionId());
+        onlineSession.setSessionId(session.getSessionId());
         //地理位置
-        onlineSession.setGeoLocation(sessionDetails.getGeoLocation());
+        onlineSession.setGeoLocation(session.getGeoLocation());
         //用户代理
-        onlineSession.setUserAgent(sessionDetails.getUserAgent());
+        onlineSession.setUserAgent(session.getUserAgent());
         //认证类型
-        onlineSession.setAuthType(sessionDetails.getAuthType());
+        onlineSession.setAuthType(session.getAuthenticationProvider());
         //登录时间
-        onlineSession.setLoginTime(sessionDetails.getLoginTime());
+        onlineSession.setLoginTime(session.getAuthenticationTime());
         //最后请求时间
-        onlineSession.setLastRequest(sessionDetails.getLastRequestTime());
+        onlineSession.setLastRequest(session.getLastRequestTime());
         return onlineSession;
     }
 }

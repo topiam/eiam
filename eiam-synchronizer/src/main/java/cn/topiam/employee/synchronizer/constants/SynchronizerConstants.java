@@ -1,6 +1,6 @@
 /*
- * eiam-synchronizer - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-synchronizer - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,12 +28,12 @@ import cn.topiam.employee.support.constant.EiamConstants;
 public final class SynchronizerConstants {
 
     /**
-     * 同步器事件接收路径
+     * 同步器路径
      */
-    public final static String EVENT_PATH         = EiamConstants.API_PATH + "/event";
+    public final static String SYNCHRONIZER_PATH  = EiamConstants.V1_API_PATH + "/synchronizer";
 
     /**
      * 同步器事件接收路径
      */
-    public final static String EVENT_RECEIVE_PATH = EVENT_PATH + "/receive";
+    public final static String EVENT_RECEIVE_PATH = SYNCHRONIZER_PATH + "/event_receive";
 }

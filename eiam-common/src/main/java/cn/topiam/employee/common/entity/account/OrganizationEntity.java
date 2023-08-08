@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,22 +20,21 @@ package cn.topiam.employee.common.entity.account;
 import java.io.Serial;
 import java.util.Objects;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLDeleteAll;
 import org.hibernate.annotations.Where;
 
 import cn.topiam.employee.common.enums.DataOrigin;
-import cn.topiam.employee.common.enums.OrganizationType;
+import cn.topiam.employee.common.enums.account.OrganizationType;
 import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
@@ -53,7 +52,6 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
 @Entity
 @Table(name = "organization")
 @SQLDelete(sql = "update organization set " + SOFT_DELETE_SET + " where id_ = ?")
-@SQLDeleteAll(sql = "update organization set " + SOFT_DELETE_SET + " where id_ = ?")
 @Where(clause = SOFT_DELETE_WHERE)
 public class OrganizationEntity extends LogicDeleteEntity<String> {
 

@@ -1,6 +1,6 @@
 /*
- * eiam-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,14 +17,14 @@
  */
 package cn.topiam.employee.core.setting.constant;
 
-import cn.topiam.employee.common.constants.SettingConstants;
+import cn.topiam.employee.common.constant.SettingConstants;
 import static org.springframework.util.ResourceUtils.CLASSPATH_URL_PREFIX;
 
 /**
  * 消息设置常量
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2020/12/5 19:53
+ * Created by support@topiam.cn on 2020/12/5 21:53
  */
 public final class MessageSettingConstants {
     /**
@@ -58,14 +58,14 @@ public final class MessageSettingConstants {
     /**
      * 系统设置电子邮件模板缓存 cacheName
      */
-    public static final String SETTING_EMAIL_TEMPLATE_CACHE_NAME = SettingConstants.SETTING_CACHE_NAME
-                                                                   + "email:template";
+    public static final String SETTING_EMAIL_TEMPLATE_CACHE_NAME = SETTING_EMAIL_CACHE_NAME
+                                                                   + ":template";
 
     /**
      * 系统设置电子邮件服务商缓存 cacheName
      */
-    public static final String SETTING_EMAIL_PROVIDER_CACHE_NAME = SettingConstants.SETTING_CACHE_NAME
-                                                                   + ":email:provider";
+    public static final String SETTING_EMAIL_PROVIDER_CACHE_NAME = SETTING_EMAIL_CACHE_NAME
+                                                                   + ":provider";
 
     /**
      * 系统设置短信服务商缓存 cacheName

@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -55,7 +55,7 @@ import static cn.topiam.employee.audit.enums.TargetType.IDENTITY_SOURCE;
  * 同步身份源同步
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/3/16 19:04
+ * Created by support@topiam.cn on  2022/3/16 21:04
  */
 @Slf4j
 @Service

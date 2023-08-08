@@ -1,6 +1,6 @@
 /*
- * eiam-synchronizer - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-synchronizer - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,11 +23,12 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.JdkIdGenerator;
+import org.springframework.util.AlternativeJdkIdGenerator;
 import org.springframework.util.StopWatch;
 
 import cn.topiam.employee.common.enums.TriggerType;
 import cn.topiam.employee.identitysource.core.IdentitySource;
+import cn.topiam.employee.identitysource.core.IdentitySourceConfig;
 import cn.topiam.employee.support.trace.TraceUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -37,12 +38,12 @@ import static cn.topiam.employee.support.lock.LockAspect.getTopiamLockKeyPrefix;
  * 身份源同步任务
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/3/20 20:41
+ * Created by support@topiam.cn on  2022/3/20 21:41
  */
 @RequiredArgsConstructor
 public class IdentitySourceSyncTask implements Runnable {
-    private final JdkIdGenerator jdkIdGenerator = new JdkIdGenerator();
-    private static final Logger  logger         = LoggerFactory
+    private final AlternativeJdkIdGenerator idGenerator = new AlternativeJdkIdGenerator();
+    private static final Logger             logger      = LoggerFactory
         .getLogger(IdentitySourceSyncTask.class);
 
     /**
@@ -61,7 +62,7 @@ public class IdentitySourceSyncTask implements Runnable {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         logger.info("[任务触发]-同步身份源[{}]数据开始", name);
-        String traceId = jdkIdGenerator.generateId().toString();
+        String traceId = idGenerator.generateId().toString();
         TraceUtils.put(traceId);
         RLock lock = redissonClient.getLock(getTopiamLockKeyPrefix() + id);
         boolean tryLock = false;
@@ -85,21 +86,21 @@ public class IdentitySourceSyncTask implements Runnable {
     /**
      * ID
      */
-    private final String         id;
+    private final String                                         id;
 
     /**
      * 名称
      */
-    private final String         name;
+    private final String                                         name;
 
     /**
      * RedissonClient
      */
-    private final RedissonClient redissonClient;
+    private final RedissonClient                                 redissonClient;
 
     /**
      * 身份源
      */
-    private final IdentitySource identitySource;
+    private final IdentitySource<? extends IdentitySourceConfig> identitySource;
 
 }

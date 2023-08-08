@@ -1,6 +1,6 @@
 /*
- * eiam-identity-source-wechatwork - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-identity-source-wechatwork - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,8 +19,6 @@ package cn.topiam.employee.identitysource.wechatwork;
 
 import java.util.Objects;
 
-import javax.validation.ConstraintViolationException;
-
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,9 +26,11 @@ import cn.topiam.employee.identitysource.core.IdentitySourceConfigValidator;
 import cn.topiam.employee.identitysource.core.exception.ApiCallException;
 import cn.topiam.employee.identitysource.core.exception.InvalidClientConfigException;
 import cn.topiam.employee.identitysource.wechatwork.domain.response.AccessTokenResponse;
-import cn.topiam.employee.support.validation.ValidationHelp;
+import cn.topiam.employee.support.validation.ValidationUtils;
 
 import lombok.extern.slf4j.Slf4j;
+
+import jakarta.validation.ConstraintViolationException;
 
 /**
  * 企业微信身份源客户端配置验证器
@@ -50,10 +50,10 @@ public class WeChatWorkConfigValidator implements IdentitySourceConfigValidator<
     @Override
     public Boolean validate(WeChatWorkConfig config) throws InvalidClientConfigException {
         try {
-            ValidationHelp.ValidationResult<WeChatWorkConfig> validationResult = ValidationHelp
+            ValidationUtils.ValidationResult<WeChatWorkConfig> validationResult = ValidationUtils
                 .validateEntity(config);
             if (validationResult.isHasErrors()) {
-                log.error("校验企业微信配置失败:{}", validationResult.getMessage());
+                log.error("校验企业微信配置失败：{}", validationResult.getMessage());
                 throw new ConstraintViolationException(validationResult.getConstraintViolations());
             }
 

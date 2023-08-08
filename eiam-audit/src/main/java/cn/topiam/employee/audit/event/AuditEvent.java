@@ -1,6 +1,6 @@
 /*
- * eiam-audit - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-audit - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,9 +41,9 @@ public class AuditEvent extends ApplicationEvent {
     private final String       sessionId;
     private final Actor        actor;
     private final Event        event;
-    private final List<Target> target;
+    private final List<Target> targets;
     private final UserAgent    userAgent;
-    private final GeoLocation  geoLocationModal;
+    private final GeoLocation  geoLocation;
 
     public AuditEvent(String requestId, String sessionId, Actor actor, Event event,
                       UserAgent userAgent, GeoLocation geoLocation, List<Target> targets) {
@@ -52,8 +52,8 @@ public class AuditEvent extends ApplicationEvent {
         this.sessionId = sessionId;
         this.actor = actor;
         this.event = event;
-        this.target = targets;
+        this.targets = targets;
         this.userAgent = userAgent;
-        this.geoLocationModal = geoLocation;
+        this.geoLocation = geoLocation;
     }
 }

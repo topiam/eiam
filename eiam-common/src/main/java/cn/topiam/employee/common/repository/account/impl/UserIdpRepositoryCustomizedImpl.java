@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,13 +32,13 @@ import cn.topiam.employee.common.repository.account.impl.mapper.UserIdpBindPoMap
 import cn.topiam.employee.support.repository.page.domain.Page;
 
 import lombok.AllArgsConstructor;
-import static cn.topiam.employee.common.constants.AccountConstants.USER_CACHE_NAME;
+import static cn.topiam.employee.common.constant.AccountConstants.USER_CACHE_NAME;
 
 /**
  * UserIdp Repository Customized
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020/12/29 20:27
+ * Created by support@topiam.cn on  2020/12/29 21:27
  */
 @Repository
 @CacheConfig(cacheNames = { USER_CACHE_NAME })

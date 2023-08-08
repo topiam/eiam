@@ -1,6 +1,6 @@
 /*
- * eiam-identity-source-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-identity-source-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -42,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
  * 这个只适合目前流行的钉钉、企业微信等，如果是AD,LDAP，不行
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/3/1 19:47
+ * Created by support@topiam.cn on  2022/3/1 21:47
  */
 @Slf4j
 @Getter

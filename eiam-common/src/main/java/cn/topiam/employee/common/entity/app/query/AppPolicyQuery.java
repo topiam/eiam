@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,18 +19,17 @@ package cn.topiam.employee.common.entity.app.query;
 
 import java.io.Serializable;
 
-import javax.validation.constraints.NotNull;
+import org.springdoc.core.annotations.ParameterObject;
 
-import org.springdoc.api.annotations.ParameterObject;
-
-import cn.topiam.employee.common.enums.PolicyEffect;
-import cn.topiam.employee.common.enums.PolicyObjectType;
-import cn.topiam.employee.common.enums.PolicySubjectType;
+import cn.topiam.employee.common.enums.app.AppPolicyEffect;
+import cn.topiam.employee.common.enums.app.AppPolicyObjectType;
+import cn.topiam.employee.common.enums.app.AppPolicySubjectType;
 
 import lombok.Data;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * 分页查询策略入参
@@ -47,37 +46,37 @@ public class AppPolicyQuery implements Serializable {
      */
     @NotNull(message = "资源所属应用不能为空")
     @Parameter(description = "所属应用")
-    private Long              appId;
+    private Long                 appId;
 
     /**
      * 授权主体Id
      */
     @Parameter(description = "授权主体Id")
-    private String            subjectId;
+    private String               subjectId;
 
     /**
      * 权限主体类型（用户、角色、分组、组织机构）
      */
     @NotNull(message = "授权主体类型不能为空")
     @Parameter(description = "授权主体类型")
-    private PolicySubjectType subjectType;
+    private AppPolicySubjectType subjectType;
 
     /**
      * 授权客体Id
      */
     @Parameter(description = "授权客体Id")
-    private String            objectId;
+    private String               objectId;
 
     /**
      * 权限客体类型（权限、角色）
      */
     @NotNull(message = "授权客体类型不能为空")
     @Parameter(description = "授权客体类型")
-    private PolicyObjectType  objectType;
+    private AppPolicyObjectType  objectType;
 
     /**
      * 规则效果
      */
     @Parameter(description = "规则效果")
-    private PolicyEffect      effect;
+    private AppPolicyEffect      effect;
 }

@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,18 +17,21 @@
  */
 package cn.topiam.employee.common.storage;
 
-import javax.validation.constraints.NotEmpty;
+import org.hibernate.validator.constraints.URL;
 
 import cn.topiam.employee.common.storage.enums.StorageProvider;
 
 import lombok.Builder;
 import lombok.Data;
 
+import jakarta.validation.constraints.NotEmpty;
+import static cn.topiam.employee.common.constant.StorageConstants.URL_REGEXP;
+
 /**
  * 存储配置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/10/1 19:10
+ * Created by support@topiam.cn on  2021/10/1 21:10
  */
 @Data
 @Builder
@@ -64,11 +67,12 @@ public class StorageConfig {
         /**
          * 域名
          */
+        @URL(message = "访问域名格式不正确", regexp = URL_REGEXP)
         @NotEmpty(message = "访问域名不能为空")
         private String domain;
         /**
          * 存储位置
          */
-        private String location;
+        private String location = "TopIAM";
     }
 }

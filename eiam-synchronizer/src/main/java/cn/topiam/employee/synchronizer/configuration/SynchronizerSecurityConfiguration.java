@@ -1,6 +1,6 @@
 /*
- * eiam-synchronizer - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-synchronizer - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,16 +17,15 @@
  */
 package cn.topiam.employee.synchronizer.configuration;
 
-import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-
-import lombok.RequiredArgsConstructor;
-import static cn.topiam.employee.common.constants.ConfigBeanNameConstants.DEFAULT_SECURITY_FILTER_CHAIN;
+import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.DEFAULT_SECURITY_FILTER_CHAIN;
 import static cn.topiam.employee.synchronizer.constants.SynchronizerConstants.EVENT_RECEIVE_PATH;
+import static cn.topiam.employee.synchronizer.constants.SynchronizerConstants.SYNCHRONIZER_PATH;
 
 /**
  * SynchronizerSecurityConfiguration
@@ -34,8 +33,8 @@ import static cn.topiam.employee.synchronizer.constants.SynchronizerConstants.EV
  * @author TopIAM
  * Created by support@topiam.cn on 2019/9/27 22:54
  */
-@EnableWebSecurity
-@RequiredArgsConstructor
+@EnableMethodSecurity
+@Configuration
 public class SynchronizerSecurityConfiguration {
 
     /**
@@ -51,13 +50,14 @@ public class SynchronizerSecurityConfiguration {
         // @formatter:off
         http
                 //认证请求
-                .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry.antMatchers(EVENT_RECEIVE_PATH+"/*").permitAll()
-                        .antMatchers(webEndpointProperties.getBasePath()+"/**").permitAll().anyRequest().authenticated())
+                .securityMatcher(SYNCHRONIZER_PATH+"/**")
+                .authorizeHttpRequests(registry -> registry.requestMatchers(EVENT_RECEIVE_PATH+"/*").permitAll().anyRequest().authenticated())
                 //csrf过滤器
-                .csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.ignoringAntMatchers(EVENT_RECEIVE_PATH+"/*"));
+                .csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.ignoringRequestMatchers(EVENT_RECEIVE_PATH+"/*"));
         // @formatter:on
         return http.build();
     }
 
-    private final WebEndpointProperties webEndpointProperties;
+    public SynchronizerSecurityConfiguration() {
+    }
 }

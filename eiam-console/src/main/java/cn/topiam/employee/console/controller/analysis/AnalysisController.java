@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,8 +32,8 @@ import cn.topiam.employee.support.result.ApiRestResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import static cn.topiam.employee.common.constants.AnalysisConstants.ANALYSIS_GROUP_NAME;
-import static cn.topiam.employee.common.constants.AnalysisConstants.ANALYSIS_PATH;
+import static cn.topiam.employee.common.constant.AnalysisConstants.ANALYSIS_GROUP_NAME;
+import static cn.topiam.employee.common.constant.AnalysisConstants.ANALYSIS_PATH;
 
 /**
  * 统计分析
@@ -54,7 +54,7 @@ public class AnalysisController {
      */
     @GetMapping("/overview")
     @Operation(summary = "概述")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<OverviewResult> overview() {
         return ApiRestResult.ok(analysisService.overview());
     }
@@ -67,7 +67,7 @@ public class AnalysisController {
      */
     @GetMapping("/authn/quantity")
     @Operation(summary = "认证量")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<List<AuthnQuantityResult>> authnQuantity(@Validated AnalysisQuery query) {
         return ApiRestResult.ok(analysisService.authnQuantity(query));
     }
@@ -79,7 +79,7 @@ public class AnalysisController {
      */
     @GetMapping("/authn/hot_provider")
     @Operation(summary = "热门认证提供商")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<List<AuthnHotProviderResult>> authnHotProvider(@Validated AnalysisQuery query) {
         return ApiRestResult.ok(analysisService.authnHotProvider(query));
     }
@@ -89,7 +89,7 @@ public class AnalysisController {
      */
     @GetMapping("/authn/zone")
     @Operation(summary = "登录区域")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<List<AuthnZoneResult>> authnZone(@Validated AnalysisQuery query) {
         return ApiRestResult.ok(analysisService.authnZone(query));
     }
@@ -102,7 +102,7 @@ public class AnalysisController {
      */
     @GetMapping("/app/visit_rank")
     @Operation(summary = "访问应用排名")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<List<AppVisitRankResult>> appVisitRank(@Validated AnalysisQuery query) {
         return ApiRestResult.ok(analysisService.appVisitRank(query));
     }

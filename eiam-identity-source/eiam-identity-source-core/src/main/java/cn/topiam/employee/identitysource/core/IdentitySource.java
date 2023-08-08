@@ -1,6 +1,6 @@
 /*
- * eiam-identity-source-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-identity-source-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,11 +19,10 @@ package cn.topiam.employee.identitysource.core;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import cn.topiam.employee.common.enums.TriggerType;
 import cn.topiam.employee.support.exception.TopIamException;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 身份源Provider
@@ -64,10 +63,10 @@ public interface IdentitySource<T extends IdentitySourceConfig> {
      * 回调
      *
      * @param request {@link HttpServletRequest}
-     * @param response {@link HttpServletResponse}
+     * @param body {@link String}
      * @return {@link Map}
      */
-    default Object event(HttpServletRequest request, HttpServletResponse response) {
+    default Object event(HttpServletRequest request, String body) {
         throw new TopIamException("暂未实现");
     }
 

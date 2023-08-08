@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,14 +17,13 @@
  */
 package cn.topiam.employee.common.entity.identitysource.config;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 import org.springframework.scheduling.support.CronExpression;
 
@@ -41,11 +40,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import cn.topiam.employee.support.exception.TopIamException;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import static com.cronutils.model.field.expression.FieldExpressionFactory.*;
 
 /**
@@ -57,20 +60,26 @@ import static com.cronutils.model.field.expression.FieldExpressionFactory.*;
 @Slf4j
 @Data
 @Schema(description = "任务配置")
-public class JobConfig {
+@AllArgsConstructor
+@NoArgsConstructor
+public class JobConfig implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = -1L;
+
     /**
      * 模式
      */
     @Parameter(description = "任务执行模式")
     @NotNull(message = "请选择任务执行模式")
-    private Mode            mode;
+    private Mode              mode;
 
     /**
      * 任务执行星期值
      */
     @NotNull(message = "请选择任务执行星期值")
     @Parameter(description = "任务执行星期值")
-    private List<DayOfWeek> dayOfWeek;
+    private List<DayOfWeek>   dayOfWeek;
 
     /**
      * 值
@@ -78,7 +87,7 @@ public class JobConfig {
     @Parameter(description = "任务执行值")
     @NotEmpty(message = "任务执行值不能为空")
     @JsonAlias({ "time", "interval" })
-    private String          value;
+    private String            value;
 
     public enum Mode {
                       /**
@@ -170,14 +179,14 @@ public class JobConfig {
             }
         }
         //模式为定时 解析时分秒
-        if (mode.equals(Mode.timed)) {
+        if (mode.equals(JobConfig.Mode.timed)) {
             LocalTime time = LocalTime.parse(value, DateTimeFormatter.ofPattern("H[H]:mm:ss"));
             hour = on(time.getHour());
             minute = on(time.getMinute());
             second = on(time.getSecond());
         }
         //模式为周期（0- 某个小时）执行
-        if (mode.equals(Mode.period)) {
+        if (mode.equals(JobConfig.Mode.period)) {
             hour = new Every(on(0), new IntegerFieldValue(Integer.parseInt(value)));
             minute = on(0);
             second = on(0);

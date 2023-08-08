@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -63,6 +63,22 @@ public interface OrganizationMemberRepository extends
     List<OrganizationMemberEntity> findAllByUserId(@Param("userId") Long userId);
 
     /**
+     * 根据根据用户id列表查询关联的组织
+     *
+     * @param userIds {@link List}
+     * @return {@link List}
+     */
+    List<OrganizationMemberEntity> findAllByUserIdIn(List<Long> userIds);
+
+    /**
+     * 根据根据组织id查询关联的用户
+     *
+     * @param orgId {@link String}
+     * @return {@link List}
+     */
+    List<OrganizationMemberEntity> findAllByOrgId(String orgId);
+
+    /**
      * 根据用户ID 批量删除关联关系
      *
      * @param userIds {@link String}
@@ -83,4 +99,15 @@ public interface OrganizationMemberRepository extends
     @Query(value = "UPDATE organization_member SET " + SOFT_DELETE_SET
                    + " WHERE user_id = :id", nativeQuery = true)
     void deleteByUserId(@Param("id") Long id);
+
+    /**
+     * 根据组织ID 删除关联关系
+     *
+     * @param orgId {@link String}
+     */
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE organization_member SET " + SOFT_DELETE_SET
+                   + " WHERE org_id = :orgId", nativeQuery = true)
+    void deleteByOrgId(@Param("orgId") String orgId);
 }

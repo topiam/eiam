@@ -1,6 +1,6 @@
 /*
- * eiam-audit - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-audit - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,14 +19,14 @@ package cn.topiam.employee.audit.entity;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import cn.topiam.employee.audit.enums.EventStatus;
-import cn.topiam.employee.audit.enums.EventType;
+import cn.topiam.employee.audit.event.type.EventType;
 
 import lombok.Builder;
 import lombok.Data;
@@ -45,6 +45,7 @@ public class Event implements Serializable {
     private static final long  serialVersionUID = -1144169992714000310L;
 
     public static final String EVENT_TYPE       = "event.type";
+
     public static final String EVENT_TIME       = "event.time";
 
     public static final String EVENT_STATUS     = "event.status.keyword";
@@ -64,7 +65,7 @@ public class Event implements Serializable {
     /**
      * 事件内容
      */
-    @Field(type = FieldType.Object, name = "content")
+    @Field(type = FieldType.Text, name = "content")
     private String             content;
 
     /**
@@ -77,7 +78,7 @@ public class Event implements Serializable {
      * 事件时间
      */
     @Field(type = FieldType.Date, name = "time", format = DateFormat.date_hour_minute_second_millis)
-    private Instant            time;
+    private LocalDateTime      time;
 
     /**
      * 事件状态

@@ -1,6 +1,6 @@
 /*
- * eiam-application-form - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-application-form - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,16 +21,16 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
-
 import cn.topiam.employee.common.entity.app.AppFormConfigEntity;
 import cn.topiam.employee.common.enums.app.AuthorizationType;
+import cn.topiam.employee.common.enums.app.FormEncryptType;
 import cn.topiam.employee.common.enums.app.FormSubmitType;
-import cn.topiam.employee.common.enums.app.InitLoginType;
 
 import lombok.Data;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author TopIAM
@@ -51,32 +51,49 @@ public class AppFormSaveConfigParam implements Serializable {
     private AuthorizationType                    authorizationType;
 
     /**
-     * SSO发起方
-     */
-    @NotNull(message = "SSO发起方不能为空")
-    @Schema(description = "SSO发起方")
-    private InitLoginType                        initLoginType;
-
-    /**
      * 登录URL
      */
-    @NotNull(message = "登录URL不能为空")
+    @NotBlank(message = "登录URL不能为空")
     @Schema(description = "登录URL")
     private String                               loginUrl;
 
     /**
      * 登录名属性名称
      */
-    @NotNull(message = "登录名属性名称不能为空")
+    @NotBlank(message = "登录名属性名称不能为空")
     @Schema(description = "登录名属性名称")
     private String                               usernameField;
 
     /**
      * 登录密码属性名称
      */
-    @NotNull(message = "登录密码属性名称不能为空")
+    @NotBlank(message = "登录密码属性名称不能为空")
     @Schema(description = "登录密码属性名称")
     private String                               passwordField;
+
+    /**
+     * 登录密码加密类型
+     */
+    @Schema(name = "登录密码加密类型")
+    private FormEncryptType                      passwordEncryptType;
+
+    /**
+     * 登录密码加密秘钥
+     */
+    @Schema(name = "登录密码加密秘钥")
+    private String                               passwordEncryptKey;
+
+    /**
+     * 用户名加密类型
+     */
+    @Schema(name = "用户名加密类型")
+    private FormEncryptType                      usernameEncryptType;
+
+    /**
+     * 用户名加密秘钥
+     */
+    @Schema(name = "用户名加密秘钥")
+    private String                               usernameEncryptKey;
 
     /**
      * 登录提交方式

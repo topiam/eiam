@@ -1,6 +1,6 @@
 /*
- * eiam-application-oidc - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-application-oidc - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -36,7 +36,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * Created by support@topiam.cn on  2022/5/31 22:46
  */
 @Data
-@Schema(description = "OIDC 配置返回结果")
+@Schema(description = "OIDC 配置返回响应")
 public class AppOidcStandardConfigGetResult implements Serializable {
 
     @Serial
@@ -82,6 +82,12 @@ public class AppOidcStandardConfigGetResult implements Serializable {
      */
     @Parameter(description = "重定向URI")
     private Set<String>             redirectUris;
+
+    /**
+     * 登出重定向URI
+     */
+    @Parameter(description = "登出重定向URI")
+    private Set<String>             postLogoutRedirectUris;
     /**
      * scopes
      */

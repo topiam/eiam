@@ -1,6 +1,6 @@
 /*
- * eiam-portal - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-portal - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,7 +17,7 @@
  */
 package cn.topiam.employee.portal.configuration;
 
-import org.springdoc.core.GroupedOpenApi;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -30,13 +30,13 @@ import lombok.RequiredArgsConstructor;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
-import static cn.topiam.employee.support.constant.EiamConstants.API_PATH;
+import static cn.topiam.employee.support.constant.EiamConstants.V1_API_PATH;
 
 /**
  * ApiConfiguration
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2019/5/16 20:28
+ * Created by support@topiam.cn on 2019/5/16 21:28
  */
 @Configuration
 @RequiredArgsConstructor
@@ -48,7 +48,7 @@ public class PortalApiConfiguration {
      */
     @Bean
     public GroupedOpenApi accountRestApi() {
-        return GroupedOpenApi.builder().group("账户管理").pathsToMatch(API_PATH + "/account/**")
+        return GroupedOpenApi.builder().group("账户管理").pathsToMatch(V1_API_PATH + "/account/**")
             .build();
     }
 
@@ -59,7 +59,7 @@ public class PortalApiConfiguration {
      */
     @Bean
     public GroupedOpenApi appRestApi() {
-        return GroupedOpenApi.builder().group("应用管理").pathsToMatch(API_PATH + "/app/**").build();
+        return GroupedOpenApi.builder().group("应用管理").pathsToMatch(V1_API_PATH + "/app/**").build();
     }
 
     /**
@@ -71,14 +71,14 @@ public class PortalApiConfiguration {
         Contact contact = new Contact();
         contact.setEmail("support@topiam.cn");
         contact.setName("TopIAM");
-        contact.setUrl("https://www.topiam.cn");
+        contact.setUrl("https://eiam.topiam.cn");
         return new Info()
             //title
             .title(environment.getProperty("spring.application.name"))
             //描述
             .description("REST API 文档")
             //服务条款网址
-            .termsOfService("https://topiam.cn")
+            .termsOfService("https://eiam.topiam.cn")
             //内容
             .contact(contact)
             //版本

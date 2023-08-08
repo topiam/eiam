@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -34,7 +34,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "身份源列表")
 public class IdentitySourceListResult implements Serializable {
     /**
-     * 唯一标志
+     * 唯一标识
      */
     @Parameter(description = "ID")
     private String  id;

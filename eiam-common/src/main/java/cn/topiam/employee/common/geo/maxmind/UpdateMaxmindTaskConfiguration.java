@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import cn.topiam.employee.common.geo.GeoLocationService;
+import cn.topiam.employee.support.geo.GeoLocationService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -43,16 +43,15 @@ public class UpdateMaxmindTaskConfiguration {
     @Scheduled(cron = "0 0 1 * * ?")
     public void update() {
         try {
-            if (geoLocationService instanceof MaxmindGeoLocationServiceImpl) {
+            if (geoLocationService instanceof MaxmindGeoLocationServiceImpl maxmindGeoLocation) {
                 logger.info("执行IP库文件更新定时任务开始");
-                MaxmindGeoLocationServiceImpl maxmindGeoLocation = (MaxmindGeoLocationServiceImpl) geoLocationService;
                 if (maxmindGeoLocation.checkDbFileIsUpdate()) {
                     maxmindGeoLocation.download();
                 }
                 logger.info("执行IP库文件更新定时任务结束");
             }
         } catch (Exception e) {
-            logger.error("执行IP库文件更新定时发生异常:{}", e.getMessage());
+            logger.error("执行IP库文件更新定时发生异常：{}", e.getMessage());
         }
     }
 

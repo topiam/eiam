@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,6 +19,7 @@ package cn.topiam.employee.common.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import cn.topiam.employee.support.enums.BaseEnum;
 import cn.topiam.employee.support.web.converter.EnumConvert;
 
 /**
@@ -44,7 +45,7 @@ public enum MailType implements BaseEnum {
                                                            getMailContentPath() + "update-bind-mail-content.html"),
 
                                           /**
-                                           * 忘记密码 暂未实现
+                                           * 忘记密码
                                            */
                                           FORGET_PASSWORD("forget_password", "忘记密码",
                                                           "每当用户忘记密码时，都会发送此电子邮件。",
@@ -65,20 +66,29 @@ public enum MailType implements BaseEnum {
                                                          "您正在重置密码，验证码为：${verify_code}", "系统账户",
                                                          getMailContentPath() + "reset-password-content.html"),
                                           /**
-                                           * 重置密码成功 TODO 提示信息调整
+                                           * 重置密码成功
                                            */
                                           RESET_PASSWORD_CONFIRM("reset_password_confirm", "重置密码成功",
                                                                  "每当用户重置密码成功时，都会发送此电子邮件。",
-                                                                 "您已成功重置密码，如非本人操作请立即修改账户密码", "系统账户",
-                                                                 getMailContentPath() + "reset-password-confirm-content.html"),
+                                                                 "您已成功重置密码，您重置后的密码为：${password} 如非本人操作请立即修改账户密码",
+                                                                 "系统账户", getMailContentPath()
+                                                                         + "reset-password-confirm-content.html"),
 
                                           /**
-                                           * 验证邮箱
+                                           * 登录验证
                                            */
-                                          VERIFY_EMAIL("verify_email", "验证邮箱",
-                                                       "用户用邮箱初次注册时会发送一封验证邮箱的链接，用户点击邮件内的网址即可完成验证。",
-                                                       "请点击此链接进行验证： ${verify_link}", "系统账户",
-                                                       getMailContentPath() + "verify-email-content.html"),
+                                          LOGIN("login", "登录验证", "每当用户选择邮箱验证码登录时，都会发送此电子邮件。",
+                                                "您正在登录TopIAM系统，验证码为：${verify_code}，该验证码${expire_time}分钟内有效，请勿泄露于他人。",
+                                                "系统账户",
+                                                getMailContentPath() + "login-content.html"),
+
+                                          //                                          /**
+                                          //                                           * 验证邮箱
+                                          //                                           */
+                                          //                                          VERIFY_EMAIL("verify_email", "验证邮箱",
+                                          //                                                       "用户用邮箱初次注册时会发送一封验证邮箱的链接，用户点击邮件内的网址即可完成验证。",
+                                          //                                                       "请点击此链接进行验证： ${verify_link}", "系统账户",
+                                          //                                                       getMailContentPath() + "verify-email-content.html"),
                                           /**
                                            * 二次验证
                                            */
@@ -92,7 +102,7 @@ public enum MailType implements BaseEnum {
                                            */
                                           WELCOME_MAIL("welcome_mail", "欢迎邮件",
                                                        "一旦用户验证其电子邮件地址，将发送此电子邮件。 如果验证电子邮件已关闭， 则会在用户第一次注册或登录时发送。",
-                                                       "你已注册成功",
+                                                       "您已注册成功",
 
                                                        "系统账户", getMailContentPath()
                                                                + "welcome-mail-content.html"),

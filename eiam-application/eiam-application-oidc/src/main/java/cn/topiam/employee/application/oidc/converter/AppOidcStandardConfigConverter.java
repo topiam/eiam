@@ -1,6 +1,6 @@
 /*
- * eiam-application-oidc - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-application-oidc - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,14 +28,14 @@ import org.mapstruct.Mapping;
 import cn.topiam.employee.application.oidc.pojo.AppOidcProtocolEndpoint;
 import cn.topiam.employee.application.oidc.pojo.AppOidcStandardConfigGetResult;
 import cn.topiam.employee.application.oidc.pojo.AppOidcStandardSaveConfigParam;
-import cn.topiam.employee.common.constants.ProtocolConstants;
+import cn.topiam.employee.common.constant.ProtocolConstants;
 import cn.topiam.employee.common.entity.app.AppOidcConfigEntity;
 import cn.topiam.employee.common.entity.app.po.AppOidcConfigPO;
-import cn.topiam.employee.core.context.ServerContextHelp;
+import cn.topiam.employee.core.help.ServerHelp;
 import cn.topiam.employee.support.util.HttpUrlUtils;
-import static cn.topiam.employee.common.constants.ProtocolConstants.APP_CODE;
-import static cn.topiam.employee.common.constants.ProtocolConstants.OidcEndpointConstants.OIDC_AUTHORIZE_PATH;
-import static cn.topiam.employee.common.constants.ProtocolConstants.OidcEndpointConstants.WELL_KNOWN_OPENID_CONFIGURATION;
+import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CODE;
+import static cn.topiam.employee.common.constant.ProtocolConstants.OidcEndpointConstants.OIDC_AUTHORIZE_PATH;
+import static cn.topiam.employee.common.constant.ProtocolConstants.OidcEndpointConstants.WELL_KNOWN_OPENID_CONFIGURATION;
 
 /**
  * 应用映射
@@ -60,8 +60,10 @@ public interface AppOidcStandardConfigConverter {
         result.setProtocolEndpoint(getProtocolEndpointDomain(config.getAppCode()));
         //认证授权类型
         result.setAuthGrantTypes(config.getAuthGrantTypes());
-        //重定向URI
+        //登录重定向URI
         result.setRedirectUris(config.getRedirectUris());
+        //登出重定向URI
+        result.setPostLogoutRedirectUris(config.getPostLogoutRedirectUris());
         //授权范围
         result.setGrantScopes(config.getGrantScopes());
         //启用PKCE
@@ -89,6 +91,7 @@ public interface AppOidcStandardConfigConverter {
      * @param config {@link AppOidcConfigEntity}
      * @return {@link AppOidcConfigEntity}
      */
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "responseTypes", ignore = true)
     @Mapping(target = "updateTime", ignore = true)
     @Mapping(target = "updateBy", ignore = true)
@@ -113,19 +116,21 @@ public interface AppOidcStandardConfigConverter {
         variables.put(APP_CODE,appCode);
         StringSubstitutor sub = new StringSubstitutor(variables, "{", "}");
         //Issuer
-        domain.setIssuer(sub.replace(ServerContextHelp.getPortalPublicBaseUrl()+OIDC_AUTHORIZE_PATH));
+        domain.setIssuer(sub.replace(ServerHelp.getPortalPublicBaseUrl()+OIDC_AUTHORIZE_PATH));
         //发现端点
-        domain.setDiscoveryEndpoint(HttpUrlUtils.format(ServerContextHelp.getPortalPublicBaseUrl() + sub.replace(WELL_KNOWN_OPENID_CONFIGURATION)));
+        domain.setDiscoveryEndpoint(HttpUrlUtils.format(ServerHelp.getPortalPublicBaseUrl() + sub.replace(WELL_KNOWN_OPENID_CONFIGURATION)));
         //认证端点
-        domain.setAuthorizationEndpoint(HttpUrlUtils.format(ServerContextHelp.getPortalPublicBaseUrl() +  sub.replace(ProtocolConstants.OidcEndpointConstants.AUTHORIZATION_ENDPOINT)));
+        domain.setAuthorizationEndpoint(HttpUrlUtils.format(ServerHelp.getPortalPublicBaseUrl() +  sub.replace(ProtocolConstants.OidcEndpointConstants.AUTHORIZATION_ENDPOINT)));
         //Token端点
-        domain.setTokenEndpoint(HttpUrlUtils.format(ServerContextHelp.getPortalPublicBaseUrl() + sub.replace( ProtocolConstants.OidcEndpointConstants.TOKEN_ENDPOINT)));
+        domain.setTokenEndpoint(HttpUrlUtils.format(ServerHelp.getPortalPublicBaseUrl() + sub.replace( ProtocolConstants.OidcEndpointConstants.TOKEN_ENDPOINT)));
         //Jwks端点
-        domain.setJwksEndpoint(HttpUrlUtils.format(ServerContextHelp.getPortalPublicBaseUrl() +  sub.replace(ProtocolConstants.OidcEndpointConstants.JWK_SET_ENDPOINT)));
+        domain.setJwksEndpoint(HttpUrlUtils.format(ServerHelp.getPortalPublicBaseUrl() +  sub.replace(ProtocolConstants.OidcEndpointConstants.JWK_SET_ENDPOINT)));
         //撤销端点
-        domain.setRevokeEndpoint(HttpUrlUtils.format(ServerContextHelp.getPortalPublicBaseUrl()+  sub.replace(ProtocolConstants.OidcEndpointConstants.TOKEN_REVOCATION_ENDPOINT)));
+        domain.setRevokeEndpoint(HttpUrlUtils.format(ServerHelp.getPortalPublicBaseUrl()+  sub.replace(ProtocolConstants.OidcEndpointConstants.TOKEN_REVOCATION_ENDPOINT)));
         //UserInfo端点
-        domain.setUserinfoEndpoint(HttpUrlUtils.format(ServerContextHelp.getPortalPublicBaseUrl() +  sub.replace(ProtocolConstants.OidcEndpointConstants.OIDC_USER_INFO_ENDPOINT)));
+        domain.setUserinfoEndpoint(HttpUrlUtils.format(ServerHelp.getPortalPublicBaseUrl() +  sub.replace(ProtocolConstants.OidcEndpointConstants.OIDC_USER_INFO_ENDPOINT)));
+        //登出端点
+        domain.setEndSessionEndpoint(HttpUrlUtils.format(ServerHelp.getPortalPublicBaseUrl() +  sub.replace(ProtocolConstants.OidcEndpointConstants.OIDC_LOGOUT_ENDPOINT)));
         return domain;
         //@formatter:on
     }

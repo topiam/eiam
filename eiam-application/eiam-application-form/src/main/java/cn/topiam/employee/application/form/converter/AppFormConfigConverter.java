@@ -1,6 +1,6 @@
 /*
- * eiam-application-form - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-application-form - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,15 +26,14 @@ import org.apache.commons.text.StringSubstitutor;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import cn.topiam.employee.application.form.model.FormProtocolConfig;
 import cn.topiam.employee.application.form.pojo.AppFormConfigGetResult;
 import cn.topiam.employee.application.form.pojo.AppFormProtocolEndpoint;
 import cn.topiam.employee.application.form.pojo.AppFormSaveConfigParam;
 import cn.topiam.employee.common.entity.app.AppFormConfigEntity;
 import cn.topiam.employee.common.entity.app.po.AppFormConfigPO;
-import cn.topiam.employee.core.context.ServerContextHelp;
-import static cn.topiam.employee.common.constants.ProtocolConstants.APP_CODE;
-import static cn.topiam.employee.common.constants.ProtocolConstants.FormEndpointConstants.FORM_SSO_PATH;
+import cn.topiam.employee.core.help.ServerHelp;
+import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CODE;
+import static cn.topiam.employee.common.constant.ProtocolConstants.FormEndpointConstants.FORM_SSO_PATH;
 
 /**
  * 应用映射
@@ -51,6 +50,7 @@ public interface AppFormConfigConverter {
      * @param config {@link AppFormSaveConfigParam}
      * @return {@link AppFormConfigEntity}
      */
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "updateTime", ignore = true)
     @Mapping(target = "updateBy", ignore = true)
     @Mapping(target = "remark", ignore = true)
@@ -59,14 +59,6 @@ public interface AppFormConfigConverter {
     @Mapping(target = "createBy", ignore = true)
     @Mapping(target = "appId", ignore = true)
     AppFormConfigEntity appFormSaveConfigParamToEntity(AppFormSaveConfigParam config);
-
-    /**
-     * entity转config
-     *
-     * @param po {@link AppFormConfigPO}
-     * @return {@link FormProtocolConfig}
-     */
-    FormProtocolConfig appFormEntityToConfig(AppFormConfigPO po);
 
     /**
      * po 转 result
@@ -88,6 +80,10 @@ public interface AppFormConfigConverter {
         result.setLoginUrl(po.getLoginUrl());
         result.setUsernameField(po.getUsernameField());
         result.setPasswordField(po.getPasswordField());
+        result.setPasswordEncryptType(po.getPasswordEncryptType());
+        result.setPasswordEncryptKey(po.getPasswordEncryptKey());
+        result.setUsernameEncryptType(po.getUsernameEncryptType());
+        result.setUsernameEncryptKey(po.getUsernameEncryptKey());
         result.setSubmitType(po.getSubmitType());
         List<AppFormConfigEntity.OtherField> list = po.getOtherField();
         if (list != null) {
@@ -110,7 +106,7 @@ public interface AppFormConfigConverter {
         variables.put(APP_CODE,appCode);
         StringSubstitutor sub = new StringSubstitutor(variables, "{", "}");
         //IDP SSO 端点
-        domain.setIdpSsoEndpoint(sub.replace(ServerContextHelp.getPortalPublicBaseUrl()+FORM_SSO_PATH));
+        domain.setIdpSsoEndpoint(sub.replace(ServerHelp.getPortalPublicBaseUrl()+FORM_SSO_PATH));
         return domain;
         //@formatter:on
     }

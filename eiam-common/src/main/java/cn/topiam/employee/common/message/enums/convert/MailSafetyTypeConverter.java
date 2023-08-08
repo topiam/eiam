@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,16 +19,16 @@ package cn.topiam.employee.common.message.enums.convert;
 
 import java.util.Objects;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
-
 import cn.topiam.employee.common.message.enums.MailSafetyType;
+
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
 /**
  * ReadingConverter
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2020/12/5 20:39
+ * Created by support@topiam.cn on 2020/12/5 21:39
  */
 @Converter(autoApply = true)
 public class MailSafetyTypeConverter implements AttributeConverter<MailSafetyType, String> {

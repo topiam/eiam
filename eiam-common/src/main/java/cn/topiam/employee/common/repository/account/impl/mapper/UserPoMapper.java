@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -62,8 +62,6 @@ public class UserPoMapper implements RowMapper<UserPO> {
         user.setDataOrigin(DataOrigin.getType(rs.getString("data_origin")));
         user.setEmailVerified(rs.getBoolean("email_verified"));
         user.setPhoneVerified(rs.getBoolean("phone_verified"));
-        user.setSharedSecret(rs.getString("shared_secret"));
-        user.setTotpBind(rs.getBoolean("totp_bind"));
         user.setAuthTotal(rs.getLong("auth_total"));
         user.setLastAuthIp(rs.getString("last_auth_ip"));
         user.setLastAuthTime(ObjectUtils.isNotEmpty(rs.getTimestamp("last_auth_time")) ? rs.getTimestamp("last_auth_time").toLocalDateTime() : null);

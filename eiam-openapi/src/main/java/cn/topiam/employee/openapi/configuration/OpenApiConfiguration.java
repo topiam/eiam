@@ -1,6 +1,6 @@
 /*
- * eiam-openapi - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-openapi - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,7 +17,7 @@
  */
 package cn.topiam.employee.openapi.configuration;
 
-import org.springdoc.core.GroupedOpenApi;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -28,8 +28,7 @@ import cn.topiam.employee.support.util.AppVersionUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
-import static cn.topiam.employee.openapi.constants.OpenApiConstants.OPEN_API_PERMISSION_NAME;
-import static cn.topiam.employee.openapi.constants.OpenApiConstants.OPEN_API_PERMISSION_PATH;
+import static cn.topiam.employee.openapi.constants.OpenApiV1Constants.*;
 
 /**
  * OpenAPI 文档
@@ -47,8 +46,8 @@ public class OpenApiConfiguration {
      */
     @Bean
     public GroupedOpenApi permissionRestApi() {
-        return GroupedOpenApi.builder().group(OPEN_API_PERMISSION_NAME)
-            .pathsToMatch(OPEN_API_PERMISSION_PATH + "/**").build();
+        return GroupedOpenApi.builder().group(OPEN_API_NAME).pathsToMatch(OPEN_API_V1_PATH + "/**")
+            .build();
     }
 
     /**
@@ -60,14 +59,14 @@ public class OpenApiConfiguration {
         Contact contact = new Contact();
         contact.setEmail("support@topiam.cn");
         contact.setName("TopIAM");
-        contact.setUrl("https://www.topiam.cn");
+        contact.setUrl("https://eiam.topiam.cn");
         return new Info()
             //title
             .title(environment.getProperty("spring.application.name"))
             //描述
             .description("REST API 文档")
             //服务条款网址
-            .termsOfService("https://topiam.cn")
+            .termsOfService("https://eiam.topiam.cn")
             //内容
             .contact(contact)
             //版本

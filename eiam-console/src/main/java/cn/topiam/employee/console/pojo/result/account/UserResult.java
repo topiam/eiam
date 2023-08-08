@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,7 +37,7 @@ import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIM
  * Created by support@topiam.cn on 2020/8/11 23:22
  */
 @Data
-@Schema(description = "根据ID查询用户结果")
+@Schema(description = "根据ID查询用户响应")
 public class UserResult implements Serializable {
     @Serial
     private static final long serialVersionUID = -5144879825451360221L;
@@ -166,5 +166,4 @@ public class UserResult implements Serializable {
      */
     @Parameter(description = "备注")
     private String            remark;
-
 }

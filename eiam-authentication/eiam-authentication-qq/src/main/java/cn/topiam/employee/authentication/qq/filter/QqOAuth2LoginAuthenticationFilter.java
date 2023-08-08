@@ -1,6 +1,6 @@
 /*
- * eiam-authentication-qq - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-authentication-qq - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,9 +23,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.core.Authentication;
@@ -41,20 +38,23 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 
+import cn.topiam.employee.authentication.common.authentication.IdpUserDetails;
 import cn.topiam.employee.authentication.common.filter.AbstractIdpAuthenticationProcessingFilter;
-import cn.topiam.employee.authentication.common.modal.IdpUser;
 import cn.topiam.employee.authentication.common.service.UserIdpService;
 import cn.topiam.employee.authentication.qq.QqIdpOauthConfig;
-import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
+import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
-import cn.topiam.employee.core.context.ServerContextHelp;
+import cn.topiam.employee.core.help.ServerHelp;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.support.util.HttpClientUtils;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import static com.nimbusds.oauth2.sdk.GrantType.AUTHORIZATION_CODE;
 
 import static cn.topiam.employee.authentication.common.IdentityProviderType.QQ;
-import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.PROVIDER_CODE;
+import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.*;
 import static cn.topiam.employee.portal.idp.qq.constant.QqAuthenticationConstants.URL_GET_ACCESS_TOKEN;
 import static cn.topiam.employee.portal.idp.qq.constant.QqAuthenticationConstants.URL_GET_OPEN_ID;
 
@@ -68,19 +68,20 @@ import static cn.topiam.employee.portal.idp.qq.constant.QqAuthenticationConstant
 public class QqOAuth2LoginAuthenticationFilter extends AbstractIdpAuthenticationProcessingFilter {
     final String                              ERROR_CODE                   = "error";
     public final static String                DEFAULT_FILTER_PROCESSES_URI = QQ.getLoginPathPrefix()
-                                                                             + "/*";
+                                                                             + "/" + "{"
+                                                                             + PROVIDER_CODE + "}";
     public static final AntPathRequestMatcher REQUEST_MATCHER              = new AntPathRequestMatcher(
-        QQ.getLoginPathPrefix() + "/" + "{" + PROVIDER_CODE + "}", HttpMethod.GET.name());
+        DEFAULT_FILTER_PROCESSES_URI, HttpMethod.GET.name());
 
     /**
      * Creates a new instance
      *
      * @param identityProviderRepository the {@link IdentityProviderRepository}
-     * @param authenticationUserDetails  {@link  UserIdpService}
+     * @param userIdpService  {@link  UserIdpService}
      */
     public QqOAuth2LoginAuthenticationFilter(IdentityProviderRepository identityProviderRepository,
-                                             UserIdpService authenticationUserDetails) {
-        super(DEFAULT_FILTER_PROCESSES_URI, authenticationUserDetails, identityProviderRepository);
+                                             UserIdpService userIdpService) {
+        super(DEFAULT_FILTER_PROCESSES_URI, userIdpService, identityProviderRepository);
     }
 
     /**
@@ -95,12 +96,13 @@ public class QqOAuth2LoginAuthenticationFilter extends AbstractIdpAuthentication
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response) throws AuthenticationException,
                                                                               IOException {
-        OAuth2AuthorizationRequest authorizationRequest = getOAuth2AuthorizationRequest(request,
+        OAuth2AuthorizationRequest authorizationRequest = getOauth2AuthorizationRequest(request,
             response);
         TraceUtils.put(UUID.randomUUID().toString());
         RequestMatcher.MatchResult matcher = REQUEST_MATCHER.matcher(request);
         Map<String, String> variables = matcher.getVariables();
-        String providerId = variables.get(PROVIDER_CODE);
+        String providerCode = variables.get(PROVIDER_CODE);
+        String providerId = getIdentityProviderId(providerCode);
         //code
         String code = request.getParameter(OAuth2ParameterNames.CODE);
         if (StringUtils.isEmpty(code)) {
@@ -118,7 +120,7 @@ public class QqOAuth2LoginAuthenticationFilter extends AbstractIdpAuthentication
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
         }
         //获取身份提供商
-        IdentityProviderEntity provider = getIdentityProviderEntity(providerId);
+        IdentityProviderEntity provider = getIdentityProviderEntity(providerCode);
         QqIdpOauthConfig config = JSONObject.parseObject(provider.getConfig(),
             QqIdpOauthConfig.class);
         if (Objects.isNull(config)) {
@@ -153,14 +155,15 @@ public class QqOAuth2LoginAuthenticationFilter extends AbstractIdpAuthentication
         }
         // 返回
         String openId = result.getString(OidcScopes.OPENID);
-        IdpUser idpUser = IdpUser.builder().openId(openId).build();
-        return attemptAuthentication(request, response, QQ, providerId, idpUser);
+        IdpUserDetails idpUserDetails = IdpUserDetails.builder().openId(openId).providerType(QQ)
+            .providerCode(providerCode).providerId(providerId).build();
+        return attemptAuthentication(request, response, idpUserDetails);
 
     }
 
     public static String getLoginUrl(String providerId) {
-        String url = ServerContextHelp.getPortalPublicBaseUrl() + "/" + QQ.getLoginPathPrefix()
-                     + "/" + providerId;
+        String url = ServerHelp.getPortalPublicBaseUrl() + "/" + QQ.getLoginPathPrefix() + "/"
+                     + providerId;
         return url.replaceAll("(?<!(http:|https:))/+", "/");
     }
 

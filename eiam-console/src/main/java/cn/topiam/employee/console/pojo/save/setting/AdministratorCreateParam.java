@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,21 +22,24 @@ import java.io.Serializable;
 import lombok.Data;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 
 /**
- * 权限创建参数
+ * 管理员创建参数
  *
  * @author TopIAM
  * Created by support@topiam.cn on 2020/8/26 21:46
  */
 @Data
-@Schema(description = "创建权限入参")
+@Schema(description = "创建管理员入参")
 public class AdministratorCreateParam implements Serializable {
     /**
      * 用户名
      */
     @Schema(description = "用户名")
+    @NotEmpty(message = "用户名不能为空")
     private String username;
+
     /**
      * 邮箱
      */
@@ -48,6 +51,7 @@ public class AdministratorCreateParam implements Serializable {
      */
     @Schema(description = "手机号")
     private String phone;
+
     /**
      * 密码
      */
@@ -65,5 +69,4 @@ public class AdministratorCreateParam implements Serializable {
      */
     @Schema(description = "备注")
     private String remark;
-
 }

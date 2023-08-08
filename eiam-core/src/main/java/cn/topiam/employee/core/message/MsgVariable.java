@@ -1,6 +1,6 @@
 /*
- * eiam-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -52,6 +52,11 @@ public final class MsgVariable implements Serializable {
      * 剩余天数
      */
     public static final String EXPIRE_DAYS        = "expire_days";
+
+    /**
+     * 密码
+     */
+    public static final String PASSWORD           = "password";
 
     public static final String TEST               = "test";
 

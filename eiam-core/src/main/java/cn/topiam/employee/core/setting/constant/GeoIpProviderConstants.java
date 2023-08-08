@@ -1,6 +1,6 @@
 /*
- * eiam-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,7 +21,7 @@ package cn.topiam.employee.core.setting.constant;
  * 地理位置IP库设置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/9 20:46
+ * Created by support@topiam.cn on  2021/11/9 21:46
  */
 public final class GeoIpProviderConstants {
 

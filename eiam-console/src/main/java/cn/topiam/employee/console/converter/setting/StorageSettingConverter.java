@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -18,26 +18,30 @@
 package cn.topiam.employee.console.converter.setting;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
-import javax.validation.ValidationException;
-
+import org.jetbrains.annotations.NotNull;
 import org.mapstruct.Mapper;
+import org.springframework.beans.BeanUtils;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cn.topiam.employee.common.crypto.EncryptionModule;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
+import cn.topiam.employee.common.jackjson.encrypt.EncryptionModule;
 import cn.topiam.employee.common.storage.StorageConfig;
+import cn.topiam.employee.common.storage.StorageProviderException;
 import cn.topiam.employee.common.storage.enums.StorageProvider;
 import cn.topiam.employee.common.storage.impl.AliYunOssStorage;
-import cn.topiam.employee.common.storage.impl.LocalStorage;
 import cn.topiam.employee.common.storage.impl.MinIoStorage;
 import cn.topiam.employee.common.storage.impl.QiNiuKodoStorage;
+import cn.topiam.employee.common.storage.impl.TencentCosStorage;
 import cn.topiam.employee.console.pojo.result.setting.StorageProviderConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.StorageConfigSaveParam;
-import cn.topiam.employee.support.validation.ValidationHelp;
+import cn.topiam.employee.support.validation.ValidationUtils;
+
+import jakarta.validation.ValidationException;
 import static cn.topiam.employee.core.setting.constant.StorageProviderSettingConstants.STORAGE_PROVIDER_KEY;
 
 /**
@@ -57,7 +61,6 @@ public interface StorageSettingConverter {
     default SettingEntity storageConfigSaveParamToEntity(StorageConfigSaveParam param) {
         SettingEntity entity = new SettingEntity();
         StorageProvider provider = param.getProvider();
-        ValidationHelp.ValidationResult<?> validationResult = null;
         StorageConfig.StorageConfigBuilder builder = StorageConfig.builder();
         builder.provider(provider);
         ObjectMapper objectMapper = EncryptionModule.deserializerEncrypt();
@@ -66,39 +69,56 @@ public interface StorageSettingConverter {
             if (provider.equals(StorageProvider.ALIYUN_OSS)) {
                 AliYunOssStorage.Config config = objectMapper
                     .readValue(param.getConfig().toJSONString(), AliYunOssStorage.Config.class);
+                config.setDomain(getUrl(config.getDomain()));
+                config.setEndpoint(getUrl(config.getEndpoint()));
                 builder.config(config);
-                validationResult = ValidationHelp.validateEntity(config);
+                validateEntity(ValidationUtils.validateEntity(config));
+
+                AliYunOssStorage.Config unencryptedConfig = new AliYunOssStorage.Config();
+                BeanUtils.copyProperties(config, unencryptedConfig);
+                unencryptedConfig
+                    .setAccessKeySecret(param.getConfig().getString("accessKeySecret"));
+                checkStorage(AliYunOssStorage::new, unencryptedConfig);
             }
             //腾讯
             else if (provider.equals(StorageProvider.TENCENT_COS)) {
-                AliYunOssStorage.Config config = objectMapper
-                    .readValue(param.getConfig().toJSONString(), AliYunOssStorage.Config.class);
+                TencentCosStorage.Config config = objectMapper
+                    .readValue(param.getConfig().toJSONString(), TencentCosStorage.Config.class);
+                config.setDomain(getUrl(config.getDomain()));
                 builder.config(config);
-                validationResult = ValidationHelp.validateEntity(config);
+                validateEntity(ValidationUtils.validateEntity(config));
+
+                TencentCosStorage.Config unencryptedConfig = new TencentCosStorage.Config();
+                BeanUtils.copyProperties(config, unencryptedConfig);
+                unencryptedConfig.setSecretKey(param.getConfig().getString("secretKey"));
+                checkStorage(TencentCosStorage::new, unencryptedConfig);
             }
             //七牛
             else if (provider.equals(StorageProvider.QINIU_KODO)) {
                 QiNiuKodoStorage.Config config = objectMapper
                     .readValue(param.getConfig().toJSONString(), QiNiuKodoStorage.Config.class);
+                config.setDomain(getUrl(config.getDomain()));
                 builder.config(config);
-                validationResult = ValidationHelp.validateEntity(config);
+                validateEntity(ValidationUtils.validateEntity(config));
+
+                QiNiuKodoStorage.Config unencryptedConfig = new QiNiuKodoStorage.Config();
+                BeanUtils.copyProperties(config, unencryptedConfig);
+                unencryptedConfig.setSecretKey(param.getConfig().getString("secretKey"));
+                checkStorage(QiNiuKodoStorage::new, unencryptedConfig);
             }
-            //MiNio
+            //Minio
             else if (provider.equals(StorageProvider.MINIO)) {
                 MinIoStorage.Config config = objectMapper
                     .readValue(param.getConfig().toJSONString(), MinIoStorage.Config.class);
+                config.setEndpoint(getUrl(config.getEndpoint()));
+                config.setDomain(getUrl(config.getDomain()));
                 builder.config(config);
-                validationResult = ValidationHelp.validateEntity(config);
-            }
-            //本机
-            else if (provider.equals(StorageProvider.LOCAL)) {
-                LocalStorage.Config config = objectMapper
-                    .readValue(param.getConfig().toJSONString(), LocalStorage.Config.class);
-                builder.config(config);
-                validationResult = ValidationHelp.validateEntity(config);
-            }
-            if (Objects.requireNonNull(validationResult).isHasErrors()) {
-                throw new ValidationException(validationResult.getMessage());
+                validateEntity(ValidationUtils.validateEntity(config));
+
+                MinIoStorage.Config unencryptedConfig = new MinIoStorage.Config();
+                BeanUtils.copyProperties(config, unencryptedConfig);
+                unencryptedConfig.setSecretKey(param.getConfig().getString("secretKey"));
+                checkStorage(MinIoStorage::new, unencryptedConfig);
             }
             entity.setName(STORAGE_PROVIDER_KEY);
             // 指定序列化输入的类型
@@ -110,6 +130,26 @@ public interface StorageSettingConverter {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static void checkStorage(Consumer<StorageConfig> consumer,
+                                     StorageConfig.Config config) {
+        try {
+            consumer.accept(StorageConfig.builder().config(config).build());
+        } catch (Exception e) {
+            throw new StorageProviderException("存储配置异常, 请检查配置信息");
+        }
+    }
+
+    private static void validateEntity(ValidationUtils.ValidationResult<?> validationResult) {
+        if (Objects.requireNonNull(validationResult).isHasErrors()) {
+            throw new ValidationException(validationResult.getMessage());
+        }
+    }
+
+    @NotNull
+    private static String getUrl(String url) {
+        return url.replaceAll("/+$", "");
     }
 
     /**

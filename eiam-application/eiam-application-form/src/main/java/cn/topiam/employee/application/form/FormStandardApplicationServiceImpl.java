@@ -1,6 +1,6 @@
 /*
- * eiam-application-form - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-application-form - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,45 +17,32 @@
  */
 package cn.topiam.employee.application.form;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.validation.ConstraintViolationException;
-
-import org.apache.commons.text.StringSubstitutor;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.topiam.employee.application.exception.AppNotExistException;
 import cn.topiam.employee.application.form.converter.AppFormConfigConverter;
-import cn.topiam.employee.application.form.model.FormProtocolConfig;
 import cn.topiam.employee.application.form.pojo.AppFormSaveConfigParam;
 import cn.topiam.employee.audit.context.AuditContext;
-import cn.topiam.employee.common.entity.app.AppAccountEntity;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.AppFormConfigEntity;
 import cn.topiam.employee.common.entity.app.po.AppFormConfigPO;
 import cn.topiam.employee.common.enums.app.*;
-import cn.topiam.employee.common.exception.app.AppAccountNotExistException;
 import cn.topiam.employee.common.repository.app.AppAccountRepository;
 import cn.topiam.employee.common.repository.app.AppFormConfigRepository;
 import cn.topiam.employee.common.repository.app.AppRepository;
-import cn.topiam.employee.core.context.ServerContextHelp;
 import cn.topiam.employee.support.exception.TopIamException;
-import cn.topiam.employee.support.util.BeanUtils;
-import cn.topiam.employee.support.util.HttpUrlUtils;
-import cn.topiam.employee.support.validation.ValidationHelp;
+import cn.topiam.employee.support.validation.ValidationUtils;
 
 import lombok.extern.slf4j.Slf4j;
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 
-import static cn.topiam.employee.common.constants.ProtocolConstants.APP_CODE;
-import static cn.topiam.employee.common.constants.ProtocolConstants.FormEndpointConstants.IDP_FORM_SSO_INITIATOR;
-import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
-import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
+import jakarta.validation.ConstraintViolationException;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 
 /**
  * Form 用户应用
@@ -86,7 +73,7 @@ public class FormStandardApplicationServiceImpl extends AbstractFormApplicationS
             throw new TopIamException(e.getMessage());
         }
         //@formatter:off
-        ValidationHelp.ValidationResult<AppFormSaveConfigParam> validationResult = ValidationHelp.validateEntity(model);
+        ValidationUtils.ValidationResult<AppFormSaveConfigParam> validationResult = ValidationUtils.validateEntity(model);
         if (validationResult.isHasErrors()) {
             throw new ConstraintViolationException(validationResult.getConstraintViolations());
         }
@@ -100,12 +87,6 @@ public class FormStandardApplicationServiceImpl extends AbstractFormApplicationS
         }
         AppEntity appEntity = optional.get();
         appEntity.setAuthorizationType(model.getAuthorizationType());
-        Map<String, String> variables = new HashMap<>(16);
-        variables.put(APP_CODE, appEntity.getCode());
-        StringSubstitutor sub = new StringSubstitutor(variables, "{", "}");
-        appEntity.setInitLoginUrl(sub.replace(HttpUrlUtils
-            .format(ServerContextHelp.getPortalPublicBaseUrl() + IDP_FORM_SSO_INITIATOR)));
-        appEntity.setInitLoginType(model.getInitLoginType());
         appRepository.save(appEntity);
         //2、修改 表单代填 配置
         Optional<AppFormConfigEntity> form = appFormConfigRepository
@@ -118,8 +99,13 @@ public class FormStandardApplicationServiceImpl extends AbstractFormApplicationS
         AppFormConfigEntity entity = form.get();
         AppFormConfigEntity formConfig = appFormConfigConverter
             .appFormSaveConfigParamToEntity(model);
-        BeanUtils.merge(formConfig, entity, LAST_MODIFIED_BY, LAST_MODIFIED_TIME);
-        appFormConfigRepository.save(entity);
+        formConfig.setId(entity.getId());
+        formConfig.setAppId(entity.getAppId());
+        formConfig.setRemark(entity.getRemark());
+        formConfig.setCreateBy(entity.getCreateBy());
+        formConfig.setCreateTime(entity.getCreateTime());
+        formConfig.setDeleted(entity.getDeleted());
+        appFormConfigRepository.save(formConfig);
     }
 
     /**
@@ -208,26 +194,14 @@ public class FormStandardApplicationServiceImpl extends AbstractFormApplicationS
      * 创建应用
      *
      * @param name   {@link String} 名称
+     * @param icon   {@link String} 图标
      * @param remark {@link String} 备注
      */
     @Override
-    public String create(String name, String remark) {
+    public String create(String name, String icon, String remark) {
         //1、创建应用
-        AppEntity appEntity = new AppEntity();
-        appEntity.setName(name);
-        appEntity.setCode(
-            org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric(32).toLowerCase());
-        appEntity.setTemplate(getCode());
-        appEntity.setType(getType());
-        appEntity.setEnabled(true);
-        appEntity.setProtocol(getProtocol());
-        appEntity.setClientId(idGenerator.generateId().toString().replace("-", ""));
-        appEntity.setClientSecret(idGenerator.generateId().toString().replace("-", ""));
-        appEntity.setInitLoginType(InitLoginType.PORTAL_OR_APP);
-        appEntity.setAuthorizationType(AuthorizationType.AUTHORIZATION);
-        appEntity.setRemark(remark);
-        appRepository.save(appEntity);
-
+        AppEntity appEntity = createApp(name, icon, remark, InitLoginType.PORTAL_OR_APP,
+            AuthorizationType.AUTHORIZATION);
         AppFormConfigEntity appFormConfig = new AppFormConfigEntity();
         appFormConfig.setAppId(appEntity.getId());
         //提交类型
@@ -237,15 +211,8 @@ public class FormStandardApplicationServiceImpl extends AbstractFormApplicationS
     }
 
     @Override
-    public FormProtocolConfig getProtocolConfig(String appCode) {
-        AppFormConfigPO configPo = appFormConfigRepository.findByAppCode(appCode);
-        return appFormConfigConverter.appFormEntityToConfig(configPo);
-    }
+    public void delete(String appId) {
 
-    @Override
-    public AppAccountEntity getAppAccount(Long appId, Long userId) {
-        return appAccountRepository.findByAppIdAndUserId(appId, userId)
-            .orElseThrow(AppAccountNotExistException::new);
     }
 
     private final AppFormConfigConverter appFormConfigConverter;

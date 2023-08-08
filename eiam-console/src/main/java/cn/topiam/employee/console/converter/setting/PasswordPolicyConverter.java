@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ import org.mapstruct.Mapper;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.console.pojo.result.setting.PasswordPolicyConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.PasswordPolicySaveParam;
-import cn.topiam.employee.core.security.password.enums.PasswordComplexityRule;
+import cn.topiam.employee.support.security.password.enums.PasswordComplexityRule;
 import static cn.topiam.employee.core.setting.constant.PasswordPolicySettingConstants.*;
 
 /**

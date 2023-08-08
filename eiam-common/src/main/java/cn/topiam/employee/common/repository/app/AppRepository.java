@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,14 +23,16 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.support.repository.LogicDeleteRepository;
-import static cn.topiam.employee.common.constants.AppConstants.APP_CACHE_NAME;
+import static cn.topiam.employee.common.constant.AppConstants.APP_CACHE_NAME;
 
 /**
  * @author TopIAM
@@ -39,6 +41,7 @@ import static cn.topiam.employee.common.constants.AppConstants.APP_CACHE_NAME;
 @CacheConfig(cacheNames = { APP_CACHE_NAME })
 public interface AppRepository extends LogicDeleteRepository<AppEntity, Long>,
                                QuerydslPredicateExecutor<AppEntity>, AppRepositoryCustomized {
+
     /**
      * 根据应用ID查询已启用应用
      *
@@ -59,6 +62,20 @@ public interface AppRepository extends LogicDeleteRepository<AppEntity, Long>,
     @Override
     @CacheEvict(allEntries = true)
     <S extends AppEntity> S save(@NotNull S entity);
+
+    /**
+     * 更新应用状态
+     *
+     * @param id      {@link  Long}
+     * @param enabled {@link  Boolean}
+     * @return {@link  Boolean}
+     */
+    @Modifying
+    @CacheEvict(allEntries = true)
+    @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE app SET is_enabled = :enabled WHERE id_ = :id", nativeQuery = true)
+    Integer updateAppStatus(@Param(value = "id") Long id,
+                            @Param(value = "enabled") Boolean enabled);
 
     /**
      * delete
@@ -98,7 +115,7 @@ public interface AppRepository extends LogicDeleteRepository<AppEntity, Long>,
      * @return {@link AppEntity}
      */
     @Cacheable
-    AppEntity findByClientId(String clientId);
+    Optional<AppEntity> findByClientId(String clientId);
 
     /**
      *  findByCode
@@ -109,4 +126,13 @@ public interface AppRepository extends LogicDeleteRepository<AppEntity, Long>,
     @NotNull
     @Cacheable
     Optional<AppEntity> findByCode(String appCode);
+
+    /**
+     * 更新应用状态
+     *
+     * @param id      {@link  Long}
+     * @param enabled {@link  Boolean}
+     * @return {@link  Boolean}
+     */
+
 }

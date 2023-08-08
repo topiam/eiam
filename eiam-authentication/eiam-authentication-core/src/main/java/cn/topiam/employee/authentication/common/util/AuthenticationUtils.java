@@ -1,6 +1,6 @@
 /*
- * eiam-authentication-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-authentication-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,44 +17,58 @@
  */
 package cn.topiam.employee.authentication.common.util;
 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import java.util.Optional;
 
-import cn.topiam.employee.core.security.authentication.IdpAuthentication;
-import cn.topiam.employee.core.security.authentication.SmsAuthentication;
-import cn.topiam.employee.core.security.mfa.MfaAuthentication;
-import static cn.topiam.employee.authentication.common.IdentityProviderType.SMS;
-import static cn.topiam.employee.authentication.common.IdentityProviderType.USERNAME_PASSWORD;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+
+import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
+import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.AUTHORIZATION_REQUEST_NOT_FOUND_ERROR_CODE;
 
 /**
+ * AuthenticationUtils
  *
- * @author SanLi
- * Created by qinggang.zuo@gmail.com / 2689170096@qq.com on  2022/12/31 14:29
+ * @author TopIAM
+ * Created by support@topiam.cn on  2023/4/19 21:43
  */
 public class AuthenticationUtils {
+    public static final String INVALID_IDP = "invalid_idp";
+
     /**
-     * 获取认证类型
      *
-     * @param authentication {@link Authentication}
-     * @return {@link String}
+     * @param request {@link HttpServletRequest}
+     * @param response {@link HttpServletResponse}
+     * @param authorizationRequestRepository {@link AuthorizationRequestRepository}
+     * @return {@link OAuth2AuthorizationRequest}
      */
-    public static String geAuthType(Authentication authentication) {
-        //用户名密码
-        if (authentication instanceof UsernamePasswordAuthenticationToken) {
-            return USERNAME_PASSWORD.value();
+    public static OAuth2AuthorizationRequest getOAuth2AuthorizationRequest(HttpServletRequest request,
+                                                                           HttpServletResponse response,
+                                                                           AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository) {
+        OAuth2AuthorizationRequest authorizationRequest = authorizationRequestRepository
+            .removeAuthorizationRequest(request, response);
+        if (authorizationRequest == null) {
+            OAuth2Error oauth2Error = new OAuth2Error(AUTHORIZATION_REQUEST_NOT_FOUND_ERROR_CODE);
+            throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
         }
-        //身份提供商
-        if (authentication instanceof IdpAuthentication) {
-            return ((IdpAuthentication) authentication).getProviderType();
-        }
-        //短信登录
-        if (authentication instanceof SmsAuthentication) {
-            return SMS.value();
-        }
-        //MFA
-        if (authentication instanceof MfaAuthentication) {
-            return geAuthType(((MfaAuthentication) authentication).getFirst());
-        }
-        throw new IllegalArgumentException("未知认证对象");
+        return authorizationRequest;
     }
+
+    public static IdentityProviderEntity getIdentityProviderEntity(String providerCode,
+                                                                   IdentityProviderRepository identityProviderRepository) {
+        Optional<IdentityProviderEntity> optional = identityProviderRepository
+            .findByCodeAndEnabledIsTrue(providerCode);
+        if (optional.isEmpty()) {
+            //无效身份提供商
+            OAuth2Error oauth2Error = new OAuth2Error(INVALID_IDP);
+            throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
+        }
+        return optional.get();
+    }
+
 }

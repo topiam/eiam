@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,11 +29,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * 弱密码列表查询结果
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2020/10/11 19:19
+ * Created by support@topiam.cn on 2020/10/11 21:19
  */
 @Data
 @RequiredArgsConstructor
-@Schema(description = "弱密码列表查询结果")
+@Schema(description = "弱密码列表查询响应")
 public class WeakPasswordLibListResult implements Serializable {
     /**
      * value

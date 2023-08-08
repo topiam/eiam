@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,8 +20,6 @@ package cn.topiam.employee.common.message.mail;
 import java.util.Date;
 import java.util.Properties;
 
-import javax.mail.internet.MimeMessage;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.task.TaskExecutor;
@@ -29,12 +27,12 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
-import com.alibaba.fastjson2.JSON;
-
 import cn.topiam.employee.common.message.SendMessageException;
 import cn.topiam.employee.common.message.enums.MailProvider;
 import cn.topiam.employee.common.message.enums.MailSafetyType;
 import cn.topiam.employee.common.message.enums.MessageType;
+
+import jakarta.mail.internet.MimeMessage;
 import static org.apache.commons.codec.CharEncoding.UTF_8;
 import static org.apache.commons.lang3.BooleanUtils.TRUE;
 
@@ -69,10 +67,10 @@ public class DefaultMailProviderSendImpl implements MailProviderSend {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
         javaMailSender.setHost(mailProvider.getSmtpUrl());
         javaMailSender.setUsername(mailProvider.getUsername());
-        javaMailSender.setPassword(mailProvider.getDecryptSecret());
+        javaMailSender.setPassword(mailProvider.getSecret());
         javaMailSender.setDefaultEncoding(UTF_8);
         javaMailSender.setPort(mailProvider.getPort());
-        if (mailProvider.getSafetyType() == MailSafetyType.SSL) {
+        if (MailSafetyType.SSL.equals(mailProvider.getSafetyType())) {
             Properties properties = new Properties();
             properties.setProperty(MAIL_SMTP_AUTH, TRUE);
             properties.setProperty(MAIL_SMTP_SOCKET_FACTORY_CLASS, JAVAX_NET_SSL_SSLSOCKET_FACTORY);
@@ -107,7 +105,7 @@ public class DefaultMailProviderSendImpl implements MailProviderSend {
      * @param isHtml {@link Boolean}
      */
     private void send(SendMailRequest sendMail, boolean isHtml) {
-        log.info("发送邮件消息入参： {}", JSON.toJSONString(sendMail));
+        log.info("发送邮件消息入参: 发送者: [{}] 接收者: [{}]", sendMail.getSender(), sendMail.getReceiver());
         try {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, false, UTF_8);

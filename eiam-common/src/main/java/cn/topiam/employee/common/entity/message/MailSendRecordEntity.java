@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,12 +19,7 @@ package cn.topiam.employee.common.entity.message;
 
 import java.time.LocalDateTime;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLDeleteAll;
 import org.hibernate.annotations.Where;
 
 import cn.topiam.employee.common.enums.MailType;
@@ -35,6 +30,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
@@ -42,7 +41,7 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
  * 邮件发送记录
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/8/1 19:41
+ * Created by support@topiam.cn on  2021/8/1 21:41
  */
 @Entity
 @Accessors(chain = true)
@@ -51,7 +50,6 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
 @ToString
 @Table(name = "mail_send_record")
 @SQLDelete(sql = "update mail_send_record set " + SOFT_DELETE_SET + " where id_ = ?")
-@SQLDeleteAll(sql = "update mail_send_record set " + SOFT_DELETE_SET + " where id_ = ?")
 @Where(clause = SOFT_DELETE_WHERE)
 public class MailSendRecordEntity extends LogicDeleteEntity<Long> {
     /**

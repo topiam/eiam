@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,12 +23,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import cn.topiam.employee.audit.annotation.Audit;
-import cn.topiam.employee.audit.enums.EventType;
-import cn.topiam.employee.common.geo.GeoLocation;
+import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.console.pojo.result.setting.GeoIpProviderResult;
 import cn.topiam.employee.console.pojo.save.setting.GeoIpProviderSaveParam;
 import cn.topiam.employee.console.service.setting.GeoLocationSettingService;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.geo.GeoLocation;
 import cn.topiam.employee.support.lock.Lock;
 import cn.topiam.employee.support.preview.Preview;
 import cn.topiam.employee.support.result.ApiRestResult;
@@ -38,8 +38,8 @@ import lombok.AllArgsConstructor;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import static cn.topiam.employee.common.constants.ConfigBeanNameConstants.GEO_LOCATION;
-import static cn.topiam.employee.common.constants.SettingConstants.SETTING_PATH;
+import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.GEO_LOCATION;
+import static cn.topiam.employee.common.constant.SettingConstants.SETTING_PATH;
 import static cn.topiam.employee.core.setting.constant.GeoIpProviderConstants.IPADDRESS_SETTING_NAME;
 
 /**
@@ -61,7 +61,7 @@ public class GeoIpLibraryController {
      */
     @Operation(summary = "获取地理位置配置")
     @GetMapping("config")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<GeoIpProviderResult> getGeoIpLibrary() {
         return ApiRestResult.<GeoIpProviderResult> builder()
             .result(geoLocationSettingService.getGeoIpLibrary()).build();
@@ -78,7 +78,7 @@ public class GeoIpLibraryController {
     @Operation(summary = "保存地理位置配置")
     @Audit(type = EventType.SAVE_GEO_LOCATION_SERVICE)
     @PostMapping("save")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> saveGeoIpLibrary(@RequestBody @Validated GeoIpProviderSaveParam param) {
         return ApiRestResult.<Boolean> builder()
             .result(geoLocationSettingService.saveGeoIpLibrary(param)).build();
@@ -94,7 +94,7 @@ public class GeoIpLibraryController {
     @Operation(summary = "禁用地理位置服务")
     @Audit(type = EventType.OFF_GEO_LOCATION_SERVICE)
     @PutMapping("/disable")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> disableGeoIpLibrary() {
         Boolean setting = geoLocationSettingService.removeSetting(IPADDRESS_SETTING_NAME);
         // refresh
@@ -110,7 +110,7 @@ public class GeoIpLibraryController {
      */
     @Operation(summary = "查询IP地址位置信息")
     @GetMapping(value = "/get_location")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<GeoLocation> getGeoLocation(@Parameter(description = "IP") String ip) {
         return ApiRestResult.<GeoLocation> builder()
             .result(geoLocationSettingService.getGeoLocation(ip)).build();

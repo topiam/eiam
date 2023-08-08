@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,7 @@ import cn.topiam.employee.support.exception.TopIamException;
 public class MessageSendException extends TopIamException {
 
     public MessageSendException(Throwable throwable) {
-        super(throwable, "message_send_error", "发送短信消息失败", HttpStatus.INTERNAL_SERVER_ERROR);
+        super(throwable, "message_send_error", "发送短信/邮件消息失败", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

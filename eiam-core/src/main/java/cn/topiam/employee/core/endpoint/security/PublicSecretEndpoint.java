@@ -1,6 +1,6 @@
 /*
- * eiam-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,68 +19,49 @@ package cn.topiam.employee.core.endpoint.security;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Objects;
 
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
-
-import com.alibaba.fastjson2.JSONObject;
-
-import cn.topiam.employee.common.enums.SecretType;
 import cn.topiam.employee.support.constant.EiamConstants;
+import cn.topiam.employee.support.context.ServletContextHelp;
+import cn.topiam.employee.support.enums.SecretType;
 import cn.topiam.employee.support.result.ApiRestResult;
 import cn.topiam.employee.support.util.AesUtils;
 
 import lombok.Builder;
 import lombok.Data;
-import static cn.topiam.employee.support.util.HttpResponseUtils.flushResponse;
-import static cn.topiam.employee.support.util.HttpResponseUtils.flushResponseJson;
+
+import jakarta.validation.constraints.NotNull;
+import static cn.topiam.employee.core.endpoint.security.PublicSecretEndpoint.PUBLIC_SECRET_PATH;
 
 /**
  * 获取加密key
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2020/5/20 19:32
+ * Created by support@topiam.cn on 2020/5/20 21:32
  */
-@Component
-@WebServlet(PublicSecretEndpoint.PUBLIC_SECRET_PATH)
-public class PublicSecretEndpoint extends HttpServlet {
+@RestController
+@RequestMapping
+public class PublicSecretEndpoint {
 
-    public static final String  PUBLIC_SECRET_PATH = EiamConstants.API_PATH + "/public_secret";
-
-    private static final String TYPE               = "type";
+    public static final String PUBLIC_SECRET_PATH = EiamConstants.V1_API_PATH + "/public_secret";
 
     /**
      * 获取加密key
      *
-     * @param req  {@link HttpServletRequest}
-     * @param resp {@link HttpServletResponse}
      */
-    @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse resp) {
+    @Validated
+    @GetMapping(PUBLIC_SECRET_PATH)
+    public ApiRestResult<PublicSecretResult> getPublicSecret(@RequestParam(value = "type", required = false) @NotNull(message = "秘钥类型不能为空") SecretType type) {
         //调用工具类生成秘钥
         String key = AesUtils.generateKey();
-        if (StringUtils.isBlank(req.getParameter(TYPE))) {
-            flushResponseJson(resp, HttpStatus.BAD_REQUEST.value(),
-                ApiRestResult.err().message("加密类型不能为空").build());
-            return;
-        }
-        SecretType type = SecretType.getType(req.getParameter(TYPE));
-        if (Objects.isNull(type)) {
-            flushResponseJson(resp, HttpStatus.BAD_REQUEST.value(),
-                ApiRestResult.err().message("不支持的加密类型").build());
-            return;
-        }
         //保存会话
-        req.getSession().setAttribute(type.getKey(), key);
-        flushResponse(resp, JSONObject.toJSONString(ApiRestResult.builder()
-            .result(PublicSecretResult.builder().secret(key).build()).build()));
+        ServletContextHelp.getSession().setAttribute(type.getKey(), key);
+        return ApiRestResult.ok(PublicSecretResult.builder().secret(key).build());
     }
 
     @Data

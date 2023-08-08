@@ -1,6 +1,6 @@
 /*
- * eiam-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,10 +31,11 @@ import cn.topiam.employee.common.entity.account.QUserEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.enums.UserStatus;
 import cn.topiam.employee.common.repository.account.UserRepository;
+import cn.topiam.employee.support.lock.Lock;
 import cn.topiam.employee.support.trace.Trace;
 
 import lombok.RequiredArgsConstructor;
-import static cn.topiam.employee.core.context.SettingContextHelp.getAutoUnlockTime;
+import static cn.topiam.employee.core.help.SettingHelp.getAutoUnlockTime;
 
 /**
  * 用户锁定自动解锁任务
@@ -51,25 +52,26 @@ public class UserUnlockTask {
      * 每分钟扫描已锁定的用户解锁
      */
     @Trace
+    @Lock(throwException = false)
     @Scheduled(cron = "0 */1 * * * ?")
     public void execute() {
         logger.info("用户自动解锁任务开始");
         QUserEntity qUserEntity = QUserEntity.userEntity;
         Predicate predicate = ExpressionUtils.and(qUserEntity.isNotNull(),
-            qUserEntity.isDeleted.eq(Boolean.FALSE));
+            qUserEntity.deleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = ExpressionUtils.and(predicate, qUserEntity.status.eq(UserStatus.LOCKED));
         List<UserEntity> list = (List<UserEntity>) userRepository.findAll(predicate);
         logger.info("待解锁用户数量: [{}] ",list.size());
         for (UserEntity entity:list) {
-            logger.info("开始解锁用户:{}",entity.getUsername());
+            logger.info("开始解锁用户：{}",entity.getUsername());
             LocalDateTime updateTime = entity.getUpdateTime();
             Integer unlockTime = getAutoUnlockTime();
             if (updateTime.plusMinutes(unlockTime).isBefore(LocalDateTime.now())){
                 entity.setStatus(UserStatus.ENABLE);
                 userRepository.save(entity);
-                logger.info("成功解锁用户:{}",entity.getUsername());
+                logger.info("成功解锁用户：{}",entity.getUsername());
             }
         }
         logger.info("用户自动解锁任务结束");

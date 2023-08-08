@@ -1,6 +1,6 @@
 /*
- * eiam-synchronizer - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-synchronizer - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,8 +23,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.persistence.EntityManager;
-
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,31 +43,34 @@ import cn.topiam.employee.common.entity.identitysource.IdentitySourceEntity;
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceSyncHistoryEntity;
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceSyncRecordEntity;
 import cn.topiam.employee.common.entity.identitysource.config.StrategyConfig;
-import cn.topiam.employee.common.enums.OrganizationType;
 import cn.topiam.employee.common.enums.SyncStatus;
 import cn.topiam.employee.common.enums.TriggerType;
+import cn.topiam.employee.common.enums.account.OrganizationType;
 import cn.topiam.employee.common.enums.identitysource.IdentitySourceActionType;
 import cn.topiam.employee.common.enums.identitysource.IdentitySourceObjectType;
 import cn.topiam.employee.common.repository.account.OrganizationRepository;
 import cn.topiam.employee.common.repository.identitysource.IdentitySourceRepository;
 import cn.topiam.employee.common.repository.identitysource.IdentitySourceSyncHistoryRepository;
 import cn.topiam.employee.common.repository.identitysource.IdentitySourceSyncRecordRepository;
+import cn.topiam.employee.common.storage.Storage;
 import cn.topiam.employee.core.message.mail.MailMsgEventPublish;
 import cn.topiam.employee.core.message.sms.SmsMsgEventPublish;
-import cn.topiam.employee.core.security.password.PasswordGenerator;
 import cn.topiam.employee.identitysource.core.domain.Dept;
 import cn.topiam.employee.identitysource.core.processor.IdentitySourceSyncDeptPostProcessor;
 import cn.topiam.employee.support.repository.domain.IdEntity;
+import cn.topiam.employee.support.security.password.PasswordGenerator;
 
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+
+import jakarta.persistence.EntityManager;
 import static java.util.stream.Collectors.toList;
 
-import static cn.topiam.employee.common.constants.AccountConstants.ROOT_DEPT_ID;
-import static cn.topiam.employee.common.constants.AccountConstants.ROOT_DEPT_NAME;
-import static cn.topiam.employee.common.constants.CommonConstants.PATH_SEPARATOR;
-import static cn.topiam.employee.common.constants.CommonConstants.SYSTEM_DEFAULT_USER_NAME;
+import static cn.topiam.employee.common.constant.AccountConstants.ROOT_DEPT_ID;
+import static cn.topiam.employee.common.constant.AccountConstants.ROOT_DEPT_NAME;
+import static cn.topiam.employee.common.constant.CommonConstants.PATH_SEPARATOR;
+import static cn.topiam.employee.common.constant.CommonConstants.SYSTEM_DEFAULT_USER_NAME;
 
 /**
  * 身份源数据 pull post 处理器
@@ -175,8 +177,9 @@ public class DefaultIdentitySourceDeptPostProcessor extends AbstractIdentitySour
         //存在根组织，部分字段不一致进行更新操作
         OrganizationEntity entity = optional.get();
         //TODO 如果存在多个身份源选择一个父组织的时候，扩展ID是否更新呢？不更新就会造成用户关联问题
-        if (!entity.getLeaf().equals(CollectionUtils.isEmpty(deptList))
-            || !entity.getExternalId().equals(getRootExternalId(identitySource.getProvider()))) {
+        if (BooleanUtils.compare(entity.getLeaf(), CollectionUtils.isEmpty(deptList)) != 0
+            || !StringUtils.equals(entity.getExternalId(),
+                getRootExternalId(identitySource.getProvider()))) {
             entity.setLeaf(CollectionUtils.isEmpty(deptList));
             entity.setExternalId(getRootExternalId(identitySource.getProvider()));
             statistics.getUpdateOrganizations().add(entity);
@@ -387,7 +390,7 @@ public class DefaultIdentitySourceDeptPostProcessor extends AbstractIdentitySour
                                                       Boolean isLeaf) {
         //@formatter:off
         //添加节点
-        entityManager.createNativeQuery("INSERT INTO organization (id_, code_, name_, parent_id, is_leaf, external_id, data_origin, type_, is_enabled, path_, display_path, identity_source_id,create_by,update_by) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
+        entityManager.createNativeQuery("INSERT INTO organization (id_, code_, name_, parent_id, is_leaf, external_id, data_origin, type_, is_enabled, path_, display_path, identity_source_id,create_by,update_by,is_deleted) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
                 .setParameter(1,id)
                 .setParameter(2,RandomStringUtils.randomAlphanumeric(7))
                 .setParameter(3,identitySource.getName())
@@ -402,6 +405,7 @@ public class DefaultIdentitySourceDeptPostProcessor extends AbstractIdentitySour
                 .setParameter(12,identitySource.getId())
                 .setParameter(13,SYSTEM_DEFAULT_USER_NAME)
                 .setParameter(14,SYSTEM_DEFAULT_USER_NAME)
+                .setParameter(15,false)
                 .executeUpdate();
         //@formatter:on
         return organizationRepository.findById(id).orElse(null);
@@ -628,11 +632,12 @@ public class DefaultIdentitySourceDeptPostProcessor extends AbstractIdentitySour
                                                   IdentitySourceRepository identitySourceRepository,
                                                   OrganizationRepository organizationRepository,
                                                   IdentitySourceSyncHistoryRepository identitySourceSyncHistoryRepository,
-                                                  IdentitySourceSyncRecordRepository identitySourceSyncRecordRepository) {
+                                                  IdentitySourceSyncRecordRepository identitySourceSyncRecordRepository,
+                                                  Storage storage) {
         super(smsMsgEventPublish, mailMsgEventPublish, passwordEncoder, passwordGenerator,
             transactionDefinition, platformTransactionManager, entityManager,
             identitySourceRepository, identitySourceSyncHistoryRepository,
-            identitySourceSyncRecordRepository);
+            identitySourceSyncRecordRepository, storage);
         this.entityManager = entityManager;
         this.identitySourceRepository = identitySourceRepository;
         this.organizationRepository = organizationRepository;

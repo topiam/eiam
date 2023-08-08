@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,7 +20,6 @@ package cn.topiam.employee.common.repository.setting;
 import java.util.Optional;
 
 import org.jetbrains.annotations.NotNull;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -68,7 +67,6 @@ public interface MailTemplateRepository extends LogicDeleteRepository<MailTempla
      * @return {@link MailTemplateEntity}
      */
     @NotNull
-    @Cacheable
     @Query(value = "SELECT * FROM mail_template WHERE id_ = :id", nativeQuery = true)
     Optional<MailTemplateEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") Long id);
 }

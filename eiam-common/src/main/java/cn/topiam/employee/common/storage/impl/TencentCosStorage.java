@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,14 +17,15 @@
  */
 package cn.topiam.employee.common.storage.impl;
 
+import java.io.InputStream;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
-
-import javax.validation.constraints.NotEmpty;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.web.multipart.MultipartFile;
+import org.jetbrains.annotations.NotNull;
 
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
@@ -37,7 +38,7 @@ import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.model.*;
 import com.qcloud.cos.region.Region;
 
-import cn.topiam.employee.common.crypto.Encrypt;
+import cn.topiam.employee.common.jackjson.encrypt.JsonPropertyEncrypt;
 import cn.topiam.employee.common.storage.AbstractStorage;
 import cn.topiam.employee.common.storage.StorageConfig;
 import cn.topiam.employee.common.storage.StorageProviderException;
@@ -46,11 +47,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 
+import jakarta.validation.constraints.NotEmpty;
+
 /**
  * 腾讯cos
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/10 20:29
+ * Created by support@topiam.cn on  2021/11/10 21:29
  */
 @Slf4j
 public class TencentCosStorage extends AbstractStorage {
@@ -81,31 +84,32 @@ public class TencentCosStorage extends AbstractStorage {
             String bucket = String.join(tencentConfig.getBucket(), JOINER,
                 tencentConfig.getAppId());
             CreateBucketRequest createBucketRequest = new CreateBucketRequest(bucket);
-            // 设置 bucket 的权限为 Private(私有读写)、其他可选有 PublicRead（公有读私有写）、PublicReadWrite（公有读写）
+            // 设置 bucket 的权限为 PublicRead（公有读私有写）、其他可选有 Private(私有读写) 、PublicReadWrite（公有读写）
             createBucketRequest.setCannedAcl(CannedAccessControlList.PublicRead);
             try {
                 cosClient.createBucket(createBucketRequest);
             } catch (CosServiceException serverException) {
                 log.error("tencent create bucket server exception: {}",
                     serverException.getErrorMessage(), serverException);
+                throw new StorageProviderException("tencent create bucket exception");
             } catch (CosClientException clientException) {
                 log.error("tencent create bucket client exception: {}",
                     clientException.getMessage(), clientException);
+                throw new StorageProviderException("tencent create bucket exception");
             }
-            throw new StorageProviderException("tencent create bucket exception");
         }
     }
 
     @Override
-    public String upload(String fileName, MultipartFile file) throws StorageProviderException {
+    public String upload(@NotNull String fileName,
+                         InputStream inputStream) throws StorageProviderException {
         try {
-            super.upload(fileName, file);
+            super.upload(fileName, inputStream);
             PutObjectRequest putObjectRequest = new PutObjectRequest(tencentConfig.getBucket(),
-                tencentConfig.getLocation() + SEPARATOR + getFileName(fileName, file),
-                file.getInputStream(), null);
+                tencentConfig.getLocation() + SEPARATOR + getFileName(fileName), inputStream, null);
             cosClient.putObject(putObjectRequest);
-            return tencentConfig.getDomain() + SEPARATOR + tencentConfig.getBucket() + SEPARATOR
-                   + putObjectRequest.getKey();
+            return tencentConfig.getDomain() + SEPARATOR + URLEncoder
+                .encode(putObjectRequest.getKey(), StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         } catch (Exception e) {
             log.error("tencent upload exception: {}", e.getMessage(), e);
             throw new StorageProviderException("tencent upload exception", e);
@@ -115,16 +119,6 @@ public class TencentCosStorage extends AbstractStorage {
     @Override
     public String download(String path) throws StorageProviderException {
         try {
-            // 初始化永久密钥信息
-            // SECRETID和SECRETKEY请登录访问管理控制台进行查看和管理
-            COSCredentials cred = new BasicCOSCredentials(tencentConfig.getSecretId(),
-                tencentConfig.getSecretKey());
-            Region region = new Region("COS_REGION");
-            ClientConfig clientConfig = new ClientConfig(region);
-            // 如果要生成一个使用 https 协议的 URL，则设置此行，推荐设置。
-            clientConfig.setHttpProtocol(HttpProtocol.https);
-            // 生成 cos 客户端。
-            COSClient cosClient = new COSClient(cred, clientConfig);
             GeneratePresignedUrlRequest req = new GeneratePresignedUrlRequest(
                 tencentConfig.getBucket(), path, HttpMethodName.GET);
             // 设置签名过期时间(可选), 若未进行设置, 则默认使用 ClientConfig 中的签名过期时间(1小时)
@@ -158,7 +152,7 @@ public class TencentCosStorage extends AbstractStorage {
         /**
          * SecretKey
          */
-        @Encrypt
+        @JsonPropertyEncrypt
         @NotEmpty(message = "SecretKey不能为空")
         private String secretKey;
         /**

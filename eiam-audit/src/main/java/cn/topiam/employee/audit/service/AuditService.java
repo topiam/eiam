@@ -1,6 +1,6 @@
 /*
- * eiam-audit - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-audit - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,10 +19,9 @@ package cn.topiam.employee.audit.service;
 
 import java.util.List;
 
-import cn.topiam.employee.audit.controller.pojo.AuditDictResult;
 import cn.topiam.employee.audit.controller.pojo.AuditListQuery;
 import cn.topiam.employee.audit.controller.pojo.AuditListResult;
-import cn.topiam.employee.common.enums.UserType;
+import cn.topiam.employee.audit.controller.pojo.DictResult;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 
@@ -45,8 +44,8 @@ public interface AuditService {
     /**
      * 获取字典类型
      *
-     * @param userType {@link UserType}
+     * @param userType {@link String}
      * @return {@link List}
      */
-    List<AuditDictResult> getAuditDict(UserType userType);
+    List<DictResult> getAuditDict(String userType);
 }

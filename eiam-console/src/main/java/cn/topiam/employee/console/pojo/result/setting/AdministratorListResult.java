@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,14 +31,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIME_FORMATTER_PATTERN;
 
 /**
- * 查询权限列表结果
+ * 查询管理员列表结果
  *
  * @author TopIAM
  * Created by support@topiam.cn on 2020/8/11 23:08
  */
 @Data
 @Accessors(chain = true)
-@Schema(description = "查询权限列表结果")
+@Schema(description = "查询管理员列表响应")
 public class AdministratorListResult implements Serializable {
 
     @Serial
@@ -78,6 +78,12 @@ public class AdministratorListResult implements Serializable {
     private String            status;
 
     /**
+     * 手机号验证有效
+     */
+    @Parameter(description = "手机号验证有效")
+    private Boolean           phoneVerified;
+
+    /**
      * 邮箱验证有效
      */
     @Parameter(description = "邮箱验证有效")
@@ -100,4 +106,23 @@ public class AdministratorListResult implements Serializable {
     @JsonFormat(pattern = DEFAULT_DATE_TIME_FORMATTER_PATTERN)
     @Parameter(description = "上次认证时间")
     private LocalDateTime     lastAuthTime;
+
+    /**
+     * 最后修改时间
+     */
+    @JsonFormat(pattern = DEFAULT_DATE_TIME_FORMATTER_PATTERN)
+    @Parameter(description = "最后修改时间")
+    private LocalDateTime     updateTime;
+
+    /**
+     * 备注
+     */
+    @Parameter(description = "备注")
+    private String            remark;
+
+    /**
+     * 是否为初始化管理员
+     */
+    @Parameter(description = "是否为初始化管理员")
+    private Boolean           initialized;
 }

@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,14 +29,14 @@ import com.alibaba.fastjson2.JSONObject;
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
-import cn.topiam.employee.common.constants.AccountConstants;
+import cn.topiam.employee.common.constant.AccountConstants;
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceEntity;
 import cn.topiam.employee.common.repository.identitysource.IdentitySourceRepository;
 import cn.topiam.employee.console.converter.identitysource.IdentitySourceConverter;
 import cn.topiam.employee.console.pojo.other.IdentitySourceConfigValidatorParam;
 import cn.topiam.employee.console.pojo.query.identity.IdentitySourceListQuery;
 import cn.topiam.employee.console.pojo.result.identitysource.IdentitySourceListResult;
-import cn.topiam.employee.console.pojo.save.authentication.IdentityProviderCreateParam;
+import cn.topiam.employee.console.pojo.save.authn.IdentityProviderCreateParam;
 import cn.topiam.employee.console.pojo.save.identitysource.IdentitySourceConfigSaveParam;
 import cn.topiam.employee.console.pojo.save.identitysource.IdentitySourceCreateParam;
 import cn.topiam.employee.console.pojo.save.identitysource.IdentitySourceCreateResult;

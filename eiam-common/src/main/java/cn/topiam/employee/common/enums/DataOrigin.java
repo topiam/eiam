@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,13 +20,14 @@ package cn.topiam.employee.common.enums;
 import com.alibaba.fastjson2.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import cn.topiam.employee.support.enums.BaseEnum;
 import cn.topiam.employee.support.web.converter.EnumConvert;
 
 /**
  * 数据来源
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2020/12/7 20:35
+ * Created by support@topiam.cn on 2020/12/7 21:35
  */
 public enum DataOrigin implements BaseEnum {
 
@@ -46,7 +47,11 @@ public enum DataOrigin implements BaseEnum {
                                             /**
                                              * 飞书
                                              */
-                                            FEI_SHU("feishu", "飞书导入");
+                                            FEI_SHU("feishu", "飞书导入"),
+                                            /**
+                                             * 飞书
+                                             */
+                                            LDAP("ldap", "LDAP导入");
 
     /**
      * code
@@ -78,7 +83,7 @@ public enum DataOrigin implements BaseEnum {
      * 获取来源
      *
      * @param code {@link String}
-     * @return {@link OrganizationType}
+     * @return {@link DataOrigin}
      */
     @EnumConvert
     public static DataOrigin getType(String code) {

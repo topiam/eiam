@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import cn.topiam.employee.common.constants.ConfigBeanNameConstants;
+import cn.topiam.employee.common.constant.ConfigBeanNameConstants;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
 import cn.topiam.employee.console.converter.setting.PasswordPolicyConverter;
@@ -31,8 +31,8 @@ import cn.topiam.employee.console.pojo.result.setting.PasswordPolicyConfigResult
 import cn.topiam.employee.console.pojo.result.setting.WeakPasswordLibListResult;
 import cn.topiam.employee.console.pojo.save.setting.PasswordPolicySaveParam;
 import cn.topiam.employee.console.service.setting.PasswordPolicyService;
-import cn.topiam.employee.core.security.password.weak.PasswordWeakLib;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.security.password.weak.PasswordWeakLib;
 import static cn.topiam.employee.core.setting.constant.PasswordPolicySettingConstants.PASSWORD_POLICY_KEYS;
 
 /**
@@ -72,7 +72,7 @@ public class PasswordPolicyServiceImpl extends SettingServiceImpl implements Pas
         //保存
         List<SettingEntity> list = passwordPolicyConverter
             .passwordPolicySaveParamConvertToEntity(param);
-        Boolean save = settingRepository.saveConfig(list);
+        Boolean save = settingRepository.save(list);
         //refresh
         ApplicationContextHelp.refresh(ConfigBeanNameConstants.DEFAULT_PASSWORD_POLICY_MANAGER);
         return save;

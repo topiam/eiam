@@ -1,7 +1,7 @@
 <!--
 
-    eiam-common - Employee Identity and Access Management Program
-    Copyright © 2020-2023 TopIAM (support@topiam.cn)
+    eiam-common - Employee Identity and Access Management
+    Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -35,7 +35,7 @@
                             <font style="line-height: 22px; " size="4">亲爱的用户：${user_email}</font>
                         </font>
                     </h2>
-                    <p>您正在进行二次认证，验证码为：<font style="color: #4a8db8">${verify_code}</font> ，5分钟内有效，请及时处理。</p>
+                    <p>您正在进行二次认证，验证码为：<font style="color: #4a8db8">${verify_code}</font> ，${expire_time}分钟内有效，请勿泄露于他人。</p>
                     <p align="right">${client_name} 官方团队</p>
                     <p align="right">${time}</p>
                 </div>

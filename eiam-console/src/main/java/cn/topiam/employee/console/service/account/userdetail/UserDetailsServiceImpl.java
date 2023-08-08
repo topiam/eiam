@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,8 +17,6 @@
  */
 package cn.topiam.employee.console.service.account.userdetail;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -29,19 +27,20 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
+import com.google.common.collect.Lists;
+
 import cn.topiam.employee.common.entity.setting.AdministratorEntity;
 import cn.topiam.employee.common.enums.UserStatus;
-import cn.topiam.employee.common.enums.UserType;
 import cn.topiam.employee.common.repository.setting.AdministratorRepository;
-import cn.topiam.employee.core.security.authorization.Roles;
-import cn.topiam.employee.core.security.userdetails.UserDetails;
-import cn.topiam.employee.core.security.userdetails.UserDetailsService;
+import cn.topiam.employee.support.security.userdetails.UserDetails;
+import cn.topiam.employee.support.security.userdetails.UserDetailsService;
+import cn.topiam.employee.support.security.userdetails.UserType;
 
 /**
  * FortressUserDetailsService
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2020/10/25 20:41
+ * Created by support@topiam.cn on 2020/10/25 21:41
  */
 @Component(value = "userDetailsService")
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -64,8 +63,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // 状态相关
         boolean enabled = true, accountNonLocked = true;
-        // 权限
-        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         // 用户名
         Optional<AdministratorEntity> optional = administratorRepository.findByUsername(username);
         if (optional.isEmpty()) {
@@ -85,7 +82,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (!ObjectUtils.isEmpty(administrator.getStatus())) {
             //锁定
             if (administrator.getStatus().equals(UserStatus.LOCKED)
-                || administrator.getStatus().equals(UserStatus.PASS_WORD_EXPIRED_LOCKED)
+                || administrator.getStatus().equals(UserStatus.PASSWORD_EXPIRED_LOCKED)
                 || administrator.getStatus().equals(UserStatus.EXPIRED_LOCKED)) {
                 logger.info("管理员【{}】被锁定", administrator.getUsername());
                 accountNonLocked = false;
@@ -95,12 +92,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 logger.info("管理员【{}】被禁用", administrator.getUsername());
                 enabled = false;
             }
-            //根据用户类型封装权限
-            SimpleGrantedAuthority authority = new SimpleGrantedAuthority(Roles.ADMIN);
-            authorities.add(authority);
+            // 查询封装用户权限
             return new UserDetails(String.valueOf(administrator.getId()),
                 administrator.getUsername(), administrator.getPassword(), UserType.ADMIN, enabled,
-                true, true, accountNonLocked, authorities);
+                true, true, accountNonLocked,
+                Lists.newArrayList(new SimpleGrantedAuthority(UserType.ADMIN.getType())));
         }
         logger.info("管理员【{}】状态异常", administrator.getUsername());
         throw new AccountExpiredException("管理员状态异常");

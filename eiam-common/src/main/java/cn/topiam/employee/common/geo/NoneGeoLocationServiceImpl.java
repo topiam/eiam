@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,21 +17,17 @@
  */
 package cn.topiam.employee.common.geo;
 
+import cn.topiam.employee.support.geo.GeoLocation;
+import cn.topiam.employee.support.geo.GeoLocationProvider;
+import cn.topiam.employee.support.geo.GeoLocationService;
+
 /**
  * None
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/27 19:20
+ * Created by support@topiam.cn on  2021/11/27 21:20
  */
 public class NoneGeoLocationServiceImpl implements GeoLocationService {
-
-    /**
-     * 获取地理库文件
-     */
-    @Override
-    public void download() {
-
-    }
 
     /**
      * 获取地理位置
@@ -41,6 +37,6 @@ public class NoneGeoLocationServiceImpl implements GeoLocationService {
      */
     @Override
     public GeoLocation getGeoLocation(String remote) {
-        return new GeoLocation().setIp(remote);
+        return GeoLocation.builder().ip(remote).provider(GeoLocationProvider.NONE).build();
     }
 }

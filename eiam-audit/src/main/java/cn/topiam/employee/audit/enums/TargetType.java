@@ -1,6 +1,6 @@
 /*
- * eiam-audit - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-audit - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,6 +19,7 @@ package cn.topiam.employee.audit.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.support.web.converter.EnumConvert;
 
 import lombok.Getter;
@@ -90,12 +91,18 @@ public enum TargetType {
                          * 应用权限策略
                          */
                         APP_PERMISSION_ROLE("app_permission_role", "应用权限角色"),
-
+                        /**
+                         * 系统角色
+                         */
+                        ROLE("role", "系统角色"),
                         /**
                          * 管理员
                          */
                         ADMINISTRATOR("administrator", "管理员"),
-
+                        /**
+                         * 密码策略
+                         */
+                        PASSWORD_POLICY("password_policy", "密码策略"),
                         /**
                          * 邮件模版
                          */

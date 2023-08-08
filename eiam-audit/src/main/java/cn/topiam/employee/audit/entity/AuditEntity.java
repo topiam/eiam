@@ -1,6 +1,6 @@
 /*
- * eiam-audit - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-audit - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -18,28 +18,28 @@
 package cn.topiam.employee.audit.entity;
 
 import java.io.Serial;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLDeleteAll;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.Where;
 
 import cn.topiam.employee.audit.enums.EventStatus;
-import cn.topiam.employee.audit.enums.EventType;
-import cn.topiam.employee.common.enums.UserType;
+import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
+import cn.topiam.employee.support.security.userdetails.UserType;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+
+import io.hypersistence.utils.hibernate.type.json.JsonType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
@@ -57,7 +57,6 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
 @Entity
 @Table(name = "audit")
 @SQLDelete(sql = "update audit set " + SOFT_DELETE_SET + " where id_ = ?")
-@SQLDeleteAll(sql = "update audit set " + SOFT_DELETE_SET + " where id_ = ?")
 @Where(clause = SOFT_DELETE_WHERE)
 public class AuditEntity extends LogicDeleteEntity<Long> {
 
@@ -79,21 +78,21 @@ public class AuditEntity extends LogicDeleteEntity<Long> {
     /**
      * 操作目标
      */
-    @Type(type = "json")
+    @Type(JsonType.class)
     @Column(name = "target_")
     private List<Target>      targets;
 
     /**
      * UserAgent
      */
-    @Type(type = "json")
+    @Type(JsonType.class)
     @Column(name = "user_agent")
     private UserAgent         userAgent;
 
     /**
      * 地理位置
      */
-    @Type(type = "json")
+    @Type(JsonType.class)
     @Column(name = "geo_location")
     private GeoLocation       geoLocation;
 
@@ -125,7 +124,7 @@ public class AuditEntity extends LogicDeleteEntity<Long> {
      * 事件时间
      */
     @Column(name = "event_time")
-    private Instant           eventTime;
+    private LocalDateTime     eventTime;
 
     /**
      * 事件状态

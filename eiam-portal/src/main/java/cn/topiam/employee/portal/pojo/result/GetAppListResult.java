@@ -1,6 +1,6 @@
 /*
- * eiam-portal - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-portal - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -99,4 +99,22 @@ public class GetAppListResult implements Serializable {
      */
     @Parameter(description = "应用描述")
     private String            description;
+
+    /**
+     * Init 登录
+     */
+    public static class InitLogin implements Serializable {
+
+        /**
+         * Sso 发起方
+         */
+        @Parameter(description = "SSO 发起方")
+        private InitLoginType type;
+
+        /**
+         * SSO 发起URL
+         */
+        @Parameter(description = "SSO 发起URL")
+        private String        url;
+    }
 }

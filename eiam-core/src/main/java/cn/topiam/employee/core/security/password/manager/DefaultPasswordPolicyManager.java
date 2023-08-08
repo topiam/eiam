@@ -1,6 +1,6 @@
 /*
- * eiam-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,17 +32,15 @@ import cn.topiam.employee.common.entity.account.QUserHistoryPasswordEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.entity.account.UserHistoryPasswordEntity;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
-import cn.topiam.employee.common.repository.account.UserDetailRepository;
 import cn.topiam.employee.common.repository.account.UserHistoryPasswordRepository;
 import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
-import cn.topiam.employee.core.security.password.PasswordPolicyManager;
-import cn.topiam.employee.core.security.password.PasswordValidator;
-import cn.topiam.employee.core.security.password.enums.PasswordComplexityRule;
-import cn.topiam.employee.core.security.password.exception.InvalidPasswordException;
-import cn.topiam.employee.core.security.password.validator.*;
-import cn.topiam.employee.core.security.password.weak.PasswordWeakLib;
 import cn.topiam.employee.core.setting.constant.PasswordPolicySettingConstants;
+import cn.topiam.employee.support.security.password.PasswordPolicyManager;
+import cn.topiam.employee.support.security.password.PasswordValidator;
+import cn.topiam.employee.support.security.password.enums.PasswordComplexityRule;
+import cn.topiam.employee.support.security.password.validator.*;
+import cn.topiam.employee.support.security.password.weak.PasswordWeakLib;
 import static cn.topiam.employee.core.setting.constant.PasswordPolicySettingConstants.*;
 
 /**
@@ -51,17 +49,15 @@ import static cn.topiam.employee.core.setting.constant.PasswordPolicySettingCons
  * @author TopIAM
  * Created by support@topiam.cn on  2022/4/17 22:21
  */
-public class DefaultPasswordPolicyManager implements PasswordPolicyManager {
+public class DefaultPasswordPolicyManager implements PasswordPolicyManager<UserEntity> {
 
     public DefaultPasswordPolicyManager(UserRepository userRepository,
-                                        UserDetailRepository userDetailRepository,
                                         UserHistoryPasswordRepository userHistoryPasswordRepository,
                                         SettingRepository settingRepository,
                                         PasswordWeakLib passwordWeakLib,
                                         PasswordEncoder passwordEncoder) {
         this.userHistoryPasswordRepository = userHistoryPasswordRepository;
         this.userRepository = userRepository;
-        this.userDetailRepository = userDetailRepository;
         this.settingRepository = settingRepository;
         this.passwordWeakLib = passwordWeakLib;
         this.passwordEncoder = passwordEncoder;
@@ -82,15 +78,14 @@ public class DefaultPasswordPolicyManager implements PasswordPolicyManager {
      * @param password {@link  String} 密码
      */
     @Override
-    public void validate(Long userId, String password) throws InvalidPasswordException {
-        //@formatter:off
-        List<PasswordValidator> validators = new ArrayList<>(List.of(
-                //密码包含用户策略验证
-                getPasswordIncludeUserInfoValidator(userId),
-                //历史密码检查验证器
-                getHistoryPasswordValidator(userId)));
-        //@formatter:on
-        validators.addAll(providers);
+    public void validate(UserEntity userId, String password) {
+        List<PasswordValidator> validators = new ArrayList<>(providers);
+        if (userId.getId() != null) {
+            //@formatter:off
+            validators.add(getPasswordIncludeUserInfoValidator(userId.getId()));
+            validators.add(getHistoryPasswordValidator(userId.getId()));
+            //@formatter:on
+        }
         validators.forEach(passwordValidator -> passwordValidator.validate(password));
     }
 
@@ -135,13 +130,12 @@ public class DefaultPasswordPolicyManager implements PasswordPolicyManager {
             //构建查询条件
             QUserHistoryPasswordEntity historyPasswordEntity = QUserHistoryPasswordEntity.userHistoryPasswordEntity;
             BooleanExpression expression = historyPasswordEntity.userId.eq(String.valueOf(userId));
-            OrderSpecifier<LocalDateTime> desc = historyPasswordEntity.createTime.desc();
+            OrderSpecifier<LocalDateTime> desc = historyPasswordEntity.updateTime.desc();
             Page<UserHistoryPasswordEntity> entities = userHistoryPasswordRepository.findAll(expression, PageRequest.of(0, count, QSort.by(desc)));
             //构建历史密码验证器
             new HistoryPasswordValidator(entities.getContent().stream().map(UserHistoryPasswordEntity::getPassword).toList(), passwordEncoder);
         }
         return new HistoryPasswordValidator(false);
-
     }
 
 
@@ -159,9 +153,9 @@ public class DefaultPasswordPolicyManager implements PasswordPolicyManager {
                 : Integer.valueOf(leastLengthEntity.getValue());
         //最大长度
         SettingEntity biggestLengthEntity = settingRepository
-                .findByName(PasswordPolicySettingConstants.PASSWORD_POLICY_LEAST_LENGTH);
-        Integer biggestLength = Objects.isNull(leastLengthEntity)
-                ? Integer.valueOf(PasswordPolicySettingConstants.PASSWORD_POLICY_DEFAULT_SETTINGS.get(PASSWORD_POLICY_LEAST_LENGTH))
+                .findByName(PasswordPolicySettingConstants.PASSWORD_POLICY_BIGGEST_LENGTH);
+        Integer biggestLength = Objects.isNull(biggestLengthEntity)
+                ? Integer.valueOf(PasswordPolicySettingConstants.PASSWORD_POLICY_DEFAULT_SETTINGS.get(PASSWORD_POLICY_BIGGEST_LENGTH))
                 : Integer.valueOf(biggestLengthEntity.getValue());
         return new PasswordLengthValidator(leastLength, biggestLength);
     }
@@ -239,10 +233,6 @@ public class DefaultPasswordPolicyManager implements PasswordPolicyManager {
      * 用户
      */
     private final UserRepository userRepository;
-    /**
-     * 用户详情
-     */
-    private final UserDetailRepository userDetailRepository;
     /**
      * 历史密码
      */

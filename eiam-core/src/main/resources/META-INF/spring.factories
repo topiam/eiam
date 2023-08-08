@@ -1,6 +1,1 @@
-org.springframework.context.ApplicationListener=\
-cn.topiam.employee.core.license.EiamCopyrightLicense,\
-cn.topiam.employee.core.listener.EiamReadyEventListener,\
-cn.topiam.employee.core.license.EiamSupportConfigurationListener
-org.springframework.context.ApplicationContextInitializer=\
-  cn.topiam.employee.support.context.ApplicationContextHelpInitializer
+

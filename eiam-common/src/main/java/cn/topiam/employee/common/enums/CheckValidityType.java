@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,7 +21,7 @@ package cn.topiam.employee.common.enums;
  * 检查有效性类型
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/17 19:22
+ * Created by support@topiam.cn on  2021/11/17 21:22
  */
 public enum CheckValidityType {
                                /**

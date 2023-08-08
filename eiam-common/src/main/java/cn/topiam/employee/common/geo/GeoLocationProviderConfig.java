@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,17 +17,20 @@
  */
 package cn.topiam.employee.common.geo;
 
-import javax.validation.constraints.NotNull;
+import java.io.Serial;
+import java.io.Serializable;
 
-import cn.topiam.employee.common.geo.maxmind.enums.GeoLocationProvider;
+import cn.topiam.employee.support.geo.GeoLocationProvider;
 
 import lombok.Data;
+
+import jakarta.validation.constraints.NotNull;
 
 /**
  * MaxmindProviderSetting
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/10/1 19:10
+ * Created by support@topiam.cn on  2021/10/1 21:10
  */
 @Data
 public class GeoLocationProviderConfig {
@@ -52,7 +55,8 @@ public class GeoLocationProviderConfig {
     private GeoLocationConfig   config;
 
     @Data
-    public static class GeoLocationConfig {
+    public static class GeoLocationConfig implements Serializable {
+        @Serial
         private static final long serialVersionUID = 5611656522133230183L;
     }
 

@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * 安全高级保存参数
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2020/10/4 19:05
+ * Created by support@topiam.cn on 2020/10/4 21:05
  */
 @Data
 @Schema(description = "安全高级保存入参")
@@ -40,10 +40,10 @@ public class SecurityBasicSaveParam implements Serializable {
     private Integer sessionValidTime;
 
     /**
-     * 短信验证码有效时间
+     * 验证码有效时间
      */
-    @Parameter(description = "短信验证码有效时间（秒）")
-    private Integer smsCodeValidTime;
+    @Parameter(description = "验证码有效时间（秒）")
+    private Integer verifyCodeValidTime;
 
     /**
      * 记住我有效时间
@@ -56,22 +56,4 @@ public class SecurityBasicSaveParam implements Serializable {
      */
     @Parameter(description = "用户并发数")
     private Integer sessionMaximum;
-
-    /**
-     * 连续登录失败持续时间
-     */
-    @Parameter(description = "连续登录失败持续时间")
-    private Integer loginFailureDuration;
-
-    /**
-     * 连续登录失败次数
-     */
-    @Parameter(description = "连续登录失败次数")
-    private Integer loginFailureCount;
-
-    /**
-     * 自动解锁时间（分）
-     */
-    @Parameter(description = "自动解锁时间（分）")
-    private Integer autoUnlockTime;
 }

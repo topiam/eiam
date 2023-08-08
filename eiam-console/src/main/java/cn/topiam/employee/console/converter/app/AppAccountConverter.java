@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -34,7 +34,7 @@ import cn.topiam.employee.support.repository.page.domain.Page;
  * 应用账户映射
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/4 19:08
+ * Created by support@topiam.cn on  2022/6/4 21:08
  */
 @Mapper(componentModel = "spring")
 public interface AppAccountConverter {
@@ -46,14 +46,14 @@ public interface AppAccountConverter {
      * @return {@link Page}
      */
     default Page<AppAccountListResult> appAccountEntityConvertToAppAccountResult(org.springframework.data.domain.Page<AppAccountPO> page) {
-        Page<AppAccountListResult> result = new Page<>();
+        cn.topiam.employee.support.repository.page.domain.Page<AppAccountListResult> result = new cn.topiam.employee.support.repository.page.domain.Page<>();
         if (!CollectionUtils.isEmpty(page.getContent())) {
             List<AppAccountListResult> list = new ArrayList<>();
             for (AppAccountPO po : page.getContent()) {
                 list.add(entityConvertToAppAccountResult(po));
             }
             //@formatter:off
-            result.setPagination(Page.Pagination.builder()
+            result.setPagination(cn.topiam.employee.support.repository.page.domain.Page.Pagination.builder()
                     .total(page.getTotalElements())
                     .totalPages(page.getTotalPages())
                     .current(page.getPageable().getPageNumber() + 1)
@@ -78,6 +78,7 @@ public interface AppAccountConverter {
      * @param param {@link AppAccountCreateParam}
      * @return {@link AppAccountEntity}
      */
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "remark", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "updateTime", ignore = true)

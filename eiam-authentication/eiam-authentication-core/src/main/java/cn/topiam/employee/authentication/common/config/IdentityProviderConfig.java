@@ -1,6 +1,6 @@
 /*
- * eiam-authentication-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-authentication-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,8 +33,5 @@ public class IdentityProviderConfig implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -7863290244166345243L;
-    /**
-     * 启用
-     */
-    private Boolean           enabled;
+
 }

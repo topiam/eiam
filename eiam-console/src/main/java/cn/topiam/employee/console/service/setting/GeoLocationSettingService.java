@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,9 +17,9 @@
  */
 package cn.topiam.employee.console.service.setting;
 
-import cn.topiam.employee.common.geo.GeoLocation;
 import cn.topiam.employee.console.pojo.result.setting.GeoIpProviderResult;
 import cn.topiam.employee.console.pojo.save.setting.GeoIpProviderSaveParam;
+import cn.topiam.employee.support.geo.GeoLocation;
 
 /**
  * ip设置接口
@@ -51,9 +51,4 @@ public interface GeoLocationSettingService extends SettingService {
      * @return {@link GeoLocation}
      */
     GeoLocation getGeoLocation(String ip);
-
-    /**
-     * 更新库文件
-     */
-    void downloadDbFile();
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    eiam-common - Employee Identity and Access Management Program
-    Copyright © 2020-2023 TopIAM (support@topiam.cn)
+    eiam-common - Employee Identity and Access Management
+    Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -24,4 +24,6 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd
           http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/pro/liquibase-pro-4.3.xsd">
     <include file="db/1.0.0-changelog.xml" relativeToChangelogFile="false"/>
+    <!-- 引入Quartz -->
+    <include file="org/quartz/impl/jdbcjobstore/liquibase.quartz.init.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>
