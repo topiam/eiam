@@ -62,7 +62,7 @@
 ## 在线演示
 
 + 管理端：https://eiam-console.topiam.cn
-  > 体验账号：console/topiam.cn
+  > 体验账号：admin/topiam.cn
 + 用户端：https://eiam-portal.topiam.cn
   > 体验账号：portal/topiam.cn
 
