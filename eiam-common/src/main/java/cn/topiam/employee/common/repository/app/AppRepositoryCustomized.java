@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 
 import cn.topiam.employee.common.entity.app.AppEntity;
 
@@ -32,16 +31,6 @@ import cn.topiam.employee.common.entity.app.AppEntity;
  * Created by support@topiam.cn on  2022/5/26 23:40
  */
 public interface AppRepositoryCustomized {
-
-    /**
-     * 更新应用状态
-     *
-     * @param id      {@link  Long}
-     * @param enabled {@link  Boolean}
-     * @return {@link  Boolean}
-     */
-    Integer updateAppStatus(@Param(value = "id") Long id,
-                            @Param(value = "enabled") Boolean enabled);
 
     /**
      *

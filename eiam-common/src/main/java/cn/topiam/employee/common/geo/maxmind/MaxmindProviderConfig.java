@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,18 +17,18 @@
  */
 package cn.topiam.employee.common.geo.maxmind;
 
-import javax.validation.constraints.NotEmpty;
-
-import cn.topiam.employee.common.crypto.Encrypt;
 import cn.topiam.employee.common.geo.GeoLocationProviderConfig;
+import cn.topiam.employee.common.jackjson.encrypt.JsonPropertyEncrypt;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import jakarta.validation.constraints.NotEmpty;
+
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/7/23 20:33
+ * Created by support@topiam.cn on  2022/7/23 21:33
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -36,7 +36,7 @@ public class MaxmindProviderConfig extends GeoLocationProviderConfig.GeoLocation
     /**
      * 密码
      */
-    @Encrypt
+    @JsonPropertyEncrypt
     @NotEmpty(message = "密码不能为空")
     private String sessionKey;
 }

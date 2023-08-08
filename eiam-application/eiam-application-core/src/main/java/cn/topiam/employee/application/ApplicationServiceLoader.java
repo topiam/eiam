@@ -1,6 +1,6 @@
 /*
- * eiam-application-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-application-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,13 +27,16 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.*;
 import org.springframework.context.annotation.Configuration;
 
+import cn.topiam.employee.application.exception.AppNotExistException;
 import cn.topiam.employee.application.exception.AppTemplateNotExistException;
+import cn.topiam.employee.common.entity.app.AppEntity;
+import cn.topiam.employee.common.repository.app.AppRepository;
 
 /**
  * 应用服务加载器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/8/20 19:08
+ * Created by support@topiam.cn on  2022/8/20 21:08
  */
 @Configuration
 public class ApplicationServiceLoader implements ApplicationContextAware {
@@ -88,18 +91,48 @@ public class ApplicationServiceLoader implements ApplicationContextAware {
      */
     public ApplicationService getApplicationService(String code) {
         ApplicationService impl = applicationServiceMap.get(code);
-        if (Objects.isNull(impl)) {
-            for (ApplicationService service : getApplicationServiceList()) {
-                if (code.equals(service.getCode())) {
-                    applicationServiceMap.put(code, service);
-                    return service;
-                }
+        if (!Objects.isNull(impl)) {
+            return impl;
+        }
+        for (ApplicationService service : getApplicationServiceList()) {
+            if (code.equals(service.getCode())) {
+                applicationServiceMap.put(code, service);
+                return service;
             }
         }
-        if (Objects.isNull(impl)) {
-            throw new AppTemplateNotExistException();
+        throw new AppTemplateNotExistException();
+    }
+
+    /**
+     * 根据应用编码获取应用服务
+     *
+     * @param appId {@link String}
+     * @return {@link List}
+     */
+    public ApplicationService getApplicationServiceByAppId(String appId) {
+        AppRepository repository = applicationContext.getBean(AppRepository.class);
+        Optional<AppEntity> optional = repository.findById(Long.valueOf(appId));
+        if (optional.isEmpty()) {
+            throw new AppNotExistException();
         }
-        return impl;
+        AppEntity app = optional.get();
+        return getApplicationService(app.getTemplate());
+    }
+
+    /**
+     * 根据应用编码获取应用服务
+     *
+     * @param appCode {@link String}
+     * @return {@link List}
+     */
+    public ApplicationService getApplicationServiceByAppCode(String appCode) {
+        AppRepository repository = applicationContext.getBean(AppRepository.class);
+        Optional<AppEntity> optional = repository.findByCode(appCode);
+        if (optional.isEmpty()) {
+            throw new AppNotExistException();
+        }
+        AppEntity app = optional.get();
+        return getApplicationService(app.getTemplate());
     }
 
     public void addApplicationService(List<String> beanNameList) {

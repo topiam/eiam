@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,10 +21,7 @@ import java.util.List;
 
 import cn.topiam.employee.common.entity.account.OrganizationEntity;
 import cn.topiam.employee.common.enums.DataOrigin;
-import cn.topiam.employee.console.pojo.result.account.OrganizationChildResult;
-import cn.topiam.employee.console.pojo.result.account.OrganizationResult;
-import cn.topiam.employee.console.pojo.result.account.OrganizationRootResult;
-import cn.topiam.employee.console.pojo.result.account.OrganizationTreeResult;
+import cn.topiam.employee.console.pojo.result.account.*;
 import cn.topiam.employee.console.pojo.save.account.OrganizationCreateParam;
 import cn.topiam.employee.console.pojo.update.account.OrganizationUpdateParam;
 
@@ -139,14 +136,6 @@ public interface OrganizationService {
      */
     OrganizationEntity getOrganizationByExternalId(String id, Long identitySourceId);
 
-    /***
-     * 批量删除
-     *
-     * @param ids {@link String}
-     * @return {@link Boolean}
-     */
-    Boolean batchDeleteOrg(String[] ids);
-
     /**
      * 查询组织成员数量
      *
@@ -154,4 +143,12 @@ public interface OrganizationService {
      * @return {@link  Long}
      */
     Long getOrgMemberCount(String orgId);
+
+    /**
+     * 批量获取组织
+     *
+     * @param ids {@link List}
+     * @return  {@link List}
+     */
+    List<BatchOrganizationResult> batchGetOrganization(List<String> ids);
 }

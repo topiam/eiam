@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -18,17 +18,24 @@
 package cn.topiam.employee.common.storage.impl;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.validation.constraints.NotEmpty;
+import org.hibernate.validator.constraints.URL;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpHeaders;
+import org.springframework.util.MimeTypeUtils;
 
-import org.springframework.web.multipart.MultipartFile;
-
-import cn.topiam.employee.common.crypto.Encrypt;
+import cn.topiam.employee.common.jackjson.encrypt.JsonPropertyEncrypt;
 import cn.topiam.employee.common.storage.AbstractStorage;
 import cn.topiam.employee.common.storage.StorageConfig;
 import cn.topiam.employee.common.storage.StorageProviderException;
+import cn.topiam.employee.common.util.ViewContentType;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -37,12 +44,14 @@ import lombok.extern.slf4j.Slf4j;
 import io.minio.*;
 import io.minio.errors.*;
 import io.minio.http.Method;
+import jakarta.validation.constraints.NotEmpty;
+import static cn.topiam.employee.common.constant.StorageConstants.URL_REGEXP;
 
 /**
  * minio
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/10 20:32
+ * Created by support@topiam.cn on  2021/11/10 21:32
  */
 @Slf4j
 public class MinIoStorage extends AbstractStorage {
@@ -58,8 +67,8 @@ public class MinIoStorage extends AbstractStorage {
                 .credentials(minioConfig.getAccessKey(), minioConfig.getSecretKey()).build();
             createBucket(this.minioClient, minioConfig);
         } catch (Exception e) {
-            log.error("create bucket excception: {}", e.getMessage(), e);
-            throw new StorageProviderException("create bucket excception", e);
+            log.error("Create bucket excception: {}", e.getMessage(), e);
+            throw new StorageProviderException("Create bucket excception", e);
         }
     }
 
@@ -79,15 +88,17 @@ public class MinIoStorage extends AbstractStorage {
     }
 
     @Override
-    public String upload(String fileName, MultipartFile file) throws StorageProviderException {
+    public String upload(@NotNull String fileName,
+                         InputStream inputStream) throws StorageProviderException {
         try {
-            super.upload(fileName, file);
-            String key = this.minioConfig.getLocation() + SEPARATOR + getFileName(fileName, file);
+            super.upload(fileName, inputStream);
+            String key = this.minioConfig.getLocation() + SEPARATOR + getFileName(fileName);
             this.minioClient.putObject(PutObjectArgs.builder().bucket(this.minioConfig.getBucket())
-                .object(key).stream(file.getInputStream(), file.getSize(), 5 * 1024 * 1024)
-                .contentType(file.getContentType()).build());
+                .object(key).contentType(ViewContentType.getContentType(key))
+                .stream(inputStream, -1, 5 * 1024 * 1024).build());
             return this.minioConfig.getDomain() + SEPARATOR + this.minioConfig.getBucket()
-                   + SEPARATOR + minioConfig.getBucket() + SEPARATOR + key;
+                   + SEPARATOR
+                   + URLEncoder.encode(key, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         } catch (Exception e) {
             log.error("minio download exception: {}", e.getMessage(), e);
             throw new StorageProviderException("minio upload exception", e);
@@ -98,9 +109,11 @@ public class MinIoStorage extends AbstractStorage {
     public String download(String path) throws StorageProviderException {
         try {
             super.download(path);
+            Map<String, String> headers = new HashMap<>(16);
+            headers.put(HttpHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE);
             String downloadUrl = this.minioClient.getPresignedObjectUrl(
                 GetPresignedObjectUrlArgs.builder().bucket(minioConfig.getBucket()).object(path)
-                    .method(Method.GET).expiry(EXPIRY_SECONDS).build());
+                    .method(Method.GET).expiry(EXPIRY_SECONDS).extraQueryParams(headers).build());
             return downloadUrl.replace(minioConfig.getEndpoint(), minioConfig.getDomain());
         } catch (Exception e) {
             log.error("minio download exception: {}", e.getMessage(), e);
@@ -119,12 +132,13 @@ public class MinIoStorage extends AbstractStorage {
         /**
          * SecretKey
          */
-        @Encrypt
+        @JsonPropertyEncrypt
         @NotEmpty(message = "SecretKey不能为空")
         private String secretKey;
         /**
          * endpoint
          */
+        @URL(message = "Endpoint格式不正确", regexp = URL_REGEXP)
         @NotEmpty(message = "Endpoint不能为空")
         private String endpoint;
         /**

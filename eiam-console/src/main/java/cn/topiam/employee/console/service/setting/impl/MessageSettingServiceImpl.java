@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,8 +28,8 @@ import cn.topiam.employee.console.pojo.save.setting.SmsProviderSaveParam;
 import cn.topiam.employee.console.pojo.setting.SmsProviderConfigResult;
 import cn.topiam.employee.console.service.setting.MessageSettingService;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
-import static cn.topiam.employee.common.constants.ConfigBeanNameConstants.MAIL_PROVIDER_SEND;
-import static cn.topiam.employee.common.constants.ConfigBeanNameConstants.SMS_PROVIDER_SEND;
+import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.MAIL_PROVIDER_SEND;
+import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.SMS_PROVIDER_SEND;
 import static cn.topiam.employee.core.setting.constant.MessageSettingConstants.MESSAGE_PROVIDER_EMAIL;
 import static cn.topiam.employee.core.setting.constant.MessageSettingConstants.MESSAGE_SMS_PROVIDER;
 

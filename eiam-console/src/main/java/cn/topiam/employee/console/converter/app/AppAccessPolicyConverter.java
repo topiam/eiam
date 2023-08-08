@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,7 +33,7 @@ import cn.topiam.employee.support.repository.page.domain.Page;
  * 应用授权策略 Converter
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/4 19:57
+ * Created by support@topiam.cn on  2022/6/4 21:57
  */
 @Mapper(componentModel = "spring")
 public interface AppAccessPolicyConverter {
@@ -45,14 +45,14 @@ public interface AppAccessPolicyConverter {
      * @return {@link AppAccessPolicyResult}
      */
     default Page<AppAccessPolicyResult> appPolicyEntityListConvertToAppPolicyResult(org.springframework.data.domain.Page<AppAccessPolicyPO> page) {
-        Page<AppAccessPolicyResult> result = new Page<>();
+        cn.topiam.employee.support.repository.page.domain.Page<AppAccessPolicyResult> result = new cn.topiam.employee.support.repository.page.domain.Page<>();
         if (!CollectionUtils.isEmpty(page.getContent())) {
             List<AppAccessPolicyResult> list = new ArrayList<>();
             for (AppAccessPolicyPO po : page.getContent()) {
                 list.add(entityConvertToAppPolicyResult(po));
             }
             //@formatter:off
-            result.setPagination(Page.Pagination.builder()
+            result.setPagination(cn.topiam.employee.support.repository.page.domain.Page.Pagination.builder()
                     .total(page.getTotalElements())
                     .totalPages(page.getTotalPages())
                     .current(page.getPageable().getPageNumber() + 1)

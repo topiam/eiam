@@ -1,6 +1,6 @@
 /*
- * eiam-portal - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-portal - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,13 +22,13 @@ import org.springframework.stereotype.Service;
 
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.repository.app.AppRepository;
-import cn.topiam.employee.core.security.util.SecurityUtils;
 import cn.topiam.employee.portal.converter.AppConverter;
 import cn.topiam.employee.portal.pojo.query.GetAppListQuery;
 import cn.topiam.employee.portal.pojo.result.GetAppListResult;
 import cn.topiam.employee.portal.service.AppService;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
+import cn.topiam.employee.support.security.util.SecurityUtils;
 
 /**
  * AppService

@@ -1,6 +1,6 @@
 #
-# eiam-synchronizer - Employee Identity and Access Management Program
-# Copyright © 2020-2023 TopIAM (support@topiam.cn)
+# eiam-synchronizer - Employee Identity and Access Management
+# Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -38,6 +38,10 @@ spring:
       fail_on_empty_beans: false
       #格式化输出
       indent_output: true
+  mvc:
+    formcontent:
+      filter:
+        enabled: true
   cache:
     type: redis
     redis:
@@ -50,13 +54,10 @@ spring:
     redis:
       namespace: ${spring.cache.redis.key-prefix}:session
       flush-mode: immediate
-    store-type: redis
+      repository-type: indexed
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/eiam_develop?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
-    username: ${MYSQL_USER:'eiam'}
-    password: ${MYSQL_PASSWORD:''}
     hikari:
       auto-commit: true
       connection-test-query: SELECT 1
@@ -66,31 +67,25 @@ spring:
       maximum-pool-size: 15
       minimum-idle: 5
       pool-name: eiam
-  #reids
-  redis:
-    host: ${REDIS_HOST:localhost}
-    port: ${REDIS_PORT:6379}
-    password: ${REDIS_PASSWORD:''}
-    database: 9
-    lettuce:
-      pool:
-        max-idle: 7
-        min-idle: 2
-        max-active: 7
-        max-wait: -1ms
-      shutdown-timeout: 200ms
-    timeout: 5000ms
   #elasticsearch
   elasticsearch:
-    uris: "http://localhost:9200"
-    username: "elastic"
-    password: ""
     socket-timeout: 30000s
     connection-timeout: 10000s
   data:
     jpa:
       repositories:
         bootstrap-mode: deferred
+    #reids
+    redis:
+      database: 9
+      lettuce:
+        pool:
+          max-idle: 7
+          min-idle: 2
+          max-active: 7
+          max-wait: -1ms
+        shutdown-timeout: 200ms
+      timeout: 5000ms
   jpa:
     hibernate:
       ddl-auto: none
@@ -109,6 +104,38 @@ spring:
             banner: false
   main:
     banner-mode: off
+  quartz:
+    #相关属性配置
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceId: AUTO #默认主机名和时间戳生成实例ID,可以是任何字符串，但对于所有调度程序来说，必须是唯一的 对应 QRTZ_SCHEDULER_STATE INSTANCE_NAME字段
+          jobStore:
+            class: org.springframework.scheduling.quartz.LocalDataSourceJobStore #持久化配置
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate #我们仅为数据库制作了特定于数据库的代理
+            tablePrefix: QRTZ_ #数据库表前缀
+            misfireThreshold: 60000 #在被认为“失火”之前，调度程序将“容忍”一个Triggers将其下一个启动时间通过的毫秒数。默认值（如果您在配置中未输入此属性）为60000（60秒）。
+            clusterCheckinInterval: 5000 #设置此实例“检入”*与群集的其他实例的频率（以毫秒为单位）。影响检测失败实例的速度。
+            isClustered: true #打开群集功能
+            acquireTriggersWithinLock: true
+            useProperties: false
+          threadPool:
+            class: org.springframework.scheduling.quartz.SimpleThreadPoolTaskExecutor
+            threadCount: 10
+            threadPriority: 5
+            threadsInheritContextClassLoaderOfInitializingThread: true
+    job-store-type: jdbc
+    # 程序结束时会等待quartz相关的内容结束
+    wait-for-jobs-to-complete-on-shutdown: true
+    # QuartzScheduler启动时更新己存在的Job,这样就不用每次修改targetObject后删除qrtz_job_details表对应记录
+    overwrite-existing-jobs: true
+    jdbc:
+      initialize-schema: never
+  #rabbitmq
+  rabbitmq:
+    template:
+      reply-timeout: 60000
 #日志配置
 logging:
   config: classpath:config/logback-spring.xml
@@ -123,10 +150,8 @@ server:
   servlet:
     session:
       cookie:
-        #dev环境secure=false
-        secure: false
-        #dev环境same-site=lax
-        same-site: lax
+        secure: true
+        same-site: none
         name: topiam-employee-synchronizer-cookie
         http-only: true
     encoding:
@@ -150,13 +175,7 @@ springdoc:
       enabled: true
       cookie-name: 'topiam-csrf-cookie'
       header-name: 'topiam-csrf'
+    enabled: false
   cache:
     disabled: true
   writer-with-default-pretty-printer: true
-#TopIAM
-topiam:
-  server:
-    console-public-base-url: https://localhost:1898
-    portal-public-base-url: https://localhost:1989
-    openapi-public-base-url: https://localhost:1988
-    synchronizer-public-base-url: https://localhost:1986

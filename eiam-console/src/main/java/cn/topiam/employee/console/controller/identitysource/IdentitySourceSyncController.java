@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import cn.topiam.employee.audit.annotation.Audit;
-import cn.topiam.employee.audit.enums.EventType;
+import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.console.pojo.query.identity.IdentitySourceSyncHistoryListQuery;
 import cn.topiam.employee.console.pojo.query.identity.IdentitySourceSyncRecordListQuery;
 import cn.topiam.employee.console.pojo.result.identitysource.IdentitySourceSyncHistoryListResult;
@@ -39,13 +39,13 @@ import lombok.AllArgsConstructor;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import static cn.topiam.employee.common.constants.AccountConstants.IDENTITY_SOURCE_PATH;
+import static cn.topiam.employee.common.constant.AccountConstants.IDENTITY_SOURCE_PATH;
 
 /**
  * 身份源同步记录
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2020/7/11 19:18
+ * Created by support@topiam.cn on 2020/7/11 21:18
  */
 @Validated
 @Tag(name = "身份源同步")
@@ -65,7 +65,7 @@ public class IdentitySourceSyncController {
     @Operation(summary = "执行身份源同步")
     @Audit(type = EventType.IDENTITY_RESOURCE_SYNC)
     @PostMapping(value = "/execute/{id}")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Void> executeIdentitySourceSync(@PathVariable String id) {
         identitySourceSyncService.executeIdentitySourceSync(id);
         return ApiRestResult.ok();
@@ -78,7 +78,7 @@ public class IdentitySourceSyncController {
      */
     @Operation(summary = "同步历史列表")
     @GetMapping(value = "/history_list")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Page<IdentitySourceSyncHistoryListResult>> getIdentitySourceSyncHistoryList(PageModel pageModel,
                                                                                                      IdentitySourceSyncHistoryListQuery query) {
         Page<IdentitySourceSyncHistoryListResult> results = identitySourceSyncService
@@ -94,7 +94,7 @@ public class IdentitySourceSyncController {
      */
     @Operation(summary = "同步记录列表")
     @GetMapping(value = "/record_list")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Page<IdentitySourceSyncRecordListResult>> getIdentitySourceSyncRecordList(PageModel pageModel,
                                                                                                    @Validated IdentitySourceSyncRecordListQuery query) {
         Page<IdentitySourceSyncRecordListResult> results = identitySourceSyncService

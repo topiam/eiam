@@ -1,6 +1,6 @@
 /*
- * eiam-portal - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-portal - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,8 +17,10 @@
  */
 package cn.topiam.employee.portal.service;
 
+import java.util.List;
+
 import cn.topiam.employee.portal.pojo.request.*;
-import cn.topiam.employee.portal.pojo.result.PrepareBindMfaResult;
+import cn.topiam.employee.portal.pojo.result.BoundIdpListResult;
 
 /**
  * 账户服务
@@ -77,25 +79,50 @@ public interface AccountService {
     Boolean changeEmail(ChangeEmailRequest param);
 
     /**
-     * 准备绑定MFA
+     * 修改密码预认证
      *
-     * @param param {@link PrepareBindTotpRequest}
-     * @return {@link PrepareBindMfaResult}
-     */
-    PrepareBindMfaResult prepareBindTotp(PrepareBindTotpRequest param);
-
-    /**
-     * 绑定 TOTP
-     *
-     * @param param {@link BindTotpRequest}
+     * @param param {@link PrepareChangePasswordRequest}
      * @return {@link Boolean}
      */
-    Boolean bindTotp(BindTotpRequest param);
+    Boolean prepareChangePassword(PrepareChangePasswordRequest param);
 
     /**
-     * 解绑 TOTP
+     * 忘记密码发送验证码
      *
+     * @param recipient {@link String} 验证码接收者（邮箱/手机号）
      * @return {@link Boolean}
      */
-    Boolean unbindTotp();
+    Boolean forgetPasswordCode(String recipient);
+
+    /**
+     * 忘记密码预认证
+     *
+     * @param recipient {@link String} 验证码接收者（邮箱/手机号）
+     * @param code {@link String} 验证码
+     * @return {@link Boolean} 忘记密码 Token
+     */
+    Boolean prepareForgetPassword(String recipient, String code);
+
+    /**
+     * 忘记密码
+     *
+     * @param forgetPasswordRequest {@link ForgetPasswordRequest}
+     * @return {@link Boolean}
+     */
+    Boolean forgetPassword(ForgetPasswordRequest forgetPasswordRequest);
+
+    /**
+     * 查询账号绑定
+     *
+     * @return {@link List< BoundIdpListResult >}
+     */
+    List<BoundIdpListResult> getBoundIdpList();
+
+    /**
+     * 解除账号绑定
+     *
+     * @param id {@link String}
+     * @return {@link Boolean}
+     */
+    Boolean unbindIdp(String id);
 }

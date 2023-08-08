@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,10 +30,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * 用户登录日志返回结果
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2022年11月13日14:49:35
+ * Created by support@topiam.cn on 2022年11月13日21:49:35
  */
 @Data
-@Schema(description = "用户登录日志返回结果")
+@Schema(description = "用户登录日志返回响应")
 public class UserLoginAuditListResult {
 
     /**

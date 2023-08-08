@@ -1,6 +1,6 @@
 /*
- * eiam-audit - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-audit - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,10 +23,9 @@ import java.io.Serializable;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-import cn.topiam.employee.common.enums.UserType;
-
 import lombok.Builder;
 import lombok.Data;
+import lombok.NonNull;
 
 /**
  * Actor
@@ -37,29 +36,32 @@ import lombok.Data;
 @Builder
 public class Actor implements Serializable {
 
-    public static final String ACTOR_ID         = "actor.id";
-    public static final String ACTOR_TYPE       = "actor.type";
+    public static final String                                       ACTOR_ID         = "actor.id";
+    public static final String                                       ACTOR_TYPE       = "actor.type";
 
-    public static final String ACTOR_AUTH_TYPE  = "actor.auth_type.keyword";
+    public static final String                                       ACTOR_AUTH_TYPE  = "actor.auth_type.keyword";
 
     @Serial
-    private static final long  serialVersionUID = -1144169992714000310L;
+    private static final long                                        serialVersionUID = -1144169992714000310L;
+
     /**
      * 行动者ID
      */
+    @NonNull
     @Field(type = FieldType.Keyword, name = "id")
-    private String             id;
+    private String                                                   id;
 
     /**
      * 行动者类型
      */
+    @NonNull
     @Field(type = FieldType.Keyword, name = "type")
-    private UserType           type;
+    private cn.topiam.employee.support.security.userdetails.UserType type;
 
     /**
      * 身份验证类型
      */
     @Field(type = FieldType.Keyword, name = "auth_type")
-    private String             authType;
+    private String                                                   authType;
 
 }

@@ -1,6 +1,6 @@
 /*
- * eiam-application-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-application-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,8 +22,12 @@ import java.util.Map;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import cn.topiam.employee.common.entity.app.AppAccountEntity;
+import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.enums.app.AppProtocol;
 import cn.topiam.employee.common.enums.app.AppType;
+import cn.topiam.employee.common.enums.app.AuthorizationType;
+import cn.topiam.employee.common.enums.app.InitLoginType;
 
 /**
  * 应用接口
@@ -86,11 +90,12 @@ public interface ApplicationService {
      * 创建应用
      *
      * @param name {@link String} 名称
+     * @param icon {@link String} 图标
      * @param remark {@link String} 备注
      * @return {@link String} 应用ID
      */
     @Transactional(rollbackFor = Exception.class)
-    String create(String name, String remark);
+    String create(String name, String icon, String remark);
 
     /**
      * 删除应用
@@ -115,4 +120,26 @@ public interface ApplicationService {
      * @return {@link Map}
      */
     Object getConfig(String appId);
+
+    /**
+     * 获取应用用户信息
+     *
+     * @param appId {@link Long}
+     * @param userId {@link Long}
+     * @return {@link AppAccountEntity}
+     */
+    AppAccount getAppAccount(Long appId, Long userId);
+
+    /**
+     * 创建应用
+     *
+     * @param name {@link String}
+     * @param icon  {@link String}
+     * @param remark  {@link String}
+     * @param initLoginType  {@link InitLoginType}
+     * @param authorizationType {@link AuthorizationType}
+     * @return {@link AppEntity}
+     */
+    AppEntity createApp(String name, String icon, String remark, InitLoginType initLoginType,
+                        AuthorizationType authorizationType);
 }

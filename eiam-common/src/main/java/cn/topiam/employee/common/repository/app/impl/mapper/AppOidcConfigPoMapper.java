@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -68,6 +68,7 @@ public class AppOidcConfigPoMapper implements RowMapper<AppOidcConfigPO> {
         appOidc.setAuthGrantTypes(JSONObject.parseObject(rs.getString("auth_grant_types"), Set.class));
         appOidc.setResponseTypes(JSONObject.parseObject(rs.getString("response_types"), Set.class));
         appOidc.setRedirectUris(JSONObject.parseObject(rs.getString("redirect_uris"), Set.class));
+        appOidc.setPostLogoutRedirectUris(JSONObject.parseObject(rs.getString("post_logout_redirect_uris"), Set.class));
         appOidc.setGrantScopes(JSONObject.parseObject(rs.getString("grant_scopes"), Set.class));
         appOidc.setRequireAuthConsent(rs.getBoolean("require_auth_consent"));
         appOidc.setRequireProofKey(rs.getBoolean("require_proof_key"));

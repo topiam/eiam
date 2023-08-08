@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import cn.topiam.employee.audit.annotation.Audit;
-import cn.topiam.employee.audit.enums.EventType;
+import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceEntity;
 import cn.topiam.employee.console.converter.identitysource.IdentitySourceConverter;
 import cn.topiam.employee.console.pojo.other.IdentitySourceConfigValidatorParam;
@@ -47,13 +47,13 @@ import lombok.AllArgsConstructor;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import static cn.topiam.employee.common.constants.AccountConstants.IDENTITY_SOURCE_PATH;
+import static cn.topiam.employee.common.constant.AccountConstants.IDENTITY_SOURCE_PATH;
 
 /**
  * 身份源管理
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2020/7/11 19:18
+ * Created by support@topiam.cn on 2020/7/11 21:18
  */
 @Validated
 @Tag(name = "身份源管理")
@@ -69,7 +69,7 @@ public class IdentitySourceController {
      */
     @Operation(summary = "身份源列表")
     @GetMapping(value = "/list")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Page<IdentitySourceListResult>> getIdentitySourceList(PageModel pageModel,
                                                                                IdentitySourceListQuery query) {
         Page<IdentitySourceListResult> results = identitySourceService.getIdentitySourceList(query,
@@ -88,7 +88,7 @@ public class IdentitySourceController {
     @Operation(summary = "创建身份源")
     @Audit(type = EventType.CREATE_IDENTITY_RESOURCE)
     @PostMapping(value = "/create")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<IdentitySourceCreateResult> createIdentitySource(@RequestBody @Validated IdentitySourceCreateParam param) {
         IdentitySourceCreateResult result = identitySourceService.createIdentitySource(param);
         IdentitySourceEventUtils.register(result.getId());
@@ -106,7 +106,7 @@ public class IdentitySourceController {
     @Operation(summary = "修改身份源")
     @Audit(type = EventType.UPDATE_IDENTITY_RESOURCE)
     @PutMapping(value = "/update")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> updateIdentitySource(@RequestBody @Validated IdentitySourceUpdateParam param) {
         boolean success = identitySourceService.updateIdentitySource(param);
         //注册
@@ -124,7 +124,7 @@ public class IdentitySourceController {
     @Preview
     @Operation(summary = "保存身份源配置")
     @PutMapping(value = "/save/config")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> saveIdentitySourceConfig(@RequestBody @Validated IdentitySourceConfigSaveParam param) {
         boolean success = identitySourceService.saveIdentitySourceConfig(param);
         //注册
@@ -141,7 +141,7 @@ public class IdentitySourceController {
     @Lock
     @Operation(summary = "获取身份源配置")
     @GetMapping(value = "/get/config/{id}")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<IdentitySourceConfigGetResult> getIdentitySourceConfig(@PathVariable(value = "id") String id) {
         IdentitySourceEntity entity = identitySourceService.getIdentitySource(id);
         IdentitySourceConfigGetResult result = identitySourceConverter
@@ -157,7 +157,7 @@ public class IdentitySourceController {
      */
     @Operation(summary = "获取认证源")
     @GetMapping(value = "/get/{id}")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<IdentitySourceGetResult> getIdentitySource(@PathVariable(value = "id") String id) {
         IdentitySourceEntity entity = identitySourceService.getIdentitySource(id);
         IdentitySourceGetResult result = identitySourceConverter
@@ -176,7 +176,7 @@ public class IdentitySourceController {
     @Operation(summary = "启用身份源")
     @Audit(type = EventType.ENABLE_IDENTITY_RESOURCE)
     @PutMapping(value = "/enable/{id}")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> enableIdentitySource(@PathVariable(value = "id") String id) {
         boolean result = identitySourceService.enableIdentitySource(id);
         //注册
@@ -195,7 +195,7 @@ public class IdentitySourceController {
     @Operation(summary = "禁用身份源")
     @Audit(type = EventType.DISABLE_IDENTITY_RESOURCE)
     @PutMapping(value = "/disable/{id}")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> disableIdentitySource(@PathVariable(value = "id") String id) {
         boolean result = identitySourceService.disableIdentitySource(id);
         //移除
@@ -214,7 +214,7 @@ public class IdentitySourceController {
     @Operation(summary = "删除身份源")
     @Audit(type = EventType.DELETE_IDENTITY_RESOURCE)
     @DeleteMapping(value = "/delete/{id}")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> deleteIdentitySource(@PathVariable String id) {
         boolean success = identitySourceService.deleteIdentitySource(id);
         //移除
@@ -230,7 +230,7 @@ public class IdentitySourceController {
      */
     @Operation(summary = "身份源配置验证")
     @PostMapping(value = "/config_validator")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> identitySourceConfigValidator(@RequestBody @Validated IdentitySourceConfigValidatorParam param) {
         boolean success = identitySourceService.identitySourceConfigValidator(param);
         return ApiRestResult.<Boolean> builder().result(success).build();

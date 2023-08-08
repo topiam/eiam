@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,13 +19,13 @@ package cn.topiam.employee.common.enums.app;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-import cn.topiam.employee.common.enums.BaseEnum;
+import cn.topiam.employee.support.enums.BaseEnum;
 import cn.topiam.employee.support.web.converter.EnumConvert;
 
 /**
  *
- * @author SanLi
- * Created by qinggang.zuo@gmail.com / 2689170096@qq.com on  2022/12/21 17:20
+ * @author TopIAM
+ * Created by support@topiam.cn on  2022/12/21 22:20
  */
 public enum FormSubmitType implements BaseEnum {
                                                 /**

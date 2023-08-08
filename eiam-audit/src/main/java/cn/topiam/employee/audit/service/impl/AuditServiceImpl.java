@@ -1,6 +1,6 @@
 /*
- * eiam-audit - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-audit - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -18,32 +18,33 @@
 package cn.topiam.employee.audit.service.impl;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import cn.topiam.employee.audit.controller.pojo.AuditDictResult;
 import cn.topiam.employee.audit.controller.pojo.AuditListQuery;
 import cn.topiam.employee.audit.controller.pojo.AuditListResult;
+import cn.topiam.employee.audit.controller.pojo.DictResult;
 import cn.topiam.employee.audit.entity.AuditElasticSearchEntity;
-import cn.topiam.employee.audit.enums.EventType;
+import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.audit.service.AuditService;
 import cn.topiam.employee.audit.service.converter.AuditDataConverter;
-import cn.topiam.employee.common.enums.UserType;
-import cn.topiam.employee.core.configuration.EiamSupportProperties;
+import cn.topiam.employee.support.autoconfiguration.SupportProperties;
+import cn.topiam.employee.support.exception.BadParamsException;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
-
-import lombok.AllArgsConstructor;
-import static cn.topiam.employee.common.constants.AuditConstants.getAuditIndexPrefix;
+import cn.topiam.employee.support.security.userdetails.UserType;
+import cn.topiam.employee.support.security.util.SecurityUtils;
+import static cn.topiam.employee.common.constant.AuditConstants.getAuditIndexPrefix;
+import static cn.topiam.employee.support.security.userdetails.UserType.USER;
 
 /**
  * 审计 service impl
@@ -52,7 +53,6 @@ import static cn.topiam.employee.common.constants.AuditConstants.getAuditIndexPr
  * Created by support@topiam.cn on  2021/9/10 23:06
  */
 @Service
-@AllArgsConstructor
 public class AuditServiceImpl implements AuditService {
 
     /**
@@ -64,13 +64,16 @@ public class AuditServiceImpl implements AuditService {
      */
     @Override
     public Page<AuditListResult> getAuditList(AuditListQuery query, PageModel page) {
+        if (USER.equals(SecurityUtils.getCurrentUser().getUserType())
+            && !USER.getType().equals(query.getUserType())) {
+            throw new BadParamsException("用户类型错误");
+        }
         //查询入参转查询条件
-        NativeSearchQuery nsq = auditDataConverter.auditListRequestConvertToNativeSearchQuery(query,
-            page);
+        NativeQuery nsq = auditDataConverter.auditListRequestConvertToNativeQuery(query, page);
         //查询列表
-        SearchHits<AuditElasticSearchEntity> search = elasticsearchRestTemplate.search(nsq,
+        SearchHits<AuditElasticSearchEntity> search = elasticsearchTemplate.search(nsq,
             AuditElasticSearchEntity.class, IndexCoordinates
-                .of(getAuditIndexPrefix(eiamSupportProperties.getDemo().isOpen()) + "*"));
+                .of(getAuditIndexPrefix(supportProperties.getAudit().getIndexPrefix()) + "*"));
         //结果转返回结果
         return auditDataConverter.searchHitsConvertToAuditListResult(search, page);
     }
@@ -78,28 +81,29 @@ public class AuditServiceImpl implements AuditService {
     /**
      * 获取字典类型
      *
-     * @param userType {@link UserType}
+     * @param userType {@link String}
      * @return {@link List}
      */
     @Override
-    public List<AuditDictResult> getAuditDict(UserType userType) {
+    public List<DictResult> getAuditDict(String userType) {
         List<EventType> types = Arrays.asList(EventType.values());
         //获取分组
-        List<AuditDictResult> list = types.stream().map(EventType::getResource).toList().stream()
+        List<DictResult> list = types.stream().map(EventType::getResource).toList().stream()
             .distinct().toList().stream().map(resource -> {
-                AuditDictResult group = new AuditDictResult();
+                DictResult group = new DictResult();
                 group.setName(resource.getName());
                 group.setCode(resource.getCode());
                 return group;
             }).collect(Collectors.toList());
         //处理每个分组的审计类型
         list.forEach(dict -> {
-            Set<AuditDictResult.AuditType> auditTypes = new HashSet<>();
+            Set<DictResult.AuditType> auditTypes = new LinkedHashSet<>();
             types.stream()
                 .filter(auditType -> auditType.getResource().getCode().equals(dict.getCode()))
                 .forEach(auditType -> {
-                    if (auditType.getUserTypes().contains(userType)) {
-                        AuditDictResult.AuditType type = new AuditDictResult.AuditType();
+                    if (auditType.getUserTypes().stream().map(UserType::getType).toList()
+                        .contains(userType)) {
+                        DictResult.AuditType type = new DictResult.AuditType();
                         type.setName(auditType.getDesc());
                         type.setCode(auditType.getCode());
                         auditTypes.add(type);
@@ -113,18 +117,26 @@ public class AuditServiceImpl implements AuditService {
     }
 
     /**
-     * EiamSupportProperties
+     * AuditProperties
      */
-    private final EiamSupportProperties     eiamSupportProperties;
+    private final SupportProperties     supportProperties;
 
     /**
-     * ElasticsearchRestTemplate
+     * ElasticsearchTemplate
      */
-    private final ElasticsearchRestTemplate elasticsearchRestTemplate;
+    private final ElasticsearchTemplate elasticsearchTemplate;
 
     /**
      * AuditDataConverter
      */
-    private final AuditDataConverter        auditDataConverter;
+    private final AuditDataConverter    auditDataConverter;
+
+    public AuditServiceImpl(SupportProperties supportProperties,
+                            ElasticsearchTemplate elasticsearchTemplate,
+                            AuditDataConverter auditDataConverter) {
+        this.supportProperties = supportProperties;
+        this.elasticsearchTemplate = elasticsearchTemplate;
+        this.auditDataConverter = auditDataConverter;
+    }
 
 }

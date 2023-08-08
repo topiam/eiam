@@ -1,6 +1,6 @@
 /*
- * eiam-synchronizer - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-synchronizer - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -42,7 +42,7 @@ import org.springframework.util.StopWatch;
 import com.alibaba.fastjson2.JSON;
 import com.cronutils.model.CronType;
 
-import cn.topiam.employee.common.constants.SettingConstants;
+import cn.topiam.employee.common.constant.SettingConstants;
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceEntity;
 import cn.topiam.employee.common.enums.TriggerType;
 import cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider;
@@ -64,7 +64,7 @@ import cn.topiam.employee.identitysource.feishu.client.FeiShuClient;
 import cn.topiam.employee.identitysource.wechatwork.WeChatWorkConfig;
 import cn.topiam.employee.identitysource.wechatwork.WeChatWorkIdentitySource;
 import cn.topiam.employee.identitysource.wechatwork.client.WeChatWorkClient;
-import cn.topiam.employee.support.task.TaskSchedulerRegistrarHelp;
+import cn.topiam.employee.support.scheduler.SpringSchedulerRegistrar;
 import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.synchronizer.task.IdentitySourceSyncTask;
 
@@ -77,7 +77,7 @@ import static cn.topiam.employee.synchronizer.configuration.IdentitySourceBeanUt
  * 身份源Bean 注册
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/3/17 20:54
+ * Created by support@topiam.cn on  2022/3/17 21:54
  */
 @Slf4j
 @Configuration
@@ -154,21 +154,21 @@ public class IdentitySourceBeanRegistry implements IdentitySourceEventListener {
         IdentitySourceEventPostProcessor identitySourceEventPostProcessor = beanFactory.getBean(IdentitySourceEventPostProcessor.class);
         IdentitySourceClient identitySourceClient;
         BeanDefinitionBuilder definitionBuilder;
-        //TODO 钉钉
+        // 钉钉
         if (DINGTALK.equals(entity.getProvider())) {
             DingTalkConfig config = JSON.parseObject(entity.getBasicConfig(), DingTalkConfig.class);
             identitySourceClient = new DingTalkClient(config);
             definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(DingTalkIdentitySource.class);
             return getDefinitionHolder(entity, identitySourceSyncUserPostProcessor, identitySourceSyncDeptPostProcessor, identitySourceEventPostProcessor, identitySourceClient, definitionBuilder, config);
         }
-        //TODO 企业微信
+        // 企业微信
         if (IdentitySourceProvider.WECHAT_WORK.equals(entity.getProvider())) {
             WeChatWorkConfig config = JSON.parseObject(entity.getBasicConfig(), WeChatWorkConfig.class);
             identitySourceClient = new WeChatWorkClient(config);
             definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(WeChatWorkIdentitySource.class);
             return getDefinitionHolder(entity, identitySourceSyncUserPostProcessor, identitySourceSyncDeptPostProcessor, identitySourceEventPostProcessor, identitySourceClient, definitionBuilder, config);
         }
-        //TODO 飞书
+        // 飞书
         if (IdentitySourceProvider.FEISHU.equals(entity.getProvider())) {
             FeiShuConfig config = JSON.parseObject(entity.getBasicConfig(), FeiShuConfig.class);
             identitySourceClient = new FeiShuClient(config);
@@ -176,6 +176,7 @@ public class IdentitySourceBeanRegistry implements IdentitySourceEventListener {
             definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(FieShuIdentitySource.class);
             return getDefinitionHolder(entity, identitySourceSyncUserPostProcessor, identitySourceSyncDeptPostProcessor, identitySourceEventPostProcessor, identitySourceClient, definitionBuilder, config);
         }
+
         log.info("未实现 [{}] 类型身份源配置", entity.getProvider());
         throw new IdentitySourceNotExistException();
         //@formatter:on
@@ -231,8 +232,8 @@ public class IdentitySourceBeanRegistry implements IdentitySourceEventListener {
         String beanName = getSourceBeanName(id);
         IdentitySource<? extends IdentitySourceConfig> identitySource = (IdentitySource<? extends IdentitySourceConfig>) applicationContext
             .getBean(beanName);
-        TaskSchedulerRegistrarHelp schedulerRegistrarHelp = applicationContext
-            .getBean(TaskSchedulerRegistrarHelp.class);
+        SpringSchedulerRegistrar schedulerRegistrarHelp = applicationContext
+            .getBean(SpringSchedulerRegistrar.class);
         RedissonClient redissonClient = applicationContext.getBean(RedissonClient.class);
         //注册定时任务
         String cronExpression = entity.getJobConfig().getCronExpression(CronType.SPRING);
@@ -251,8 +252,8 @@ public class IdentitySourceBeanRegistry implements IdentitySourceEventListener {
      */
     public static void destroyIdentitySourceSyncTask(String id,
                                                      ApplicationContext applicationContext) {
-        TaskSchedulerRegistrarHelp schedulerRegistrarHelp = applicationContext
-            .getBean(TaskSchedulerRegistrarHelp.class);
+        SpringSchedulerRegistrar schedulerRegistrarHelp = applicationContext
+            .getBean(SpringSchedulerRegistrar.class);
         schedulerRegistrarHelp.removeCronTask(id);
     }
 

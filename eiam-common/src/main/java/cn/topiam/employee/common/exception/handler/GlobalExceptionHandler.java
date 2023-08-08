@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,8 +17,8 @@
  */
 package cn.topiam.employee.common.exception.handler;
 
-import javax.validation.ConstraintViolationException;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.http.HttpStatus;
@@ -33,15 +33,19 @@ import cn.topiam.employee.support.exception.TopIamException;
 
 import lombok.AllArgsConstructor;
 
+import jakarta.validation.ConstraintViolationException;
+
 /**
  * 全局异常处理
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2020/8/20 20:55
+ * Created by support@topiam.cn on 2020/8/20 21:55
  */
 @AllArgsConstructor
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    private final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     /**
      * Exception
      *
@@ -52,6 +56,7 @@ public class GlobalExceptionHandler {
         request.setAttribute(WebUtils.ERROR_STATUS_CODE_ATTRIBUTE,
             HttpStatus.INTERNAL_SERVER_ERROR.value(), WebRequest.SCOPE_REQUEST);
         setExceptionAttribute(request, e);
+        logger.error("Global exception catch", e);
         return new ModelAndView(serverProperties.getError().getPath());
     }
 
@@ -64,26 +69,26 @@ public class GlobalExceptionHandler {
     public ModelAndView topIamException(WebRequest request, TopIamException e) {
         request.setAttribute(WebUtils.ERROR_STATUS_CODE_ATTRIBUTE, e.getHttpStatus().value(),
             WebRequest.SCOPE_REQUEST);
+        logger.error("Global exception catch", e);
         return new ModelAndView(serverProperties.getError().getPath());
     }
 
     /**
      * BindException
-     *
      * HandlerExceptionResolver 默认处理为400状态码，这里设置为500，并转发到异常处理页面。
      *
      * @return {@link ModelAndView}
      */
     @ExceptionHandler(value = BindException.class)
-    public ModelAndView bindException(WebRequest request) {
+    public ModelAndView bindException(WebRequest request, BindException e) {
         request.setAttribute(WebUtils.ERROR_STATUS_CODE_ATTRIBUTE, HttpStatus.BAD_REQUEST.value(),
             WebRequest.SCOPE_REQUEST);
+        logger.error("Global exception catch", e);
         return new ModelAndView(serverProperties.getError().getPath());
     }
 
     /**
      * ConstraintViolationException
-     *
      * HandlerExceptionResolver 默认处理为400状态码，这里设置为500，并转发到异常处理页面。
      *
      * @return {@link ModelAndView}

@@ -1,6 +1,6 @@
 /*
- * eiam-audit - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-audit - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,8 +19,6 @@ package cn.topiam.employee.audit.controller;
 
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
-
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,12 +26,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cn.topiam.employee.audit.controller.pojo.AuditDictResult;
 import cn.topiam.employee.audit.controller.pojo.AuditListQuery;
 import cn.topiam.employee.audit.controller.pojo.AuditListResult;
+import cn.topiam.employee.audit.controller.pojo.DictResult;
 import cn.topiam.employee.audit.service.AuditService;
-import cn.topiam.employee.common.constants.AuditConstants;
-import cn.topiam.employee.common.enums.UserType;
+import cn.topiam.employee.common.constant.AuditConstants;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.result.ApiRestResult;
@@ -42,6 +39,7 @@ import lombok.AllArgsConstructor;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * 系统审计
@@ -79,8 +77,8 @@ public class AuditController {
     @Validated
     @Operation(description = "获取审计类型")
     @GetMapping(value = "/types/{user_type}")
-    public ApiRestResult<List<AuditDictResult>> getAuditDict(@PathVariable(name = "user_type") @NotNull(message = "用户类型不能为空！") UserType userType) {
-        List<AuditDictResult> dict = auditService.getAuditDict(userType);
+    public ApiRestResult<List<DictResult>> getAuditDict(@PathVariable(name = "user_type") @NotNull(message = "用户类型不能为空！") String userType) {
+        List<DictResult> dict = auditService.getAuditDict(userType);
         return ApiRestResult.ok(dict);
     }
 

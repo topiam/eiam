@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,24 +17,24 @@
  */
 package cn.topiam.employee.common.storage;
 
-import org.springframework.web.multipart.MultipartFile;
+import java.io.InputStream;
 
 /**
  * 存储
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/10 20:29
+ * Created by support@topiam.cn on  2021/11/10 21:29
  */
 public interface Storage {
     /**
      * 上传文件
      *
      * @param fileName {@link String}
-     * @param file {@link MultipartFile}
+     * @param inputStream {@link InputStream}
      * @return path
      * @throws Exception Exception
      */
-    String upload(String fileName, MultipartFile file) throws Exception;
+    String upload(String fileName, InputStream inputStream) throws Exception;
 
     /**
      * 下载文件

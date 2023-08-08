@@ -1,6 +1,6 @@
 /*
- * eiam-identity-source-feishu - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-identity-source-feishu - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,14 +20,10 @@ package cn.topiam.employee.identitysource.feishu;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 
 import cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider;
-import cn.topiam.employee.common.util.RequestUtils;
 import cn.topiam.employee.identitysource.core.AbstractDefaultIdentitySource;
 import cn.topiam.employee.identitysource.core.client.IdentitySourceClient;
 import cn.topiam.employee.identitysource.core.enums.IdentitySourceEventReceiveType;
@@ -40,11 +36,13 @@ import cn.topiam.employee.identitysource.feishu.util.FeiShuEventDecryptUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 /**
  * 飞书身份源
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/9/21 20:04
+ * Created by support@topiam.cn on  2022/9/21 21:04
  */
 @Slf4j
 public class FieShuIdentitySource extends AbstractDefaultIdentitySource<FeiShuConfig> {
@@ -63,14 +61,13 @@ public class FieShuIdentitySource extends AbstractDefaultIdentitySource<FeiShuCo
      * 回调
      *
      * @param request  {@link HttpServletRequest}
-     * @param response {@link HttpServletResponse}
+     * @param body {@link String}
      */
     @Override
-    public Object event(HttpServletRequest request, HttpServletResponse response) {
+    public Object event(HttpServletRequest request, String body) {
         LocalDateTime eventTime = LocalDateTime.now();
-        String json = RequestUtils.getBody(request);
-        log.debug("飞书身份源 [{}] 事件回调入参: {}", getId(), json);
-        JSONObject result = eventCallBack(eventTime, JSON.parseObject(json));
+        log.debug("飞书身份源 [{}] 事件回调入参: {}", getId(), body);
+        JSONObject result = eventCallBack(eventTime, JSON.parseObject(body));
         log.debug("飞书身份源 [{}] 事件回调返回: {}", getId(), JSON.toJSONString(result));
         return result;
     }

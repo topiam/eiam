@@ -1,6 +1,6 @@
 /*
- * eiam-audit - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-audit - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ import lombok.Getter;
  * 事件状态
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/11/6 19:57
+ * Created by support@topiam.cn on  2022/11/6 21:57
  */
 @Getter
 public enum EventStatus {

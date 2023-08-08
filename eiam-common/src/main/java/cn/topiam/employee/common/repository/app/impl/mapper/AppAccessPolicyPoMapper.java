@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 import org.springframework.jdbc.core.RowMapper;
 
 import cn.topiam.employee.common.entity.app.po.AppAccessPolicyPO;
-import cn.topiam.employee.common.enums.PolicySubjectType;
+import cn.topiam.employee.common.enums.app.AppPolicySubjectType;
 import cn.topiam.employee.common.enums.app.AppProtocol;
 import cn.topiam.employee.common.enums.app.AppType;
 
@@ -52,7 +52,7 @@ public class AppAccessPolicyPoMapper implements RowMapper<AppAccessPolicyPO> {
         appAccount.setId(rs.getLong("id_"));
         appAccount.setAppId(rs.getLong("app_id"));
         appAccount.setSubjectId(rs.getString("subject_id"));
-        appAccount.setSubjectType(PolicySubjectType.getType(rs.getString("subject_type")));
+        appAccount.setSubjectType(AppPolicySubjectType.getType(rs.getString("subject_type")));
         appAccount.setSubjectName(rs.getString("name_"));
         appAccount.setCreateTime(rs.getObject("create_time", LocalDateTime.class));
         appAccount.setAppName(rs.getString("app_name"));

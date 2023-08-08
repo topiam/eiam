@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,7 +35,7 @@ import cn.topiam.employee.common.repository.identitysource.IdentitySourceSyncRec
  * 身份源同步记录
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/3/15 20:35
+ * Created by support@topiam.cn on  2022/3/15 21:35
  */
 @Repository
 public class IdentitySourceSyncRecordRepositoryCustomizedImpl implements
@@ -44,7 +44,7 @@ public class IdentitySourceSyncRecordRepositoryCustomizedImpl implements
     @Override
     public void batchSave(List<IdentitySourceSyncRecordEntity> list) {
         jdbcTemplate.batchUpdate(
-            "INSERT INTO identity_source_sync_record (id_, sync_history_id, action_type, object_id, object_name, object_type, status_,desc_,create_by,create_time,update_by,update_time,remark_) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            "INSERT INTO identity_source_sync_record (id_, sync_history_id, action_type, object_id, object_name, object_type, status_,desc_,create_by,create_time,update_by,update_time,remark_,is_deleted) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(@NotNull PreparedStatement ps, int i) throws SQLException {
@@ -63,6 +63,7 @@ public class IdentitySourceSyncRecordRepositoryCustomizedImpl implements
                     ps.setString(11, entity.getUpdateBy());
                     ps.setTimestamp(12, Timestamp.valueOf(entity.getUpdateTime()));
                     ps.setString(13, entity.getRemark());
+                    ps.setBoolean(14, false);
                     //@formatter:on
                 }
 

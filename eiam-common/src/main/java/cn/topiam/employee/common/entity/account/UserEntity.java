@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,14 +22,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLDeleteAll;
 import org.hibernate.annotations.Where;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -42,6 +36,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
@@ -60,7 +59,6 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
 @Entity
 @Table(name = "user")
 @SQLDelete(sql = "update user set " + SOFT_DELETE_SET + " where id_ = ?")
-@SQLDeleteAll(sql = "update user set " + SOFT_DELETE_SET + " where id_ = ?")
 @Where(clause = SOFT_DELETE_WHERE)
 public class UserEntity extends LogicDeleteEntity<Long> {
 
@@ -144,18 +142,6 @@ public class UserEntity extends LogicDeleteEntity<Long> {
      */
     @Column(name = "phone_verified")
     private Boolean           phoneVerified;
-
-    /**
-     * 共享秘钥-TIME OTP
-     */
-    @Column(name = "shared_secret")
-    private String            sharedSecret;
-
-    /**
-     * 是否绑定 TOTP
-     */
-    @Column(name = "totp_bind")
-    private Boolean           totpBind;
 
     /**
      * 认证次数

@@ -1,6 +1,6 @@
 /*
- * eiam-portal - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-portal - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,33 +17,32 @@
  */
 package cn.topiam.employee.portal.service.userdetail;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
-import cn.topiam.employee.common.entity.account.UserDetailEntity;
+import com.google.common.collect.Lists;
+
+import cn.topiam.employee.audit.access.AuditAccess;
 import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.enums.UserStatus;
-import cn.topiam.employee.common.enums.UserType;
-import cn.topiam.employee.common.repository.account.UserDetailRepository;
 import cn.topiam.employee.common.repository.account.UserRepository;
-import cn.topiam.employee.core.security.authorization.Roles;
-import cn.topiam.employee.core.security.userdetails.UserDetails;
-import cn.topiam.employee.core.security.userdetails.UserDetailsService;
+import cn.topiam.employee.support.security.userdetails.UserDetails;
+import cn.topiam.employee.support.util.PhoneNumberUtils;
+import static cn.topiam.employee.support.security.userdetails.UserType.USER;
 
 /**
  * UserDetailsServiceImpl
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2020/10/25 20:41
+ * Created by support@topiam.cn on 2020/10/25 21:41
  */
 @Component(value = "userDetailsService")
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -66,14 +65,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // 状态相关
         boolean enabled = true, accountNonLocked = true;
-        // 权限
-        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        // 权限，默认赋予审计查看权限
+        Collection<SimpleGrantedAuthority> authorities = Lists
+            .newArrayList(new SimpleGrantedAuthority(AuditAccess.Audit.audit_list.getCode()));
         UserEntity user;
         // 用户名
         user = userRepository.findByUsername(username);
         if (ObjectUtils.isEmpty(user)) {
             // 手机号
-            user = userRepository.findByPhone(username);
+            if (PhoneNumberUtils.isPhoneValidate(username)) {
+                user = userRepository.findByPhone(PhoneNumberUtils.getPhoneNumber(username));
+            }
             if (ObjectUtils.isEmpty(user)) {
                 // 邮箱
                 user = userRepository.findByEmail(username);
@@ -84,21 +86,19 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             logger.info("根据用户名、手机号、邮箱未查询该用户【{}】", username);
             throw new UsernameNotFoundException("用户名或密码错误");
         }
-        Optional<UserDetailEntity> detail = userDetailRepository.findByUserId(user.getId());
-        return getUserDetails(enabled, accountNonLocked, authorities, user,
-            detail.orElse(new UserDetailEntity()));
+        return getUserDetails(enabled, accountNonLocked, authorities, user);
     }
 
     public static UserDetails getUserDetails(boolean enabled, boolean accountNonLocked,
                                              Collection<SimpleGrantedAuthority> authorities,
-                                             UserEntity user, UserDetailEntity userDetail) {
+                                             UserEntity user) {
         //TODO 密码是否过期
 
         //TODO 状态
         if (!ObjectUtils.isEmpty(user.getStatus())) {
             //锁定
             if (user.getStatus().equals(UserStatus.LOCKED)
-                || user.getStatus().equals(UserStatus.PASS_WORD_EXPIRED_LOCKED)
+                || user.getStatus().equals(UserStatus.PASSWORD_EXPIRED_LOCKED)
                 || user.getStatus().equals(UserStatus.EXPIRED_LOCKED)) {
                 logger.info("用户【{}】被锁定", user.getUsername());
                 accountNonLocked = false;
@@ -109,13 +109,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 enabled = false;
             }
             //根据用户类型封装权限
-            SimpleGrantedAuthority authority = new SimpleGrantedAuthority(Roles.USER);
+            SimpleGrantedAuthority authority = new SimpleGrantedAuthority(USER.getType());
             authorities.add(authority);
 
             //封装
             return new UserDetails(String.valueOf(user.getId()), user.getUsername(),
-                user.getPassword(), UserType.USER, enabled, true, true, accountNonLocked,
-                authorities);
+                user.getPassword(), USER, enabled, true, true, accountNonLocked, authorities);
         }
         logger.info("用户【{}】状态异常", user.getUsername());
         throw new AccountExpiredException("用户状态异常");
@@ -124,15 +123,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     /**
      * UserRepository
      */
-    private final UserRepository       userRepository;
-    /**
-     * UserDetail
-     */
-    private final UserDetailRepository userDetailRepository;
+    private final UserRepository userRepository;
 
-    public UserDetailsServiceImpl(UserRepository userRepository,
-                                  UserDetailRepository userDetailRepository) {
+    public UserDetailsServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.userDetailRepository = userDetailRepository;
     }
 }

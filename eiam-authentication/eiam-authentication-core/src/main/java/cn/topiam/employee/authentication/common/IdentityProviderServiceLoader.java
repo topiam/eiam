@@ -1,6 +1,6 @@
 /*
- * eiam-authentication-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-authentication-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,7 +33,7 @@ import cn.topiam.employee.authentication.common.exception.IdentityProviderTempla
  * 身份提供商加载器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/8/20 19:08
+ * Created by support@topiam.cn on  2022/8/20 21:08
  */
 @Configuration
 public class IdentityProviderServiceLoader implements ApplicationContextAware {

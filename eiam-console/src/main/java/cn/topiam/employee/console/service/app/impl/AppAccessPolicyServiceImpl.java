@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -49,7 +49,7 @@ import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIF
  * 应用访问权限策略 Service
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/4 19:56
+ * Created by support@topiam.cn on  2022/6/4 21:56
  */
 @Service
 @Slf4j
@@ -130,13 +130,25 @@ public class AppAccessPolicyServiceImpl implements AppAccessPolicyService {
             log.warn(AuditContext.getContent());
             throw new TopIamException(AuditContext.getContent());
         }
-        appAccessPolicyRepository.deleteById(Long.valueOf(id));
         AppAccessPolicyEntity entity = optional.get();
+        appAccessPolicyRepository.deleteById(Long.valueOf(id));
         AuditContext.setTarget(
             Target.builder().id(entity.getSubjectId())
                 .type(TargetType.getType(entity.getSubjectType().getCode().toLowerCase())).build(),
             Target.builder().id(entity.getAppId().toString()).type(TargetType.APPLICATION).build());
         return true;
+    }
+
+    /**
+     * 用户是否允许访问应用
+     *
+     * @param appId {@link Long}
+     * @param userId {@link Long}
+     * @return {@link Boolean}
+     */
+    @Override
+    public Boolean hasAllowAccess(Long appId, Long userId) {
+        return appAccessPolicyRepository.hasAllowAccess(appId, userId);
     }
 
     /**

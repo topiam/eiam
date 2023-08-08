@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -115,6 +115,7 @@ public interface UserGroupConverter {
      * @param param {@link UserGroupCreateParam}
      * @return {@link UserEntity}
      */
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "updateTime", ignore = true)
     @Mapping(target = "updateBy", ignore = true)
@@ -129,6 +130,7 @@ public interface UserGroupConverter {
      * @return {@link UserEntity} 用户实体
      */
 
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "updateTime", ignore = true)
     @Mapping(target = "updateBy", ignore = true)
@@ -153,7 +155,7 @@ public interface UserGroupConverter {
     default Predicate queryUserGroupListParamConvertToPredicate(UserGroupListQuery query) {
         QUserGroupEntity userGroup = QUserGroupEntity.userGroupEntity;
         Predicate predicate = ExpressionUtils.and(userGroup.isNotNull(),
-            userGroup.isDeleted.eq(Boolean.FALSE));
+            userGroup.deleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = StringUtils.isBlank(query.getName()) ? predicate : ExpressionUtils.and(predicate, userGroup.name.like("%" + query.getName() + "%"));

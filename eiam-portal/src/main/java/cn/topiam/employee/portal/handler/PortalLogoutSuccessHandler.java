@@ -1,6 +1,6 @@
 /*
- * eiam-portal - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-portal - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,20 +19,20 @@ package cn.topiam.employee.portal.handler;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 
-import cn.topiam.employee.core.context.ServerContextHelp;
+import cn.topiam.employee.core.help.ServerHelp;
 import cn.topiam.employee.support.result.ApiRestResult;
 import cn.topiam.employee.support.util.HttpResponseUtils;
 import cn.topiam.employee.support.util.HttpUrlUtils;
-import static cn.topiam.employee.common.constants.AuthorizeConstants.FE_LOGIN;
-import static cn.topiam.employee.support.context.ServletContextHelp.acceptIncludeTextHtml;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import static cn.topiam.employee.common.constant.AuthorizeConstants.FE_LOGIN;
+import static cn.topiam.employee.support.context.ServletContextHelp.isHtmlRequest;
 import static cn.topiam.employee.support.result.ApiRestResult.SUCCESS;
 
 /**
@@ -52,16 +52,16 @@ public class PortalLogoutSuccessHandler implements
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response,
                                 Authentication authentication) throws IOException {
         //@formatter:off
-        boolean isTextHtml = acceptIncludeTextHtml(request);
+        boolean isHtmlRequest = isHtmlRequest(request);
         if (response.isCommitted()) {
             return;
         }
-        if (!isTextHtml) {
+        if (!isHtmlRequest) {
             HttpResponseUtils.flushResponseJson(response, HttpStatus.OK.value(),
                     ApiRestResult.builder().status(SUCCESS).build());
             return;
         }
-        response.sendRedirect(HttpUrlUtils.format(ServerContextHelp.getPortalPublicBaseUrl() + FE_LOGIN));
+        response.sendRedirect(HttpUrlUtils.format(ServerHelp.getPortalPublicBaseUrl() + FE_LOGIN));
         //@formatter:on
     }
 }

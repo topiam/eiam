@@ -1,6 +1,6 @@
 /*
- * eiam-synchronizer - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-synchronizer - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,8 +21,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.persistence.EntityManager;
-
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,9 +40,9 @@ import cn.topiam.employee.common.entity.account.OrganizationMemberEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceEntity;
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceEventRecordEntity;
-import cn.topiam.employee.common.enums.OrganizationType;
 import cn.topiam.employee.common.enums.SyncStatus;
 import cn.topiam.employee.common.enums.UserStatus;
+import cn.topiam.employee.common.enums.account.OrganizationType;
 import cn.topiam.employee.common.enums.identitysource.IdentitySourceActionType;
 import cn.topiam.employee.common.enums.identitysource.IdentitySourceObjectType;
 import cn.topiam.employee.common.repository.account.OrganizationMemberRepository;
@@ -54,20 +52,25 @@ import cn.topiam.employee.common.repository.identitysource.IdentitySourceEventRe
 import cn.topiam.employee.common.repository.identitysource.IdentitySourceRepository;
 import cn.topiam.employee.common.repository.identitysource.IdentitySourceSyncHistoryRepository;
 import cn.topiam.employee.common.repository.identitysource.IdentitySourceSyncRecordRepository;
+import cn.topiam.employee.common.storage.Storage;
 import cn.topiam.employee.core.message.mail.MailMsgEventPublish;
 import cn.topiam.employee.core.message.sms.SmsMsgEventPublish;
-import cn.topiam.employee.core.security.password.PasswordGenerator;
+import cn.topiam.employee.core.mq.UserMessagePublisher;
+import cn.topiam.employee.core.mq.UserMessageTag;
 import cn.topiam.employee.identitysource.core.domain.Dept;
 import cn.topiam.employee.identitysource.core.domain.User;
 import cn.topiam.employee.identitysource.core.enums.IdentitySourceEventReceiveType;
 import cn.topiam.employee.identitysource.core.processor.IdentitySourceEventPostProcessor;
 import cn.topiam.employee.identitysource.core.processor.modal.IdentitySourceEventProcessData;
 import cn.topiam.employee.support.exception.TopIamException;
+import cn.topiam.employee.support.security.password.PasswordGenerator;
 
 import lombok.extern.slf4j.Slf4j;
+
+import jakarta.persistence.EntityManager;
 import static java.util.stream.Collectors.toSet;
 
-import static cn.topiam.employee.common.constants.CommonConstants.SYSTEM_DEFAULT_USER_NAME;
+import static cn.topiam.employee.common.constant.CommonConstants.SYSTEM_DEFAULT_USER_NAME;
 
 /**
  * 身份源数据 event 处理器
@@ -130,6 +133,7 @@ public class DefaultIdentitySourceEventPostProcessor extends AbstractIdentitySou
         List<IdentitySourceEventRecordEntity> records = new ArrayList<>();
         List<UserEntity> createUsers = new ArrayList<>();
         Set<OrganizationMemberEntity> createOrganizationMembers = Sets.newHashSet();
+        List<String> batchEsUserIdList = new ArrayList<>();
         users.forEach(thirdPartyUser -> {
             log.info("处理上游用户新增事件:[{}]开始", thirdPartyUser.getUserId());
             UserEntity userEntity = thirdPartyUserToUserEntity(thirdPartyUser, identitySource);
@@ -145,6 +149,7 @@ public class DefaultIdentitySourceEventPostProcessor extends AbstractIdentitySou
                     userEntity.getId());
                 createOrganizationMember(createOrganizationMembers, userEntity, organization);
             });
+            batchEsUserIdList.add(String.valueOf(userEntity.getId()));
             //记录日志
             IdentitySourceEventRecordEntity record = new IdentitySourceEventRecordEntity();
             record.setObjectId(userEntity.getId().toString());
@@ -169,6 +174,9 @@ public class DefaultIdentitySourceEventPostProcessor extends AbstractIdentitySou
         organizationMemberRepository.batchSave(Lists.newArrayList(createOrganizationMembers));
         //保存事件记录
         identitySourceEventRecordRepository.batchSave(records);
+        // 异步创建ES用户数据
+        userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE,
+            String.join(",", batchEsUserIdList));
         // 批量发送短信邮件欢迎信息(密码通知)
         publishMessage(createUsers);
     }
@@ -180,17 +188,18 @@ public class DefaultIdentitySourceEventPostProcessor extends AbstractIdentitySou
      */
     void modifyUsers(List<User> users, LocalDateTime eventTime,
                      IdentitySourceEntity identitySource) {
+        //@formatter:off
         List<IdentitySourceEventRecordEntity> records = new ArrayList<>();
         List<UserEntity> updateUsers = new ArrayList<>();
         List<OrganizationMemberEntity> createOrganizationMembers = new ArrayList<>();
+        List<String> batchEsUserIdList = new ArrayList<>();
         //需要删除组织成员关系集合 KEY：用户ID，value：组织ID
         Map<Long, Set<String>> deleteOrganizationMembers = Maps.newHashMap();
         Map<UserEntity, Set<OrganizationEntity>> currentUsers = Maps.newHashMap();
         Map<User, Set<OrganizationEntity>> thirdPartyUsers = Maps.newHashMap();
         //根据上游用户封装数据，因为这里是修改操作，所以只有本地存在才会处理，如果上游用户在本地不存在，减少复杂度，这里不处理，可以走增量拉取
         users.forEach(thirdParty -> {
-            List<OrganizationEntity> list = organizationRepository
-                .findByExternalIdIn(thirdParty.getDeptIdList());
+            List<OrganizationEntity> list = organizationRepository.findByExternalIdIn(thirdParty.getDeptIdList());
             Optional<UserEntity> optional = userRepository.findByExternalId(thirdParty.getUserId());
             if (optional.isPresent()) {
                 currentUsers.put(optional.get(), Sets.newHashSet(list));
@@ -203,41 +212,29 @@ public class DefaultIdentitySourceEventPostProcessor extends AbstractIdentitySou
                     log.info("处理上游用户修改事件:[{}]开始", thirdPartyUser.getUserId());
                     //更新基本信息
                     setUpdateUser(thirdPartyUser, currentUser, identitySource);
-                    log.info("上游用户:[{}]对应系统用户:[{}]({})存在,修改本地用户信息:{}", thirdPartyUser.getUserId(),
-                        currentUser.getUsername(), currentUser.getId(),
-                        JSONObject.toJSONString(currentUser));
+                    log.info("上游用户:[{}]对应系统用户:[{}]({})存在,修改本地用户信息：{}", thirdPartyUser.getUserId(), currentUser.getUsername(), currentUser.getId(), JSONObject.toJSONString(currentUser));
                     updateUsers.add(currentUser);
                     //处理组织机构关系
-                    Set<OrganizationEntity> thirdPartyOrganizations = thirdPartyUsers
-                        .get(thirdPartyUser);
+                    Set<OrganizationEntity> thirdPartyOrganizations = thirdPartyUsers.get(thirdPartyUser);
                     Set<OrganizationEntity> currentOrganizations = currentUsers.get(currentUser);
                     //需要创建的新关系
                     thirdPartyOrganizations.stream()
                         .filter(item -> !currentOrganizations.contains(item)).collect(toSet())
-                        .forEach(organization -> {
-                            createOrganizationMember(Sets.newHashSet(createOrganizationMembers),
-                                currentUser, organization);
-                            log.info("上游用户:[{}]对应当前系统用户:[{}]({}),需要创建本地组织[{}]({})与本地成员[{}]({})关系",
-                                thirdPartyUser.getUserId(), currentUser.getUsername(),
-                                currentUser.getId(), organization.getName(), organization.getId(),
-                                currentUser.getUsername(), currentUser.getId());
+                        .forEach(organization -> {createOrganizationMember(Sets.newHashSet(createOrganizationMembers), currentUser, organization);
+                            log.info("上游用户:[{}]对应当前系统用户:[{}]({}),需要创建本地组织[{}]({})与本地成员[{}]({})关系", thirdPartyUser.getUserId(), currentUser.getUsername(), currentUser.getId(), organization.getName(), organization.getId(), currentUser.getUsername(), currentUser.getId());
                         });
                     //需要删除的旧关系
                     currentOrganizations.stream()
                         .filter(item -> !thirdPartyOrganizations.contains(item)).collect(toSet())
                         .forEach(organization -> {
                             Set<String> ids = deleteOrganizationMembers.get(currentUser.getId());
-                            log.info("上游用户:[{}]对应当前系统用户:[{}]({}),需要删除本地组织[{}]({})与本地成员[{}]({})关系",
-                                thirdPartyUser.getUserId(), currentUser.getUsername(),
-                                currentUser.getId(), organization.getName(), organization.getId(),
-                                currentUser.getUsername(), currentUser.getId());
+                            log.info("上游用户:[{}]对应当前系统用户:[{}]({}),需要删除本地组织[{}]({})与本地成员[{}]({})关系", thirdPartyUser.getUserId(), currentUser.getUsername(), currentUser.getId(), organization.getName(), organization.getId(), currentUser.getUsername(), currentUser.getId());
                             if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(ids)) {
                                 ids.add(organization.getId());
                                 deleteOrganizationMembers.put(currentUser.getId(), ids);
                                 return;
                             }
-                            deleteOrganizationMembers.put(currentUser.getId(),
-                                Sets.newHashSet(organization.getId()));
+                            deleteOrganizationMembers.put(currentUser.getId(), Sets.newHashSet(organization.getId()));
                         });
                     //记录日志
                     IdentitySourceEventRecordEntity record = new IdentitySourceEventRecordEntity();
@@ -255,6 +252,9 @@ public class DefaultIdentitySourceEventPostProcessor extends AbstractIdentitySou
                     record.setUpdateBy(SYSTEM_DEFAULT_USER_NAME);
                     record.setUpdateTime(LocalDateTime.now());
                     records.add(record);
+
+                    // 构建ES用户Id信息
+                    batchEsUserIdList.add(String.valueOf(currentUser.getId()));
                     log.info("处理上游用户修改事件:[{}]结束", thirdPartyUser.getUserId());
                 }
             }));
@@ -267,8 +267,11 @@ public class DefaultIdentitySourceEventPostProcessor extends AbstractIdentitySou
             .forEach(user -> deleteOrganizationMembers.get(user)
                 .forEach(organization -> organizationMemberRepository
                     .deleteByOrgIdAndUserId(organization, user)));
+        // 异步更新ES用户数据
+        userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE, String.join(",", batchEsUserIdList));
         //保存事件记录
         identitySourceEventRecordRepository.batchSave(records);
+        //@formatter:on
     }
 
     /**
@@ -395,9 +398,11 @@ public class DefaultIdentitySourceEventPostProcessor extends AbstractIdentitySou
         //根据外部ID查询
         List<OrganizationEntity> list = organizationRepository
             .findByExternalIdIn(organizations.stream().map(Dept::getDeptId).toList());
+        List<String> userIds = new ArrayList<>();
         list.forEach(current -> organizations.forEach(threeParty -> {
             //当前三方ID和上游科室对应
             if (current.getExternalId().equals(threeParty.getDeptId())) {
+
                 //判断父部门是否变化，父部门变化，需要更改次部门的下级部门，判断名称是否更改，需要更改子路径显示名称
                 //如果父部门是根节点，那需要查询一下IAM中根节点目前配置的是多少
                 Optional<OrganizationEntity> parentOptional;
@@ -413,17 +418,14 @@ public class DefaultIdentitySourceEventPostProcessor extends AbstractIdentitySou
                 if (parentOptional.isEmpty()) {
                     return;
                 }
-                //修改基本信息
-                current.setName(threeParty.getName());
-                current.setOrder(threeParty.getOrder());
-                updateOrganizations.add(current);
                 //上级部门不一致
                 OrganizationEntity parentOrganization = parentOptional.get();
-                if (!StringUtils.equals(parentOrganization.getId(), current.getParentId())) {
+                if (!StringUtils.equals(parentOrganization.getId(), current.getParentId())
+                    || !StringUtils.equals(current.getName(), threeParty.getName())) {
                     current.setParentId(parentOrganization.getId());
                     current.setPath(parentOrganization.getPath() + SEPARATE + current.getId());
                     current.setDisplayPath(
-                        parentOrganization.getDisplayPath() + SEPARATE + current.getName());
+                        parentOrganization.getDisplayPath() + SEPARATE + threeParty.getName());
                     //递归组装子级数据
                     updateOrganizations.addAll(processSubOrganizations(current));
                     //当前组织的父组织是否具有子节点，已经不存在子节点，更改 leaf=true
@@ -432,11 +434,25 @@ public class DefaultIdentitySourceEventPostProcessor extends AbstractIdentitySou
                     if (subOrganizations.stream().map(i -> i.getId().equals(current.getId()))
                         .findAny().isEmpty()) {
                         organizationRepository.updateIsLeaf(parentOrganization.getId(), true);
+                        // 查询关联用户
+                        List<OrganizationMemberEntity> orgMemberList = organizationMemberRepository
+                            .findAllByOrgId(parentOrganization.getId());
+                        userIds.addAll(orgMemberList.stream()
+                            .map(item -> String.valueOf(item.getUserId())).toList());
                     }
                 }
                 if (parentOrganization.getLeaf()) {
                     organizationRepository.updateIsLeaf(parentOrganization.getId(), false);
+                    // 查询关联用户
+                    List<OrganizationMemberEntity> orgMemberList = organizationMemberRepository
+                        .findAllByOrgId(parentOrganization.getId());
+                    userIds.addAll(orgMemberList.stream()
+                        .map(item -> String.valueOf(item.getUserId())).toList());
                 }
+                //修改基本信息
+                current.setName(threeParty.getName());
+                current.setOrder(threeParty.getOrder());
+                updateOrganizations.add(current);
                 //记录日志
                 IdentitySourceEventRecordEntity record = new IdentitySourceEventRecordEntity();
                 record.setObjectId(current.getId());
@@ -453,10 +469,17 @@ public class DefaultIdentitySourceEventPostProcessor extends AbstractIdentitySou
                 record.setUpdateBy(SYSTEM_DEFAULT_USER_NAME);
                 record.setUpdateTime(LocalDateTime.now());
                 records.add(record);
+                // 查询关联用户
+                List<OrganizationMemberEntity> orgMemberList = organizationMemberRepository
+                    .findAllByOrgId(current.getId());
+                userIds.addAll(
+                    orgMemberList.stream().map(item -> String.valueOf(item.getUserId())).toList());
             }
         }));
         //批量保存部门信息
         organizationRepository.batchUpdate(updateOrganizations);
+        // 更新es用户信息
+        userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE, String.join(",", userIds));
         //保存事件记录
         identitySourceEventRecordRepository.batchSave(records);
     }
@@ -531,6 +554,11 @@ public class DefaultIdentitySourceEventPostProcessor extends AbstractIdentitySou
      */
     private final IdentitySourceEventRecordRepository identitySourceEventRecordRepository;
 
+    /**
+     * MessagePublisher
+     */
+    private final UserMessagePublisher                userMessagePublisher;
+
     public DefaultIdentitySourceEventPostProcessor(SmsMsgEventPublish smsMsgEventPublish,
                                                    MailMsgEventPublish mailMsgEventPublish,
                                                    PasswordEncoder passwordEncoder,
@@ -544,14 +572,17 @@ public class DefaultIdentitySourceEventPostProcessor extends AbstractIdentitySou
                                                    UserRepository userRepository,
                                                    OrganizationRepository organizationRepository,
                                                    OrganizationMemberRepository organizationMemberRepository,
-                                                   IdentitySourceEventRecordRepository identitySourceEventRecordRepository) {
+                                                   IdentitySourceEventRecordRepository identitySourceEventRecordRepository,
+                                                   Storage storage,
+                                                   UserMessagePublisher userMessagePublisher) {
         super(smsMsgEventPublish, mailMsgEventPublish, passwordEncoder, passwordGenerator,
             transactionDefinition, platformTransactionManager, entityManager,
             identitySourceRepository, identitySourceSyncHistoryRepository,
-            identitySourceSyncRecordRepository);
+            identitySourceSyncRecordRepository, storage);
         this.userRepository = userRepository;
         this.organizationRepository = organizationRepository;
         this.organizationMemberRepository = organizationMemberRepository;
         this.identitySourceEventRecordRepository = identitySourceEventRecordRepository;
+        this.userMessagePublisher = userMessagePublisher;
     }
 }

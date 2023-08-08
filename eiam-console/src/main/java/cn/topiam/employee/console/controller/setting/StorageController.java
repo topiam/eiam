@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import cn.topiam.employee.audit.annotation.Audit;
-import cn.topiam.employee.audit.enums.EventType;
+import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.console.pojo.result.setting.StorageProviderConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.StorageConfigSaveParam;
 import cn.topiam.employee.console.service.setting.StorageSettingService;
@@ -35,7 +35,7 @@ import lombok.AllArgsConstructor;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import static cn.topiam.employee.common.constants.SettingConstants.SETTING_PATH;
+import static cn.topiam.employee.common.constant.SettingConstants.SETTING_PATH;
 
 /**
  * 存储配置
@@ -61,7 +61,7 @@ public class StorageController {
     @Operation(summary = "禁用存储服务")
     @Audit(type = EventType.OFF_STORAGE_SERVICE)
     @PutMapping(value = "/disable")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> disableStorage() {
         Boolean result = storageSettingsService.disableStorage();
         return ApiRestResult.ok(result);
@@ -79,7 +79,7 @@ public class StorageController {
     @Operation(summary = "保存存储服务配置")
     @Audit(type = EventType.SAVE_STORAGE_SERVICE)
     @PostMapping(value = "/save")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> saveStorageConfig(@RequestBody StorageConfigSaveParam param) {
         Boolean result = storageSettingsService.saveStorageConfig(param);
         return ApiRestResult.ok(result);
@@ -92,7 +92,7 @@ public class StorageController {
      */
     @Operation(summary = "获取存储服务配置")
     @GetMapping(value = "/config")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<StorageProviderConfigResult> getStorageConfig() {
         StorageProviderConfigResult result = storageSettingsService.getStorageConfig();
         return ApiRestResult.ok(result);

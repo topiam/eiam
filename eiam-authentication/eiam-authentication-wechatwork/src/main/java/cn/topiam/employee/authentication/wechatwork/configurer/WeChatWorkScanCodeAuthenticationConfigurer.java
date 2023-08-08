@@ -1,6 +1,6 @@
 /*
- * eiam-authentication-wechatwork - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-authentication-wechatwork - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,7 +17,7 @@
  */
 package cn.topiam.employee.authentication.wechatwork.configurer;
 
-import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
@@ -37,9 +37,8 @@ import cn.topiam.employee.common.repository.authentication.IdentityProviderRepos
  * @author TopIAM
  * Created by support@topiam.cn on  2021/9/10 22:58
  */
-public final class WeChatWorkScanCodeAuthenticationConfigurer<H extends HttpSecurityBuilder<H>>
-                                                             extends
-                                                             AbstractAuthenticationFilterConfigurer<H, WeChatWorkScanCodeAuthenticationConfigurer<H>, WeChatWorkScanCodeLoginAuthenticationFilter> {
+public final class WeChatWorkScanCodeAuthenticationConfigurer extends
+                                                              AbstractAuthenticationFilterConfigurer<HttpSecurity, WeChatWorkScanCodeAuthenticationConfigurer, WeChatWorkScanCodeLoginAuthenticationFilter> {
 
     private final IdentityProviderRepository identityProviderRepository;
     private final UserIdpService             userIdpService;
@@ -65,7 +64,7 @@ public final class WeChatWorkScanCodeAuthenticationConfigurer<H extends HttpSecu
     }
 
     @Override
-    public void init(H http) throws Exception {
+    public void init(HttpSecurity http) throws Exception {
         //微信扫码登录认证
         WeChatWorkScanCodeLoginAuthenticationFilter loginAuthenticationFilter = new WeChatWorkScanCodeLoginAuthenticationFilter(
             identityProviderRepository, userIdpService);
@@ -77,7 +76,7 @@ public final class WeChatWorkScanCodeAuthenticationConfigurer<H extends HttpSecu
     }
 
     @Override
-    public void configure(H http) throws Exception {
+    public void configure(HttpSecurity http) throws Exception {
         //企业微信扫码请求重定向
         WeChatWorkScanCodeAuthorizationRequestRedirectFilter requestRedirectFilter = new WeChatWorkScanCodeAuthorizationRequestRedirectFilter(
             identityProviderRepository);
@@ -90,5 +89,11 @@ public final class WeChatWorkScanCodeAuthenticationConfigurer<H extends HttpSecu
         return new OrRequestMatcher(
             WeChatWorkScanCodeAuthorizationRequestRedirectFilter.getRequestMatcher(),
             WeChatWorkScanCodeLoginAuthenticationFilter.getRequestMatcher());
+    }
+
+    public static WeChatWorkScanCodeAuthenticationConfigurer weChatWorkScanCode(IdentityProviderRepository identityProviderRepository,
+                                                                                UserIdpService userIdpService) {
+        return new WeChatWorkScanCodeAuthenticationConfigurer(identityProviderRepository,
+            userIdpService);
     }
 }

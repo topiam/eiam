@@ -1,6 +1,6 @@
 /*
- * eiam-audit - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-audit - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -18,6 +18,7 @@
 package cn.topiam.employee.audit.repository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -45,8 +46,16 @@ public interface AuditRepository extends LogicDeleteRepository<AuditEntity, Long
      * @param userId {@link Long}
      * @return {@link Integer}
      */
-    @Query(value = "SELECT count(*) FROM `audit` WHERE event_time BETWEEN :startTime AND :endTime AND actor_id  = :userId AND event_type = 'eiam:event:account:user_login_fail'", nativeQuery = true)
+    @Query(value = "SELECT count(*) FROM `audit` WHERE event_time BETWEEN :startTime AND :endTime AND actor_id  = :userId AND event_type = 'eiam:event:login:portal' AND event_status = 'fail'", nativeQuery = true)
     Integer countLoginFailByUserId(@Param("startTime") LocalDateTime startTime,
                                    @Param("endTime") LocalDateTime endTime,
                                    @Param("userId") Long userId);
+
+    /**
+     * 根据requestId查询审计是否已存在
+     *
+     * @param requestId {@link String}
+     * @return {@link AuditEntity}
+     */
+    Optional<AuditEntity> findByRequestId(String requestId);
 }

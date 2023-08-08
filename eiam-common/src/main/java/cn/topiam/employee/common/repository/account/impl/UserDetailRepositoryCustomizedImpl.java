@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -36,7 +36,7 @@ import cn.topiam.employee.common.repository.account.UserDetailRepositoryCustomiz
  * User Detail Repository Customized
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020/12/29 20:27
+ * Created by support@topiam.cn on  2020/12/29 21:27
  */
 @Repository
 public class UserDetailRepositoryCustomizedImpl implements UserDetailRepositoryCustomized {
@@ -49,7 +49,7 @@ public class UserDetailRepositoryCustomizedImpl implements UserDetailRepositoryC
     @Override
     public void batchSave(List<UserDetailEntity> data) {
         jdbcTemplate.batchUpdate(
-            "INSERT INTO user_detail (id_, user_id, id_type, id_card, website_,address_,create_by,create_time,update_by,update_time,remark_) values (?,?,?,?,?,?,?,?,?,?,?)",
+            "INSERT INTO user_detail (id_, user_id, id_type, id_card, website_,address_,create_by,create_time,update_by,update_time,remark_,is_deleted) values (?,?,?,?,?,?,?,?,?,?,?,?)",
             new BatchPreparedStatementSetter() {
 
                 @Override
@@ -67,6 +67,7 @@ public class UserDetailRepositoryCustomizedImpl implements UserDetailRepositoryC
                     ps.setString(9, entity.getUpdateBy());
                     ps.setTimestamp(10, Timestamp.valueOf(entity.getUpdateTime()));
                     ps.setString(11, entity.getRemark());
+                    ps.setBoolean(12, false);
                 }
 
                 @Override

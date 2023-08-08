@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,8 +20,6 @@ package cn.topiam.employee.console.controller.app;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.constraints.NotEmpty;
-
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -40,13 +38,14 @@ import lombok.RequiredArgsConstructor;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import static cn.topiam.employee.common.constants.AppConstants.APP_PATH;
+import jakarta.validation.constraints.NotEmpty;
+import static cn.topiam.employee.common.constant.AppConstants.APP_PATH;
 
 /**
  * 应用模板
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2020/9/27 19:28
+ * Created by support@topiam.cn on 2020/9/27 21:28
  */
 @Validated
 @Tag(name = "应用模板")
@@ -62,10 +61,9 @@ public class AppTemplateController {
      */
     @Operation(summary = "模板列表")
     @GetMapping(value = "/list")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
-    public ApiRestResult<List<AppTemplateResult>> getAppTemplateList(@Parameter(description = "模板类型") @RequestParam(value = "type", required = false) String type,
-                                                                     @RequestParam(value = "name", required = false) String name) {
-        return ApiRestResult.ok(templateService.getAppTemplateList(AppType.getType(type), name));
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
+    public ApiRestResult<List<AppTemplateResult>> getAppTemplateList(@RequestParam(value = "name", required = false) String name) {
+        return ApiRestResult.ok(templateService.getAppTemplateList(AppType.STANDARD, name));
     }
 
     /**
@@ -75,7 +73,7 @@ public class AppTemplateController {
      */
     @Operation(summary = "模板表单架构")
     @GetMapping(value = "/form_schema")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<List<Map>> getAppTemplateFormSchema(@Validated @Parameter(description = "模板编码") @NotEmpty(message = "模板编码不能为空") @RequestParam(value = "code", required = false) String code) {
         return ApiRestResult.ok(templateService.getAppTemplateFormSchema(code));
     }

@@ -1,6 +1,6 @@
 /*
- * eiam-portal - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-portal - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,7 +32,7 @@ import lombok.AllArgsConstructor;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import static cn.topiam.employee.support.constant.EiamConstants.API_PATH;
+import static cn.topiam.employee.common.constant.AppConstants.APP_PATH;
 
 /**
  * 应用
@@ -42,7 +42,7 @@ import static cn.topiam.employee.support.constant.EiamConstants.API_PATH;
  */
 @Tag(name = "应用管理")
 @RestController
-@RequestMapping(value = API_PATH + "/app")
+@RequestMapping(value = APP_PATH)
 @AllArgsConstructor
 public class AppController {
     /**

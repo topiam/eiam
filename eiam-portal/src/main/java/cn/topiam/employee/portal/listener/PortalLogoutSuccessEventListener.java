@@ -1,6 +1,6 @@
 /*
- * eiam-portal - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-portal - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,7 @@ import cn.topiam.employee.audit.enums.EventStatus;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.audit.event.AuditEventPublish;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
-import static cn.topiam.employee.audit.enums.EventType.LOGOUT_PORTAL;
+import static cn.topiam.employee.audit.event.type.EventType.LOGOUT_PORTAL_PORTAL;
 
 /**
  * 退出成功
@@ -52,7 +52,7 @@ public class PortalLogoutSuccessEventListener implements ApplicationListener<Log
         // 审计事件
         //@formatter:off
         List<Target> targets= Lists.newArrayList(Target.builder().type(TargetType.PORTAL).build());
-        auditEventPublish.publish(LOGOUT_PORTAL, event.getAuthentication(), EventStatus.SUCCESS,targets);
+        auditEventPublish.publish(LOGOUT_PORTAL_PORTAL, event.getAuthentication(), EventStatus.SUCCESS,targets);
         //@formatter:on
     }
 }

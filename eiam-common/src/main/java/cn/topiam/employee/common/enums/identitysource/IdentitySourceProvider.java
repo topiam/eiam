@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,7 +19,7 @@ package cn.topiam.employee.common.enums.identitysource;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-import cn.topiam.employee.common.enums.BaseEnum;
+import cn.topiam.employee.support.enums.BaseEnum;
 import cn.topiam.employee.support.web.converter.EnumConvert;
 
 /**
@@ -44,19 +44,7 @@ public enum IdentitySourceProvider implements BaseEnum {
                                                          * 飞书
                                                          */
                                                         FEISHU("feishu", "飞书",
-                                                               "飞书是字节跳动于2016年自研的新一代一站式协作平台，是保障字节跳动全球数万人高效协作的办公工具。飞书将即时沟通、日历、云文档、云盘和工作台深度整合，通过开放兼容的平台，让成员在一处即可实现高效的沟通和流畅的协作，全方位提升企业效率。"),
-
-                                                        /**
-                                                         * AD
-                                                         */
-                                                        WINDOWS_AD("windows-ad", "Windows AD",
-                                                                   "使用Windows AD身份源同步数据"),
-
-                                                        /**
-                                                         * LDAP
-                                                         */
-                                                        LDAP("ldap", "LDAP",
-                                                             "LDAP 是轻量目录访问协议，你可以理解为一个树型结构，用来存储用户和组织信息的数据库");
+                                                               "飞书是字节跳动于2016年自研的新一代一站式协作平台，是保障字节跳动全球数万人高效协作的办公工具。飞书将即时沟通、日历、云文档、云盘和工作台深度整合，通过开放兼容的平台，让成员在一处即可实现高效的沟通和流畅的协作，全方位提升企业效率。");
 
     @JsonValue
     private final String code;

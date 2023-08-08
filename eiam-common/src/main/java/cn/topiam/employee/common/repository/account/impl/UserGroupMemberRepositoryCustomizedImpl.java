@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -67,8 +67,6 @@ public class UserGroupMemberRepositoryCustomizedImpl implements
                 	`u`.data_origin,
                 	`u`.email_verified,
                 	`u`.phone_verified,
-                	`u`.shared_secret,
-                	`u`.totp_bind,
                 	`u`.auth_total,
                 	`u`.last_auth_ip,
                 	`u`.last_auth_time,
@@ -93,8 +91,8 @@ public class UserGroupMemberRepositoryCustomizedImpl implements
                 	AND ug.id_ = '%s'
                 """.formatted(query.getId(), query.getId()));
         //用户名
-        if (StringUtils.isNoneBlank(query.getUsername())) {
-            builder.append(" AND username_='%").append(query.getUsername()).append("%'");
+        if (StringUtils.isNoneBlank(query.getFullName())) {
+            builder.append(" AND full_name like '%").append(query.getFullName()).append("%'");
         }
         builder.append("GROUP BY `u`.id_");
         //@formatter:on

@@ -1,6 +1,6 @@
 /*
- * eiam-identity-source-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-identity-source-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,7 +21,7 @@ package cn.topiam.employee.identitysource.core.event;
      * 身份源配置事件类型
      *
      * @author TopIAM
-     * Created by support@topiam.cn on  2022/3/20 19:59
+     * Created by support@topiam.cn on  2022/3/20 21:59
      */
 public enum IdentitySourceEventType {
                                      /**

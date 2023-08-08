@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,12 +25,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import cn.topiam.employee.audit.annotation.Audit;
-import cn.topiam.employee.audit.enums.EventType;
+import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.common.enums.MailType;
 import cn.topiam.employee.console.pojo.result.setting.EmailProviderConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.MailProviderSaveParam;
 import cn.topiam.employee.console.service.setting.MessageSettingService;
-import cn.topiam.employee.core.context.ServerContextHelp;
+import cn.topiam.employee.core.help.ServerHelp;
 import cn.topiam.employee.core.message.MsgVariable;
 import cn.topiam.employee.core.message.mail.MailMsgEventPublish;
 import cn.topiam.employee.support.lock.Lock;
@@ -41,7 +41,7 @@ import lombok.AllArgsConstructor;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import static cn.topiam.employee.common.constants.SettingConstants.SETTING_PATH;
+import static cn.topiam.employee.common.constant.SettingConstants.SETTING_PATH;
 
 /**
  * 消息设置
@@ -68,7 +68,7 @@ public class MailProviderController {
     @Operation(summary = "保存邮件服务提供商配置")
     @Audit(type = EventType.SAVE_MAIL_SERVICE)
     @PostMapping("save")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> saveEmailProviderConfig(@RequestBody MailProviderSaveParam param) {
         Boolean result = messageSettingService.saveMailProviderConfig(param);
         return ApiRestResult.ok(result);
@@ -81,7 +81,7 @@ public class MailProviderController {
      */
     @Operation(summary = "获取邮件服务提供商配置")
     @GetMapping("config")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<EmailProviderConfigResult> getEmailProviderConfig() {
         return ApiRestResult.ok(messageSettingService.getMailProviderConfig());
     }
@@ -97,7 +97,7 @@ public class MailProviderController {
     @Operation(summary = "禁用邮件服务提供商")
     @Audit(type = EventType.OFF_MAIL_SERVICE)
     @PutMapping(value = "/disable")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> disableMailProvider() {
         Boolean result = messageSettingService.disableMailProvider();
         return ApiRestResult.ok(result);
@@ -114,16 +114,16 @@ public class MailProviderController {
     @Preview
     @Operation(summary = "发送测试邮件")
     @GetMapping(value = "/test")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> sendMail(MailType mailType, String receiver) {
         HashMap<String, Object> map = new HashMap<>(16);
         if (mailType == MailType.UPDATE_PASSWORD || mailType == MailType.UPDATE_BIND_MAIL
-            || mailType == MailType.VERIFY_EMAIL || mailType == MailType.RESET_PASSWORD) {
+            || mailType == MailType.RESET_PASSWORD) {
             map.put(MsgVariable.VERIFY_CODE, RandomStringUtils.randomAlphanumeric(6));
         }
         map.put(MsgVariable.TEST, "(TEST)");
         map.put(MsgVariable.EXPIRE_DAYS, "3");
-        map.put("verify_link", ServerContextHelp.getPortalPublicBaseUrl());
+        map.put("verify_link", ServerHelp.getPortalPublicBaseUrl());
         mailMsgEventPublish.publish(mailType, receiver, map);
         return ApiRestResult.ok();
     }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    eiam-common - Employee Identity and Access Management Program
-    Copyright © 2020-2023 TopIAM (support@topiam.cn)
+    eiam-common - Employee Identity and Access Management
+    Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -40,9 +40,12 @@
                     converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
     <conversionRule conversionWord="wEx"
                     converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
+    <conversionRule conversionWord="msg"
+                    converterClass="cn.topiam.employee.support.logback.DesensitizationMessageConverter"/>
+
     <!-- 日志格式 -->
     <property name="CONSOLE_LOG_PATTERN"
-              value="${CONSOLE_LOG_PATTERN:-%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){blue} %clr([%-5p]){green} %clr([%X{req.remoteHost}]){cyan} %clr([%X{req.requestURI}]){yellow} %clr([%X{TRACE_ID}]){red} %clr(${PID:- }){magenta} %clr(&#45;&#45;){faint}  %clr(%-40.40logger{60} Line:%-3L){cyan} %clr(:){faint}  %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx }}"/>
+              value="${CONSOLE_LOG_PATTERN:-%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){blue} %clr([%-5p]){green} %clr([%X{req.remoteHost}]){cyan} %clr([%X{req.requestURI}]){yellow} %clr([%X{TRACE_ID}]){red} %clr(${PID:- }){magenta} %clr(&#45;&#45;){faint}  %clr(%-40.40logger{60} Line:%-3L){cyan} %clr(:){faint}  %msg%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx }}"/>
     <!-- 控制台打印 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -61,12 +64,10 @@
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${ROOT}%d/%d-error-%i.log</fileNamePattern>
             <maxHistory>${MAXHISTORY}</maxHistory>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>${FILESIZE}</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxFileSize>${FILESIZE}</maxFileSize>
         </rollingPolicy>
     </appender>
     <!-- WARN 输入到文件，按日期和文件大小 -->
@@ -80,12 +81,10 @@
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${ROOT}%d/%d-warn-%i.log</fileNamePattern>
             <maxHistory>${MAXHISTORY}</maxHistory>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>${FILESIZE}</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxFileSize>${FILESIZE}</maxFileSize>
         </rollingPolicy>
     </appender>
     <!-- INFO 输入到文件，按日期和文件大小 -->
@@ -99,12 +98,10 @@
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${ROOT}%d/%d-info-%i.log</fileNamePattern>
             <maxHistory>${MAXHISTORY}</maxHistory>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>${FILESIZE}</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxFileSize>${FILESIZE}</maxFileSize>
         </rollingPolicy>
     </appender>
     <!-- DEBUG 输入到文件，按日期和文件大小 -->
@@ -118,12 +115,10 @@
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${ROOT}%d/%d-debug-%i.log</fileNamePattern>
             <maxHistory>${MAXHISTORY}</maxHistory>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>${FILESIZE}</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxFileSize>${FILESIZE}</maxFileSize>
         </rollingPolicy>
     </appender>
     <!-- TRACE 输入到文件，按日期和文件大小 -->
@@ -137,12 +132,10 @@
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${ROOT}%d/%d-trace-%i.log</fileNamePattern>
             <maxHistory>${MAXHISTORY}</maxHistory>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>${FILESIZE}</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxFileSize>${FILESIZE}</maxFileSize>
         </rollingPolicy>
     </appender>
     <!-- Logger 根目录  -->
@@ -151,13 +144,16 @@
     </root>
     <logger name="java.sql.Connection" level="DEBUG"/>
     <logger name="java.sql.Statement" level="DEBUG"/>
-    <logger name="org.springframework.jdbc.core.JdbcTemplate" level="DEBUG"/>
     <logger name="java.sql.PreparedStatement" level="DEBUG"/>
     <logger name="org.hibernate.SQL" level="DEBUG"/>
     <logger name="org.hibernate.engine.QueryParameters" level="DEBUG"/>
     <logger name="org.hibernate.engine.query.HQLQueryPlan" level="DEBUG"/>
     <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
     <logger name="org.hibernate.type.descriptor.sql.BasicExtractor" level="TRACE"/>
+    <logger name="org.springframework.jdbc.core.JdbcTemplate" level="DEBUG"/>
+    <logger name="org.springframework.security.web.access" level="TRACE"/>
+    <logger name="org.springframework.security.oauth2.server" level="TRACE"/>
+    <logger name="cn.topiam.eiam.protocol.oidc" level="TRACE"/>
     <logger name="cn.topiam.support" level="DEBUG"/>
     <logger name="cn.topiam" level="INFO">
         <appender-ref ref="ERROR-OUT"/>

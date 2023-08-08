@@ -1,6 +1,6 @@
 /*
- * eiam-authentication-qq - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-authentication-qq - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,7 +17,7 @@
  */
 package cn.topiam.employee.authentication.qq.configurer;
 
-import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
@@ -37,14 +37,14 @@ import cn.topiam.employee.common.repository.authentication.IdentityProviderRepos
  * @author TopIAM
  * Created by support@topiam.cn on  2021/9/10 22:58
  */
-public final class QqOauthAuthenticationConfigurer<H extends HttpSecurityBuilder<H>> extends
-                                                  AbstractAuthenticationFilterConfigurer<H, QqOauthAuthenticationConfigurer<H>, QqOAuth2LoginAuthenticationFilter> {
+public final class QqOauthAuthenticationConfigurer extends
+                                                   AbstractAuthenticationFilterConfigurer<HttpSecurity, QqOauthAuthenticationConfigurer, QqOAuth2LoginAuthenticationFilter> {
 
     private final IdentityProviderRepository identityProviderRepository;
     private final UserIdpService             userIdpService;
 
-    public QqOauthAuthenticationConfigurer(IdentityProviderRepository identityProviderRepository,
-                                           UserIdpService userIdpService) {
+    QqOauthAuthenticationConfigurer(IdentityProviderRepository identityProviderRepository,
+                                    UserIdpService userIdpService) {
         Assert.notNull(identityProviderRepository, "identityProviderRepository must not be null");
         Assert.notNull(userIdpService, "userIdpService must not be null");
         this.identityProviderRepository = identityProviderRepository;
@@ -64,7 +64,7 @@ public final class QqOauthAuthenticationConfigurer<H extends HttpSecurityBuilder
     }
 
     @Override
-    public void init(H http) throws Exception {
+    public void init(HttpSecurity http) throws Exception {
         //设置登录成功失败处理器
         //QQ扫码登录认证
         QqOAuth2LoginAuthenticationFilter loginAuthenticationFilter = new QqOAuth2LoginAuthenticationFilter(
@@ -76,7 +76,7 @@ public final class QqOauthAuthenticationConfigurer<H extends HttpSecurityBuilder
     }
 
     @Override
-    public void configure(H http) throws Exception {
+    public void configure(HttpSecurity http) throws Exception {
         //QQ扫码请求重定向
         QqOAuth2AuthorizationRequestRedirectFilter requestRedirectFilter = new QqOAuth2AuthorizationRequestRedirectFilter(
             identityProviderRepository);
@@ -86,8 +86,13 @@ public final class QqOauthAuthenticationConfigurer<H extends HttpSecurityBuilder
     }
 
     public RequestMatcher getRequestMatcher() {
-        //
         return new OrRequestMatcher(QqOAuth2AuthorizationRequestRedirectFilter.getRequestMatcher(),
             QqOAuth2LoginAuthenticationFilter.getRequestMatcher());
     }
+
+    public static QqOauthAuthenticationConfigurer qq(IdentityProviderRepository identityProviderRepository,
+                                                     UserIdpService userIdpService) {
+        return new QqOauthAuthenticationConfigurer(identityProviderRepository, userIdpService);
+    }
+
 }

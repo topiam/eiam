@@ -4,7 +4,7 @@ target/
 !**/src/main/**
 !**/src/test/**
 !**/target/generated-sources/**
-**/logs/**
+logs/**
 ### STS ###
 .apt_generated
 .classpath
@@ -19,7 +19,7 @@ target/
 *.iws
 *.iml
 *.ipr
-
+**/rebel.xml
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

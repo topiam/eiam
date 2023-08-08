@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,13 +19,7 @@ package cn.topiam.employee.common.entity.app;
 
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
 import org.hibernate.annotations.*;
-
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
 
 import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
 
@@ -33,6 +27,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+
+import io.hypersistence.utils.hibernate.type.json.JsonType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
@@ -49,8 +48,6 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
 @Accessors(chain = true)
 @Table(name = "app_oidc_config")
 @SQLDelete(sql = "update app_oidc_config set " + SOFT_DELETE_SET + " where id_ = ?")
-@SQLDeleteAll(sql = "update app_oidc_config set " + SOFT_DELETE_SET + " where id_ = ?")
-@TypeDef(name = "json", typeClass = JsonStringType.class)
 @Where(clause = SOFT_DELETE_WHERE)
 public class AppOidcConfigEntity extends LogicDeleteEntity<Long> {
 
@@ -64,39 +61,50 @@ public class AppOidcConfigEntity extends LogicDeleteEntity<Long> {
      * 客户端认证方式
      */
     @Column(name = "client_auth_methods")
-    @Type(type = "json")
+    @Type(JsonType.class)
     private Set<String> clientAuthMethods;
+
     /**
      * 授权类型
      */
     @Column(name = "auth_grant_types")
-    @Type(type = "json")
+    @Type(JsonType.class)
     private Set<String> authGrantTypes;
 
     /**
      * 响应类型
      */
     @Column(name = "response_types")
-    @Type(type = "json")
+    @Type(JsonType.class)
     private Set<String> responseTypes;
 
     /**
      * 重定向URIs
      */
     @Column(name = "redirect_uris")
-    @Type(type = "json")
+    @Type(JsonType.class)
     private Set<String> redirectUris;
+
+    /**
+     * 登出重定向URIs
+     */
+    @Column(name = "post_logout_redirect_uris")
+    @Type(JsonType.class)
+    private Set<String> postLogoutRedirectUris;
+
     /**
      * scopes
      */
     @Column(name = "grant_scopes")
-    @Type(type = "json")
+    @Type(JsonType.class)
     private Set<String> grantScopes;
+
     /**
      * 是否需要授权同意
      */
     @Column(name = "require_auth_consent")
     private Boolean     requireAuthConsent;
+
     /**
      * 需要PKCE
      */

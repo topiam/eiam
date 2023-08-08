@@ -1,6 +1,6 @@
 /*
- * eiam-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,11 +19,6 @@ package cn.topiam.employee.core.security.form;
 
 import java.io.IOException;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
@@ -33,13 +28,18 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.alibaba.fastjson2.JSONObject;
 
-import cn.topiam.employee.common.enums.SecretType;
-import cn.topiam.employee.support.request.ParameterRequestWrapper;
+import cn.topiam.employee.support.enums.SecretType;
 import cn.topiam.employee.support.result.ApiRestResult;
 import cn.topiam.employee.support.util.AesUtils;
+import cn.topiam.employee.support.web.servlet.ParameterRequestWrapper;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import static org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_PASSWORD_KEY;
 
-import static cn.topiam.employee.common.constants.AuthorizeConstants.FORM_LOGIN;
+import static cn.topiam.employee.common.constant.AuthorizeConstants.FORM_LOGIN;
 import static cn.topiam.employee.support.exception.enums.ExceptionStatus.EX900005;
 import static cn.topiam.employee.support.util.HttpResponseUtils.flushResponse;
 
@@ -47,7 +47,7 @@ import static cn.topiam.employee.support.util.HttpResponseUtils.flushResponse;
  * 秘钥过滤器
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2020/10/23 20:34
+ * Created by support@topiam.cn on 2020/10/23 21:34
  */
 public class FormLoginSecretFilter extends OncePerRequestFilter {
     /**

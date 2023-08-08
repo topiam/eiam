@@ -1,6 +1,6 @@
 /*
- * eiam-synchronizer - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-synchronizer - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,12 +17,14 @@
  */
 package cn.topiam.employee.synchronizer.processor;
 
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import javax.persistence.EntityManager;
-
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -43,20 +45,25 @@ import cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider;
 import cn.topiam.employee.common.repository.identitysource.IdentitySourceRepository;
 import cn.topiam.employee.common.repository.identitysource.IdentitySourceSyncHistoryRepository;
 import cn.topiam.employee.common.repository.identitysource.IdentitySourceSyncRecordRepository;
+import cn.topiam.employee.common.storage.Storage;
+import cn.topiam.employee.common.util.ViewContentType;
+import cn.topiam.employee.core.message.MsgVariable;
 import cn.topiam.employee.core.message.mail.MailMsgEventPublish;
 import cn.topiam.employee.core.message.sms.SmsMsgEventPublish;
-import cn.topiam.employee.core.security.password.PasswordGenerator;
 import cn.topiam.employee.identitysource.core.domain.User;
 import cn.topiam.employee.identitysource.core.domain.UserDetail;
 import cn.topiam.employee.identitysource.core.exception.IdentitySourceNotExistException;
+import cn.topiam.employee.support.security.password.PasswordGenerator;
 import cn.topiam.employee.support.snowflake.Snowflake;
 
+import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
-import static cn.topiam.employee.common.constants.CommonConstants.SYSTEM_DEFAULT_USER_NAME;
+
+import jakarta.persistence.EntityManager;
+import static cn.topiam.employee.common.constant.CommonConstants.SYSTEM_DEFAULT_USER_NAME;
 import static cn.topiam.employee.common.enums.UserStatus.DISABLE;
 import static cn.topiam.employee.common.enums.UserStatus.ENABLE;
 import static cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider.*;
-import static cn.topiam.employee.core.message.sms.SmsMsgEventPublish.PASSWORD;
 import static cn.topiam.employee.core.message.sms.SmsMsgEventPublish.USERNAME;
 
 /**
@@ -82,14 +89,13 @@ public class AbstractIdentitySourcePostProcessor {
         }
         UserDetail userDetail = user.getUserDetail();
         return StringUtils.equals(entity.getExternalId(), user.getUserId())
-                && StringUtils.equals(entity.getAvatar(), user.getAvatar())
                 && StringUtils.equals(Objects.isNull(entity.getIdentitySourceId()) ? null:entity.getIdentitySourceId().toString(), identitySourceId.toString())
                 && StringUtils.equals(entity.getPhoneAreaCode(), user.getPhoneAreaCode())
                 //上游返回""，数据库有唯一索引，所以""在保存的时候被变成null，这里匹配需要注意
                 && StringUtils.equals(StringUtils.isBlank(entity.getEmail()) ? null : entity.getEmail(), StringUtils.isBlank(user.getEmail()) ? null : user.getEmail())
                 //上游返回""，数据库有唯一索引，所以""在保存的时候被变成null，这里匹配需要注意
                 && StringUtils.equals(StringUtils.isBlank(entity.getPhone()) ? null : entity.getPhone(), StringUtils.isBlank(user.getPhone()) ? null : user.getPhone())
-                && Objects.equals(entity.getStatus() == UserStatus.ENABLE, user.getActive())
+                && Objects.equals(UserStatus.ENABLE.equals(entity.getStatus()), user.getActive())
                 && StringUtils.equals(entity.getFullName(),userDetail.getName())
                 && StringUtils.equals(entity.getNickName(),userDetail.getNickName());
         //@formatter:on
@@ -103,7 +109,13 @@ public class AbstractIdentitySourcePostProcessor {
      */
     protected void setUpdateUser(User user, UserEntity entity,
                                  IdentitySourceEntity identitySource) {
-        entity.setAvatar(user.getAvatar());
+        if (StringUtils.isEmpty(entity.getAvatar())) {
+            try {
+                convertAvatar(user.getAvatar(), entity);
+            } catch (Exception e) {
+                log.error("修改用户, 同步头像失败: user: [{}]", user.getUserId());
+            }
+        }
         if (ENABLE.equals(entity.getStatus()) && user.getActive()) {
             entity.setStatus(ENABLE);
         } else {
@@ -141,7 +153,15 @@ public class AbstractIdentitySourcePostProcessor {
         UserEntity entity = new UserEntity();
         entity.setId(SNOWFLAKE.nextId());
         entity.setExternalId(user.getUserId());
-        entity.setAvatar(user.getAvatar());
+        String avatar = user.getAvatar();
+        if (StringUtils.isNotEmpty(avatar)) {
+            try {
+                convertAvatar(user.getAvatar(), entity);
+            }
+            catch (Exception e) {
+                log.error("创建用户, 同步头像失败: user: [{}]", user.getUserId());
+            }
+        }
         entity.setEmail(user.getEmail());
         entity.setPhone(user.getPhone());
         entity.setFullName(user.getUserDetail().getName());
@@ -167,6 +187,26 @@ public class AbstractIdentitySourcePostProcessor {
         entity.setUpdateTime(LocalDateTime.now());
         return entity;
         //@formatter:on
+    }
+
+    /**
+     * 上游头像转换为iam系统地址
+     *
+     * @param avatar {@link String}
+     * @param entity {@link UserEntity}
+     */
+    private void convertAvatar(String avatar, UserEntity entity) throws Exception {
+        // 上传至对象存储空间
+        URL url = new URL(avatar);
+        URLConnection urlConnection = url.openConnection();
+        String contentType = urlConnection.getContentType();
+        String name = FilenameUtils.getBaseName(avatar);
+        String suffix = ViewContentType.getSuffix(contentType);
+        @Cleanup
+        InputStream inputStream = urlConnection.getInputStream();
+        if (Objects.nonNull(inputStream)) {
+            entity.setAvatar(storage.upload(name + "." + suffix, inputStream));
+        }
     }
 
     /**
@@ -262,14 +302,14 @@ public class AbstractIdentitySourcePostProcessor {
                 thirdPartyUser.getEmail(), thirdPartyUser.getPhone());
             if (StringUtils.isNotEmpty(thirdPartyUser.getEmail())) {
                 Map<String, Object> parameter = new HashMap<>(16);
-                parameter.put(PASSWORD, thirdPartyUser.getPlaintext());
+                parameter.put(MsgVariable.PASSWORD, thirdPartyUser.getPlaintext());
                 mailMsgEventPublish.publish(MailType.RESET_PASSWORD_CONFIRM,
                     thirdPartyUser.getEmail(), parameter);
             }
             if (StringUtils.isNotEmpty(thirdPartyUser.getPhone())) {
                 LinkedHashMap<String, String> parameter = new LinkedHashMap<>();
                 parameter.put(USERNAME, thirdPartyUser.getUsername());
-                parameter.put(PASSWORD, thirdPartyUser.getPlaintext());
+                parameter.put(MsgVariable.PASSWORD, thirdPartyUser.getPlaintext());
                 smsMsgEventPublish.publish(SmsType.RESET_PASSWORD_SUCCESS,
                     thirdPartyUser.getPhone(), parameter);
             }
@@ -319,6 +359,11 @@ public class AbstractIdentitySourcePostProcessor {
 
     private final MailMsgEventPublish                   mailMsgEventPublish;
 
+    /**
+     * Storage
+     */
+    private final Storage                               storage;
+
     public AbstractIdentitySourcePostProcessor(SmsMsgEventPublish smsMsgEventPublish,
                                                MailMsgEventPublish mailMsgEventPublish,
                                                PasswordEncoder passwordEncoder,
@@ -328,7 +373,8 @@ public class AbstractIdentitySourcePostProcessor {
                                                EntityManager entityManager,
                                                IdentitySourceRepository identitySourceRepository,
                                                IdentitySourceSyncHistoryRepository identitySourceSyncHistoryRepository,
-                                               IdentitySourceSyncRecordRepository identitySourceSyncRecordRepository) {
+                                               IdentitySourceSyncRecordRepository identitySourceSyncRecordRepository,
+                                               Storage storage) {
         this.smsMsgEventPublish = smsMsgEventPublish;
         this.mailMsgEventPublish = mailMsgEventPublish;
         this.passwordEncoder = passwordEncoder;
@@ -339,6 +385,7 @@ public class AbstractIdentitySourcePostProcessor {
         this.identitySourceRepository = identitySourceRepository;
         this.identitySourceSyncHistoryRepository = identitySourceSyncHistoryRepository;
         this.identitySourceSyncRecordRepository = identitySourceSyncRecordRepository;
+        this.storage = storage;
     }
 
 }

@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,6 +25,7 @@ import cn.topiam.employee.common.entity.account.query.UserListNotInGroupQuery;
 import cn.topiam.employee.common.entity.account.query.UserListQuery;
 import cn.topiam.employee.common.enums.CheckValidityType;
 import cn.topiam.employee.common.enums.UserStatus;
+import cn.topiam.employee.console.pojo.result.account.BatchUserResult;
 import cn.topiam.employee.console.pojo.result.account.UserListResult;
 import cn.topiam.employee.console.pojo.result.account.UserLoginAuditListResult;
 import cn.topiam.employee.console.pojo.result.account.UserResult;
@@ -147,13 +148,6 @@ public interface UserService {
     Boolean userParamCheck(CheckValidityType type, String value, Long id);
 
     /**
-     * 批量删除
-     *
-     * @param removeIds {@link Long}
-     */
-    void deleteBatchUser(List<Long> removeIds);
-
-    /**
      * 查看用户登录日志
      *
      * @param id {@link Long}
@@ -161,4 +155,12 @@ public interface UserService {
      * @return {@link   List}
      */
     Page<UserLoginAuditListResult> findUserLoginAuditList(Long id, PageModel pageModel);
+
+    /**
+     * 批量获取用户信息
+     *
+     * @param ids {@link List}
+     * @return {@link List}
+     */
+    List<BatchUserResult> batchGetUser(List<Long> ids);
 }

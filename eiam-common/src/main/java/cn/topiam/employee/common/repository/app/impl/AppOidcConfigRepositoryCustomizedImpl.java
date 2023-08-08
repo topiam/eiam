@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,12 +28,12 @@ import cn.topiam.employee.common.repository.app.AppOidcConfigRepositoryCustomize
 import cn.topiam.employee.common.repository.app.impl.mapper.AppOidcConfigPoMapper;
 
 import lombok.AllArgsConstructor;
-import static cn.topiam.employee.common.constants.ProtocolConstants.OIDC_CONFIG_CACHE_NAME;
+import static cn.topiam.employee.common.constant.ProtocolConstants.OIDC_CONFIG_CACHE_NAME;
 
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/8/23 20:51
+ * Created by support@topiam.cn on  2022/8/23 21:51
  */
 @Repository
 @AllArgsConstructor
@@ -52,7 +52,7 @@ public class AppOidcConfigRepositoryCustomizedImpl implements AppOidcConfigRepos
                 app.client_secret
             FROM
                 app
-                LEFT JOIN app_oidc_config aoc ON app.id_ = aoc.app_id and aoc.is_deleted = '0'
+                INNER JOIN app_oidc_config aoc ON app.id_ = aoc.app_id and aoc.is_deleted = '0'
             WHERE
                 app.is_deleted = '0'
             """;

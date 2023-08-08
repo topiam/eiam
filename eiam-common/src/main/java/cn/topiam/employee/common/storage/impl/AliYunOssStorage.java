@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,13 +17,14 @@
  */
 package cn.topiam.employee.common.storage.impl;
 
+import java.io.InputStream;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-import javax.validation.constraints.NotEmpty;
-
 import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.web.multipart.MultipartFile;
+import org.jetbrains.annotations.NotNull;
 
 import com.aliyun.oss.HttpMethod;
 import com.aliyun.oss.OSS;
@@ -32,7 +33,7 @@ import com.aliyun.oss.model.CreateBucketRequest;
 import com.aliyun.oss.model.GeneratePresignedUrlRequest;
 import com.aliyun.oss.model.PutObjectRequest;
 
-import cn.topiam.employee.common.crypto.Encrypt;
+import cn.topiam.employee.common.jackjson.encrypt.JsonPropertyEncrypt;
 import cn.topiam.employee.common.storage.AbstractStorage;
 import cn.topiam.employee.common.storage.StorageConfig;
 import cn.topiam.employee.common.storage.StorageProviderException;
@@ -41,11 +42,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 
+import jakarta.validation.constraints.NotEmpty;
+import static cn.topiam.employee.common.constant.StorageConstants.URL_REGEXP;
+
 /**
  * 阿里云OSS
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/10 20:28
+ * Created by support@topiam.cn on  2021/11/10 21:28
  */
 @Slf4j
 public class AliYunOssStorage extends AbstractStorage {
@@ -75,18 +79,19 @@ public class AliYunOssStorage extends AbstractStorage {
     }
 
     @Override
-    public String upload(String fileName, MultipartFile file) throws StorageProviderException {
+    public String upload(@NotNull String fileName,
+                         InputStream inputStream) throws StorageProviderException {
         try {
-            super.upload(fileName, file);
-            String key = aliYunConfig.getLocation() + SEPARATOR + getFileName(fileName, file);
+            super.upload(fileName, inputStream);
+            String key = aliYunConfig.getLocation() + SEPARATOR + getFileName(fileName);
             // 创建PutObjectRequest对象。
             // 依次填写Bucket名称（例如examplebucket）和Object完整路径（例如exampledir/exampleobject.txt）。Object完整路径中不能包含Bucket名称。
             PutObjectRequest putObjectRequest = new PutObjectRequest(aliYunConfig.getBucket(), key,
-                file.getInputStream());
+                inputStream);
             // 上传字符串
             ossClient.putObject(putObjectRequest);
             return aliYunConfig.getDomain() + SEPARATOR + aliYunConfig.getBucket() + SEPARATOR
-                   + key;
+                   + URLEncoder.encode(key, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         } catch (Exception e) {
             log.error("ali yun upload exception: {}", e.getMessage(), e);
             throw new StorageProviderException("ali yun upload exception", e);
@@ -130,12 +135,13 @@ public class AliYunOssStorage extends AbstractStorage {
         /**
          * accessKeySecret
          */
-        @Encrypt
+        @JsonPropertyEncrypt
         @NotEmpty(message = "AccessKeySecret不能为空")
         private String accessKeySecret;
         /**
          * endpoint
          */
+        @org.hibernate.validator.constraints.URL(message = "Endpoint格式不正确", regexp = URL_REGEXP)
         @NotEmpty(message = "Endpoint不能为空")
         private String endpoint;
         /**

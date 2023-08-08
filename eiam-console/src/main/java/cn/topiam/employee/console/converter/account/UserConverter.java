@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -18,40 +18,32 @@
 package cn.topiam.employee.console.converter.account;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.sort.FieldSortBuilder;
-import org.elasticsearch.search.sort.SortBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
-import org.elasticsearch.search.sort.SortOrder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
+import org.springframework.data.elasticsearch.client.elc.Queries;
 import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import cn.topiam.employee.audit.entity.AuditElasticSearchEntity;
 import cn.topiam.employee.audit.entity.Event;
-import cn.topiam.employee.audit.enums.EventType;
-import cn.topiam.employee.audit.event.type.AppEventType;
-import cn.topiam.employee.audit.event.type.AuthenticationEventType;
+import cn.topiam.employee.audit.event.type.EventType;
+import cn.topiam.employee.audit.event.type.PortalEventType;
+import cn.topiam.employee.common.constant.CommonConstants;
 import cn.topiam.employee.common.entity.account.UserDetailEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.entity.account.po.UserPO;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.repository.app.AppRepository;
+import cn.topiam.employee.console.pojo.result.account.BatchUserResult;
 import cn.topiam.employee.console.pojo.result.account.UserListResult;
 import cn.topiam.employee.console.pojo.result.account.UserLoginAuditListResult;
 import cn.topiam.employee.console.pojo.result.account.UserResult;
@@ -60,20 +52,30 @@ import cn.topiam.employee.console.pojo.update.account.UserUpdateParam;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
+
+import co.elastic.clients.elasticsearch._types.FieldSort;
+import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.SortOptions;
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
 import static cn.topiam.employee.audit.entity.Actor.ACTOR_ID;
 import static cn.topiam.employee.audit.entity.Event.EVENT_TIME;
 import static cn.topiam.employee.audit.entity.Event.EVENT_TYPE;
-import static cn.topiam.employee.audit.enums.EventType.LOGIN_PORTAL;
 import static cn.topiam.employee.audit.enums.TargetType.PORTAL;
+import static cn.topiam.employee.audit.event.type.EventType.LOGIN_PORTAL;
 import static cn.topiam.employee.audit.service.converter.AuditDataConverter.SORT_EVENT_TIME;
-import static cn.topiam.employee.support.util.PhoneUtils.getPhoneAreaCode;
-import static cn.topiam.employee.support.util.PhoneUtils.getPhoneNumber;
+import static cn.topiam.employee.common.util.ImageAvatarUtils.bufferedImageToBase64;
+import static cn.topiam.employee.common.util.ImageAvatarUtils.generateAvatarImg;
+import static cn.topiam.employee.support.util.PhoneNumberUtils.getPhoneAreaCode;
+import static cn.topiam.employee.support.util.PhoneNumberUtils.getPhoneNumber;
 
 /**
  * 用户映射
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2020/8/14 20:45
+ * Created by support@topiam.cn on 2020/8/14 21:45
  */
 @Mapper(componentModel = "spring")
 public interface UserConverter {
@@ -90,6 +92,13 @@ public interface UserConverter {
             List<UserListResult> list = new ArrayList<>();
             for (UserPO user : page.getContent()) {
                 UserListResult userListResult = userPoConvertToUserListResult(user);
+                if (org.apache.commons.lang3.StringUtils.isEmpty(userListResult.getAvatar())) {
+                    userListResult.setAvatar(bufferedImageToBase64(
+                        generateAvatarImg(org.apache.commons.lang3.StringUtils.defaultString(
+                            userListResult.getFullName(), userListResult.getUsername()))));
+                } else {
+                    userListResult.setAvatar(userListResult.getAvatar());
+                }
                 if (StringUtils.hasText(user.getPhone())) {
                     userListResult.setPhone((StringUtils.hasText(user.getPhoneAreaCode())
                         ? "+" + user.getPhoneAreaCode()
@@ -135,15 +144,15 @@ public interface UserConverter {
         }
         userEntity.setFullName(param.getFullName());
         userEntity.setNickName(param.getNickName());
-        userEntity.setLastUpdatePasswordTime(LocalDateTime.now());
+        userEntity.setLastUpdatePasswordTime(java.time.LocalDateTime.now());
         userEntity.setStatus(cn.topiam.employee.common.enums.UserStatus.ENABLE);
-        userEntity.setAvatar("https://joeschmoe.io/api/v1/random");
+        userEntity.setAvatar(CommonConstants.getRandomAvatar());
         userEntity.setDataOrigin(cn.topiam.employee.common.enums.DataOrigin.INPUT);
         userEntity.setExpireDate(
             java.util.Objects.isNull(param.getExpireDate()) ? java.time.LocalDate.of(2116, 12, 31)
                 : param.getExpireDate());
         userEntity.setAuthTotal(0L);
-        userEntity.setPassword(ApplicationContextHelp
+        userEntity.setPassword(cn.topiam.employee.support.context.ApplicationContextHelp
             .getBean(org.springframework.security.crypto.password.PasswordEncoder.class)
             .encode(param.getPassword()));
 
@@ -165,8 +174,11 @@ public interface UserConverter {
             userEntity.setId(Long.parseLong(param.getId()));
         }
         userEntity.setRemark(param.getRemark());
-        userEntity.setEmail(param.getEmail());
-        if (StringUtils.hasText(param.getPhone())) {
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(param.getEmail())) {
+            userEntity.setEmail(param.getEmail());
+            userEntity.setEmailVerified(Boolean.TRUE);
+        }
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(param.getPhone())) {
             userEntity.setPhone(getPhoneNumber(param.getPhone()));
             userEntity.setPhoneAreaCode(getPhoneAreaCode(param.getPhone()));
         }
@@ -214,6 +226,7 @@ public interface UserConverter {
      * @param param {@link UserUpdateParam}
      * @return {@link UserDetailEntity}
      */
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "website", ignore = true)
     @Mapping(target = "idType", ignore = true)
     @Mapping(target = "updateTime", ignore = true)
@@ -229,6 +242,7 @@ public interface UserConverter {
      * @param param {@link  UserCreateParam}
      * @return {@link  UserDetailEntity}
      */
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "website", ignore = true)
     @Mapping(target = "idType", ignore = true)
     @Mapping(target = "userId", ignore = true)
@@ -246,35 +260,44 @@ public interface UserConverter {
      *
      * @param id   {@link Long}
      * @param page {@link PageModel}
-     * @return {@link NativeSearchQuery}
+     * @return {@link NativeQuery}
      */
-    default NativeSearchQuery auditListRequestConvertToNativeSearchQuery(Long id, PageModel page) {
+    default NativeQuery auditListRequestConvertToNativeQuery(Long id, PageModel page) {
         //构建查询 builder下有 must、should 以及 mustNot 相当于 sql 中的 and、or 以及 not
-        BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
-        Collection<SortBuilder<?>> fieldSortBuilders = Lists.newArrayList();
+        BoolQuery.Builder queryBuilder = QueryBuilders.bool();
+        List<SortOptions> fieldSortBuilders = Lists.newArrayList();
         //事件类型
-        Set<String> set = Sets.newHashSet();
-        set.add(LOGIN_PORTAL.getCode());
-        set.add(EventType.APP_SSO.getCode());
-        queryBuilder.must(QueryBuilders.termsQuery(EVENT_TYPE, set));
+        List<FieldValue> set = new ArrayList<>();
+        set.add(FieldValue.of(LOGIN_PORTAL.getCode()));
+        set.add(FieldValue.of(EventType.APP_SSO.getCode()));
+        queryBuilder.must(QueryBuilders.terms(builder -> {
+            builder.terms(new TermsQueryField.Builder().value(set).build());
+            builder.field(EVENT_TYPE);
+            return builder;
+        }));
         //用户id
-        queryBuilder.must(QueryBuilders.queryStringQuery(id.toString()).field(ACTOR_ID));
+        queryBuilder.must(Queries.termQueryAsQuery(ACTOR_ID, id.toString()));
         //字段排序
         page.getSorts().forEach(sort -> {
-            FieldSortBuilder eventTimeSortBuilder = SortBuilders.fieldSort(EVENT_TIME)
-                .order(SortOrder.DESC);
+            co.elastic.clients.elasticsearch._types.SortOrder sortOrder;
             if (org.apache.commons.lang3.StringUtils.equals(sort.getSorter(), SORT_EVENT_TIME)) {
                 if (sort.getAsc()) {
-                    eventTimeSortBuilder.order(SortOrder.ASC);
+                    sortOrder = co.elastic.clients.elasticsearch._types.SortOrder.Asc;
+                } else {
+                    sortOrder = SortOrder.Desc;
                 }
+            } else {
+                sortOrder = SortOrder.Desc;
             }
+            SortOptions eventTimeSortBuilder = SortOptions
+                .of(s -> s.field(FieldSort.of(f -> f.field(EVENT_TIME).order(sortOrder))));
             fieldSortBuilders.add(eventTimeSortBuilder);
         });
-        return new NativeSearchQueryBuilder().withQuery(queryBuilder)
+        return new NativeQueryBuilder().withQuery(queryBuilder.build()._toQuery())
             //分页参数
             .withPageable(PageRequest.of(page.getCurrent(), page.getPageSize()))
             //排序
-            .withSorts(fieldSortBuilders).build();
+            .withSort(fieldSortBuilders).build();
     }
 
     /**
@@ -293,14 +316,14 @@ public interface UserConverter {
             Event event = content.getEvent();
             UserLoginAuditListResult result = new UserLoginAuditListResult();
             //单点登录
-            if (event.getType().getCode().equals(AppEventType.APP_SSO.getCode())) {
+            if (event.getType().getCode().equals(PortalEventType.APP_SSO.getCode())) {
                 result.setAppName(getAppName(content.getTargets().get(0).getId()));
             }
             //登录门户
-            if (event.getType().getCode().equals(AuthenticationEventType.LOGIN_PORTAL.getCode())) {
+            if (event.getType().getCode().equals(PortalEventType.LOGIN_PORTAL.getCode())) {
                 result.setAppName(PORTAL.getDesc());
             }
-            result.setEventTime(LocalDateTime.ofInstant(event.getTime(), ZoneId.systemDefault()));
+            result.setEventTime(event.getTime());
             result.setClientIp(content.getGeoLocation().getIp());
             result.setBrowser(content.getUserAgent().getBrowser());
             result.setLocation(content.getGeoLocation().getCityName());
@@ -346,4 +369,23 @@ public interface UserConverter {
         return app.getName();
     }
 
+    /**
+     * 实体转换为批量获取用户结果
+     *
+     * @param organization {@link UserEntity}
+     * @return {@link BatchUserResult}
+     */
+    @Mapping(target = "idCard", ignore = true)
+    @Mapping(target = "address", ignore = true)
+    BatchUserResult entityConvertToBatchGetUserResult(UserEntity organization);
+
+    /**
+     * 实体转换为批量获取用户结果
+     *
+     * @param list {@link List}
+     * @return {@link List}
+     */
+    default List<BatchUserResult> entityConvertToBatchGetUserResult(List<UserEntity> list) {
+        return list.stream().map(this::entityConvertToBatchGetUserResult).toList();
+    }
 }

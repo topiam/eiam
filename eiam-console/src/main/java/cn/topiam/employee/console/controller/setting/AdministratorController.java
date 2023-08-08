@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,20 +17,16 @@
  */
 package cn.topiam.employee.console.controller.setting;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import cn.topiam.employee.audit.annotation.Audit;
-import cn.topiam.employee.audit.enums.EventType;
+import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.common.enums.CheckValidityType;
 import cn.topiam.employee.common.enums.UserStatus;
 import cn.topiam.employee.console.pojo.query.setting.AdministratorListQuery;
-import cn.topiam.employee.console.pojo.result.app.AppPermissionRoleListResult;
 import cn.topiam.employee.console.pojo.result.setting.AdministratorListResult;
 import cn.topiam.employee.console.pojo.result.setting.AdministratorResult;
 import cn.topiam.employee.console.pojo.save.setting.AdministratorCreateParam;
@@ -47,7 +43,9 @@ import lombok.AllArgsConstructor;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import static cn.topiam.employee.common.constants.SettingConstants.SETTING_PATH;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import static cn.topiam.employee.common.constant.SettingConstants.SETTING_PATH;
 
 /**
  * 管理员
@@ -56,7 +54,7 @@ import static cn.topiam.employee.common.constants.SettingConstants.SETTING_PATH;
  * Created by support@topiam.cn on  2021/11/13 22:09
  */
 @Validated
-@Tag(name = "平台管理员")
+@Tag(name = "系统管理员")
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = SETTING_PATH
@@ -66,11 +64,11 @@ public class AdministratorController {
      * 获取管理员列表
      *
      * @param model {@link PageModel}
-     * @return {@link AppPermissionRoleListResult}
+     * @return {@link AdministratorListResult}
      */
     @Operation(summary = "获取管理员列表")
     @GetMapping(value = "/list")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Page<AdministratorListResult>> getAdministratorList(PageModel model,
                                                                              AdministratorListQuery query) {
         Page<AdministratorListResult> result = administratorService.getAdministratorList(model,
@@ -89,7 +87,7 @@ public class AdministratorController {
     @Operation(summary = "创建管理员")
     @Audit(type = EventType.ADD_ADMINISTRATOR)
     @PostMapping(value = "/create")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> createAdministrator(@RequestBody @Validated AdministratorCreateParam param) {
         Boolean result = administratorService.createAdministrator(param);
         return ApiRestResult.<Boolean> builder().result(result).build();
@@ -105,10 +103,9 @@ public class AdministratorController {
     @Preview
     @Operation(summary = "修改管理员")
     @Audit(type = EventType.UPDATE_ADMINISTRATOR)
-    @PutMapping(value = "/update/{id}")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
-    public ApiRestResult<Boolean> updateAdministrator(@PathVariable(value = "id") String id,
-                                                      @RequestBody @Validated AdministratorUpdateParam param) {
+    @PutMapping(value = "/update")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
+    public ApiRestResult<Boolean> updateAdministrator(@RequestBody @Validated AdministratorUpdateParam param) {
         Boolean result = administratorService.updateAdministrator(param);
         return ApiRestResult.<Boolean> builder().result(result).build();
     }
@@ -123,8 +120,8 @@ public class AdministratorController {
     @Preview
     @Operation(summary = "删除管理员")
     @DeleteMapping(value = "/delete/{id}")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     @Audit(type = EventType.DELETE_ADMINISTRATOR)
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
     public ApiRestResult<Boolean> deleteAdministrator(@PathVariable(value = "id") String id) {
         Boolean result = administratorService.deleteAdministrator(id);
         return ApiRestResult.<Boolean> builder().result(result).build();
@@ -141,7 +138,7 @@ public class AdministratorController {
     @Operation(summary = "启用管理员")
     @Audit(type = EventType.ENABLE_ADMINISTRATOR)
     @PutMapping(value = "/enable/{id}")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> enableAdministrator(@PathVariable(value = "id") String id) {
         Boolean result = administratorService.updateAdministratorStatus(id, UserStatus.ENABLE);
         return ApiRestResult.<Boolean> builder().result(result).build();
@@ -158,7 +155,7 @@ public class AdministratorController {
     @Operation(summary = "禁用管理员")
     @Audit(type = EventType.DISABLE_ADMINISTRATOR)
     @PutMapping(value = "/disable/{id}")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> disableAdministrator(@PathVariable(value = "id") String id) {
         Boolean result = administratorService.updateAdministratorStatus(id, UserStatus.DISABLE);
         return ApiRestResult.<Boolean> builder().result(result).build();
@@ -176,7 +173,7 @@ public class AdministratorController {
     @Operation(summary = "重置管理员密码")
     @Audit(type = EventType.RESET_ADMINISTRATOR_PASSWORD)
     @PutMapping(value = "/reset_password")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> resetAdministratorPassword(@NotEmpty(message = "ID不能为空") @Parameter(description = "ID") String id,
                                                              @NotEmpty(message = "密码不能为空") @Parameter(description = "密码") String password) {
         Boolean result = administratorService.resetAdministratorPassword(id, password);
@@ -191,7 +188,7 @@ public class AdministratorController {
      */
     @Operation(summary = "获取管理员信息")
     @GetMapping(value = "/get/{id}")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<AdministratorResult> getAdministrator(@PathVariable(value = "id") String id) {
         AdministratorResult result = administratorService.getAdministrator(id);
         //返回
@@ -205,7 +202,7 @@ public class AdministratorController {
      */
     @Operation(summary = "参数有效性验证")
     @GetMapping(value = "/param_check")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> administratorParamCheck(@Parameter(description = "验证类型") @NotNull(message = "验证类型不能为空") CheckValidityType type,
                                                           @Parameter(description = "值") @NotEmpty(message = "验证值不能为空") String value,
                                                           @Parameter(description = "ID") Long id) {

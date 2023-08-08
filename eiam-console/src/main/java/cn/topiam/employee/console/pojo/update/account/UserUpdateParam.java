@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,12 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-import javax.validation.constraints.NotBlank;
-
 import cn.topiam.employee.common.enums.UserStatus;
 
 import lombok.Data;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * 编辑用户入参
@@ -76,7 +75,6 @@ public class UserUpdateParam implements Serializable {
      * 昵称
      */
     @Schema(description = "昵称")
-    @NotBlank(message = "昵称不能为空")
     private String            nickName;
 
     /**

@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,8 +19,6 @@ package cn.topiam.employee.console.controller.setting;
 
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
-
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -38,7 +36,8 @@ import lombok.AllArgsConstructor;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import static cn.topiam.employee.common.constants.SettingConstants.SETTING_PATH;
+import jakarta.validation.constraints.NotNull;
+import static cn.topiam.employee.common.constant.SettingConstants.SETTING_PATH;
 
 /**
  * 短信模版配置
@@ -61,7 +60,7 @@ public class SmsTemplateController {
      */
     @GetMapping(value = "/list")
     @Operation(summary = "获取短信模板列表")
-    @PreAuthorize(value = "authenticated and hasAuthority(T(cn.topiam.employee.core.security.authorization.Roles).ADMIN)")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<List<SmsTemplateListResult>> getSmsTemplateList(@NotNull(message = "语言类型不能为空") @Parameter(description = "语言") Language language) {
         List<SmsTemplateListResult> list = smsTemplateService.getSmsTemplateList(language);
         return ApiRestResult.<List<SmsTemplateListResult>> builder().result(list).build();

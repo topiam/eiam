@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,17 +21,22 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 
+import cn.topiam.employee.common.entity.account.UserElasticSearchEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
+import cn.topiam.employee.common.entity.account.po.UserEsPO;
 import cn.topiam.employee.common.entity.account.po.UserPO;
 import cn.topiam.employee.common.entity.account.query.UserListNotInGroupQuery;
 import cn.topiam.employee.common.entity.account.query.UserListQuery;
+
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 
 /**
  * User Repository Customized
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020/12/29 20:27
+ * Created by support@topiam.cn on  2020/12/29 21:27
  */
 public interface UserRepositoryCustomized {
     /**
@@ -102,4 +107,29 @@ public interface UserRepositoryCustomized {
      */
     void batchUpdate(List<UserEntity> list);
 
+    /**
+     * 获取用户列表
+     *
+     * @param idList {@link  List}
+     * @return {@link List}
+     */
+    List<UserEsPO> getUserList(List<String> idList);
+
+    /**
+     * 查询es用户数据
+     *
+     * @param userIndex {@link IndexCoordinates}
+     * @return {@link List}
+     */
+    List<UserElasticSearchEntity> getAllUserElasticSearchEntity(IndexCoordinates userIndex);
+
+    /**
+     * 查询es用户数据
+     *
+     * @param userIndex {@link IndexCoordinates}
+     * @param queryBuilder {@link Query}
+     * @return {@link List}
+     */
+    List<UserElasticSearchEntity> getAllUserElasticSearchEntity(IndexCoordinates userIndex,
+                                                                Query queryBuilder);
 }

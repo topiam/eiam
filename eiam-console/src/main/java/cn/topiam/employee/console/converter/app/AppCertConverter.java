@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -48,8 +48,7 @@ public interface AppCertConverter {
      */
     default Predicate queryAppCertListParamConvertToPredicate(AppCertQuery query) {
         QAppCertEntity cert = QAppCertEntity.appCertEntity;
-        Predicate predicate = ExpressionUtils.and(cert.isNotNull(),
-            cert.isDeleted.eq(Boolean.FALSE));
+        Predicate predicate = ExpressionUtils.and(cert.isNotNull(), cert.deleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = StringUtils.isBlank(query.getAppId()) ? predicate : ExpressionUtils.and(predicate, cert.appId.eq(Long.valueOf(query.getAppId())));

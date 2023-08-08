@@ -1,6 +1,6 @@
 /*
- * eiam-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,13 +17,13 @@
  */
 package cn.topiam.employee.core.configuration;
 
-import org.springdoc.core.GroupedOpenApi;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import cn.topiam.employee.common.constants.AuditConstants;
-import static cn.topiam.employee.common.constants.StorageConstants.STORAGE_GROUP_NAME;
-import static cn.topiam.employee.common.constants.StorageConstants.STORAGE_PATH;
+import cn.topiam.employee.common.constant.AuditConstants;
+import static cn.topiam.employee.common.constant.StorageConstants.STORAGE_GROUP_NAME;
+import static cn.topiam.employee.common.constant.StorageConstants.STORAGE_PATH;
 import static cn.topiam.employee.support.constant.EiamConstants.CONTEXT_ENDPOINT;
 import static cn.topiam.employee.support.constant.EiamConstants.CONTEXT_ENDPOINT_GROUP_NAME;
 
@@ -31,7 +31,7 @@ import static cn.topiam.employee.support.constant.EiamConstants.CONTEXT_ENDPOINT
  * ApiConfiguration
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2019/5/16 20:28
+ * Created by support@topiam.cn on 2019/5/16 21:28
  */
 @Configuration
 public class EiamApiConfiguration {

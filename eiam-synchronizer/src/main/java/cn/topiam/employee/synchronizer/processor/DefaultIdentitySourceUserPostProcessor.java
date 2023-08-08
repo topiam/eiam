@@ -1,6 +1,6 @@
 /*
- * eiam-synchronizer - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-synchronizer - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,8 +21,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
-
-import javax.persistence.EntityManager;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -52,19 +51,24 @@ import cn.topiam.employee.common.repository.account.*;
 import cn.topiam.employee.common.repository.identitysource.IdentitySourceRepository;
 import cn.topiam.employee.common.repository.identitysource.IdentitySourceSyncHistoryRepository;
 import cn.topiam.employee.common.repository.identitysource.IdentitySourceSyncRecordRepository;
+import cn.topiam.employee.common.storage.Storage;
 import cn.topiam.employee.core.message.mail.MailMsgEventPublish;
 import cn.topiam.employee.core.message.sms.SmsMsgEventPublish;
-import cn.topiam.employee.core.security.password.PasswordGenerator;
+import cn.topiam.employee.core.mq.UserMessagePublisher;
+import cn.topiam.employee.core.mq.UserMessageTag;
 import cn.topiam.employee.identitysource.core.domain.User;
 import cn.topiam.employee.identitysource.core.processor.IdentitySourceSyncUserPostProcessor;
 import cn.topiam.employee.support.repository.domain.IdEntity;
+import cn.topiam.employee.support.security.password.PasswordGenerator;
 
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+
+import jakarta.persistence.EntityManager;
 import static java.util.stream.Collectors.toSet;
 
-import static cn.topiam.employee.common.constants.CommonConstants.SYSTEM_DEFAULT_USER_NAME;
+import static cn.topiam.employee.common.constant.CommonConstants.SYSTEM_DEFAULT_USER_NAME;
 
 /**
  * 身份源数据 pull post 处理器
@@ -96,23 +100,31 @@ public class DefaultIdentitySourceUserPostProcessor extends AbstractIdentitySour
             processData = processData(identitySource, initData);
             //校验数据
             validateData(processData);
+            String batchEsUserId = "";
             //批量保存用户
             if (!CollectionUtils.isEmpty(processData.getCreateUsers())) {
-                userRepository.batchSave(Lists.newArrayList(processData.getCreateUsers()));
+                List<UserEntity> createUserList = Lists.newArrayList(processData.getCreateUsers());
+                batchEsUserId += createUserList.stream().map(user -> String.valueOf(user.getId()))
+                    .collect(Collectors.joining(","));
+                userRepository.batchSave(createUserList);
             }
             //批量更新用户
             if (!CollectionUtils.isEmpty(processData.getUpdateUsers())) {
-                userRepository.batchUpdate(Lists.newArrayList(processData.getUpdateUsers()));
+                List<UserEntity> updateUserList = Lists.newArrayList(processData.getUpdateUsers());
+                batchEsUserId += updateUserList.stream().map(user -> String.valueOf(user.getId()))
+                    .collect(Collectors.joining(","));
+                userRepository.batchUpdate(updateUserList);
             }
             //保存组织成员关系
             if (!CollectionUtils.isEmpty(processData.getCreateOrganizationMembers())) {
-                organizationMemberRepository
-                    .batchSave(Lists.newArrayList(processData.getCreateOrganizationMembers()));
+                List<OrganizationMemberEntity> organizationMemberEntityList = Lists
+                    .newArrayList(processData.getCreateOrganizationMembers());
+                organizationMemberRepository.batchSave(organizationMemberEntityList);
             }
             //删除相关数据
+            List<Long> deleteUserIds = new ArrayList<>();
             if (!CollectionUtils.isEmpty(processData.getDeleteUsers())) {
-                List<Long> deleteUserIds = processData.getDeleteUsers().stream()
-                    .map(IdEntity::getId).toList();
+                deleteUserIds = processData.getDeleteUsers().stream().map(IdEntity::getId).toList();
                 //删除用户
                 userRepository.deleteAllById(deleteUserIds);
                 //删除用户详情
@@ -136,7 +148,13 @@ public class DefaultIdentitySourceUserPostProcessor extends AbstractIdentitySour
             saveSyncHistoryRecord(history.getId(), processData);
             //提交事务
             platformTransactionManager.commit(transactionStatus);
-
+            // 异步更新ES用户数据
+            userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE, batchEsUserId);
+            // 异步删除用户ES数据
+            if (!CollectionUtils.isEmpty(processData.getDeleteUsers())) {
+                userMessagePublisher.sendUserChangeMessage(UserMessageTag.DELETE,
+                    deleteUserIds.stream().map(String::valueOf).collect(Collectors.joining(",")));
+            }
             if (!CollectionUtils.isEmpty(processData.getCreateUsers())) {
                 // 发送密码通知
                 publishMessage(Lists.newArrayList(processData.getCreateUsers()));
@@ -408,7 +426,7 @@ public class DefaultIdentitySourceUserPostProcessor extends AbstractIdentitySour
                 if (!equalsUser(thirdPartyUser, currentUser,identitySource.getId())) {
                     //设置更新用户数据
                     setUpdateUser(thirdPartyUser, currentUser,identitySource);
-                    log.info("上游用户:[{}]对应系统用户:[{}]({})存在,用户信息不一致,修改用户信息:{}", thirdPartyUser.getUserId(), currentUser.getUsername(), currentUser.getId(), JSONObject.toJSONString(currentUser));
+                    log.info("上游用户:[{}]对应系统用户:[{}]({})存在,用户信息不一致,修改用户信息：{}", thirdPartyUser.getUserId(), currentUser.getUsername(), currentUser.getId(), JSONObject.toJSONString(currentUser));
                     updateUsers.add(currentUser);
                 } else {
                     skipUsers.add(SkipUser.builder().user(currentUser).actionType(IdentitySourceActionType.UPDATE).status(SyncStatus.SKIP).reason( "用户信息一致").build());
@@ -716,6 +734,11 @@ public class DefaultIdentitySourceUserPostProcessor extends AbstractIdentitySour
      */
     private final UserGroupMemberRepository    userGroupMemberRepository;
 
+    /**
+     * MessagePublisher
+     */
+    private final UserMessagePublisher         userMessagePublisher;
+
     public DefaultIdentitySourceUserPostProcessor(SmsMsgEventPublish smsMsgEventPublish,
                                                   MailMsgEventPublish mailMsgEventPublish,
                                                   TransactionDefinition transactionDefinition,
@@ -730,15 +753,18 @@ public class DefaultIdentitySourceUserPostProcessor extends AbstractIdentitySour
                                                   UserDetailRepository userDetailRepository,
                                                   OrganizationMemberRepository organizationMemberRepository,
                                                   UserGroupMemberRepository userGroupMemberRepository,
-                                                  OrganizationRepository organizationRepository) {
+                                                  OrganizationRepository organizationRepository,
+                                                  Storage storage,
+                                                  UserMessagePublisher userMessagePublisher) {
         super(smsMsgEventPublish, mailMsgEventPublish, passwordEncoder, passwordGenerator,
             transactionDefinition, platformTransactionManager, entityManager,
             identitySourceRepository, identitySourceSyncHistoryRepository,
-            identitySourceSyncRecordRepository);
+            identitySourceSyncRecordRepository, storage);
         this.userRepository = userRepository;
         this.userDetailRepository = userDetailRepository;
         this.organizationMemberRepository = organizationMemberRepository;
         this.userGroupMemberRepository = userGroupMemberRepository;
         this.organizationRepository = organizationRepository;
+        this.userMessagePublisher = userMessagePublisher;
     }
 }

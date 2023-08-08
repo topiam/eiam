@@ -1,6 +1,6 @@
 /*
- * eiam-portal - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-portal - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,8 +22,8 @@ import java.util.List;
 
 import org.mapstruct.Mapper;
 
-import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
-import cn.topiam.employee.portal.pojo.result.LoginConfigResult;
+import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
+import cn.topiam.employee.portal.pojo.result.IdentityProviderResult;
 
 /**
  * AuthenticationConverter
@@ -40,10 +40,10 @@ public interface LoginConfigConverter {
      * @param list {@link List}
      * @return {@link List}
      */
-    default List<LoginConfigResult.Idps> entityConverterToLoginConfigListResult(List<IdentityProviderEntity> list) {
-        List<LoginConfigResult.Idps> result = new ArrayList<>();
+    default List<IdentityProviderResult> entityConverterToLoginConfigListResult(List<IdentityProviderEntity> list) {
+        List<IdentityProviderResult> result = new ArrayList<>();
         for (IdentityProviderEntity entity : list) {
-            LoginConfigResult.Idps idp = new LoginConfigResult.Idps();
+            IdentityProviderResult idp = new IdentityProviderResult();
             idp.setCode(entity.getCode());
             idp.setName(entity.getName());
             idp.setType(entity.getType());

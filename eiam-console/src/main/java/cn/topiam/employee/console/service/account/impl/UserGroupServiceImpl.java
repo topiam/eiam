@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,10 +21,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.google.common.collect.Lists;
 import com.querydsl.core.types.ExpressionUtils;
@@ -47,6 +49,8 @@ import cn.topiam.employee.console.pojo.result.account.UserGroupMemberListResult;
 import cn.topiam.employee.console.pojo.save.account.UserGroupCreateParam;
 import cn.topiam.employee.console.pojo.update.account.UserGroupUpdateParam;
 import cn.topiam.employee.console.service.account.UserGroupService;
+import cn.topiam.employee.core.mq.UserMessagePublisher;
+import cn.topiam.employee.core.mq.UserMessageTag;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
@@ -79,7 +83,8 @@ public class UserGroupServiceImpl implements UserGroupService {
         //查询条件
         Predicate predicate = userGroupConverter.queryUserGroupListParamConvertToPredicate(query);
         //分页条件
-        QPageRequest request = QPageRequest.of(page.getCurrent(), page.getPageSize());
+        QPageRequest request = QPageRequest.of(page.getCurrent(), page.getPageSize(),
+            QUserGroupEntity.userGroupEntity.updateTime.desc());
         //查询映射
         org.springframework.data.domain.Page<UserGroupEntity> list = userGroupRepository
             .findAll(predicate, request);
@@ -113,6 +118,14 @@ public class UserGroupServiceImpl implements UserGroupService {
         UserGroupEntity details = getUserGroup(Long.valueOf(param.getId()));
         BeanUtils.merge(entity, details, LAST_MODIFIED_TIME, LAST_MODIFIED_BY);
         userGroupRepository.save(details);
+        // 更新用户es信息
+        List<UserGroupMemberEntity> userGroupMemberList = userGroupMemberRepository
+            .findByGroupId(details.getId());
+        if (!CollectionUtils.isEmpty(userGroupMemberList)) {
+            userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE,
+                userGroupMemberList.stream().map(item -> String.valueOf(item.getUserId()))
+                    .collect(Collectors.joining(",")));
+        }
         AuditContext.setTarget(
             Target.builder().id(details.getId().toString()).type(TargetType.USER_GROUP).build());
         return true;
@@ -129,14 +142,16 @@ public class UserGroupServiceImpl implements UserGroupService {
         Optional<UserGroupEntity> optional = userGroupRepository.findById(Long.valueOf(id));
         //用户不存在
         if (optional.isEmpty()) {
-            AuditContext.setContent("操作失败，用户组不存在");
+            AuditContext.setContent("删除用户组失败，用户组不存在");
             log.warn(AuditContext.getContent());
             throw new TopIamException(AuditContext.getContent());
         }
         //用户组存在用户
         Long count = getUserGroupMemberCount(id);
         if (count > 0) {
-            throw new RuntimeException("删除用户组失败，当前用户组下存在用户");
+            AuditContext.setContent("删除用户组失败，当前用户组下存在用户");
+            log.warn(AuditContext.getContent());
+            throw new RuntimeException(AuditContext.getContent());
         }
         userGroupRepository.deleteById(Long.valueOf(id));
         AuditContext.setTarget(Target.builder().id(id).type(TargetType.USER_GROUP).build());
@@ -168,6 +183,8 @@ public class UserGroupServiceImpl implements UserGroupService {
     public Boolean removeMember(String id, String userId) {
         //查询关联关系
         userGroupMemberRepository.deleteByGroupIdAndUserId(Long.valueOf(id), Long.valueOf(userId));
+        // 更新用户es用户组信息
+        userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE, userId);
         AuditContext.setTarget(Target.builder().id(userId).type(TargetType.USER).build(),
             Target.builder().id(id).type(TargetType.USER_GROUP).build());
         return true;
@@ -198,7 +215,8 @@ public class UserGroupServiceImpl implements UserGroupService {
         });
         //添加
         userGroupMemberRepository.saveAll(list);
-
+        // 更新用户es用户组信息
+        userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE, String.join(",", userIds));
         List<Target> targets = new ArrayList<>(Arrays.stream(userIds)
             .map(i -> Target.builder().id(i).type(TargetType.USER).build()).toList());
 
@@ -236,7 +254,8 @@ public class UserGroupServiceImpl implements UserGroupService {
         }
         userIds.forEach(userId -> userGroupMemberRepository
             .deleteByGroupIdAndUserId(Long.valueOf(id), Long.valueOf(userId)));
-
+        // 更新用户es用户组信息
+        userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE, String.join(",", userIds));
         List<Target> targets = new ArrayList<>(userIds.stream()
             .map(i -> Target.builder().id(i).type(TargetType.USER).build()).toList());
 
@@ -250,13 +269,13 @@ public class UserGroupServiceImpl implements UserGroupService {
         //条件
         QUserEntity user = QUserEntity.userEntity;
         QUserGroupEntity qUserGroup = QUserGroupEntity.userGroupEntity;
-        Predicate predicate = ExpressionUtils.and(user.isNotNull(),
-            user.isDeleted.eq(Boolean.FALSE));
+        Predicate predicate = ExpressionUtils.and(user.isNotNull(), user.deleted.eq(Boolean.FALSE));
         predicate = ExpressionUtils.and(predicate, qUserGroup.id.eq(Long.valueOf(groupId)));
         //构造查询
         JPAQuery<Long> jpaQuery = jpaQueryFactory.selectFrom(user).select(user.count())
             .innerJoin(QUserGroupMemberEntity.userGroupMemberEntity)
-            .on(user.id.eq(QUserGroupMemberEntity.userGroupMemberEntity.userId))
+            .on(user.id.eq(QUserGroupMemberEntity.userGroupMemberEntity.userId)
+                .and(QUserGroupMemberEntity.userGroupMemberEntity.deleted.eq(Boolean.FALSE)))
             .innerJoin(qUserGroup)
             .on(qUserGroup.id.eq(QUserGroupMemberEntity.userGroupMemberEntity.groupId))
             .where(predicate);
@@ -267,16 +286,24 @@ public class UserGroupServiceImpl implements UserGroupService {
      * JPAQueryFactory
      */
     private final JPAQueryFactory           jpaQueryFactory;
+
     /**
      * 用户组数据映射
      */
     private final UserGroupConverter        userGroupConverter;
+
     /**
      * UserGroupRepository
      */
     private final UserGroupRepository       userGroupRepository;
+
     /**
      * UserGroupMemberRepository
      */
     private final UserGroupMemberRepository userGroupMemberRepository;
+
+    /**
+     * MessagePublisher
+     */
+    private final UserMessagePublisher      userMessagePublisher;
 }

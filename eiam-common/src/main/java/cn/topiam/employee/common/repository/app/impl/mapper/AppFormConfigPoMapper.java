@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,6 +30,7 @@ import com.alibaba.fastjson2.JSON;
 import cn.topiam.employee.common.entity.app.AppFormConfigEntity;
 import cn.topiam.employee.common.entity.app.po.AppFormConfigPO;
 import cn.topiam.employee.common.enums.app.AuthorizationType;
+import cn.topiam.employee.common.enums.app.FormEncryptType;
 import cn.topiam.employee.common.enums.app.FormSubmitType;
 import cn.topiam.employee.common.enums.app.InitLoginType;
 
@@ -69,6 +70,10 @@ public class AppFormConfigPoMapper implements RowMapper<AppFormConfigPO> {
         appForm.setLoginUrl(rs.getString("login_url"));
         appForm.setUsernameField(rs.getString("username_field"));
         appForm.setPasswordField(rs.getString("password_field"));
+        appForm.setPasswordEncryptType(FormEncryptType.getType(rs.getString("password_encrypt_type")));
+        appForm.setPasswordEncryptKey(rs.getString("password_encrypt_key"));
+        appForm.setUsernameEncryptType(FormEncryptType.getType(rs.getString("username_encrypt_type")));
+        appForm.setUsernameEncryptKey(rs.getString("username_encrypt_key"));
         String submitType = rs.getString("submit_type");
         if (!Objects.isNull(submitType)){
             appForm.setSubmitType(FormSubmitType.getType(submitType));

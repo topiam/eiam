@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,15 +17,27 @@
  */
 package cn.topiam.employee.console.service.setting.impl;
 
+import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.topiam.employee.common.entity.setting.SettingEntity;
+import cn.topiam.employee.common.jackjson.encrypt.EncryptionModule;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
+import cn.topiam.employee.common.storage.StorageConfig;
 import cn.topiam.employee.console.converter.setting.StorageSettingConverter;
 import cn.topiam.employee.console.pojo.result.setting.StorageProviderConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.StorageConfigSaveParam;
 import cn.topiam.employee.console.service.setting.StorageSettingService;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.exception.TopIamException;
+import static cn.topiam.employee.core.help.SettingHelp.addImgSrcHostContentSecurityPolicy;
 import static cn.topiam.employee.core.setting.constant.StorageProviderSettingConstants.STORAGE_BEAN_NAME;
 import static cn.topiam.employee.core.setting.constant.StorageProviderSettingConstants.STORAGE_PROVIDER_KEY;
 
@@ -37,6 +49,8 @@ import static cn.topiam.employee.core.setting.constant.StorageProviderSettingCon
  */
 @Service
 public class StorageSettingServiceImpl extends SettingServiceImpl implements StorageSettingService {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * 更改存储启用禁用
@@ -58,11 +72,24 @@ public class StorageSettingServiceImpl extends SettingServiceImpl implements Sto
      * @return {@link Boolean}
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean saveStorageConfig(StorageConfigSaveParam param) {
-        SettingEntity entity = storageSettingsConverter.storageConfigSaveParamToEntity(param);
-        Boolean setting = saveSetting(entity);
-        ApplicationContextHelp.refresh(STORAGE_BEAN_NAME);
-        return setting;
+        try {
+            SettingEntity entity = storageSettingsConverter.storageConfigSaveParamToEntity(param);
+            Boolean setting = saveSetting(entity);
+            ApplicationContextHelp.refresh(STORAGE_BEAN_NAME);
+
+            //操作内容安全策略
+            ObjectMapper objectMapper = EncryptionModule.deserializerEncrypt();
+            StorageConfig config = objectMapper.readValue(entity.getValue(), StorageConfig.class);
+            if (!Objects.isNull(Objects.requireNonNull(config).getConfig())) {
+                addImgSrcHostContentSecurityPolicy(config.getConfig().getDomain());
+            }
+            return setting;
+        } catch (JsonProcessingException e) {
+            logger.error("保存存储配置发生异常", e);
+            throw new TopIamException("保存存储配置发生异常");
+        }
     }
 
     /**
@@ -77,10 +104,13 @@ public class StorageSettingServiceImpl extends SettingServiceImpl implements Sto
     }
 
     private final StorageSettingConverter storageSettingsConverter;
+    private final SettingRepository       settingRepository;
 
     public StorageSettingServiceImpl(SettingRepository settingsRepository,
-                                     StorageSettingConverter storageSettingsConverter) {
+                                     StorageSettingConverter storageSettingsConverter,
+                                     SettingRepository settingRepository) {
         super(settingsRepository);
         this.storageSettingsConverter = storageSettingsConverter;
+        this.settingRepository = settingRepository;
     }
 }

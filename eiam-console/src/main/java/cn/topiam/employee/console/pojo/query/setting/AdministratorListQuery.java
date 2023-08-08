@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,7 +17,7 @@
  */
 package cn.topiam.employee.console.pojo.query.setting;
 
-import org.springdoc.api.annotations.ParameterObject;
+import org.springdoc.core.annotations.ParameterObject;
 
 import lombok.Data;
 
@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/14 19:36
+ * Created by support@topiam.cn on  2021/11/14 21:36
  */
 @Data
 @Schema(description = "管理员列表查询")
@@ -37,14 +37,17 @@ public class AdministratorListQuery {
      */
     @Parameter(description = "用户名")
     private String username;
+
     /**
      * phone
      */
     @Parameter(description = "手机号码")
     private String phone;
+
     /**
      * email
      */
     @Parameter(description = "邮箱地址")
     private String email;
+
 }

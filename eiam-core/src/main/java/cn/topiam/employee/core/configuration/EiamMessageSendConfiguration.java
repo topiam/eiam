@@ -1,6 +1,6 @@
 /*
- * eiam-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,13 +24,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 
-import com.alibaba.fastjson2.JSONObject;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cn.topiam.employee.common.constants.SettingConstants;
+import cn.topiam.employee.common.constant.SettingConstants;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.entity.setting.config.SmsConfig;
+import cn.topiam.employee.common.jackjson.encrypt.EncryptionModule;
 import cn.topiam.employee.common.message.mail.DefaultMailProviderSendImpl;
-import cn.topiam.employee.common.message.mail.MailNoneProviderSend;
 import cn.topiam.employee.common.message.mail.MailProviderConfig;
 import cn.topiam.employee.common.message.mail.MailProviderSend;
 import cn.topiam.employee.common.message.sms.SmsNoneProviderSend;
@@ -38,9 +40,9 @@ import cn.topiam.employee.common.message.sms.SmsProviderSend;
 import cn.topiam.employee.common.message.sms.SmsSendProviderFactory;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
 import cn.topiam.employee.core.setting.constant.MessageSettingConstants;
-import static cn.topiam.employee.common.constants.ConfigBeanNameConstants.MAIL_PROVIDER_SEND;
-import static cn.topiam.employee.common.constants.ConfigBeanNameConstants.SMS_PROVIDER_SEND;
-import static cn.topiam.employee.core.context.SettingContextHelp.getSmsProviderConfig;
+import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.MAIL_PROVIDER_SEND;
+import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.SMS_PROVIDER_SEND;
+import static cn.topiam.employee.core.help.SettingHelp.getSmsProviderConfig;
 
 /**
  * 消息发送配置
@@ -77,13 +79,23 @@ public class EiamMessageSendConfiguration {
     @RefreshScope
     public MailProviderSend mailProviderSend(SettingRepository messageSettingRepository,
                                              TaskExecutor taskExecutor) {
-        SettingEntity setting = messageSettingRepository
-            .findByName(MessageSettingConstants.MESSAGE_PROVIDER_EMAIL);
-        if (!Objects.isNull(setting) && !SettingConstants.NOT_CONFIG.equals(setting.getValue())) {
-            String value = setting.getValue();
-            return new DefaultMailProviderSendImpl(
-                JSONObject.parseObject(value, MailProviderConfig.class), taskExecutor);
+        try {
+            SettingEntity setting = messageSettingRepository
+                .findByName(MessageSettingConstants.MESSAGE_PROVIDER_EMAIL);
+            if (!Objects.isNull(setting)
+                && !SettingConstants.NOT_CONFIG.equals(setting.getValue())) {
+                String value = setting.getValue();
+                ObjectMapper objectMapper = EncryptionModule.deserializerDecrypt();
+                // 指定序列化输入的类型
+                objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
+                    ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+                // 根据提供商序列化
+                MailProviderConfig config = objectMapper.readValue(value, MailProviderConfig.class);
+                return new DefaultMailProviderSendImpl(config, taskExecutor);
+            }
+            return null;
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
-        return new MailNoneProviderSend();
     }
 }

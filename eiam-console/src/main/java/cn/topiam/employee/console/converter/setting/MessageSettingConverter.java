@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,21 +19,18 @@ package cn.topiam.employee.console.converter.setting;
 
 import java.util.Objects;
 
-import javax.validation.ValidationException;
-
 import org.mapstruct.Mapper;
 
-import com.alibaba.fastjson2.JSONObject;
-import com.alibaba.fastjson2.JSONWriter;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cn.topiam.employee.common.crypto.EncryptContextHelp;
-import cn.topiam.employee.common.crypto.EncryptionModule;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.entity.setting.config.SmsConfig;
 import cn.topiam.employee.common.enums.MessageNoticeChannel;
+import cn.topiam.employee.common.jackjson.encrypt.EncryptContextHelp;
+import cn.topiam.employee.common.jackjson.encrypt.EncryptionModule;
 import cn.topiam.employee.common.message.enums.MailProvider;
 import cn.topiam.employee.common.message.enums.MailSafetyType;
 import cn.topiam.employee.common.message.enums.SmsProvider;
@@ -46,8 +43,11 @@ import cn.topiam.employee.console.pojo.result.setting.EmailProviderConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.MailProviderSaveParam;
 import cn.topiam.employee.console.pojo.save.setting.SmsProviderSaveParam;
 import cn.topiam.employee.console.pojo.setting.SmsProviderConfigResult;
-import cn.topiam.employee.support.validation.ValidationHelp;
-import static cn.topiam.employee.core.context.SettingContextHelp.getSmsProviderConfig;
+import cn.topiam.employee.support.exception.TopIamException;
+import cn.topiam.employee.support.validation.ValidationUtils;
+
+import jakarta.validation.ValidationException;
+import static cn.topiam.employee.core.help.SettingHelp.getSmsProviderConfig;
 import static cn.topiam.employee.core.setting.constant.MessageSettingConstants.MESSAGE_PROVIDER_EMAIL;
 import static cn.topiam.employee.core.setting.constant.MessageSettingConstants.MESSAGE_SMS_PROVIDER;
 
@@ -69,60 +69,52 @@ public interface MessageSettingConverter {
         SettingEntity entity = new SettingEntity();
         entity.setName(MESSAGE_PROVIDER_EMAIL);
         String desc = MessageNoticeChannel.MAIL.getDesc();
-        ValidationHelp.ValidationResult<?> validationResult = null;
         //@formatter:off
-        MailProviderConfig.MailProviderConfigBuilder builder =
-                MailProviderConfig.builder()
-                        .username(param.getUsername())
-                        .secret(EncryptContextHelp.encrypt(param.getSecret()));
         //根据提供商封装参数
-        if (MailProvider.CUSTOMIZE.equals(param.getProvider())) {
-            desc = desc + MailProvider.CUSTOMIZE.getName();
-            builder
-                    .provider(MailProvider.CUSTOMIZE)
-                    .smtpUrl(param.getSmtpUrl())
-                    .port(param.getPort())
-                    .safetyType(param.getSafetyType());
-            validationResult = ValidationHelp.validateEntity(builder.build());
-        }
-        //阿里云
-        if (MailProvider.ALIYUN.equals(param.getProvider())) {
-            desc = desc + MailProvider.ALIYUN.getName();
-            builder
-                    .provider(MailProvider.ALIYUN)
-                    .smtpUrl(MailProvider.ALIYUN.getSmtpUrl())
-                    .port(MailProvider.ALIYUN.getSslPort())
-                    .safetyType(MailSafetyType.SSL);
-            validationResult = ValidationHelp.validateEntity(builder.build());
-        }
-        //腾讯
-        if (MailProvider.TENCENT.equals(param.getProvider())) {
-            desc = desc + MailProvider.TENCENT.getName();
-            builder
-                    .provider(MailProvider.TENCENT)
-                    .smtpUrl(MailProvider.TENCENT.getSmtpUrl())
-                    .port(MailProvider.TENCENT.getSslPort())
-                    .safetyType(MailSafetyType.SSL);
-            validationResult = ValidationHelp.validateEntity(builder.build());
-        }
-        //网易
-        if (MailProvider.NETEASE.equals(param.getProvider())) {
-            desc = desc + MailProvider.NETEASE.getName();
-            builder
-                    .provider(MailProvider.NETEASE)
-                    .smtpUrl(MailProvider.NETEASE.getSmtpUrl())
-                    .port(MailProvider.NETEASE.getSslPort())
-                    .safetyType(MailSafetyType.SSL);
-            validationResult = ValidationHelp.validateEntity(builder.build());
-        }
+        desc = desc + param.getProvider().getName();
+        MailProviderConfig mailProviderConfig = buildMailProviderConfig(param);
         // 验证
+        ValidationUtils.ValidationResult<?> validationResult = ValidationUtils.validateEntity(mailProviderConfig);
         if (Objects.requireNonNull(validationResult).isHasErrors()) {
             throw new ValidationException(validationResult.getMessage());
         }
-        entity.setValue(JSONObject.toJSONString(builder.build(), JSONWriter.Feature.WriteClassName));
+        try {
+            ObjectMapper objectMapper = EncryptionModule.deserializerEncrypt();
+            objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
+                    ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+            String value = objectMapper.writeValueAsString(mailProviderConfig);
+            entity.setValue(value);
+        }catch (JsonProcessingException e){
+            throw new TopIamException("配置转换异常",e.getMessage());
+        }
         entity.setDesc(desc);
         //@formatter:no
         return entity;
+    }
+
+    /**
+     * 构建邮件提供商信息
+     *
+     * @param param {@link MailProviderSaveParam}
+     * @return {@link MailProviderConfig}
+     */
+    private static MailProviderConfig buildMailProviderConfig(MailProviderSaveParam param) {
+        MailProviderConfig mailProviderConfig = new MailProviderConfig();
+        mailProviderConfig.setUsername(param.getUsername());
+        mailProviderConfig.setSecret(EncryptContextHelp.encrypt(param.getSecret()));
+        // 封装提供商信息
+        mailProviderConfig.setProvider(param.getProvider());
+        if (MailProvider.CUSTOMIZE == param.getProvider()) {
+            mailProviderConfig.setSmtpUrl(param.getSmtpUrl());
+            mailProviderConfig.setPort(param.getPort());
+            mailProviderConfig.setSafetyType(param.getSafetyType());
+        }
+        else {
+            mailProviderConfig.setSmtpUrl(param.getProvider().getSmtpUrl());
+            mailProviderConfig.setPort(param.getProvider().getSslPort());
+            mailProviderConfig.setSafetyType(MailSafetyType.SSL);
+        }
+        return mailProviderConfig;
     }
 
     /**
@@ -132,7 +124,7 @@ public interface MessageSettingConverter {
      * @return {@link SettingEntity}
      */
     default SettingEntity smsProviderConfigToEntity(SmsProviderSaveParam param) {
-        ValidationHelp.ValidationResult<?> validationResult = null;
+        ValidationUtils.ValidationResult<?> validationResult = null;
         String desc = MessageNoticeChannel.SMS.getDesc();
         SmsProviderConfig providerConfig = new SmsProviderConfig();
         ObjectMapper objectMapper = EncryptionModule.deserializerEncrypt();
@@ -140,21 +132,21 @@ public interface MessageSettingConverter {
             // 七牛云
             if (SmsProvider.QINIU.equals(param.getProvider())) {
                 QiNiuSmsProviderConfig smsConfig = objectMapper.readValue(param.getConfig().toJSONString(), QiNiuSmsProviderConfig.class);
-                validationResult = ValidationHelp.validateEntity(smsConfig);
+                validationResult = ValidationUtils.validateEntity(smsConfig);
                 providerConfig = smsConfig;
                 desc = desc + SmsProvider.QINIU.getDesc();
             }
             // 阿里云
             else if (SmsProvider.ALIYUN.equals(param.getProvider())) {
                 AliyunSmsProviderConfig smsConfig = objectMapper.readValue(param.getConfig().toJSONString(), AliyunSmsProviderConfig.class);
-                validationResult = ValidationHelp.validateEntity(smsConfig);
+                validationResult = ValidationUtils.validateEntity(smsConfig);
                 providerConfig = smsConfig;
                 desc = desc + SmsProvider.ALIYUN.getDesc();
             }
             // 腾讯云
             else if (SmsProvider.TENCENT.equals(param.getProvider())) {
                 TencentSmsProviderConfig smsConfig = objectMapper.readValue(param.getConfig().toJSONString(), TencentSmsProviderConfig.class);
-                validationResult = ValidationHelp.validateEntity(smsConfig);
+                validationResult = ValidationUtils.validateEntity(smsConfig);
                 providerConfig = smsConfig;
                 desc = desc + SmsProvider.TENCENT.getDesc();
             }
@@ -190,23 +182,31 @@ public interface MessageSettingConverter {
      * @return {@link EmailProviderConfigResult}
      */
     default EmailProviderConfigResult entityToMailProviderConfig(SettingEntity entity) {
-        //没有数据，默认未启用
-        if (Objects.isNull(entity)) {
-            return EmailProviderConfigResult.builder().enabled(false).build();
-        }
-        String config = entity.getValue();
-        // 根据提供商序列化
-        MailProviderConfig setting = JSONObject.parseObject(config, MailProviderConfig.class);
         //@formatter:off
-        return EmailProviderConfigResult.builder()
-                .provider(setting.getProvider())
-                .port(setting.getPort())
-                .safetyType(setting.getSafetyType())
-                .username(setting.getUsername())
-                .secret(EncryptContextHelp.decrypt(setting.getSecret()))
-                .smtpUrl(setting.getSmtpUrl())
-                .enabled(true)
-                .build();
+        try {
+           //没有数据，默认未启用
+           if (Objects.isNull(entity)) {
+               return EmailProviderConfigResult.builder().enabled(false).build();
+           }
+           String config = entity.getValue();
+           // 根据提供商序列化
+           ObjectMapper objectMapper = EncryptionModule.deserializerDecrypt();
+           // 指定序列化输入的类型
+           objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(), ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+           // 根据提供商序列化
+           MailProviderConfig setting = objectMapper.readValue(config, MailProviderConfig.class);
+           return EmailProviderConfigResult.builder()
+                   .provider(setting.getProvider())
+                   .port(setting.getPort())
+                   .safetyType(setting.getSafetyType())
+                   .username(setting.getUsername())
+                   .secret(setting.getSecret())
+                   .smtpUrl(setting.getSmtpUrl())
+                   .enabled(true)
+                   .build();
+        } catch (JacksonException e) {
+            throw new RuntimeException(e);
+        }
         //@formatter:on
     }
 

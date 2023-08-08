@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.app.AppAccessPolicyEntity;
-import cn.topiam.employee.common.enums.PolicySubjectType;
+import cn.topiam.employee.common.enums.app.AppPolicySubjectType;
 import cn.topiam.employee.support.repository.LogicDeleteRepository;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 
@@ -35,7 +35,7 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
  * 应用授权策略 Repository
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/4 19:54
+ * Created by support@topiam.cn on  2022/6/4 21:54
  */
 @Repository
 public interface AppAccessPolicyRepository extends
@@ -58,10 +58,10 @@ public interface AppAccessPolicyRepository extends
      *
      * @param appId {@link Long}
      * @param subjectId {@link String}
-     * @param subjectType {@link PolicySubjectType}
+     * @param subjectType {@link AppPolicySubjectType}
      * @return {@link AppAccessPolicyEntity}
      */
     Optional<AppAccessPolicyEntity> findByAppIdAndSubjectIdAndSubjectType(Long appId,
                                                                           String subjectId,
-                                                                          PolicySubjectType subjectType);
+                                                                          AppPolicySubjectType subjectType);
 }

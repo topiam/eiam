@@ -1,6 +1,6 @@
 /*
- * eiam-authentication-wechat - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-authentication-wechat - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,7 +17,7 @@
  */
 package cn.topiam.employee.authentication.wechat.configurer;
 
-import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
@@ -37,14 +37,14 @@ import cn.topiam.employee.common.repository.authentication.IdentityProviderRepos
  * @author TopIAM
  * Created by support@topiam.cn on  2021/9/10 22:58
  */
-public final class WeChatScanCodeAuthenticationConfigurer<H extends HttpSecurityBuilder<H>> extends
-                                                         AbstractAuthenticationFilterConfigurer<H, WeChatScanCodeAuthenticationConfigurer<H>, WeChatScanCodeLoginAuthenticationFilter> {
+public final class WeChatScanCodeAuthenticationConfigurer extends
+                                                          AbstractAuthenticationFilterConfigurer<HttpSecurity, WeChatScanCodeAuthenticationConfigurer, WeChatScanCodeLoginAuthenticationFilter> {
 
     private final IdentityProviderRepository identityProviderRepository;
     private final UserIdpService             userIdpService;
 
-    public WeChatScanCodeAuthenticationConfigurer(IdentityProviderRepository identityProviderRepository,
-                                                  UserIdpService userIdpService) {
+    WeChatScanCodeAuthenticationConfigurer(IdentityProviderRepository identityProviderRepository,
+                                           UserIdpService userIdpService) {
         Assert.notNull(identityProviderRepository, "identityProviderRepository must not be null");
         Assert.notNull(userIdpService, "userIdpService must not be null");
         this.identityProviderRepository = identityProviderRepository;
@@ -64,7 +64,7 @@ public final class WeChatScanCodeAuthenticationConfigurer<H extends HttpSecurity
     }
 
     @Override
-    public void init(H http) throws Exception {
+    public void init(HttpSecurity http) throws Exception {
         //微信扫码登录认证
         WeChatScanCodeLoginAuthenticationFilter loginAuthenticationFilter = new WeChatScanCodeLoginAuthenticationFilter(
             identityProviderRepository, userIdpService);
@@ -76,7 +76,7 @@ public final class WeChatScanCodeAuthenticationConfigurer<H extends HttpSecurity
     }
 
     @Override
-    public void configure(H http) throws Exception {
+    public void configure(HttpSecurity http) throws Exception {
         //微信扫码请求重定向
         WeChatScanCodeAuthorizationRequestRedirectFilter requestRedirectFilter = new WeChatScanCodeAuthorizationRequestRedirectFilter(
             identityProviderRepository);
@@ -89,5 +89,11 @@ public final class WeChatScanCodeAuthenticationConfigurer<H extends HttpSecurity
         return new OrRequestMatcher(
             WeChatScanCodeAuthorizationRequestRedirectFilter.getRequestMatcher(),
             WeChatScanCodeLoginAuthenticationFilter.getRequestMatcher());
+    }
+
+    public static WeChatScanCodeAuthenticationConfigurer weChatScanCode(IdentityProviderRepository identityProviderRepository,
+                                                                        UserIdpService userIdpService) {
+        return new WeChatScanCodeAuthenticationConfigurer(identityProviderRepository,
+            userIdpService);
     }
 }

@@ -1,0 +1,46 @@
+<!--
+
+    eiam-common - Employee Identity and Access Management
+    Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<div style="padding: 35px;">
+    <table cellpadding="0" align="center"
+           style="width: 600px; margin: 0 auto; text-align: left; position: relative; border-radius: 5px;font-size: 18px; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; line-height: 1.5; box-shadow: rgb(153, 153, 153) 0 0 5px; border-collapse: collapse; background: #fff initial initial initial initial;">
+        <tbody>
+        <tr>
+            <th valign="middle"
+                style="height: 25px; line-height: 25px; padding: 15px 35px; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgba(18, 24, 37, 0.87); background-color: #484f60; border-radius: 5px 5px 0 0;">
+                <font size="5" style="color: rgb(255, 255, 255); ">${client_name} </font>
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <div style="padding:25px 35px 40px; background-color:#fff;">
+                    <h2 style="margin: 5px 0; ">
+                        <font color="#333333" style="line-height: 20px; ">
+                            <font style="line-height: 22px; " size="4">亲爱的用户：${user_email}</font>
+                        </font>
+                    </h2>
+                    <p>您正在登录TopIAM系统, 您的验证码为：<font style="color: #4a8db8">${verify_code}</font>，，该验证码${expire_time}分钟内有效，请勿泄露于他人。</p>
+                    <p align="right">${client_name} 官方团队</p>
+                    <p align="right">${time}</p>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

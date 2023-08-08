@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,7 +37,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  */
 @Data
 @Builder
-@Schema(description = "存储配置查询结果")
+@Schema(description = "存储配置查询响应")
 public class StorageProviderConfigResult implements Serializable {
 
     @Serial

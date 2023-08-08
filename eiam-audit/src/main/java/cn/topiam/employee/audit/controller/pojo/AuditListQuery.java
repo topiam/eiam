@@ -1,6 +1,6 @@
 /*
- * eiam-audit - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-audit - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,18 +21,17 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
-
-import org.springdoc.api.annotations.ParameterObject;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import cn.topiam.employee.audit.enums.EventType;
-import cn.topiam.employee.common.enums.UserType;
+import cn.topiam.employee.audit.enums.EventStatus;
+import cn.topiam.employee.audit.event.type.EventType;
 
 import lombok.Data;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIME_FORMATTER_PATTERN;
 
 /**
@@ -51,6 +50,7 @@ public class AuditListQuery implements Serializable {
      */
     @Parameter(description = "用户名")
     private String          username;
+
     /**
      * 审计类型
      */
@@ -62,7 +62,13 @@ public class AuditListQuery implements Serializable {
      */
     @NotNull(message = "用户类型不能为空")
     @Parameter(description = "用户类型")
-    private UserType        userType;
+    private String          userType;
+
+    /**
+     * 事件状态
+     */
+    @Schema(description = "事件状态")
+    private EventStatus     eventStatus;
 
     /**
      * 事件开始时间

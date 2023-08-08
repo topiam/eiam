@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.validation.ConstraintViolationException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -36,7 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 
-import cn.topiam.employee.common.constants.CommonConstants;
+import cn.topiam.employee.common.constant.CommonConstants;
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceEntity;
 import cn.topiam.employee.common.entity.identitysource.QIdentitySourceEntity;
 import cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider;
@@ -47,7 +45,7 @@ import cn.topiam.employee.console.pojo.result.identitysource.IdentitySourceListR
 import cn.topiam.employee.console.pojo.save.identitysource.IdentitySourceConfigSaveParam;
 import cn.topiam.employee.console.pojo.save.identitysource.IdentitySourceCreateParam;
 import cn.topiam.employee.console.pojo.update.identity.IdentitySourceUpdateParam;
-import cn.topiam.employee.core.context.ServerContextHelp;
+import cn.topiam.employee.core.help.ServerHelp;
 import cn.topiam.employee.identitysource.core.IdentitySourceConfig;
 import cn.topiam.employee.identitysource.dingtalk.DingTalkConfig;
 import cn.topiam.employee.identitysource.feishu.FeiShuConfig;
@@ -55,7 +53,9 @@ import cn.topiam.employee.identitysource.wechatwork.WeChatWorkConfig;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.repository.page.domain.QueryDslRequest;
-import cn.topiam.employee.support.validation.ValidationHelp;
+import cn.topiam.employee.support.validation.ValidationUtils;
+
+import jakarta.validation.ConstraintViolationException;
 
 /**
  * 身份源转换器
@@ -112,6 +112,7 @@ public interface IdentitySourceConverter {
      * @param param {@link IdentitySourceCreateParam}
      * @return {@link IdentitySourceEntity}
      */
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "code", expression = "java(org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric(32).toLowerCase())")
     @Mapping(target = "configured", expression = "java(Boolean.FALSE)")
     @Mapping(target = "enabled", expression = "java(Boolean.TRUE)")
@@ -154,6 +155,7 @@ public interface IdentitySourceConverter {
      * @param param {@link IdentitySourceCreateParam}
      * @return {@link IdentitySourceEntity}
      */
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "code", ignore = true)
     @Mapping(target = "configured", ignore = true)
     @Mapping(target = "strategyConfig", ignore = true)
@@ -173,6 +175,7 @@ public interface IdentitySourceConverter {
      * @param param {@link  IdentitySourceConfigSaveParam}
      * @return {@link  IdentitySourceEntity}
      */
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "code", ignore = true)
     @Mapping(target = "configured", expression = "java(Boolean.TRUE)")
     @Mapping(target = "basicConfig", ignore = true)
@@ -195,7 +198,7 @@ public interface IdentitySourceConverter {
      */
     default IdentitySourceEntity saveConfigParamConverterToEntity(IdentitySourceConfigSaveParam param,
                                                                   IdentitySourceProvider provider) {
-        ValidationHelp.ValidationResult<?> validationResult;
+        ValidationUtils.ValidationResult<?> validationResult;
         IdentitySourceConfig clientConfig = null;
         //钉钉
         if (Objects.equals(provider, IdentitySourceProvider.DINGTALK)) {
@@ -213,7 +216,7 @@ public interface IdentitySourceConverter {
         if (!Objects.nonNull(clientConfig)) {
             throw new NullPointerException("提供商配置不能为空!");
         }
-        validationResult = ValidationHelp.validateEntity(clientConfig);
+        validationResult = ValidationUtils.validateEntity(clientConfig);
         //处理异常
         if (validationResult.isHasErrors()) {
             throw new ConstraintViolationException(validationResult.getConstraintViolations());
@@ -237,7 +240,7 @@ public interface IdentitySourceConverter {
         QueryDslRequest request = new QueryDslRequest();
         QIdentitySourceEntity queryEntity = QIdentitySourceEntity.identitySourceEntity;
         Predicate predicate = ExpressionUtils.and(queryEntity.isNotNull(),
-            queryEntity.isDeleted.eq(Boolean.FALSE));
+            queryEntity.deleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = StringUtils.isBlank(query.getName()) ? predicate : ExpressionUtils.and(predicate, queryEntity.name.like("%" + query.getName() + "%"));
@@ -245,7 +248,7 @@ public interface IdentitySourceConverter {
         request.setPredicate(predicate);
         //分页条件
         //@formatter:off
-        request.setPageRequest(QPageRequest.of(pageModel.getCurrent(), pageModel.getPageSize()));
+        request.setPageRequest(QPageRequest.of(pageModel.getCurrent(), pageModel.getPageSize(),queryEntity.updateTime.desc()));
         return request;
     }
 
@@ -270,7 +273,7 @@ public interface IdentitySourceConverter {
           JSONObject value = OBJECT_MAPPER.readValue(entity.getBasicConfig(), JSONObject.class);
           value.remove(CommonConstants.TYPE);
           //@formatter:off
-          value.put(CommonConstants.CALLBACK_URL, ServerContextHelp.getSynchronizerPublicBaseUrl() + "/api/synchronizer/event_receive/" +  entity.getCode());
+          value.put(CommonConstants.CALLBACK_URL, ServerHelp.getSynchronizerPublicBaseUrl() + "/api/v1/synchronizer/event_receive/" +  entity.getCode());
           //@formatter:on
             identitySourceResult.setBasicConfig(value);
         } catch (Exception e) {

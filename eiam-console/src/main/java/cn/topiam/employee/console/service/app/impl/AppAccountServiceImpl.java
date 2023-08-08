@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,21 +20,21 @@ package cn.topiam.employee.console.service.app.impl;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Base64Utils;
 
 import com.alibaba.excel.util.StringUtils;
 
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
-import cn.topiam.employee.common.crypto.EncryptContextHelp;
 import cn.topiam.employee.common.entity.app.AppAccountEntity;
 import cn.topiam.employee.common.entity.app.po.AppAccountPO;
 import cn.topiam.employee.common.entity.app.query.AppAccountQuery;
 import cn.topiam.employee.common.exception.app.AppAccountExistException;
+import cn.topiam.employee.common.jackjson.encrypt.EncryptContextHelp;
 import cn.topiam.employee.common.repository.app.AppAccountRepository;
 import cn.topiam.employee.console.converter.app.AppAccountConverter;
 import cn.topiam.employee.console.pojo.result.app.AppAccountListResult;
@@ -51,7 +51,7 @@ import lombok.extern.slf4j.Slf4j;
  * 应用账户
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/4 19:07
+ * Created by support@topiam.cn on  2022/6/4 21:07
  */
 @Service
 @Slf4j
@@ -93,7 +93,8 @@ public class AppAccountServiceImpl implements AppAccountService {
         AppAccountEntity entity = appAccountConverter.appAccountCreateParamConvertToEntity(param);
         //密码不为空
         if (!StringUtils.isBlank(param.getPassword())) {
-            String password = new String(Base64Utils.decodeFromString(param.getPassword()),
+            Base64 base64 = new Base64();
+            String password = new String(base64.decode(param.getPassword()),
                 StandardCharsets.UTF_8);
             entity.setPassword(EncryptContextHelp.encrypt(password));
         }

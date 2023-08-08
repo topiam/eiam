@@ -1,6 +1,6 @@
 /*
- * eiam-application-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-application-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,53 +19,45 @@ package cn.topiam.employee.application.context;
 
 import java.util.Map;
 
-import lombok.Data;
-
 /**
- * ApplicationContext
+ * 应用上下文
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/10/29 22:34
+ * Created by support@topiam.cn on  2023/6/30 23:52
  */
-@Data
-public final class ApplicationContext {
+public interface ApplicationContext {
     /**
-     * 应用ID
+     * 获取应用ID
+     *
+     * @return {@link Long}
      */
-    private final Long                appId;
+    Long getAppId();
 
     /**
-     * 应用编码
+     * 获取客户端ID
+     *
+     * @return {@link String}
      */
-    private final String              appCode;
+    String getClientId();
 
     /**
-     * 应用模版
+     * 获取应用编码
+     *
+     * @return {@link String}
      */
-    private final String              appTemplate;
+    String getAppCode();
 
     /**
-     * 客户端ID
+     * 获取应用模版
+     *
+     * @return {@link String}
      */
-    private final String              clientId;
+    String getAppTemplate();
 
     /**
-     * 客户端秘钥
+     * 获取协议配置
+     *
+     * @return {@link Map}
      */
-    private final String              clientSecret;
-
-    /**
-     * 配置
-     */
-    private final Map<String, Object> config;
-
-    public ApplicationContext(Long appId, String appCode, String appTemplate, String clientId,
-                              String clientSecret, Map<String, Object> config) {
-        this.appCode = appCode;
-        this.appId = appId;
-        this.appTemplate = appTemplate;
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.config = config;
-    }
+    Map<String, Object> getConfig();
 }

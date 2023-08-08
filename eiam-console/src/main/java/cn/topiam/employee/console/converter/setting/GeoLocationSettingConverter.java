@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,24 +19,32 @@ package cn.topiam.employee.console.converter.setting;
 
 import java.util.Objects;
 
-import javax.validation.ValidationException;
-
 import org.mapstruct.Mapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cn.topiam.employee.common.crypto.EncryptionModule;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.geo.GeoLocationProviderConfig;
 import cn.topiam.employee.common.geo.maxmind.MaxmindProviderConfig;
-import cn.topiam.employee.common.geo.maxmind.enums.GeoLocationProvider;
+import cn.topiam.employee.common.jackjson.encrypt.EncryptionModule;
 import cn.topiam.employee.console.pojo.result.setting.EmailProviderConfigResult;
 import cn.topiam.employee.console.pojo.result.setting.GeoIpProviderResult;
 import cn.topiam.employee.console.pojo.save.setting.GeoIpProviderSaveParam;
 import cn.topiam.employee.console.pojo.save.setting.MailProviderSaveParam;
-import cn.topiam.employee.support.validation.ValidationHelp;
+import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.exception.TopIamException;
+import cn.topiam.employee.support.validation.ValidationUtils;
+
+import jakarta.validation.ValidationException;
+import static cn.topiam.employee.common.geo.maxmind.MaxmindGeoLocationServiceImpl.MAXMIND;
+import static cn.topiam.employee.common.geo.maxmind.MaxmindGeoLocationServiceImpl.SHA256_URL;
 import static cn.topiam.employee.core.setting.constant.GeoIpProviderConstants.IPADDRESS_SETTING_NAME;
 
 /**
@@ -47,6 +55,9 @@ import static cn.topiam.employee.core.setting.constant.GeoIpProviderConstants.IP
  */
 @Mapper(componentModel = "spring")
 public interface GeoLocationSettingConverter {
+
+    Logger log = LoggerFactory.getLogger(GeoLocationSettingConverter.class);
+
     /**
      * 地理位置配置转实体类
      *
@@ -62,18 +73,31 @@ public interface GeoLocationSettingConverter {
             SettingEntity entity = new SettingEntity();
             entity.setName(IPADDRESS_SETTING_NAME);
             String desc = null;
-            ValidationHelp.ValidationResult<?> validationResult = null;
            //@formatter:off
            //根据提供商封装参数
-           if (GeoLocationProvider.MAXMIND.equals(param.getProvider())) {
-               desc = GeoLocationProvider.MAXMIND.getName();
+           if (MAXMIND.getProvider().equals(param.getProvider())) {
+               desc = MAXMIND.getName();
                MaxmindProviderConfig maxmindProviderConfig = param.getConfig().to(MaxmindProviderConfig.class);
-               validationResult = ValidationHelp.validateEntity(maxmindProviderConfig);
-               entity.setValue(objectMapper.writeValueAsString(new GeoLocationProviderConfig(param.getProvider(), maxmindProviderConfig)));
-           }
-           // 验证
-           if (Objects.requireNonNull(validationResult).isHasErrors()) {
-               throw new ValidationException(validationResult.getMessage());
+               ValidationUtils.ValidationResult<?> validationResult = ValidationUtils.validateEntity(maxmindProviderConfig);
+               entity.setValue(objectMapper.writeValueAsString(new GeoLocationProviderConfig(MAXMIND, maxmindProviderConfig)));
+               // 验证
+               if (Objects.requireNonNull(validationResult).isHasErrors()) {
+                   throw new ValidationException(validationResult.getMessage());
+               }
+               try {
+                   ResponseEntity<String> checkConnect = ApplicationContextHelp.getBean(RestTemplate.class).getForEntity(
+                           String.format(SHA256_URL,
+                                   maxmindProviderConfig.getSessionKey()), String.class);
+                   HttpStatusCode statusCode = checkConnect.getStatusCode();
+                   if (statusCode.isError()) {
+                       log.error("MAXMIND调用失败:[{}]", checkConnect);
+                       throw new TopIamException("注册码错误或连接异常");
+                   }
+               }
+               catch (Exception e) {
+                   log.error("MAXMIND调用异常: [{}]", e.getMessage());
+                   throw new TopIamException("注册码错误或连接异常");
+               }
            }
            entity.setDesc(desc);
            //@formatter:no
@@ -102,11 +126,11 @@ public interface GeoLocationSettingConverter {
                    ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
            // 根据提供商序列化
            GeoLocationProviderConfig setting = objectMapper.readValue(value, GeoLocationProviderConfig.class);
-           if (GeoLocationProvider.MAXMIND.equals(setting.getProvider())) {
+           if (MAXMIND.equals(setting.getProvider())) {
                MaxmindProviderConfig config = (MaxmindProviderConfig) setting.getConfig();
                //@formatter:off
                return GeoIpProviderResult.builder()
-                       .provider(setting.getProvider())
+                       .provider(setting.getProvider().getProvider())
                        .config(config)
                        .enabled(true)
                        .build();

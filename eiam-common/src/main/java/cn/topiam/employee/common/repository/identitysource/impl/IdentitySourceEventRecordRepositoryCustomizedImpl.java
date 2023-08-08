@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -44,7 +44,7 @@ public class IdentitySourceEventRecordRepositoryCustomizedImpl implements
     @Override
     public void batchSave(List<IdentitySourceEventRecordEntity> list) {
         jdbcTemplate.batchUpdate(
-            "INSERT INTO identity_source_event_record (id_, identity_source_id, action_type, object_id, object_name, object_type, status_,event_time,desc_,create_by,create_time,update_by,update_time,remark_) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            "INSERT INTO identity_source_event_record (id_, identity_source_id, action_type, object_id, object_name, object_type, status_,event_time,desc_,create_by,create_time,update_by,update_time,remark_,is_deleted) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(@NotNull PreparedStatement ps, int i) throws SQLException {
@@ -64,6 +64,7 @@ public class IdentitySourceEventRecordRepositoryCustomizedImpl implements
                         ps.setString(12, entity.getUpdateBy());
                         ps.setTimestamp(13, Timestamp.valueOf(entity.getUpdateTime()));
                         ps.setString(14, entity.getRemark());
+                        ps.setBoolean(15, false);
                         //@formatter:on
                 }
 

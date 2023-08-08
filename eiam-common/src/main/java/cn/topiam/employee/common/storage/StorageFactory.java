@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,7 +22,7 @@ import java.lang.reflect.Constructor;
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/10 20:40
+ * Created by support@topiam.cn on  2021/11/10 21:40
  */
 public class StorageFactory {
 
@@ -35,7 +35,6 @@ public class StorageFactory {
      * @param config {@link StorageConfig}
      * @return {@link Storage}
      */
-    @SuppressWarnings("JavaReflectionInvocation")
     public static Storage getStorage(StorageConfig config) {
         try {
             Constructor<? extends Storage> constructor = config.getProvider().getStorage()

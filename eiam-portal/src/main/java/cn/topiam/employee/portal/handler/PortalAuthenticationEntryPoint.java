@@ -1,6 +1,6 @@
 /*
- * eiam-portal - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-portal - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,21 +19,21 @@ package cn.topiam.employee.portal.handler;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
 
-import cn.topiam.employee.core.context.ServerContextHelp;
+import cn.topiam.employee.core.help.ServerHelp;
 import cn.topiam.employee.support.result.ApiRestResult;
 import cn.topiam.employee.support.util.HttpResponseUtils;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
-import static cn.topiam.employee.common.constants.AuthorizeConstants.FE_LOGIN;
-import static cn.topiam.employee.support.context.ServletContextHelp.acceptIncludeTextHtml;
+import static cn.topiam.employee.common.constant.AuthorizeConstants.FE_LOGIN;
+import static cn.topiam.employee.support.context.ServletContextHelp.isHtmlRequest;
 
 /**
  * 认证入口点
@@ -70,9 +70,9 @@ public class PortalAuthenticationEntryPoint implements
         logger.info("----------------------------------------------------------");
         logger.info("未登录, 或登录过期");
         //判断请求
-        boolean isTextHtml = acceptIncludeTextHtml(request);
+        boolean isHtmlRequest = isHtmlRequest(request);
         //JSON
-        if (!isTextHtml) {
+        if (!isHtmlRequest) {
             ApiRestResult<Object> result = ApiRestResult.builder()
                 .status(String.valueOf(UNAUTHORIZED.value())).message(StringUtils
                     .defaultString(authException.getMessage(), UNAUTHORIZED.getReasonPhrase()))
@@ -82,7 +82,7 @@ public class PortalAuthenticationEntryPoint implements
         // HTML
         else {
             //跳转前端SESSION过期路由
-            response.sendRedirect(ServerContextHelp.getPortalPublicBaseUrl() + FE_LOGIN);
+            response.sendRedirect(ServerHelp.getPortalPublicBaseUrl() + FE_LOGIN);
         }
         logger.info("----------------------------------------------------------");
     }

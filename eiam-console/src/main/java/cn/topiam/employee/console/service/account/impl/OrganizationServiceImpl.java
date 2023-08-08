@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,7 +17,11 @@
  */
 package cn.topiam.employee.console.service.account.impl;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -25,30 +29,24 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import com.google.common.collect.Lists;
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.common.entity.account.OrganizationEntity;
-import cn.topiam.employee.common.entity.account.QOrganizationEntity;
-import cn.topiam.employee.common.entity.account.QOrganizationMemberEntity;
+import cn.topiam.employee.common.entity.account.OrganizationMemberEntity;
 import cn.topiam.employee.common.entity.account.QUserEntity;
 import cn.topiam.employee.common.enums.DataOrigin;
+import cn.topiam.employee.common.repository.account.OrganizationMemberRepository;
 import cn.topiam.employee.common.repository.account.OrganizationRepository;
 import cn.topiam.employee.console.converter.account.OrganizationConverter;
-import cn.topiam.employee.console.pojo.result.account.OrganizationChildResult;
-import cn.topiam.employee.console.pojo.result.account.OrganizationResult;
-import cn.topiam.employee.console.pojo.result.account.OrganizationRootResult;
-import cn.topiam.employee.console.pojo.result.account.OrganizationTreeResult;
+import cn.topiam.employee.console.pojo.result.account.*;
 import cn.topiam.employee.console.pojo.save.account.OrganizationCreateParam;
 import cn.topiam.employee.console.pojo.update.account.OrganizationUpdateParam;
 import cn.topiam.employee.console.service.account.OrganizationService;
+import cn.topiam.employee.core.mq.UserMessagePublisher;
+import cn.topiam.employee.core.mq.UserMessageTag;
+import cn.topiam.employee.support.repository.id.SnowflakeIdGenerator;
 import cn.topiam.employee.support.util.BeanUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -81,19 +79,20 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Transactional(rollbackFor = Exception.class)
     public Boolean createOrg(OrganizationCreateParam param) {
         //保存
-        OrganizationEntity entity = orgDataConverter.orgCreateParamConvertToEntity(param);
+        OrganizationEntity entity = organizationConverter.orgCreateParamConvertToEntity(param);
+        entity.setId(String.valueOf(SnowflakeIdGenerator.SNOWFLAKE.nextId()));
         //查询父节点
         Optional<OrganizationEntity> parent = organizationRepository.findById(param.getParentId());
-        //新建
-        organizationRepository.save(entity);
-        //展示路径枚举
-        parent.ifPresent(org -> entity
-            .setDisplayPath(StringUtils.isEmpty(org.getPath()) ? SEPARATE + entity.getName()
-                : org.getDisplayPath() + SEPARATE + entity.getName()));
+        // 展示路径枚举
+        parent.ifPresent(parentOrg -> entity
+            .setDisplayPath(StringUtils.isEmpty(parentOrg.getPath()) ? SEPARATE + entity.getName()
+                : parentOrg.getDisplayPath() + SEPARATE + entity.getName()));
         //设置路径枚举
-        parent.ifPresent(
-            org -> entity.setPath(StringUtils.isEmpty(org.getPath()) ? SEPARATE + entity.getId()
-                : org.getPath() + SEPARATE + entity.getId()));
+        parent.ifPresent(parentOrg -> entity
+            .setPath(StringUtils.isEmpty(parentOrg.getPath()) ? SEPARATE + entity.getId()
+                : parentOrg.getPath() + SEPARATE + entity.getId()));
+        // 新建
+        organizationRepository.save(entity);
         //存在父节点，更改为非叶子节点
         if (parent.isPresent() && parent.get().getLeaf()) {
             organizationRepository.updateIsLeaf(parent.get().getId(), false);
@@ -112,10 +111,12 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean updateOrg(OrganizationUpdateParam param) {
-        OrganizationEntity organization = orgDataConverter.orgUpdateParamConvertToEntity(param);
+        OrganizationEntity organization = organizationConverter
+            .orgUpdateParamConvertToEntity(param);
         Optional<OrganizationEntity> optional = this.organizationRepository.findById(param.getId());
         if (optional.isPresent()) {
             OrganizationEntity entity = optional.get();
+            String userIds;
             //如果修改了名字，递归修改和该组织有关所有节点信息的展示路径
             if (!optional.get().getName().equals(param.getName())) {
                 //修改名称
@@ -125,10 +126,22 @@ public class OrganizationServiceImpl implements OrganizationService {
                 if (!entity.getLeaf()) {
                     recursiveUpdateDisplayPath(entity.getId(), entity.getId(), param.getName());
                 }
+                userIds = organizationRepository
+                    .getOrgMemberList(organization.getId(), QUserEntity.userEntity.id).stream()
+                    .map(String::valueOf).collect(Collectors.joining(","));
+            } else {
+                List<OrganizationMemberEntity> orgMemberList = organizationMemberRepository
+                    .findAllByOrgId(entity.getId());
+                userIds = orgMemberList.stream().map(item -> String.valueOf(item.getUserId()))
+                    .collect(Collectors.joining(","));
             }
             //修改
             BeanUtils.merge(organization, entity, LAST_MODIFIED_BY, LAST_MODIFIED_TIME);
             organizationRepository.save(entity);
+            // 更新用户es信息
+            if (StringUtils.isNotBlank(userIds)) {
+                userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE, userIds);
+            }
             AuditContext.setTarget(
                 Target.builder().id(entity.getId()).type(TargetType.ORGANIZATION).build());
             return true;
@@ -196,6 +209,7 @@ public class OrganizationServiceImpl implements OrganizationService {
      */
     @Override
     public Boolean updateStatus(String id, boolean enabled) {
+        // TODO 更新用户es信息
         return organizationRepository.updateStatus(id, enabled) > 0;
     }
 
@@ -245,7 +259,9 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public OrganizationResult getOrganization(String id) {
         Optional<OrganizationEntity> entity = organizationRepository.findById(id);
-        return entity.map(orgDataConverter::entityConvertToOrgDetailResult).orElse(null);
+        OrganizationResult organizationResult = entity
+            .map(organizationConverter::entityConvertToGetOrganizationResult).orElse(null);
+        return organizationResult;
     }
 
     /**
@@ -256,24 +272,32 @@ public class OrganizationServiceImpl implements OrganizationService {
      * @return {@link Boolean}
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean moveOrganization(String id, String parentId) {
+        if (id.equals(parentId)) {
+            throw new RuntimeException("当前机构与所选机构相同，不可移动");
+        }
         Optional<OrganizationEntity> organization = organizationRepository.findById(id);
         if (organization.isPresent()) {
             OrganizationEntity entity = organization.get();
             String oldParentId = entity.getParentId();
-            Optional<OrganizationEntity> parent = organizationRepository.findById(parentId);
-            if (parent.isPresent()) {
-                if (parent.get().getLeaf()) {
-                    parent.get().setLeaf(false);
-                    organizationRepository.save(parent.get());
+            Optional<OrganizationEntity> parentOptional = organizationRepository.findById(parentId);
+            if (parentOptional.isPresent()) {
+                OrganizationEntity parent = parentOptional.get();
+                if (parent.getLeaf()) {
+                    parent.setLeaf(false);
+                    organizationRepository.save(parent);
+                    Target.builder().type(TargetType.ORGANIZATION)
+                        .typeName(TargetType.ORGANIZATION.getDesc()).id(parentId)
+                        .name(parent.getName()).build();
                 }
                 entity.setParentId(parentId);
                 //父级路径
                 entity.setPath(
-                    StringUtils.defaultString(parent.get().getPath()) + SEPARATE + entity.getId());
+                    StringUtils.defaultString(parent.getPath()) + SEPARATE + entity.getId());
                 //父级展示路径
-                entity.setDisplayPath(StringUtils.defaultString(parent.get().getDisplayPath())
-                                      + SEPARATE + entity.getName());
+                entity.setDisplayPath(StringUtils.defaultString(parent.getDisplayPath()) + SEPARATE
+                                      + entity.getName());
             }
             organizationRepository.save(entity);
             // 判断旧的父节点下是否还存在子节点，不存在更改此节点为叶子节点
@@ -286,15 +310,18 @@ public class OrganizationServiceImpl implements OrganizationService {
                     organizationRepository.save(oldParentOrganization.get());
                 }
             }
-            AuditContext.setTarget(
-                Target.builder().type(TargetType.ORGANIZATION)
-                    .typeName(TargetType.ORGANIZATION.getDesc()).id(id)
-                    .name(organization.get().getName()).build(),
-                Target.builder().type(TargetType.ORGANIZATION)
-                    .typeName(TargetType.ORGANIZATION.getDesc()).id(parentId)
-                    .name(parent.get().getName()).build());
+            AuditContext.setTarget(Target.builder().type(TargetType.ORGANIZATION)
+                .typeName(TargetType.ORGANIZATION.getDesc()).id(id)
+                .name(organization.get().getName()).build());
             //存在子组织，递归更改子组织 path 和 displayPath
             recursiveUpdateChildNodePathAndDisplayPath(entity.getId());
+            // 更新用户es信息
+            String userIds = organizationRepository
+                .getOrgMemberList(entity.getId(), QUserEntity.userEntity.id).stream()
+                .map(String::valueOf).collect(Collectors.joining(","));
+            if (StringUtils.isNotBlank(userIds)) {
+                userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE, userIds);
+            }
             return true;
         }
         return false;
@@ -331,7 +358,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public OrganizationRootResult getRootOrganization() {
         OrganizationEntity entity = organizationRepository.findById(ROOT_NODE).orElse(null);
-        return orgDataConverter.entityConvertToRootOrgListResult(entity);
+        return organizationConverter.entityConvertToRootOrgListResult(entity);
     }
 
     /**
@@ -344,7 +371,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     public List<OrganizationChildResult> getChildOrganization(String parentId) {
         List<OrganizationEntity> entityList = organizationRepository
             .findByParentIdOrderByOrderAsc(parentId);
-        return orgDataConverter.entityConvertToChildOrgListResult(entityList);
+        return organizationConverter.entityConvertToChildOrgListResult(entityList);
     }
 
     /**
@@ -370,7 +397,8 @@ public class OrganizationServiceImpl implements OrganizationService {
      */
     @Override
     public List<OrganizationTreeResult> filterOrganizationTree(String keyWord) {
-        List<OrganizationEntity> list = organizationRepository.findByNameLikeOrCodeLike(keyWord);
+        List<OrganizationEntity> list = organizationRepository
+            .findByNameLikeOrCodeLike("%" + keyWord + "%");
         if (!CollectionUtils.isEmpty(list)) {
             List<String> parentIds = Lists.newArrayList();
             for (OrganizationEntity entity : list) {
@@ -379,7 +407,8 @@ public class OrganizationServiceImpl implements OrganizationService {
             if (!CollectionUtils.isEmpty(parentIds)) {
                 List<OrganizationEntity> entityList = organizationRepository
                     .findByIdInOrderByOrderAsc(parentIds);
-                return orgDataConverter.entityConvertToChildOrgTreeListResult(null, entityList);
+                return organizationConverter.entityConvertToChildOrgTreeListResult(null,
+                    entityList);
             }
         }
         return Lists.newArrayList();
@@ -403,18 +432,6 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     /**
-     * 批量删除组织
-     *
-     * @param ids {@link String}
-     * @return {@link Boolean}
-     */
-    @Override
-    public Boolean batchDeleteOrg(String[] ids) {
-        organizationRepository.deleteAllById(Arrays.asList(ids));
-        return true;
-    }
-
-    /**
      * 查询组织成员数量
      *
      * @param orgId {@link  String}
@@ -422,37 +439,39 @@ public class OrganizationServiceImpl implements OrganizationService {
      */
     @Override
     public Long getOrgMemberCount(String orgId) {
-        //条件
-        QUserEntity user = QUserEntity.userEntity;
-        QOrganizationEntity qOrganization = QOrganizationEntity.organizationEntity;
-        Predicate predicate = ExpressionUtils.and(user.isNotNull(),
-            user.isDeleted.eq(Boolean.FALSE));
-        //FIND_IN_SET函数
-        BooleanExpression template = Expressions.booleanTemplate(
-            "FIND_IN_SET({0}, replace({1}, '/', ','))> 0", orgId, qOrganization.path);
-        predicate = ExpressionUtils.and(predicate, qOrganization.id.eq(orgId).or(template));
-        //构造查询
-        JPAQuery<Long> jpaQuery = jpaQueryFactory.selectFrom(user).select(user.count())
-            .innerJoin(QOrganizationMemberEntity.organizationMemberEntity)
-            .on(user.id.eq(QOrganizationMemberEntity.organizationMemberEntity.userId))
-            .innerJoin(qOrganization)
-            .on(qOrganization.id.eq(QOrganizationMemberEntity.organizationMemberEntity.orgId))
-            .where(predicate);
-        return jpaQuery.fetch().get(0);
+        return organizationRepository.getOrgMemberList(orgId, QUserEntity.userEntity.count())
+            .get(0);
     }
 
     /**
-     * JPAQueryFactory
+     * 批量获取组织
+     *
+     * @param ids {@link List}
+     * @return {@link List}
      */
-    private final JPAQueryFactory        jpaQueryFactory;
+    @Override
+    public List<BatchOrganizationResult> batchGetOrganization(List<String> ids) {
+        List<OrganizationEntity> list = organizationRepository.findAllById(ids);
+        return organizationConverter.entityConvertToBatchGetOrganizationResult(list);
+    }
 
     /**
      * 组织架构数据映射器
      */
-    private final OrganizationConverter  orgDataConverter;
+    private final OrganizationConverter        organizationConverter;
 
     /**
      * OrganizationRepository
      */
-    private final OrganizationRepository organizationRepository;
+    private final OrganizationRepository       organizationRepository;
+
+    /**
+     * MessagePublisher
+     */
+    private final UserMessagePublisher         userMessagePublisher;
+
+    /**
+     * OrganizationMemberRepository
+     */
+    private final OrganizationMemberRepository organizationMemberRepository;
 }

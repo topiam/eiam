@@ -1,6 +1,6 @@
 /*
- * eiam-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,22 +19,18 @@ package cn.topiam.employee.core.security.task;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import cn.topiam.employee.common.entity.account.UserEntity;
-import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.enums.UserStatus;
 import cn.topiam.employee.common.repository.account.UserRepository;
-import cn.topiam.employee.common.repository.setting.SettingRepository;
+import cn.topiam.employee.support.lock.Lock;
 import cn.topiam.employee.support.trace.Trace;
 
 import lombok.RequiredArgsConstructor;
-import static cn.topiam.employee.core.setting.constant.PasswordPolicySettingConstants.PASSWORD_POLICY_DEFAULT_SETTINGS;
-import static cn.topiam.employee.core.setting.constant.PasswordPolicySettingConstants.PASSWORD_POLICY_VALID_DAYS;
 
 /**
  * 用户过期锁定任务
@@ -51,6 +47,7 @@ public class UserExpireLockTask {
      * 每分钟扫描已过期的用户
      */
     @Trace
+    @Lock(throwException = false)
     @Scheduled(cron = "0 0 0 * * ?")
     public void execute() {
         logger.info("扫描已过期待锁定用户任务开始");
@@ -58,11 +55,11 @@ public class UserExpireLockTask {
         List<UserEntity> list = userRepository.findExpireUser();
         Iterator<UserEntity> iterator = list.iterator();
         logger.info("已过期待锁定用户数量为:{}个", list.size());
-        while (list.size() > 0) {
+        while (!list.isEmpty()) {
             UserEntity entity = iterator.next();
             entity.setStatus(UserStatus.EXPIRED_LOCKED);
             userRepository.save(entity);
-            logger.info("锁定已过期用户:{}", entity.getUsername());
+            logger.info("锁定已过期用户：{}", entity.getUsername());
             iterator.remove();
             iterator = list.iterator();
         }
@@ -70,26 +67,8 @@ public class UserExpireLockTask {
     }
 
     /**
-     * 获取密码过期日
-     *
-     * @return {@link  Integer}
-     */
-    private Integer getExpireDays() {
-        SettingEntity expireDaysSetting = settingRepository.findByName(PASSWORD_POLICY_VALID_DAYS);
-        String expireDays = Objects.isNull(expireDaysSetting)
-            ? PASSWORD_POLICY_DEFAULT_SETTINGS.get(PASSWORD_POLICY_VALID_DAYS)
-            : expireDaysSetting.getValue();
-        return Integer.parseInt(expireDays);
-    }
-
-    /**
-     * 设置
-     */
-    private final SettingRepository settingRepository;
-
-    /**
      * UserRepository
      */
-    private final UserRepository    userRepository;
+    private final UserRepository userRepository;
 
 }

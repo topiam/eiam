@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,15 +20,12 @@ package cn.topiam.employee.console.pojo.save.setting;
 import java.io.Serial;
 import java.io.Serializable;
 
-import javax.validation.constraints.NotNull;
-
 import com.alibaba.fastjson2.JSONObject;
-
-import cn.topiam.employee.common.geo.maxmind.enums.GeoLocationProvider;
 
 import lombok.Data;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * 保存地理位置服务商配置入参
@@ -40,17 +37,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "保存地理位置服务商配置入参")
 public class GeoIpProviderSaveParam implements Serializable {
     @Serial
-    private static final long   serialVersionUID = -6723117700517052520L;
+    private static final long serialVersionUID = -6723117700517052520L;
     /**
      * 地理位置服务商
      */
     @Schema(description = "地理位置提供商")
     @NotNull(message = "地理位置提供商不能为空")
-    private GeoLocationProvider provider;
+    private String            provider;
 
     /**
      * 配置信息
      */
     @Schema(description = "配置信息")
-    private JSONObject          config;
+    private JSONObject        config;
 }

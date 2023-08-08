@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,8 +23,6 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.util.AlternativeJdkIdGenerator;
-import org.springframework.util.IdGenerator;
 
 import com.google.common.collect.Lists;
 import com.querydsl.core.types.ExpressionUtils;
@@ -59,7 +57,7 @@ public interface AppConverter {
     default Predicate queryAppListParamConvertToPredicate(AppQuery query) {
         QAppEntity application = QAppEntity.appEntity;
         Predicate predicate = ExpressionUtils.and(application.isNotNull(),
-            application.isDeleted.eq(Boolean.FALSE));
+            application.deleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = StringUtils.isBlank(query.getName()) ? predicate : ExpressionUtils.and(predicate, application.name.like("%" + query.getName() + "%"));
@@ -152,7 +150,14 @@ public interface AppConverter {
         appGetResult.setClientId(entity.getClientId());
         appGetResult.setClientSecret(entity.getClientSecret());
         appGetResult.setType(entity.getType());
-        appGetResult.setIcon(entity.getIcon());
+        //图标未配置，所以先从模版中拿
+        if (StringUtils.isBlank(entity.getIcon())) {
+            ApplicationService applicationService = getApplicationServiceLoader()
+                .getApplicationService(entity.getTemplate());
+            appGetResult.setIcon(applicationService.getBase64Icon());
+        } else {
+            appGetResult.setIcon(entity.getIcon());
+        }
         appGetResult.setTemplate(entity.getTemplate());
         appGetResult.setProtocol(entity.getProtocol());
         appGetResult.setProtocolName(entity.getProtocol().getDesc());
@@ -168,6 +173,7 @@ public interface AppConverter {
      * @param param {@link AppUpdateParam}
      * @return {@link AppEntity}
      */
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "code", ignore = true)
     @Mapping(target = "initLoginUrl", ignore = true)
     @Mapping(target = "clientSecret", ignore = true)
@@ -183,11 +189,6 @@ public interface AppConverter {
     @Mapping(target = "createTime", ignore = true)
     @Mapping(target = "createBy", ignore = true)
     AppEntity appUpdateParamConverterToEntity(AppUpdateParam param);
-
-    /**
-     * IdGenerator
-     */
-    IdGenerator ID_GENERATOR = new AlternativeJdkIdGenerator();
 
     /**
      * 获取 ApplicationServiceLoader

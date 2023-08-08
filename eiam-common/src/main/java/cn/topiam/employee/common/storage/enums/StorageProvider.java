@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -48,10 +48,6 @@ public enum StorageProvider implements Serializable {
                                                       */
                                                      QINIU_KODO("qiniu_kodo", "七牛云Kodo",
                                                                 QiNiuKodoStorage.class),
-                                                     /**
-                                                      * 本地存储
-                                                      */
-                                                     LOCAL("local", "本地存储", LocalStorage.class),
                                                      /**
                                                       * minio
                                                       */

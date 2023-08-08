@@ -1,6 +1,6 @@
 /*
- * eiam-portal - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-portal - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,17 @@ package cn.topiam.employee.portal.pojo.request;
 import java.io.Serial;
 import java.io.Serializable;
 
-import javax.validation.constraints.NotEmpty;
-
 import lombok.Data;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 
 /**
  *准备更改手机号入参
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/8/8 19:15
+ * Created by support@topiam.cn on  2022/8/8 21:15
  */
 @Data
 @Schema(description = "准备更改手机号入参")

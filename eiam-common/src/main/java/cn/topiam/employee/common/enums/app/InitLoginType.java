@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,22 +19,28 @@ package cn.topiam.employee.common.enums.app;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-import cn.topiam.employee.common.enums.BaseEnum;
+import cn.topiam.employee.support.enums.BaseEnum;
 import cn.topiam.employee.support.web.converter.EnumConvert;
 
 /**
  * Sso 发起方
  *
+ * OIDC 应用：支持应用发起，若要支持门户端发起，需配置SSO 发起登录URL
+ * JWT 应用：支持应用发起，也支持门户端发起
+ * FORM 应用：支持应用发起，也支持门户端发起
+ *
  * @author TopIAM
  * Created by support@topiam.cn on  2022/6/4 23:33
  */
 public enum InitLoginType implements BaseEnum {
+
                                                /**
-                                                * 仅应用发起SSO，OIDC协议应用默认取值。当SAML应用指定为该方式时，InitLoginUrl必须指定。
+                                                * 仅应用发起SSO
                                                 */
                                                APP("only_app_init_sso", "只允许应用发起"),
+
                                                /**
-                                                * 支持门户或者应用发起SSO，SAML协议应用默认取值范围。当OIDC协议指定为该方式时，InitLoginUrl必须指定。
+                                                * 支持门户或者应用发起SSO协议应用默认取值范围。
                                                 */
                                                PORTAL_OR_APP("portal_or_app_init_sso", "支持门户和应用发起");
 

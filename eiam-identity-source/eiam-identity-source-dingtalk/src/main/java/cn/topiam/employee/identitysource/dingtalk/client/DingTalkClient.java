@@ -1,6 +1,6 @@
 /*
- * eiam-identity-source-dingtalk - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-identity-source-dingtalk - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -225,11 +225,11 @@ public class DingTalkClient extends AbstractDingTalkClient implements IdentitySo
     private List<User> getUserList(OapiV2UserListRequest request) {
         List<User> list = new ArrayList<>();
         try {
-            log.info("分页获取用户列表入参:{}", JSON.toJSONString(request));
+            log.info("分页获取用户列表入参：{}", JSON.toJSONString(request));
             com.dingtalk.api.DingTalkClient client = new DefaultDingTalkClient(
                 DingTalkConstants.USER_LIST);
             OapiV2UserListResponse execute = client.execute(request, getAccessToken());
-            log.info("分页获取用户列表返回:{}", JSON.toJSONString(execute));
+            log.info("分页获取用户列表返回：{}", JSON.toJSONString(execute));
             if (execute.isSuccess()) {
                 OapiV2UserListResponse.PageResult result = execute.getResult();
                 List<OapiV2UserListResponse.ListUserResponse> userList = result.getList();
@@ -247,10 +247,10 @@ public class DingTalkClient extends AbstractDingTalkClient implements IdentitySo
                 }
                 return list;
             }
-            log.error("获取钉钉用户列表失败:{}", JSON.toJSONString(execute));
+            log.error("获取钉钉用户列表失败：{}", JSON.toJSONString(execute));
             throw new ApiCallException(execute.getErrmsg());
         } catch (ApiException e) {
-            log.error("获取钉钉用户列表异常:{}", e.getErrMsg(), e);
+            log.error("获取钉钉用户列表异常：{}", e.getErrMsg(), e);
             throw new ApiCallException(e.getErrMsg());
         }
     }

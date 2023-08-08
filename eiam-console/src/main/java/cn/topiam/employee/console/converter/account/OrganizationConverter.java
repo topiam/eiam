@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,10 +26,7 @@ import org.mapstruct.Mapping;
 import org.springframework.util.CollectionUtils;
 
 import cn.topiam.employee.common.entity.account.OrganizationEntity;
-import cn.topiam.employee.console.pojo.result.account.OrganizationChildResult;
-import cn.topiam.employee.console.pojo.result.account.OrganizationResult;
-import cn.topiam.employee.console.pojo.result.account.OrganizationRootResult;
-import cn.topiam.employee.console.pojo.result.account.OrganizationTreeResult;
+import cn.topiam.employee.console.pojo.result.account.*;
 import cn.topiam.employee.console.pojo.save.account.OrganizationCreateParam;
 import cn.topiam.employee.console.pojo.update.account.OrganizationUpdateParam;
 
@@ -117,6 +114,7 @@ public interface OrganizationConverter {
      * @param param {@link OrganizationCreateParam}
      * @return {@link OrganizationEntity}
      */
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "identitySourceId", ignore = true)
     @Mapping(target = "path", ignore = true)
     @Mapping(target = "displayPath", ignore = true)
@@ -140,12 +138,12 @@ public interface OrganizationConverter {
      * @param param {@link OrganizationUpdateParam}
      * @return {@link OrganizationEntity}
      */
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "identitySourceId", ignore = true)
     @Mapping(target = "path", ignore = true)
     @Mapping(target = "displayPath", ignore = true)
     @Mapping(target = "dataOrigin", ignore = true)
     @Mapping(target = "parentId", ignore = true)
-    @Mapping(target = "id", ignore = true)
     @Mapping(target = "leaf", ignore = true)
     @Mapping(target = "code", ignore = true)
     @Mapping(target = "remark", ignore = true)
@@ -162,5 +160,23 @@ public interface OrganizationConverter {
      * @param organization {@link OrganizationEntity}
      * @return {@link OrganizationResult}
      */
-    OrganizationResult entityConvertToOrgDetailResult(OrganizationEntity organization);
+    OrganizationResult entityConvertToGetOrganizationResult(OrganizationEntity organization);
+
+    /**
+     * 实体转批量获取组织结果
+     *
+     * @param organization {@link OrganizationEntity}
+     * @return {@link OrganizationResult}
+     */
+    BatchOrganizationResult entityConvertToBatchGetOrganizationResult(OrganizationEntity organization);
+
+    /**
+     * 实体转批量获取组织结果
+     *
+     * @param list {@link List}
+     * @return {@link List}
+     */
+    default List<BatchOrganizationResult> entityConvertToBatchGetOrganizationResult(List<OrganizationEntity> list) {
+        return list.stream().map(this::entityConvertToBatchGetOrganizationResult).toList();
+    }
 }

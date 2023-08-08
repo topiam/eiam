@@ -1,6 +1,6 @@
 /*
- * eiam-authentication-wechatwork - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-authentication-wechatwork - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,6 @@ package cn.topiam.employee.authentication.wechatwork.filter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,8 +42,13 @@ import com.alibaba.fastjson2.JSONObject;
 
 import cn.topiam.employee.authentication.wechatwork.WeChatWorkIdpScanCodeConfig;
 import cn.topiam.employee.authentication.wechatwork.constant.WeChatWorkAuthenticationConstants;
-import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
+import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import static cn.topiam.employee.authentication.common.IdentityProviderType.WECHAT_WORK_QR;
 import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.PROVIDER_CODE;
 
@@ -56,7 +56,7 @@ import static cn.topiam.employee.authentication.common.constant.AuthenticationCo
  * 微信扫码登录请求重定向过滤器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/20 20:22
+ * Created by support@topiam.cn on  2022/6/20 21:22
  */
 @SuppressWarnings("DuplicatedCode")
 public class WeChatWorkScanCodeAuthorizationRequestRedirectFilter extends OncePerRequestFilter {

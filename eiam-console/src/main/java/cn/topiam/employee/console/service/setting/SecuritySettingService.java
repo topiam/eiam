@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -18,11 +18,7 @@
 package cn.topiam.employee.console.service.setting;
 
 import cn.topiam.employee.console.pojo.result.setting.SecurityBasicConfigResult;
-import cn.topiam.employee.console.pojo.result.setting.SecurityCaptchaConfigResult;
-import cn.topiam.employee.console.pojo.result.setting.SecurityMfaConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.SecurityBasicSaveParam;
-import cn.topiam.employee.console.pojo.save.setting.SecurityCaptchaSaveParam;
-import cn.topiam.employee.console.pojo.save.setting.SecurityMfaSaveParam;
 
 /**
  * <p>
@@ -48,42 +44,5 @@ public interface SecuritySettingService extends SettingService {
      * @return {@link Boolean}
      */
     Boolean saveBasicConfig(SecurityBasicSaveParam param);
-
-    /**
-     * 获取验证码配置
-     *
-     * @return  {@link SecurityCaptchaConfigResult}
-     */
-    SecurityCaptchaConfigResult getCaptchaProviderConfig();
-
-    /**
-     * 保存行为验证码
-     *
-     * @param param {@link SecurityCaptchaSaveParam}
-     * @return {@link Boolean}
-     */
-    Boolean saveCaptchaProviderConfig(SecurityCaptchaSaveParam param);
-
-    /**
-     * 禁用行为验证码
-     *
-     * @return {@link Boolean}
-     */
-    Boolean disableCaptchaProvider();
-
-    /**
-     * 获取MFA配置
-     *
-     * @return {@link SecurityMfaConfigResult}
-     */
-    SecurityMfaConfigResult getMfaConfig();
-
-    /**
-     * 保存行为验证码
-     *
-     * @param param {@link SecurityMfaSaveParam}
-     * @return {@link Boolean}
-     */
-    Boolean saveMfaConfig(SecurityMfaSaveParam param);
 
 }

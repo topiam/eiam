@@ -1,6 +1,6 @@
 /*
- * eiam-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,26 +23,30 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.alibaba.fastjson2.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.topiam.employee.common.entity.setting.config.SmsConfig;
 import cn.topiam.employee.common.enums.MessageCategory;
 import cn.topiam.employee.common.enums.SmsType;
+import cn.topiam.employee.common.message.enums.MessageType;
+import cn.topiam.employee.core.mq.NoticeMessagePublisher;
+import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.exception.TopIamException;
 
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import static cn.topiam.employee.core.context.SettingContextHelp.getCodeValidTime;
-import static cn.topiam.employee.core.context.SettingContextHelp.getSmsProviderConfig;
+import static cn.topiam.employee.core.help.SettingHelp.getCodeValidTime;
+import static cn.topiam.employee.core.help.SettingHelp.getSmsProviderConfig;
 import static cn.topiam.employee.core.message.MsgVariable.EXPIRE_TIME_KEY;
 import static cn.topiam.employee.core.message.MsgVariable.VERIFY_CODE;
 
 /**
- * 短信邮件消息发送
+ * 短信消息发送
  *
  * @author TopIAM
  * Created by support@topiam.cn on  2021/9/25 21:07
@@ -51,19 +55,18 @@ import static cn.topiam.employee.core.message.MsgVariable.VERIFY_CODE;
 @Slf4j
 @AllArgsConstructor
 public class SmsMsgEventPublish {
-    public static final String              TEMPLATE_CODE = "template_code";
+    public static final String           TEMPLATE_CODE = "template_code";
 
-    public static final String              CONTENT       = "content";
+    public static final String           CONTENT       = "content";
 
     /**
-     * ApplicationEventPublisher
+     * NoticeMessagePublisher
      */
-    private final ApplicationEventPublisher applicationEventPublisher;
-    public static final String              PHONE         = "phone";
+    private final NoticeMessagePublisher noticeMessageProducer;
 
-    public static final String              USERNAME      = "username";
+    public static final String           PHONE         = "phone";
 
-    public static final String              PASSWORD      = "password";
+    public static final String           USERNAME      = "username";
 
     /**
      * 发布验证代码
@@ -87,9 +90,10 @@ public class SmsMsgEventPublish {
      * @param phone {@link String} 接收人手机号
      * @param parameter {@link Map} 参数
      */
+    @SneakyThrows
     public void publish(SmsType type, String phone, LinkedHashMap<String, String> parameter) {
         if (StringUtils.isBlank(phone)) {
-            log.error("发送邮件通知失败, 接受者为空, type: {}, parameter: {}", type, parameter);
+            log.warn("发送短信通知失败, 接受者为空, type: {}", type);
             return;
         }
         parameter.put(PHONE, phone);
@@ -106,7 +110,9 @@ public class SmsMsgEventPublish {
         parameter.put(TEMPLATE_CODE, templateConfig.getCode());
         parameter.put(CONTENT, JSON.toJSONString(parameter));
         // publish event
-        applicationEventPublisher.publishEvent(new SmsMsgEvent(type, parameter));
+        ObjectMapper objectMapper = ApplicationContextHelp.getBean(ObjectMapper.class);
+        noticeMessageProducer.sendNotice(MessageType.SMS,
+            objectMapper.writeValueAsString(new SmsMessage(type, parameter)));
     }
 
 }

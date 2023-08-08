@@ -1,6 +1,6 @@
 /*
- * eiam-portal - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-portal - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,17 +19,19 @@ package cn.topiam.employee.portal.handler;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.AuthorizationServiceException;
+import org.springframework.security.web.csrf.CsrfException;
 
-import cn.topiam.employee.core.security.util.SecurityUtils;
+import cn.topiam.employee.support.security.util.SecurityUtils;
 
 import lombok.AllArgsConstructor;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 访问拒绝处理程序
@@ -56,7 +58,12 @@ public class PortalAccessDeniedHandler implements
     public void handle(HttpServletRequest request, HttpServletResponse response,
                        AccessDeniedException accessDeniedException) throws IOException {
         logger.info("----------------------------------------------------------");
-        logger.info("用户【{}】权限不足", SecurityUtils.getCurrentUser());
+        if (!(accessDeniedException.getCause() instanceof CsrfException)) {
+            logger.info(accessDeniedException.getMessage());
+        }
+        if (!(accessDeniedException.getCause() instanceof AuthorizationServiceException)) {
+            logger.info("用户 [{}] 权限不足", SecurityUtils.getCurrentUser());
+        }
         response.sendError(HttpStatus.FORBIDDEN.value(),
             accessDeniedException.getLocalizedMessage());
         logger.info("----------------------------------------------------------");

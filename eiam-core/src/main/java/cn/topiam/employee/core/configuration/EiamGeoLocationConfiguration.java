@@ -1,6 +1,6 @@
 /*
- * eiam-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,18 +30,18 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cn.topiam.employee.common.constants.SettingConstants;
-import cn.topiam.employee.common.crypto.EncryptionModule;
+import cn.topiam.employee.common.constant.SettingConstants;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.geo.GeoLocationProviderConfig;
-import cn.topiam.employee.common.geo.GeoLocationService;
 import cn.topiam.employee.common.geo.NoneGeoLocationServiceImpl;
 import cn.topiam.employee.common.geo.maxmind.MaxmindGeoLocationServiceImpl;
 import cn.topiam.employee.common.geo.maxmind.MaxmindProviderConfig;
-import cn.topiam.employee.common.geo.maxmind.enums.GeoLocationProvider;
+import cn.topiam.employee.common.jackjson.encrypt.EncryptionModule;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
 import cn.topiam.employee.core.setting.constant.GeoIpProviderConstants;
-import static cn.topiam.employee.common.constants.ConfigBeanNameConstants.GEO_LOCATION;
+import cn.topiam.employee.support.geo.GeoLocationService;
+import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.GEO_LOCATION;
+import static cn.topiam.employee.common.geo.maxmind.MaxmindGeoLocationServiceImpl.MAXMIND;
 
 /**
  * 地理位置库
@@ -70,13 +70,13 @@ public class EiamGeoLocationConfiguration {
                 GeoLocationProviderConfig provider = objectMapper.readValue(setting.getValue(),
                     GeoLocationProviderConfig.class);
                 // 如果是maxmind,下载最新的数据库文件
-                if (provider.getProvider() == GeoLocationProvider.MAXMIND) {
+                if (MAXMIND.equals(provider.getProvider())) {
                     return new MaxmindGeoLocationServiceImpl(
                         (MaxmindProviderConfig) provider.getConfig(), restTemplate);
                 }
             }
         } catch (IOException e) {
-            logger.error("Create Maxmind Exception: {}", e.getMessage(), e);
+            logger.error("Create geo location Exception: {}", e.getMessage(), e);
         }
         return new NoneGeoLocationServiceImpl();
     }

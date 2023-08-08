@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,34 +19,20 @@ package cn.topiam.employee.common.enums.app;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-import cn.topiam.employee.common.enums.BaseEnum;
-import cn.topiam.employee.common.enums.OrganizationType;
+import cn.topiam.employee.support.enums.BaseEnum;
 import cn.topiam.employee.support.web.converter.EnumConvert;
 
 /**
  * 应用类型
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/5/22 20:21
+ * Created by support@topiam.cn on  2022/5/22 21:21
  */
 public enum AppType implements BaseEnum {
-
-                                         /**
-                                          * 定制应用
-                                          */
-                                         CUSTOM_MADE("custom_made", "定制应用"),
                                          /**
                                           * 标准应用
                                           */
-                                         STANDARD("standard", "标准应用"),
-                                         /**
-                                          * 自研
-                                          */
-                                         SELF_DEVELOPED("self_developed", "自研应用"),
-                                         /**
-                                           * TSA
-                                           */
-                                         TSA("tsa", "TSA"),;
+                                         STANDARD("standard", "标准应用");
 
     /**
      * code
@@ -77,7 +63,7 @@ public enum AppType implements BaseEnum {
      * 获取来源
      *
      * @param code {@link String}
-     * @return {@link OrganizationType}
+     * @return {@link AppType}
      */
     @EnumConvert
     public static AppType getType(String code) {

@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -73,6 +73,12 @@ public class AdministratorResult implements Serializable {
     private String            status;
 
     /**
+     * 手机号验证有效
+     */
+    @Parameter(description = "手机号验证有效")
+    private Boolean           phoneVerified;
+
+    /**
      * 邮箱验证有效
      */
     @Parameter(description = "邮箱验证有效")
@@ -94,4 +100,16 @@ public class AdministratorResult implements Serializable {
      */
     @Parameter(description = "上次认证时间")
     private LocalDateTime     lastAuthTime;
+
+    /**
+     * 是否为初始化管理员
+     */
+    @Parameter(description = "是否为初始化管理员")
+    private Boolean           initialized;
+
+    /**
+     * 备注
+     */
+    @Parameter(description = "备注")
+    private String            remark;
 }

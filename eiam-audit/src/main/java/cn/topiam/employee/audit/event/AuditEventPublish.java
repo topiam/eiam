@@ -1,6 +1,6 @@
 /*
- * eiam-audit - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-audit - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,17 +17,14 @@
  */
 package cn.topiam.employee.audit.event;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -39,17 +36,21 @@ import com.google.common.collect.Maps;
 
 import cn.topiam.employee.audit.entity.*;
 import cn.topiam.employee.audit.enums.EventStatus;
-import cn.topiam.employee.audit.enums.EventType;
-import cn.topiam.employee.common.enums.UserType;
-import cn.topiam.employee.common.geo.GeoLocationService;
-import cn.topiam.employee.core.security.userdetails.UserDetails;
+import cn.topiam.employee.audit.event.type.EventType;
+import cn.topiam.employee.audit.mq.AuditMessagePublisher;
 import cn.topiam.employee.support.context.ServletContextHelp;
+import cn.topiam.employee.support.geo.GeoLocationService;
+import cn.topiam.employee.support.security.authentication.WebAuthenticationDetails;
+import cn.topiam.employee.support.security.userdetails.UserDetails;
+import cn.topiam.employee.support.security.userdetails.UserType;
 import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.support.util.IpUtils;
-import cn.topiam.employee.support.web.useragent.UserAgentUtils;
+import cn.topiam.employee.support.web.useragent.UserAgentParser;
 
 import lombok.AllArgsConstructor;
-import static cn.topiam.employee.core.logger.LogAspect.replaceBlank;
+
+import jakarta.servlet.http.HttpServletRequest;
+import static cn.topiam.employee.support.util.StringUtils.replaceBlank;
 
 /**
  * 发布审计事件
@@ -73,7 +74,7 @@ public class AuditEventPublish {
         //封装操作事件
         Event event = Event.builder()
                 .type(eventType)
-                .time(Instant.now())
+                .time(LocalDateTime.now())
                 .content(content)
                 .status(eventStatus).build();
         //封装地理位置
@@ -83,36 +84,7 @@ public class AuditEventPublish {
         //封装操作人
         Actor actor = getActor();
         //Publish AuditEvent
-        applicationEventPublisher.publishEvent(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, null));
-        //@formatter:on
-    }
-
-    /**
-     * 发布 审计事件
-     *
-     * @param eventType {@link EventType}
-     */
-    public void publish(EventType eventType, Authentication authentication, EventStatus eventStatus,
-                        List<Target> targets, String result) {
-        //@formatter:off
-        //封装操作事件
-        Event event = Event.builder()
-                .type(eventType)
-                .time(Instant.now())
-                .result(result)
-                .status(eventStatus).build();
-        if (authentication.getPrincipal() instanceof UserDetails){
-            String username = ((UserDetails) authentication.getPrincipal()).getUsername();
-            event.setContent(username+"："+event.getType().getDesc());
-        }
-        //封装地理位置
-        GeoLocation geoLocationModal = getGeoLocation();
-        //封装用户代理
-        UserAgent userAgent = getUserAgent();
-        //封装操作人
-        Actor actor = getActor(authentication);
-        //Publish AuditEvent
-        applicationEventPublisher.publishEvent(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, targets));
+        auditMessagePublisher.sendAuditChangeMessage(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, null));
         //@formatter:on
     }
 
@@ -124,26 +96,26 @@ public class AuditEventPublish {
     public void publish(EventType eventType, Authentication authentication, EventStatus eventStatus,
                         List<Target> targets) {
         //@formatter:off
+        UserDetails principal = (UserDetails) authentication.getPrincipal();
+        WebAuthenticationDetails details = (WebAuthenticationDetails) authentication.getDetails();
         //封装操作事件
         Event event = Event.builder()
                 .type(eventType)
-                .time(Instant.now())
+                .time(LocalDateTime.now())
                 .status(eventStatus).build();
-        if (authentication.getPrincipal() instanceof UserDetails principal){
-            String username = principal.getUsername();
-            Map<String,String> content= Maps.newConcurrentMap();
-            content.put("auth_type",principal.getAuthType());
-            content.put("desc",username+"："+event.getType().getDesc());
-            event.setContent(JSONObject.toJSONString(content));
-        }
+        String username = principal.getUsername();
+        Map<String,String> content= Maps.newConcurrentMap();
+        content.put("auth_type",details.getAuthenticationProvider().getType());
+        content.put("desc",username+"："+event.getType().getDesc());
+        event.setContent(JSONObject.toJSONString(content));
         //封装地理位置
-        GeoLocation geoLocationModal = getGeoLocation();
+        GeoLocation geoLocationModal = getGeoLocation(authentication);
         //封装用户代理
-        UserAgent userAgent = getUserAgent();
+        UserAgent userAgent = getUserAgent(authentication);
         //封装操作人
         Actor actor = getActor(authentication);
         //Publish AuditEvent
-        applicationEventPublisher.publishEvent(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, targets));
+        auditMessagePublisher.sendAuditChangeMessage(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, targets));
         //@formatter:on
     }
 
@@ -157,7 +129,7 @@ public class AuditEventPublish {
         //封装操作事件
         Event event = Event.builder()
                 .type(eventType)
-                .time(Instant.now())
+                .time(LocalDateTime.now())
                 .content(content)
                 .status(eventStatus).build();
         //封装地理位置
@@ -165,7 +137,7 @@ public class AuditEventPublish {
         //封装用户代理
         UserAgent userAgent = getUserAgent();
         //Publish AuditEvent
-        applicationEventPublisher.publishEvent(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, null));
+        auditMessagePublisher.sendAuditChangeMessage(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, null));
         //@formatter:on
     }
 
@@ -175,12 +147,12 @@ public class AuditEventPublish {
      * @param eventType {@link EventType}
      */
     public void publish(EventType eventType, Map<String, Object> parameters, String content,
-                        List<Target> target, String result, EventStatus eventStatus) {
+                        List<Target> target, String result, EventStatus eventStatus, Actor actor) {
         //@formatter:off
         //封装操作事件
         Event event = Event.builder()
                 .type(eventType)
-                .time(Instant.now())
+                .time(LocalDateTime.now())
                 .status(eventStatus).build();
         if (!Objects.isNull(parameters)){
             try {
@@ -202,9 +174,11 @@ public class AuditEventPublish {
         //封装用户代理
         UserAgent userAgent = getUserAgent();
         //封装操作人
-        Actor actor = getActor();
+        if (Objects.isNull(actor)) {
+            actor = getActor();
+        }
         //Publish AuditEvent
-        applicationEventPublisher.publishEvent(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, target));
+        auditMessagePublisher.sendAuditChangeMessage(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, target));
         //@formatter:on
     }
 
@@ -219,7 +193,7 @@ public class AuditEventPublish {
         //封装操作事件
         Event event = Event.builder()
                 .type(eventType)
-                .time(Instant.now())
+                .time(LocalDateTime.now())
                 .status(eventStatus).build();
         //事件结果
         event.setResult(result);
@@ -230,7 +204,7 @@ public class AuditEventPublish {
         //封装操作人
         Actor actor = getActor();
         //Publish AuditEvent
-        applicationEventPublisher.publishEvent(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, target));
+        auditMessagePublisher.sendAuditChangeMessage(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, target));
         //@formatter:on
     }
 
@@ -238,19 +212,16 @@ public class AuditEventPublish {
      * 封装操作者
      * @return {@link Actor}
      */
-    private Actor getActor() {
+    public static Actor getActor() {
         //@formatter:off
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
-        Object principal = authentication.getPrincipal();
-
+        WebAuthenticationDetails details = (WebAuthenticationDetails) authentication.getDetails();
         Actor actor = Actor.builder()
                 .id(getActorId(authentication))
                 .type(getActorType(authentication))
                 .build();
-        if (principal instanceof UserDetails){
-            actor.setAuthType(((UserDetails) principal).getAuthType());
-        }
+        actor.setAuthType(details.getAuthenticationProvider().getType());
         return actor;
         //@formatter:on
     }
@@ -266,15 +237,13 @@ public class AuditEventPublish {
                 .id(getActorId(authentication))
                 .type(getActorType(authentication))
                 .build();
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof UserDetails){
-            actor.setAuthType(((UserDetails) principal).getAuthType());
-        }
+        WebAuthenticationDetails details = (WebAuthenticationDetails) authentication.getDetails();
+        actor.setAuthType(details.getAuthenticationProvider().getType());
         return actor;
         //@formatter:on
     }
 
-    private String getActorId(Authentication authentication) {
+    private static String getActorId(Authentication authentication) {
         //@formatter:off
         Object principal = authentication.getPrincipal();
         if (principal instanceof UserDetails) {
@@ -290,7 +259,7 @@ public class AuditEventPublish {
      * @param authentication {@link Authentication}
      * @return {@link UserType}
      */
-    private UserType getActorType(Authentication authentication) {
+    private static cn.topiam.employee.support.security.userdetails.UserType getActorType(Authentication authentication) {
         //@formatter:off
         Object principal = authentication.getPrincipal();
         if (principal instanceof UserDetails) {
@@ -308,7 +277,7 @@ public class AuditEventPublish {
     private UserAgent getUserAgent() {
         //@formatter:off
         HttpServletRequest request = ServletContextHelp.getRequest();
-        cn.topiam.employee.support.web.useragent.UserAgent ua = UserAgentUtils.getUserAgent(request);
+        cn.topiam.employee.support.web.useragent.UserAgent ua = UserAgentParser.getUserAgent(request);
         return UserAgent.builder()
                 .browser(ua.getBrowser())
                 .browserType(ua.getBrowserType())
@@ -329,7 +298,7 @@ public class AuditEventPublish {
         //@formatter:off
         HttpServletRequest request = ServletContextHelp.getRequest();
         String ip = IpUtils.getIpAddr(request);
-        cn.topiam.employee.common.geo.GeoLocation geoLocation = geoLocationService.getGeoLocation(ip);
+        cn.topiam.employee.support.geo.GeoLocation geoLocation = geoLocationService.getGeoLocation(ip);
         if (Objects.isNull(geoLocation)){
             return null;
         }
@@ -360,12 +329,68 @@ public class AuditEventPublish {
     }
 
     /**
-     * ApplicationEventPublisher
+     * 获取用户代理
+     *
+     * @return {@link UserAgent}
      */
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private UserAgent getUserAgent(Authentication authentication) {
+        //@formatter:off
+        WebAuthenticationDetails details = (WebAuthenticationDetails) authentication.getDetails();
+        cn.topiam.employee.support.web.useragent.UserAgent userAgent = details.getUserAgent();
+        if (Objects.isNull(userAgent)){
+            return getUserAgent();
+        }
+        return UserAgent.builder()
+                .browser(userAgent.getBrowser())
+                .browserType(userAgent.getBrowserType())
+                .browserMajorVersion(userAgent.getBrowserMajorVersion())
+                .platform(userAgent.getPlatform())
+                .platformVersion(userAgent.getPlatformVersion())
+                .deviceType(userAgent.getDeviceType())
+                .build();
+        //@formatter:on
+    }
+
+    /**
+     * 获取地理位置
+     *
+     * @return {@link GeoLocation}
+     */
+    private GeoLocation getGeoLocation(Authentication authentication) {
+        //@formatter:off
+        WebAuthenticationDetails details = (WebAuthenticationDetails) authentication.getDetails();
+        cn.topiam.employee.support.geo.GeoLocation geoLocation = details.getGeoLocation();
+        if (Objects.isNull(geoLocation)){
+            return getGeoLocation();
+        }
+        GeoPoint geoPoint = null;
+        if (!Objects.isNull(geoLocation.getLatitude()) && !Objects.isNull(geoLocation.getLongitude())) {
+            geoPoint = new GeoPoint(geoLocation.getLatitude(), geoLocation.getLongitude());
+        }
+        return  GeoLocation.builder()
+                .ip(geoLocation.getIp())
+                .continentCode(geoLocation.getContinentCode())
+                .continentName(geoLocation.getContinentName())
+                .countryCode(geoLocation.getCountryCode())
+                .countryName(geoLocation.getCountryName())
+                .provinceCode(geoLocation.getProvinceCode())
+                .provinceName(geoLocation.getProvinceName())
+                .cityCode(geoLocation.getCityCode())
+                .cityName(geoLocation.getCityName())
+                .point(geoPoint)
+                .provider(geoLocation.getProvider())
+                .build();
+        //@formatter:on
+    }
+
+    /**
+     * AuditMessagePublisher
+     */
+    private final AuditMessagePublisher auditMessagePublisher;
+
     /**
      * 地理位置
      */
-    private final GeoLocationService        geoLocationService;
+    private final GeoLocationService    geoLocationService;
 
 }

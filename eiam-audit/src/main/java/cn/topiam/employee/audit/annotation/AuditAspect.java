@@ -1,6 +1,6 @@
 /*
- * eiam-audit - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-audit - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,57 +35,52 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONWriter;
 import com.beust.jcommander.internal.Maps;
 
 import cn.topiam.employee.audit.context.AuditContext;
+import cn.topiam.employee.audit.entity.Actor;
 import cn.topiam.employee.audit.enums.EventStatus;
 import cn.topiam.employee.audit.event.AuditEventPublish;
 import cn.topiam.employee.support.result.ApiRestResult;
 
 import lombok.AllArgsConstructor;
+
+import jakarta.validation.ConstraintViolationException;
+import static cn.topiam.employee.audit.event.AuditEventPublish.getActor;
 import static cn.topiam.employee.support.constant.EiamConstants.COLON;
 
 /**
  * 审计切面
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/28 19:20
+ * Created by support@topiam.cn on  2021/9/28 21:20
  */
 @Component
 @Aspect
 @AllArgsConstructor
 public class AuditAspect {
 
-    private final Logger                         logger                  = LoggerFactory
-        .getLogger(AuditAspect.class);
-    /**
-     * SpelExpressionParser
-     */
-    private final SpelExpressionParser           spelExpressionParser    = new SpelExpressionParser();
-    /**
-     * 参数名发现器
-     */
-    private final DefaultParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
+    private final Logger        logger = LoggerFactory.getLogger(AuditAspect.class);
 
-    private final ApplicationContext             applicationContext;
+    private static final String ACTOR  = "actor";
 
-    private final AuditEventPublish              auditEventPublish;
-
-    private static final String                  RESULT                  = "result";
-    private static final String                  METHOD                  = "method";
-    private static final String                  ARGS                    = "args";
-    private static final String                  P                       = "p";
-    private static final String                  ERROR                   = "error";
+    private static final String RESULT = "result";
+    private static final String METHOD = "method";
+    private static final String ARGS   = "args";
+    private static final String P      = "p";
+    private static final String ERROR  = "error";
 
     /**
      * 请求Controller 日志处理
      *
      * @param pjp {@link ProceedingJoinPoint}
      */
+    @SuppressWarnings("AlibabaMethodTooLong")
     @Around(value = "@annotation(audit)", argNames = "pjp,audit")
     public Object around(ProceedingJoinPoint pjp, Audit audit) throws Throwable {
+        //@formatter:off
         boolean success = true;
         Object[] parameter;
         String result = "";
@@ -111,6 +106,7 @@ public class AuditAspect {
             }
         }
         Object proceed;
+        Actor actor = getActor();
         try {
             proceed = pjp.proceed();
             //结果
@@ -122,14 +118,13 @@ public class AuditAspect {
         }
         //正常、还是异常，都会走以下逻辑
         finally {
-            //@formatter:off
             //内容
             Object content = null;
             if (StringUtils.isNoneBlank(audit.content())) {
                 content = spelExpressionParser.parseExpression(audit.content()).getValue(context);
                 if (!Objects.isNull(content)) {
                     try {
-                        content = audit.type().getDesc() + COLON + JSON.toJSONString(content);
+                        content = audit.type().getDesc() + COLON + JSONObject.toJSONString(content);
                     } catch (Exception e) {
                         content = audit.type().getDesc() + COLON + content;
                     }
@@ -154,7 +149,7 @@ public class AuditAspect {
                     if (resultObject instanceof ApiRestResult) {
                        success=((ApiRestResult<?>) resultObject).getSuccess();
                     }
-                    result = JSON.toJSONString(resultObject);
+                    result = JSONObject.toJSONString(resultObject);
                 } catch (Exception e) {
                     result = resultObject.toString();
                 }
@@ -163,15 +158,39 @@ public class AuditAspect {
             if (!success) {
                 Object error = spelExpressionParser.parseExpression("#" + ERROR).getValue(context);
                 if (!Objects.isNull(error)) {
-                    result= JSON.toJSONString(error, JSONWriter.Feature.PrettyFormat);
+                    if (error instanceof ConstraintViolationException) {
+                        result = ((ConstraintViolationException) error).getMessage();
+                    }
+                    else {
+                        result = JSONObject.toJSONString(error, JSONWriter.Feature.PrettyFormat);
+                    }
                 }
             }
-            //@formatter:on
-            auditEventPublish.publish(audit.type(), parameterMap, content.toString(),
-                AuditContext.getTarget(), result, success ? EventStatus.SUCCESS : EventStatus.FAIL);
+            auditEventPublish.publish(audit.type(), parameterMap, content.toString(), AuditContext.getTarget(), result, success ? EventStatus.SUCCESS : EventStatus.FAIL, actor);
         }
         //Remove AuditContext
         AuditContext.removeAuditContext();
         return proceed;
+        //@formatter:on
     }
+
+    /**
+     * SpelExpressionParser
+     */
+    private final SpelExpressionParser           spelExpressionParser    = new SpelExpressionParser();
+
+    /**
+     * 参数名发现器
+     */
+    private final DefaultParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
+
+    /**
+     * ApplicationContext
+     */
+    private final ApplicationContext             applicationContext;
+
+    /**
+     * AuditEventPublish
+     */
+    private final AuditEventPublish              auditEventPublish;
 }

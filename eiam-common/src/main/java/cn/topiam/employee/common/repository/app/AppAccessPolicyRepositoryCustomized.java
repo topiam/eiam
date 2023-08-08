@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -40,4 +40,13 @@ public interface AppAccessPolicyRepositoryCustomized {
      * @return {@link Page}
      */
     Page<AppAccessPolicyPO> getAppPolicyList(AppAccessPolicyQuery query, Pageable pageable);
+
+    /**
+     * 用户是否允许访问应用
+     *
+     * @param appId {@link Long}
+     * @param userId {@link Long}
+     * @return {@link Boolean}
+     */
+    Boolean hasAllowAccess(Long appId, Long userId);
 }

@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -59,7 +59,7 @@ public interface IdentitySourceSyncConverter {
     default Predicate queryIdentitySourceSyncHistoryListQueryConvertToPredicate(IdentitySourceSyncHistoryListQuery query) {
         QIdentitySourceSyncHistoryEntity queryEntity = QIdentitySourceSyncHistoryEntity.identitySourceSyncHistoryEntity;
         Predicate predicate = ExpressionUtils.and(queryEntity.isNotNull(),
-            queryEntity.isDeleted.eq(Boolean.FALSE));
+            queryEntity.deleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = StringUtils.isBlank(query.getIdentitySourceId()) ? predicate : ExpressionUtils.and(predicate, queryEntity.identitySourceId.eq(Long.valueOf(query.getIdentitySourceId())));
@@ -158,7 +158,7 @@ public interface IdentitySourceSyncConverter {
     default Predicate queryIdentitySourceSyncRecordListQueryConvertToPredicate(IdentitySourceSyncRecordListQuery query) {
         QIdentitySourceSyncRecordEntity entity = QIdentitySourceSyncRecordEntity.identitySourceSyncRecordEntity;
         Predicate predicate = ExpressionUtils.and(entity.isNotNull(),
-            entity.isDeleted.eq(Boolean.FALSE));
+            entity.deleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = StringUtils.isBlank(query.getSyncHistoryId()) ? predicate : ExpressionUtils.and(predicate, entity.syncHistoryId.eq(Long.valueOf(query.getSyncHistoryId())));

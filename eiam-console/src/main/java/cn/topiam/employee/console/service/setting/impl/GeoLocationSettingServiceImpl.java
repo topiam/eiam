@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,17 +21,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.setting.SettingEntity;
-import cn.topiam.employee.common.geo.GeoLocation;
-import cn.topiam.employee.common.geo.GeoLocationService;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
 import cn.topiam.employee.console.converter.setting.GeoLocationSettingConverter;
 import cn.topiam.employee.console.pojo.result.setting.GeoIpProviderResult;
 import cn.topiam.employee.console.pojo.save.setting.GeoIpProviderSaveParam;
 import cn.topiam.employee.console.service.setting.GeoLocationSettingService;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.geo.GeoLocation;
+import cn.topiam.employee.support.geo.GeoLocationService;
 
 import lombok.extern.slf4j.Slf4j;
-import static cn.topiam.employee.common.constants.ConfigBeanNameConstants.GEO_LOCATION;
+import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.GEO_LOCATION;
 import static cn.topiam.employee.core.setting.constant.GeoIpProviderConstants.IPADDRESS_SETTING_NAME;
 
 /**
@@ -81,14 +81,6 @@ public class GeoLocationSettingServiceImpl extends SettingServiceImpl
     @Override
     public GeoLocation getGeoLocation(String ip) {
         return geoLocationService.getGeoLocation(ip);
-    }
-
-    /**
-     * 下载IP库
-     */
-    @Override
-    public void downloadDbFile() {
-        geoLocationService.download();
     }
 
     private final GeoLocationService          geoLocationService;

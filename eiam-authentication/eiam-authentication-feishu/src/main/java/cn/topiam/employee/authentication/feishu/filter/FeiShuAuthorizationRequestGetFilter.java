@@ -1,6 +1,6 @@
 /*
- * eiam-authentication-feishu - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-authentication-feishu - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,11 +19,6 @@ package cn.topiam.employee.authentication.feishu.filter;
 
 import java.io.IOException;
 import java.util.*;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
@@ -47,8 +42,13 @@ import com.alibaba.fastjson2.JSONObject;
 import com.google.common.collect.Maps;
 
 import cn.topiam.employee.authentication.feishu.FeiShuIdpScanCodeConfig;
-import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
+import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.RESPONSE_TYPE;
 
 import static cn.topiam.employee.authentication.common.IdentityProviderType.FEISHU_OAUTH;

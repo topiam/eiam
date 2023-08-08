@@ -1,6 +1,6 @@
 /*
- * eiam-portal - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-portal - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,21 +24,19 @@ import java.util.Optional;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import cn.topiam.employee.authentication.common.modal.IdpUser;
+import cn.topiam.employee.authentication.common.authentication.IdpUserDetails;
 import cn.topiam.employee.authentication.common.service.UserIdpService;
-import cn.topiam.employee.common.entity.account.UserDetailEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.entity.account.UserIdpBindEntity;
 import cn.topiam.employee.common.entity.account.po.UserIdpBindPo;
-import cn.topiam.employee.common.entity.authentication.IdentityProviderEntity;
-import cn.topiam.employee.common.repository.account.UserDetailRepository;
+import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
 import cn.topiam.employee.common.repository.account.UserIdpRepository;
 import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
-import cn.topiam.employee.core.security.userdetails.UserDetails;
 import cn.topiam.employee.portal.converter.AccountConverter;
 import cn.topiam.employee.portal.service.userdetail.UserDetailsServiceImpl;
 import cn.topiam.employee.support.exception.TopIamException;
+import cn.topiam.employee.support.security.userdetails.UserDetails;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +59,7 @@ public class UserIdpServiceImpl implements UserIdpService {
      * @return {@link Boolean}
      */
     @Override
-    public Boolean checkUserIdpIsAlreadyBind(String openId, String providerId) {
+    public Boolean checkIdpUserIsExistBind(String openId, String providerId) {
         Optional<IdentityProviderEntity> source = identityProviderRepository
             .findById(Long.valueOf(providerId));
         if (source.isEmpty()) {
@@ -76,27 +74,16 @@ public class UserIdpServiceImpl implements UserIdpService {
     }
 
     /**
-     * 是否自动绑定账户
-     *
-     * @param providerId {@link String}
-     * @return {@link Boolean}
-     */
-    @Override
-    public Boolean isAutoBindUserIdp(String providerId) {
-        return false;
-    }
-
-    /**
      * 绑定
      *
      * @param accountId   {@link  String} 账户ID
-     * @param idpUser {@link  IdpUser} 用户信息
+     * @param idpUserDetails {@link  IdpUserDetails} 用户信息
      * @return {@link  Boolean}
      */
     @Override
-    public Boolean bindUserIdp(String accountId, IdpUser idpUser) {
+    public Boolean bindUserIdp(String accountId, IdpUserDetails idpUserDetails) {
         UserIdpBindEntity userIdpBind = accountConverter
-            .accountBindIdpRequestConverterToEntity(accountId, idpUser);
+            .accountBindIdpRequestConverterToEntity(accountId, idpUserDetails);
         userIdpRepository.save(userIdpBind);
         return true;
     }
@@ -104,12 +91,12 @@ public class UserIdpServiceImpl implements UserIdpService {
     /**
      * 更新账户信息
      *
-     * @param idpUser   {@link IdpUser}
+     * @param idpUserDetails   {@link IdpUserDetails}
      * @param providerId {@link String}
      * @return {@link Boolean}
      */
     @Override
-    public Boolean updateUser(IdpUser idpUser, String providerId) {
+    public Boolean updateUser(IdpUserDetails idpUserDetails, String providerId) {
         return true;
     }
 
@@ -128,10 +115,7 @@ public class UserIdpServiceImpl implements UserIdpService {
         // 权限
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         UserEntity user = getUser(openId, providerId);
-        //用户详情
-        Optional<UserDetailEntity> userDetail = userDetailRepository.findByUserId(user.getId());
-        return UserDetailsServiceImpl.getUserDetails(enabled, accountNonLocked, authorities, user,
-            userDetail.orElse(new UserDetailEntity()));
+        return UserDetailsServiceImpl.getUserDetails(enabled, accountNonLocked, authorities, user);
     }
 
     private UserEntity getUser(String openId, String providerId) {
@@ -154,11 +138,6 @@ public class UserIdpServiceImpl implements UserIdpService {
     private final UserRepository             userRepository;
 
     /**
-     * UserDetailRepository
-     */
-    private final UserDetailRepository       userDetailRepository;
-
-    /**
      * AuthenticationSourceRepository
      */
     private final IdentityProviderRepository identityProviderRepository;
@@ -168,6 +147,9 @@ public class UserIdpServiceImpl implements UserIdpService {
      */
     private final UserIdpRepository          userIdpRepository;
 
+    /**
+     * AccountConverter
+     */
     private final AccountConverter           accountConverter;
 
 }

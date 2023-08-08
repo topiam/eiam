@@ -1,6 +1,6 @@
 /*
- * eiam-core - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-core - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,15 +22,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.topiam.employee.common.enums.MailType;
 import cn.topiam.employee.common.enums.MessageCategory;
+import cn.topiam.employee.common.message.enums.MessageType;
+import cn.topiam.employee.core.mq.NoticeMessagePublisher;
+import cn.topiam.employee.support.context.ApplicationContextHelp;
 
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import static cn.topiam.employee.core.context.SettingContextHelp.getCodeValidTime;
+import static cn.topiam.employee.core.help.SettingHelp.getCodeValidTime;
 import static cn.topiam.employee.core.message.MsgVariable.*;
 import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIME_FORMATTER;
 
@@ -45,9 +50,9 @@ import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIM
 @AllArgsConstructor
 public class MailMsgEventPublish {
     /**
-     * ApplicationEventPublisher
+     * NoticeMessagePublisher
      */
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private final NoticeMessagePublisher noticeMessageProducer;
 
     /**
      * 发布验证代码
@@ -70,18 +75,24 @@ public class MailMsgEventPublish {
      * @param type     {@link MailType} 邮件类型
      * @param receiver {@link String} 接受者
      */
+    @SneakyThrows
     public void publish(MailType type, String receiver, Map<String, Object> parameter) {
         if (StringUtils.isBlank(receiver)) {
-            log.error("发送邮件通知失败, 接受者为空, type: {}, parameter: {}", type, parameter);
+            log.warn("发送邮件通知失败, 接受者为空, type: {}", type);
             return;
         }
         // 时间点
         parameter.put(TIME, LocalDateTime.now().format(DEFAULT_DATE_TIME_FORMATTER));
         // 客户端名称
         parameter.put(CLIENT_NAME, "TopIAM 企业数字身份管控平台");
+        // 客户端描述
+        parameter.put(CLIENT_DESCRIPTION,
+            "TopIAM 数字身份管控平台，简称：EIAM（Employee Identity and Access Management）， 用于管理企业内员工账号、权限、身份认证、应用访问，帮助整合部署在本地或云端的内部办公系统、业务系统及三方 SaaS 系统的所有身份，实现一个账号打通所有应用的服务。");
         // 收件人
         parameter.put(USER_EMAIL, receiver);
         // publish event
-        applicationEventPublisher.publishEvent(new MailMsgEvent(type, receiver, parameter));
+        ObjectMapper objectMapper = ApplicationContextHelp.getBean(ObjectMapper.class);
+        noticeMessageProducer.sendNotice(MessageType.MAIL,
+            objectMapper.writeValueAsString(new MailMessage(type, receiver, parameter)));
     }
 }

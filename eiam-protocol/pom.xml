@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    eiam-protocol - Employee Identity and Access Management Program
-    Copyright © 2020-2023 TopIAM (support@topiam.cn)
+    eiam-protocol - Employee Identity and Access Management
+    Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -24,7 +24,7 @@
     <parent>
         <groupId>cn.topiam</groupId>
         <artifactId>eiam</artifactId>
-        <version>1.0.0-beta1</version>
+        <version>1.0.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -33,10 +33,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>eiam-protocol-cas</module>
         <module>eiam-protocol-form</module>
         <module>eiam-protocol-jwt</module>
-        <module>eiam-protocol-saml2</module>
         <module>eiam-protocol-oidc</module>
         <module>eiam-protocol-core</module>
         <module>eiam-protocol-all</module>

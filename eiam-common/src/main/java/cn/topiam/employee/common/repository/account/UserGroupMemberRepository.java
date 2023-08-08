@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -62,6 +62,15 @@ public interface UserGroupMemberRepository extends
      * @return {@link List}
      */
     List<UserGroupMemberEntity> findByUserId(@Param("userId") Long userId);
+
+    /**
+     * 根据用户组id查询所有用户组关联信息
+     *
+     * @param groupId {@link Long}
+     *
+     * @return {@link List}
+     */
+    List<UserGroupMemberEntity> findByGroupId(Long groupId);
 
     /**
      * 根据用户ID 批量删除关联关系

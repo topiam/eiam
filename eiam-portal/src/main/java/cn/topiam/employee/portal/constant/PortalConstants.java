@@ -1,6 +1,6 @@
 /*
- * eiam-portal - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-portal - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,8 +17,9 @@
  */
 package cn.topiam.employee.portal.constant;
 
-import static cn.topiam.employee.common.constants.AuthorizeConstants.AUTHORIZE_PATH;
-import static cn.topiam.employee.common.constants.ProtocolConstants.APP_CODE_VARIABLE;
+import static cn.topiam.employee.common.constant.AuthorizeConstants.AUTHORIZE_PATH;
+import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CODE_VARIABLE;
+import static cn.topiam.employee.support.constant.EiamConstants.V1_API_PATH;
 
 /**
  * 认证常量
@@ -30,12 +31,6 @@ public class PortalConstants {
 
     public static final String BIND_ACCOUNT                  = "/bind-account";
     public static final String TOPIAM_BIND_STATE_COOKIE_NAME = "topiam-bind-state-cookie";
-
-    /**
-     * SAML2 IDP SSO 发起
-     */
-    public static final String IDP_SAML2_SSO_INITIATOR       = AUTHORIZE_PATH + "/saml2/"
-                                                               + APP_CODE_VARIABLE + "/initiator";
 
     /**
      * OAuth2 IDP SSO 发起
@@ -55,9 +50,20 @@ public class PortalConstants {
     public static final String IDP_JWT_SSO_INITIATOR         = AUTHORIZE_PATH + "/jwt/"
                                                                + APP_CODE_VARIABLE + "/initiator";
 
+    public static final String ACCOUNT_PATH                  = V1_API_PATH + "/account";
+
     /**
-     * CAS IDP SSO 发起
+     * 忘记密码预认证
      */
-    public static final String IDP_CAS_SSO_INITIATOR         = AUTHORIZE_PATH + "/cas/"
-                                                               + APP_CODE_VARIABLE + "/initiator";
+    public static final String PREPARE_FORGET_PASSWORD       = "/prepare_forget_password";
+
+    /**
+     * 忘记密码
+     */
+    public static final String FORGET_PASSWORD               = "/forget_password";
+
+    /**
+     * 忘记密码发送验证码
+     */
+    public static final String FORGET_PASSWORD_CODE          = "/forget_password_code";
 }

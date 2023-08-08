@@ -1,6 +1,6 @@
 /*
- * eiam-common - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,14 +33,14 @@ import cn.topiam.employee.common.entity.app.AppCertEntity;
 import cn.topiam.employee.common.entity.app.AppOidcConfigEntity;
 import cn.topiam.employee.common.enums.app.AppCertUsingType;
 import cn.topiam.employee.support.repository.LogicDeleteRepository;
-import static cn.topiam.employee.common.constants.ProtocolConstants.APP_CERT_CACHE_NAME;
+import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CERT_CACHE_NAME;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 
 /**
  * AppCertificateRepository
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/5/31 20:52
+ * Created by support@topiam.cn on  2022/5/31 21:52
  */
 @CacheConfig(cacheNames = { APP_CERT_CACHE_NAME })
 public interface AppCertRepository extends LogicDeleteRepository<AppCertEntity, Long>,

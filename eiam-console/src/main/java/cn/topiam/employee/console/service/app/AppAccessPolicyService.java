@@ -1,6 +1,6 @@
 /*
- * eiam-console - Employee Identity and Access Management Program
- * Copyright © 2020-2023 TopIAM (support@topiam.cn)
+ * eiam-console - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ import cn.topiam.employee.support.repository.page.domain.PageModel;
  * 应用访问权限策略 Service
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/4 19:55
+ * Created by support@topiam.cn on  2022/6/4 21:55
  */
 public interface AppAccessPolicyService {
 
@@ -56,4 +56,13 @@ public interface AppAccessPolicyService {
      * @return {@link Boolean}
      */
     Boolean deleteAppAccessPolicy(String id);
+
+    /**
+     * 用户是否允许访问应用
+     *
+     * @param appId {@link Long}
+     * @param userId {@link Long}
+     * @return {@link Boolean}
+     */
+    Boolean hasAllowAccess(Long appId, Long userId);
 }

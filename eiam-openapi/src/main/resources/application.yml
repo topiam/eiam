@@ -1,6 +1,6 @@
 #
-# eiam-openapi - Employee Identity and Access Management Program
-# Copyright © 2020-2023 TopIAM (support@topiam.cn)
+# eiam-openapi - Employee Identity and Access Management
+# Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -38,6 +38,10 @@ spring:
       fail_on_empty_beans: false
       #格式化输出
       indent_output: true
+  mvc:
+    formcontent:
+      filter:
+        enabled: true
   cache:
     type: redis
     redis:
@@ -50,13 +54,10 @@ spring:
     redis:
       namespace: ${spring.cache.redis.key-prefix}:session
       flush-mode: immediate
-    store-type: redis
+      repository-type: indexed
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/eiam_develop?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
-    username: ${MYSQL_USER:'eiam'}
-    password: ${MYSQL_PASSWORD:''}
     hikari:
       auto-commit: true
       connection-test-query: SELECT 1
@@ -66,31 +67,25 @@ spring:
       maximum-pool-size: 15
       minimum-idle: 5
       pool-name: eiam
-  #reids
-  redis:
-    host: ${REDIS_HOST:localhost}
-    port: ${REDIS_PORT:6379}
-    password: ${REDIS_PASSWORD:''}
-    database: 9
-    lettuce:
-      pool:
-        max-idle: 7
-        min-idle: 2
-        max-active: 7
-        max-wait: -1ms
-      shutdown-timeout: 200ms
-    timeout: 5000ms
   #elasticsearch
   elasticsearch:
-    uris: "http://${ES_HOST:localhost}:${ES_PORT:9200}"
-    username: ${ES_USER:"elastic"}
-    password: ${ES_PASSWORD:""}
     socket-timeout: 30000s
     connection-timeout: 10000s
   data:
     jpa:
       repositories:
         bootstrap-mode: deferred
+    #reids
+    redis:
+      database: 9
+      lettuce:
+        pool:
+          max-idle: 7
+          min-idle: 2
+          max-active: 7
+          max-wait: -1ms
+        shutdown-timeout: 200ms
+      timeout: 5000ms
   jpa:
     hibernate:
       ddl-auto: none
@@ -109,6 +104,10 @@ spring:
             banner: false
   main:
     banner-mode: off
+  #rabbitmq
+  rabbitmq:
+    template:
+      reply-timeout: 60000
 #日志配置
 logging:
   config: classpath:config/logback-spring.xml
@@ -123,10 +122,8 @@ server:
   servlet:
     session:
       cookie:
-        #dev环境secure=false
-        secure: false
-        #dev环境same-site=lax
-        same-site: lax
+        secure: true
+        same-site: none
         name: topiam-employee-openapi-cookie
         http-only: true
     encoding:
@@ -150,13 +147,7 @@ springdoc:
       enabled: true
       cookie-name: 'topiam-csrf-cookie'
       header-name: 'topiam-csrf'
+    enabled: false
   cache:
     disabled: true
   writer-with-default-pretty-printer: true
-#TopIAM
-topiam:
-  server:
-    console-public-base-url: https://localhost:1898
-    portal-public-base-url:  https://localhost:1989
-    openapi-public-base-url: https://localhost:1988
-    synchronizer-public-base-url: https://localhost:1986
