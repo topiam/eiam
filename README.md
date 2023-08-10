@@ -73,36 +73,25 @@
 - **中间件**：[MySQL](https://www.mysql.com/) 、[Redis](https://redis.io/)、[ElasticSearch](https://www.elastic.co/cn/elasticsearch/)、[RabbitMQ](https://www.rabbitmq.com/)
 - **基础设施**：[Docker](https://www.docker.com/)
 
-## 快速启动
+## 安装部署
 
-### 下载项目
++ [本地部署](https://eiam.topiam.cn/docs/deployment/deployment-local/)
++ [Docker部署](https://eiam.topiam.cn/docs/deployment/deployment-local/)
++ [K8S部署](https://eiam.topiam.cn/docs/deployment/deployment-k8s/)
++ [更多方式](https://eiam.topiam.cn/docs/deployment/)
 
-``` shell
-git clone https://gitee.com/topiam/eiam.git
-```
 
-### 配置参数
+## 用户登记
 
-application.yml文件依次修改以下配置
+如果您和您的公司或组织使用了 TopIAM 企业身份管控平台 ，非常感谢您的支持与信任，请在此进行登记，您的回复将成为维护者、社区用户和观望者的信心来源。感谢支持 💖
 
-* database 配置
-* redis 配置
-* elasticsearch 配置
+**我们会优先支持登记用户的需求及问题反馈。**
 
-> 项目使用 [liquibase](https://www.liquibase.org/) 管理数据库，新建`eiam_develop`数据库 不需要手动创建表结构，服务启动后，会自动创建表结构。
+>登记信息仅用于推广本产品～
 
-### 启动项目
++ 浙江智慧江能技术服务股份有限公司
++ 广东省印象华云数据有限公司
 
-* eiam-openapi (必选)
-* eiam-console (必选)
-* eiam-protal  (必选)
-* eiam-synchronizer（可选）
-
-> 项目启动没有依赖顺序
-
-项目启动完毕后，控制台会打印出访问地址
-
-`eiam-console` 服务启动后，控制台会打印出控制台端管理员的初始化密码，及初始化密码内容文件存储位置。
 
 ![](https://user-images.githubusercontent.com/30397655/208237130-5655a8a4-b528-45d3-ad7c-4295b9f7d42d.png)
 
@@ -112,20 +101,9 @@ application.yml文件依次修改以下配置
 
 ![](https://user-images.githubusercontent.com/30397655/206887629-faf77f3e-1681-4918-99bf-773ef434f088.png)
 
-## 微信交流群
+## 交流群
 
-如果您想加入我们的开源交流群，请扫码添加下方微信，拉您入群，请您在询问前尽可能全面的描述您的情况，例如：
-
-+ 当前使用的系统版本
-+ 当前使用的浏览器类型
-+ 详细的问题描述
-+ 问题的截图说明
-
-![](https://user-images.githubusercontent.com/30397655/205442835-cfcfbf2e-eefb-4e9f-8f36-72d91c240896.jpg)
-
-## QQ交流群
-
-![](https://github.com/topiam/eiam/assets/30397655/3983edc4-5b74-4210-8a4c-dbc03df46da7)
+![](https://github.com/topiam/eiam/assets/30397655/0f679506-5d75-4eeb-9525-ce46b21e0dd4)
 
 ## 参与贡献
 
