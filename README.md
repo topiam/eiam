@@ -89,11 +89,10 @@
 
 >登记信息仅用于推广本产品～
 
+[点击进行接入登记](https://gitee.com/topiam/eiam/issues/I7SAJK)
+
 + 浙江智慧江能技术服务股份有限公司
 + 广东省印象华云数据有限公司
-
-
-![](https://user-images.githubusercontent.com/30397655/208237130-5655a8a4-b528-45d3-ad7c-4295b9f7d42d.png)
 
 ## 微信公众号
 
