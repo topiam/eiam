@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.DEFAULT_SECURITY_FILTER_CHAIN;
 import static cn.topiam.employee.synchronizer.constants.SynchronizerConstants.EVENT_RECEIVE_PATH;
 import static cn.topiam.employee.synchronizer.constants.SynchronizerConstants.SYNCHRONIZER_PATH;
@@ -51,9 +52,9 @@ public class SynchronizerSecurityConfiguration {
         http
                 //认证请求
                 .securityMatcher(SYNCHRONIZER_PATH+"/**")
-                .authorizeHttpRequests(registry -> registry.requestMatchers(EVENT_RECEIVE_PATH+"/*").permitAll().anyRequest().authenticated())
+                .authorizeHttpRequests(registry -> registry.requestMatchers(new AntPathRequestMatcher(EVENT_RECEIVE_PATH+"/*")).permitAll().anyRequest().authenticated())
                 //csrf过滤器
-                .csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.ignoringRequestMatchers(EVENT_RECEIVE_PATH+"/*"));
+                .csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.ignoringRequestMatchers(new AntPathRequestMatcher(EVENT_RECEIVE_PATH+"/*")));
         // @formatter:on
         return http.build();
     }
