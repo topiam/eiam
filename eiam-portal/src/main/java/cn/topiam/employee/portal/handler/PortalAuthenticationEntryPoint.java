@@ -26,8 +26,10 @@ import org.springframework.security.core.AuthenticationException;
 
 import cn.topiam.employee.core.help.ServerHelp;
 import cn.topiam.employee.support.result.ApiRestResult;
+import cn.topiam.employee.support.security.web.AbstractAuthenticationEntryPoint;
 import cn.topiam.employee.support.util.HttpResponseUtils;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
@@ -42,8 +44,7 @@ import static cn.topiam.employee.support.context.ServletContextHelp.isHtmlReques
  * Created by support@topiam.cn on 2020/9/2 22:11
  */
 @SuppressWarnings("DuplicatedCode")
-public class PortalAuthenticationEntryPoint implements
-                                            org.springframework.security.web.AuthenticationEntryPoint {
+public class PortalAuthenticationEntryPoint extends AbstractAuthenticationEntryPoint {
     /**
      * 日志
      */
@@ -66,13 +67,11 @@ public class PortalAuthenticationEntryPoint implements
      */
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
-                         AuthenticationException authException) throws IOException {
-        logger.info("----------------------------------------------------------");
-        logger.info("未登录, 或登录过期");
-        //判断请求
-        boolean isHtmlRequest = isHtmlRequest(request);
+                         AuthenticationException authException) throws IOException,
+                                                                ServletException {
+        super.commence(request, response, authException);
         //JSON
-        if (!isHtmlRequest) {
+        if (!isHtmlRequest(request)) {
             ApiRestResult<Object> result = ApiRestResult.builder()
                 .status(String.valueOf(UNAUTHORIZED.value())).message(StringUtils
                     .defaultString(authException.getMessage(), UNAUTHORIZED.getReasonPhrase()))
@@ -84,6 +83,5 @@ public class PortalAuthenticationEntryPoint implements
             //跳转前端SESSION过期路由
             response.sendRedirect(ServerHelp.getPortalPublicBaseUrl() + FE_LOGIN);
         }
-        logger.info("----------------------------------------------------------");
     }
 }

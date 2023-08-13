@@ -17,15 +17,18 @@
  */
 package cn.topiam.employee.console.handler;
 
+import java.io.IOException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
 
 import cn.topiam.employee.support.result.ApiRestResult;
+import cn.topiam.employee.support.security.web.AbstractAuthenticationEntryPoint;
 import cn.topiam.employee.support.util.HttpResponseUtils;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
@@ -36,7 +39,7 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
  * @author TopIAM
  * Created by support@topiam.cn on 2020/9/2 22:11
  */
-public class ConsoleAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class ConsoleAuthenticationEntryPoint extends AbstractAuthenticationEntryPoint {
     /**
      * 日志
      */
@@ -59,14 +62,13 @@ public class ConsoleAuthenticationEntryPoint implements AuthenticationEntryPoint
      */
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
-                         AuthenticationException authException) {
-        logger.info("----------------------------------------------------------");
-        logger.info("未登录，或登录过期");
+                         AuthenticationException authException) throws IOException,
+                                                                ServletException {
+        super.commence(request, response, authException);
         ApiRestResult<Object> result = ApiRestResult.builder()
             .status(String.valueOf(UNAUTHORIZED.value())).message(StringUtils
                 .defaultString(authException.getMessage(), UNAUTHORIZED.getReasonPhrase()))
             .build();
         HttpResponseUtils.flushResponseJson(response, UNAUTHORIZED.value(), result);
-        logger.info("----------------------------------------------------------");
     }
 }
