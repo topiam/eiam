@@ -24,7 +24,7 @@
     <parent>
         <groupId>cn.topiam</groupId>
         <artifactId>eiam</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -42,6 +42,7 @@
         <module>eiam-authentication-all</module>
         <module>eiam-authentication-mail</module>
         <module>eiam-authentication-sms</module>
+        <module>eiam-authentication-gitee</module>
     </modules>
 
     <dependencies>
