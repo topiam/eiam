@@ -20,6 +20,7 @@ package cn.topiam.employee.protocol.form.authentication;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -137,6 +138,9 @@ public final class FormAuthenticationTokenProvider implements AuthenticationProv
             }
             case AES -> {
                 return new AesUtils(encryptionKey).encrypt(fieldValue);
+            }
+            case MD5 -> {
+                return DigestUtils.md5Hex(fieldValue);
             }
         }
         return fieldValue;
