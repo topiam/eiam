@@ -34,6 +34,10 @@ public enum FormEncryptType implements BaseEnum {
                                                   */
                                                  AES("aes", "AES加密"),
                                                  /**
+                                                  * MD5编码
+                                                  */
+                                                 MD5("md5", "MD5编码"),
+                                                 /**
                                                   * bas64
                                                   */
                                                  BASE64("base64", "BASE64编码");
