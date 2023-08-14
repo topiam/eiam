@@ -24,7 +24,7 @@
     <parent>
         <groupId>cn.topiam</groupId>
         <artifactId>eiam</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <packaging>pom</packaging>

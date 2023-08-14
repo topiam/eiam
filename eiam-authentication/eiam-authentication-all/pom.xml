@@ -24,7 +24,7 @@
     <parent>
         <artifactId>eiam-authentication</artifactId>
         <groupId>cn.topiam</groupId>
-        <version>1.0.0</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <packaging>jar</packaging>
@@ -73,6 +73,12 @@
         <dependency>
             <groupId>cn.topiam</groupId>
             <artifactId>eiam-authentication-mail</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!--gitee-->
+        <dependency>
+            <groupId>cn.topiam</groupId>
+            <artifactId>eiam-authentication-gitee</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

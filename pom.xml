@@ -25,11 +25,11 @@
     <parent>
         <groupId>cn.topiam</groupId>
         <artifactId>eiam-support-parent</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath/>
     </parent>
     <artifactId>eiam</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>TopIAM Employee</name>
     <description>Employee Identity and Access Management</description>
@@ -93,6 +93,52 @@
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>remove</goal>
+                            <goal>format</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <quiet>true</quiet>
+                    <licenseSets>
+                        <licenseSet>
+                            <header>${main.user.dir}/tools/codestyle/HEADER</header>
+                            <excludes>
+                                <exclude>*.sh</exclude>
+                                <exclude>*.yml</exclude>
+                                <exclude>*.iml</exclude>
+                                <exclude>*.config</exclude>
+                                <exclude>**/*.ftlh</exclude>
+                                <exclude>.editorconfig</exclude>
+                                <exclude>.gitignore</exclude>
+                                <exclude>LICENSE</exclude>
+                                <exclude>**/*.md</exclude>
+                                <exclude>**/*.log</exclude>
+                                <exclude>**/codestyle/HEADER</exclude>
+                                <exclude>**/.gitkeep</exclude>
+                                <exclude>**/spring.factories</exclude>
+                                <exclude>**/META-INF/**</exclude>
+                                <exclude>**/.mvn/**</exclude>
+                                <exclude>**/mvnw</exclude>
+                                <exclude>**/resources/template/**</exclude>
+                                <exclude>**/node_modules/**</exclude>
+                                <exclude>**/docs/**</exclude>
+                                <exclude>**/dictionaries/**</exclude>
+                            </excludes>
+                        </licenseSet>
+                    </licenseSets>
+                    <strictCheck>true</strictCheck>
+                    <mapping>
+                        <java>SLASHSTAR_STYLE</java>
+                        <tsx>SLASHSTAR_STYLE</tsx>
+                        <ts>SLASHSTAR_STYLE</ts>
+                        <js>SLASHSTAR_STYLE</js>
+                    </mapping>
+                </configuration>
             </plugin>
             <!--formatter-->
             <plugin>

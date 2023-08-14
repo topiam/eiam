@@ -17,19 +17,22 @@
  */
 package cn.topiam.employee.openapi.authorization;
 
+import java.io.IOException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.topiam.employee.openapi.constants.OpenApiStatus;
+import cn.topiam.employee.support.security.web.AbstractAuthenticationEntryPoint;
 import cn.topiam.employee.support.util.HttpResponseUtils;
 
 import lombok.Data;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -38,7 +41,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author TopIAM
  * Created by support@topiam.cn on  2023/6/25 21:55
  */
-public final class AccessTokenAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public final class AccessTokenAuthenticationEntryPoint extends AbstractAuthenticationEntryPoint {
 
     /**
      * Collect error details from the provided parameters and format according to RFC
@@ -50,7 +53,9 @@ public final class AccessTokenAuthenticationEntryPoint implements Authentication
      */
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse httpServletResponse,
-                         AuthenticationException authException) {
+                         AuthenticationException authException) throws ServletException,
+                                                                IOException {
+        super.commence(request, httpServletResponse, authException);
         Response response = new Response();
         response.setCode(OpenApiStatus.INVALID_ACCESS_TOKEN.getCode());
         response.setMsg(OpenApiStatus.INVALID_ACCESS_TOKEN.getDesc());

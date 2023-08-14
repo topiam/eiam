@@ -24,7 +24,7 @@
     <parent>
         <groupId>cn.topiam</groupId>
         <artifactId>eiam</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -131,7 +131,7 @@
                                 <phase>generate-resources</phase>
                                 <configuration>
                                     <nodeVersion>v18.16.1</nodeVersion>
-                                    <pnpmVersion>v8.6.7</pnpmVersion>
+                                    <pnpmVersion>v8.6.12</pnpmVersion>
                                     <nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</nodeDownloadRoot>
                                 </configuration>
                             </execution>
@@ -184,7 +184,7 @@
                                 <phase>generate-resources</phase>
                                 <configuration>
                                     <nodeVersion>v18.16.1</nodeVersion>
-                                    <pnpmVersion>v8.6.7</pnpmVersion>
+                                    <pnpmVersion>v8.6.12</pnpmVersion>
                                     <nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</nodeDownloadRoot>
                                 </configuration>
                             </execution>
