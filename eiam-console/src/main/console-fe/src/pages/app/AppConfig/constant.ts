@@ -77,4 +77,6 @@ export enum FormEncryptType {
   aes = 'aes',
   /**base64*/
   base64 = 'base64',
+  /**md5*/
+  md5 = 'md5',
 }
