@@ -30,6 +30,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
+import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
@@ -40,7 +41,6 @@ import cn.topiam.employee.authentication.common.authentication.IdpUserDetails;
 import cn.topiam.employee.authentication.common.filter.AbstractIdpAuthenticationProcessingFilter;
 import cn.topiam.employee.authentication.common.service.UserIdpService;
 import cn.topiam.employee.authentication.wechat.WeChatIdpScanCodeConfig;
-import cn.topiam.employee.authentication.wechat.constant.WeChatAuthenticationConstants;
 import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 import cn.topiam.employee.core.help.ServerHelp;
@@ -51,8 +51,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import static org.springframework.security.oauth2.core.AuthorizationGrantType.AUTHORIZATION_CODE;
 
-import static cn.topiam.employee.authentication.common.IdentityProviderType.*;
+import static cn.topiam.employee.authentication.common.IdentityProviderType.WECHAT_QR;
+import static cn.topiam.employee.authentication.common.IdentityProviderType.WECHAT_WORK_QR;
 import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.*;
+import static cn.topiam.employee.authentication.wechat.constant.WeChatAuthenticationConstants.QrConnect.*;
 
 /**
  * 微信扫码登录过滤器
@@ -130,13 +132,12 @@ public class WeChatScanCodeLoginAuthenticationFilter extends
         }
         //获取access token
         HashMap<String, String> param = new HashMap<>(16);
-        param.put(WeChatAuthenticationConstants.QrConnect.APP_ID, config.getAppId());
-        param.put(WeChatAuthenticationConstants.QrConnect.SECRET, config.getAppSecret());
+        param.put(APP_ID, config.getAppId());
+        param.put(SECRET, config.getAppSecret());
         param.put(OAuth2ParameterNames.CODE, code);
         param.put(OAuth2ParameterNames.GRANT_TYPE, AUTHORIZATION_CODE.getValue());
-        JSONObject result = JSON.parseObject(
-                HttpClientUtils.get(WeChatAuthenticationConstants.QrConnect.ACCESS_TOKEN, param));
-        if (result.containsKey(WeChatAuthenticationConstants.QrConnect.ERROR_CODE)) {
+        JSONObject result = JSON.parseObject(HttpClientUtils.get(ACCESS_TOKEN, param));
+        if (result.containsKey(ERROR_CODE)) {
             logger.error("获取access_token发生错误:  " + result.toJSONString());
             throw new TopIamException("获取access_token发生错误:  " + result.toJSONString());
         }
@@ -144,15 +145,15 @@ public class WeChatScanCodeLoginAuthenticationFilter extends
         param = new HashMap<>(16);
         param.put(OAuth2ParameterNames.ACCESS_TOKEN,
                 result.getString(OAuth2ParameterNames.ACCESS_TOKEN));
-        result = JSON.parseObject(
-                HttpClientUtils.get(WeChatAuthenticationConstants.QrConnect.USER_INFO, param));
-        if (result.containsKey(WeChatAuthenticationConstants.QrConnect.ERROR_CODE)) {
+        result = JSON.parseObject(HttpClientUtils.get(USER_INFO, param));
+        if (result.containsKey(ERROR_CODE)) {
             logger.error("获取微信用户个人信息发生错误:  " + result.toJSONString());
             throw new TopIamException("获取微信用户个人信息发生错误:  " + result.toJSONString());
         }
         // 返回
-        IdpUserDetails idpUserDetails = IdpUserDetails.builder().openId(param.get("id"))
-                .providerCode(providerCode).providerId(providerId).providerType(WECHAT_QR).build();
+        IdpUserDetails idpUserDetails = IdpUserDetails.builder()
+                .openId(param.get(OidcScopes.OPENID)).providerCode(providerCode).providerId(providerId)
+                .providerType(WECHAT_QR).build();
         return attemptAuthentication(request, response, idpUserDetails);
     }
 
