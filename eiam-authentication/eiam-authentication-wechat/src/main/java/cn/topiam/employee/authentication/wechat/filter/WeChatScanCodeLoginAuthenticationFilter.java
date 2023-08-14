@@ -52,7 +52,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import static org.springframework.security.oauth2.core.AuthorizationGrantType.AUTHORIZATION_CODE;
 
 import static cn.topiam.employee.authentication.common.IdentityProviderType.WECHAT_QR;
-import static cn.topiam.employee.authentication.common.IdentityProviderType.WECHAT_WORK_QR;
 import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.*;
 import static cn.topiam.employee.authentication.wechat.constant.WeChatAuthenticationConstants.QrConnect.*;
 
@@ -64,12 +63,12 @@ import static cn.topiam.employee.authentication.wechat.constant.WeChatAuthentica
  */
 @SuppressWarnings("DuplicatedCode")
 public class WeChatScanCodeLoginAuthenticationFilter extends
-        AbstractIdpAuthenticationProcessingFilter {
+                                                     AbstractIdpAuthenticationProcessingFilter {
 
     public final static String                DEFAULT_FILTER_PROCESSES_URI = WECHAT_QR
-            .getLoginPathPrefix() + "/" + "{" + PROVIDER_CODE + "}";
+        .getLoginPathPrefix() + "/" + "{" + PROVIDER_CODE + "}";
     public static final AntPathRequestMatcher REQUEST_MATCHER              = new AntPathRequestMatcher(
-            DEFAULT_FILTER_PROCESSES_URI, HttpMethod.GET.name());
+        DEFAULT_FILTER_PROCESSES_URI, HttpMethod.GET.name());
 
     /**
      * Creates a new instance
@@ -93,9 +92,9 @@ public class WeChatScanCodeLoginAuthenticationFilter extends
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response) throws AuthenticationException,
-            IOException {
+                                                                              IOException {
         OAuth2AuthorizationRequest authorizationRequest = getOauth2AuthorizationRequest(request,
-                response);
+            response);
         RequestMatcher.MatchResult matcher = REQUEST_MATCHER.matcher(request);
         Map<String, String> variables = matcher.getVariables();
         String providerCode = variables.get(PROVIDER_CODE);
@@ -122,12 +121,12 @@ public class WeChatScanCodeLoginAuthenticationFilter extends
         //获取身份提供商
         IdentityProviderEntity provider = getIdentityProviderEntity(providerCode);
         WeChatIdpScanCodeConfig config = JSONObject.parseObject(provider.getConfig(),
-                WeChatIdpScanCodeConfig.class);
+            WeChatIdpScanCodeConfig.class);
         if (Objects.isNull(config)) {
             logger.error("未查询到微信扫码登录配置");
             //无效身份提供商
             OAuth2Error oauth2Error = new OAuth2Error(
-                    AbstractIdpAuthenticationProcessingFilter.INVALID_IDP_CONFIG);
+                AbstractIdpAuthenticationProcessingFilter.INVALID_IDP_CONFIG);
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
         }
         //获取access token
@@ -144,7 +143,7 @@ public class WeChatScanCodeLoginAuthenticationFilter extends
         // 获取user信息
         param = new HashMap<>(16);
         param.put(OAuth2ParameterNames.ACCESS_TOKEN,
-                result.getString(OAuth2ParameterNames.ACCESS_TOKEN));
+            result.getString(OAuth2ParameterNames.ACCESS_TOKEN));
         result = JSON.parseObject(HttpClientUtils.get(USER_INFO, param));
         if (result.containsKey(ERROR_CODE)) {
             logger.error("获取微信用户个人信息发生错误:  " + result.toJSONString());
@@ -152,14 +151,14 @@ public class WeChatScanCodeLoginAuthenticationFilter extends
         }
         // 返回
         IdpUserDetails idpUserDetails = IdpUserDetails.builder()
-                .openId(param.get(OidcScopes.OPENID)).providerCode(providerCode).providerId(providerId)
-                .providerType(WECHAT_QR).build();
+            .openId(param.get(OidcScopes.OPENID)).providerCode(providerCode).providerId(providerId)
+            .providerType(WECHAT_QR).build();
         return attemptAuthentication(request, response, idpUserDetails);
     }
 
     public static String getLoginUrl(String providerId) {
         String url = ServerHelp.getPortalPublicBaseUrl() + WECHAT_QR.getLoginPathPrefix() + "/"
-                + providerId;
+                     + providerId;
         return url.replaceAll("(?<!(http:|https:))/+", "/");
     }
 
