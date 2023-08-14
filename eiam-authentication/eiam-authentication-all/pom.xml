@@ -75,11 +75,5 @@
             <artifactId>eiam-authentication-mail</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!--gitee-->
-        <dependency>
-            <groupId>cn.topiam</groupId>
-            <artifactId>eiam-authentication-gitee</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
 </project>
