@@ -42,7 +42,6 @@
         <module>eiam-authentication-all</module>
         <module>eiam-authentication-mail</module>
         <module>eiam-authentication-sms</module>
-        <module>eiam-authentication-gitee</module>
     </modules>
 
     <dependencies>
