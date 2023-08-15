@@ -17,7 +17,7 @@
  */
 package cn.topiam.employee.synchronizer.configuration;
 
-import cn.topiam.employee.support.util.Md5Utils;
+import org.apache.commons.codec.digest.DigestUtils;
 
 /**
  *  IdentitySourceBeanUtils
@@ -34,6 +34,6 @@ public class IdentitySourceBeanUtils {
      * @return {@link  String}
      */
     public static String getSourceBeanName(String id) {
-        return "identitySourceBean_" + Md5Utils.md516(id);
+        return "identitySourceBean_" + DigestUtils.md5Hex(id);
     }
 }

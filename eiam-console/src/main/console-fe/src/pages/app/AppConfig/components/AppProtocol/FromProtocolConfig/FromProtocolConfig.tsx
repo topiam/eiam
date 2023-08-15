@@ -210,6 +210,7 @@ export default (props: { app: GetApp | Record<string, any> }) => {
           options={[
             { value: FormEncryptType.aes, label: 'AES' },
             { value: FormEncryptType.base64, label: 'BASE64' },
+            { value: FormEncryptType.md5, label: 'MD5' },
           ]}
           fieldProps={{ allowClear: true }}
           extra={intl.formatMessage({

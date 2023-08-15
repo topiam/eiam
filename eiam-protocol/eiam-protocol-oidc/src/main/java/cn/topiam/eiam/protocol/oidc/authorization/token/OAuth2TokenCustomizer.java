@@ -18,9 +18,7 @@
 package cn.topiam.eiam.protocol.oidc.authorization.token;
 
 import java.security.Principal;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
@@ -64,23 +62,29 @@ public class OAuth2TokenCustomizer implements
                     Optional<UserEntity> optional = userRepository.findById(Long.valueOf(principal.getId()));
                     if (optional.isPresent()){
                         UserEntity user = optional.get();
+                        boolean hasCustomClaims=false;
                         OidcUserInfo.Builder userInfoBuilder = OidcUserInfo.builder();
                         // Customize headers/claims for id_token
                         if (authorizedScopes.contains(EMAIL)) {
+                            hasCustomClaims=true;
                             userInfoBuilder.email(StringUtils.defaultString(user.getEmail(), ""));
                             userInfoBuilder.emailVerified(!Objects.isNull(user.getEmailVerified()) && user.getEmailVerified());
                         }
                         if (authorizedScopes.contains(PHONE)) {
+                            hasCustomClaims=true;
                             userInfoBuilder.phoneNumber(StringUtils.defaultString(user.getPhone(), ""));
                             userInfoBuilder.phoneNumberVerified(!Objects.isNull(user.getPhoneVerified()) && user.getPhoneVerified());
                         }
                         if (authorizedScopes.contains(PROFILE)) {
+                            hasCustomClaims=true;
                             userInfoBuilder.preferredUsername(StringUtils.defaultString(user.getFullName(), ""));
                             userInfoBuilder.nickname(StringUtils.defaultString(user.getNickName(), ""));
                             userInfoBuilder.updatedAt(user.getUpdateTime().format(DEFAULT_DATE_TIME_FORMATTER));
                         }
-                        context.getClaims().claims(claims ->
-                                claims.putAll(userInfoBuilder.build().getClaims()));
+                        if (hasCustomClaims){
+                            context.getClaims().claims(claims ->
+                                    claims.putAll(userInfoBuilder.build().getClaims()));
+                        }
                     }
                 }
             }
