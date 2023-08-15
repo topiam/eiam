@@ -104,7 +104,7 @@
 
 ## 交流群
 
-![](https://github.com/topiam/eiam/assets/30397655/0f679506-5d75-4eeb-9525-ce46b21e0dd4)
+![](https://eiam.topiam.cn/img/group-qr-code.jpg)
 
 ## 参与贡献
 
