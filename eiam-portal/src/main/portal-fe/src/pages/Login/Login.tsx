@@ -185,6 +185,21 @@ const Login = () => {
   };
 
   /**
+   * GITHUB
+   *
+   * @param id
+   */
+  const githubOauthOnClick = (id: string) => {
+    const query = queryString.parse(history.location.search);
+    const { redirect_uri } = query as { redirect_uri: string };
+    let path = `/api/v1/authorization/github_oauth/${id}`;
+    if (redirect_uri) {
+      path = `${path}?redirect_uri=${redirect_uri}`;
+    }
+    window.open(path, '_self');
+  };
+
+  /**
    * 提交
    *
    * @param values
@@ -476,6 +491,11 @@ const Login = () => {
                                               //微博
                                               if (value.type === IDP_TYPE.WEIBO_OAUTH) {
                                                 weiBoOauthOnClick(value.code);
+                                                return;
+                                              }
+                                              //GITHUB，跳转页面
+                                              if (value.type === IDP_TYPE.GITHUB_OAUTH) {
+                                                githubOauthOnClick(value.code);
                                                 return;
                                               }
                                               //其他方式，跳转页面

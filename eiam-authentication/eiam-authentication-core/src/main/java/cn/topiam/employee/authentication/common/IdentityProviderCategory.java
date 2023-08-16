@@ -35,9 +35,11 @@ public enum IdentityProviderCategory implements BaseEnum {
                                                           /**
                                                            * 社交
                                                            */
-                                                          social("social", "社交", Lists.newArrayList(
-                                                              IdentityProviderType.QQ,
-                                                              IdentityProviderType.WECHAT_QR)),
+                                                          social("social", "社交",
+                                                                 Lists.newArrayList(
+                                                                     IdentityProviderType.QQ,
+                                                                     IdentityProviderType.WECHAT_QR,
+                                                                     IdentityProviderType.GITHUB)),
                                                           /**
                                                            * 企业
                                                            */

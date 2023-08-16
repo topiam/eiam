@@ -36,6 +36,7 @@ export enum IdentityProviderType {
   //社交
   qq = 'qq_oauth',
   wechat_qr = 'wechat_qr',
+  github = 'github_oauth',
 }
 
 /**

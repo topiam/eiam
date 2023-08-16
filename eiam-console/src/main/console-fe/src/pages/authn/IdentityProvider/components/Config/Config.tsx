@@ -23,6 +23,7 @@ import FeiShuScanCodeConfig from './FeiShuScanCodeConfig';
 import QqOauthConfig from './QqOauthConfig';
 import WeChatScanCode from './WeChatScanCodeConfig';
 import WeWorkScanCode from './WeWorkScanCodeConfig';
+import GithubOauthConfig from './GithubOauthConfig';
 import { useIntl } from '@umijs/max';
 
 /**
@@ -43,6 +44,7 @@ const Config = (props: { type: IdentityProviderType | string; isCreate?: boolean
       {type === IdentityProviderType.dingtalk_oauth && <DingTalkOauthConfig isCreate={isCreate} />}
       {type === IdentityProviderType.qq && <QqOauthConfig isCreate={isCreate} />}
       {type === IdentityProviderType.feishu_oauth && <FeiShuScanCodeConfig isCreate={isCreate} />}
+      {type === IdentityProviderType.github && <GithubOauthConfig isCreate={isCreate} />}
       <ProFormSwitch
         name={['displayed']}
         extra={intl.formatMessage({

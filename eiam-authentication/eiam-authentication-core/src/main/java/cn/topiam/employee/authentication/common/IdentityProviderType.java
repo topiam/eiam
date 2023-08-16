@@ -93,6 +93,13 @@ public final class IdentityProviderType {
      */
     public static final IdentityProviderType MAIL              = new IdentityProviderType("mail",
         "邮件验证码认证", "通过邮件验证码进行身份认证");
+
+    /**
+     * GITHUB认证
+     */
+    public static final IdentityProviderType GITHUB            = new IdentityProviderType(
+        "github_oauth", "GITHUB认证", "通过GITHUB进行身份认证");
+
     private final String                     value;
     private final String                     name;
     private final String                     desc;

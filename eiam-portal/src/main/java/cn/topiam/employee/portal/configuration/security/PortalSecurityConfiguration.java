@@ -57,6 +57,7 @@ import cn.topiam.employee.authentication.common.service.UserIdpService;
 import cn.topiam.employee.authentication.dingtalk.configurer.DingtalkOAuth2AuthenticationConfigurer;
 import cn.topiam.employee.authentication.dingtalk.configurer.DingtalkScanCodeAuthenticationConfigurer;
 import cn.topiam.employee.authentication.feishu.configurer.FeiShuScanCodeAuthenticationConfigurer;
+import cn.topiam.employee.authentication.github.configurer.GithubOauthAuthenticationConfigurer;
 import cn.topiam.employee.authentication.otp.mail.MailOtpAuthenticationConfigurer;
 import cn.topiam.employee.authentication.otp.sms.SmsOtpAuthenticationConfigurer;
 import cn.topiam.employee.authentication.qq.configurer.QqOauthAuthenticationConfigurer;
@@ -92,6 +93,7 @@ import static cn.topiam.employee.authentication.common.configurer.IdpBindAuthent
 import static cn.topiam.employee.authentication.dingtalk.configurer.DingtalkOAuth2AuthenticationConfigurer.dingtalkOAuth2;
 import static cn.topiam.employee.authentication.dingtalk.configurer.DingtalkScanCodeAuthenticationConfigurer.dingtalkScanCode;
 import static cn.topiam.employee.authentication.feishu.configurer.FeiShuScanCodeAuthenticationConfigurer.feiShuScanCode;
+import static cn.topiam.employee.authentication.github.configurer.GithubOauthAuthenticationConfigurer.github;
 import static cn.topiam.employee.authentication.otp.mail.MailOtpAuthenticationConfigurer.mailOtp;
 import static cn.topiam.employee.authentication.otp.sms.SmsOtpAuthenticationConfigurer.smsOtp;
 import static cn.topiam.employee.authentication.qq.configurer.QqOauthAuthenticationConfigurer.qq;
@@ -163,6 +165,14 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
                 .authenticationDetailsSource(authenticationDetailsSource);
         requestMatchers.add(chatScanCode.getRequestMatcher());
         httpSecurity.apply(chatScanCode);
+
+        //GITHUB
+        GithubOauthAuthenticationConfigurer github = github(identityProviderRepository, userIdpService)
+                .successHandler(successHandler)
+                .failureHandler(failureHandler)
+                .authenticationDetailsSource(authenticationDetailsSource);
+        requestMatchers.add(github.getRequestMatcher());
+        httpSecurity.apply(github);
 
         //企业微信
         WeChatWorkScanCodeAuthenticationConfigurer weChatWorkScanCode = weChatWorkScanCode(identityProviderRepository, userIdpService)

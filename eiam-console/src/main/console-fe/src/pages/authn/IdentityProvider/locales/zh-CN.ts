@@ -38,6 +38,7 @@ export default {
   'pages.authn.identity_provider.create_modal.form.type.rule.0.message': '请选择认证提供商',
   'pages.authn.identity_provider.create_modal.form.type.wechat_qr': '微信开放平台扫码认证',
   'pages.authn.identity_provider.create_modal.form.type.qq': 'QQ认证',
+  'pages.authn.identity_provider.create_modal.form.type.github': 'Github认证',
   'pages.authn.identity_provider.create_modal.form.type.dingtalk_oauth': '钉钉认证',
   'pages.authn.identity_provider.create_modal.form.type.dingtalk_qr': '钉钉扫码认证',
   'pages.authn.identity_provider.create_modal.form.type.feishu_oauth': '飞书认证',
@@ -75,4 +76,8 @@ export default {
   'pages.authn.identity_provider.config.wework_scan_code.app_secret.placeholder':
     '请输入获取的Secret',
   'pages.authn.identity_provider.add-success-content': '请复制以下链接访问门户端',
+  'pages.authn.identity_provider.config.github_oauth.client_id.placeholder': '请填写Client ID',
+  'pages.authn.identity_provider.config.github_oauth.client_secret.placeholder': '请填写Client Secret',
+  'pages.authn.identity_provider.config.github_oauth.client_id.extra': 'GitHub应用的Client ID',
+  'pages.authn.identity_provider.config.github_oauth.client_secret.extra': 'GitHub应用生成的Client secret',
 };

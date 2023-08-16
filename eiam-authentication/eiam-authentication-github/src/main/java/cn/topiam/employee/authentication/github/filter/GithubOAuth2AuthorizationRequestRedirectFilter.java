@@ -1,5 +1,5 @@
 /*
- * eiam-authentication-qq - Employee Identity and Access Management
+ * eiam-authentication-github - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.authentication.qq.filter;
+package cn.topiam.employee.authentication.github.filter;
 
 import java.io.IOException;
 import java.util.Base64;
@@ -41,7 +41,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.alibaba.fastjson2.JSONObject;
 
-import cn.topiam.employee.authentication.qq.QqIdpOauthConfig;
+import cn.topiam.employee.authentication.github.GithubIdpOauthConfig;
 import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 
@@ -49,10 +49,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import static cn.topiam.employee.authentication.common.IdentityProviderType.QQ;
+import static cn.topiam.employee.authentication.common.IdentityProviderType.GITHUB;
 import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.PROVIDER_CODE;
-import static cn.topiam.employee.authentication.qq.constant.QqAuthenticationConstants.URL_AUTHORIZE;
-import static cn.topiam.employee.authentication.qq.filter.QqOAuth2LoginAuthenticationFilter.getLoginUrl;
+import static cn.topiam.employee.authentication.github.constant.GithubAuthenticationConstants.URL_AUTHORIZE;
+import static cn.topiam.employee.authentication.github.filter.GithubOAuth2LoginAuthenticationFilter.getLoginUrl;
 
 /**
  * 微信扫码登录请求重定向过滤器
@@ -61,16 +61,17 @@ import static cn.topiam.employee.authentication.qq.filter.QqOAuth2LoginAuthentic
  * Created by support@topiam.cn on  2022/6/20 21:22
  */
 @SuppressWarnings("ALL")
-public class QqOAuth2AuthorizationRequestRedirectFilter extends OncePerRequestFilter {
+public class GithubOAuth2AuthorizationRequestRedirectFilter extends OncePerRequestFilter {
 
     private final Logger                                                     logger                         = LoggerFactory
-        .getLogger(QqOAuth2AuthorizationRequestRedirectFilter.class);
+        .getLogger(GithubOAuth2AuthorizationRequestRedirectFilter.class);
 
     /**
      * AntPathRequestMatcher
      */
-    public static final AntPathRequestMatcher                                QQ_REQUEST_MATCHER             = new AntPathRequestMatcher(
-        QQ.getAuthorizationPathPrefix() + "/" + "{" + PROVIDER_CODE + "}", HttpMethod.GET.name());
+    public static final AntPathRequestMatcher                                GITHUB_REQUEST_MATCHER         = new AntPathRequestMatcher(
+        GITHUB.getAuthorizationPathPrefix() + "/" + "{" + PROVIDER_CODE + "}",
+        HttpMethod.GET.name());
 
     /**
      * 重定向策略
@@ -86,7 +87,7 @@ public class QqOAuth2AuthorizationRequestRedirectFilter extends OncePerRequestFi
         Base64.getUrlEncoder());
     private final IdentityProviderRepository                                 identityProviderRepository;
 
-    public QqOAuth2AuthorizationRequestRedirectFilter(IdentityProviderRepository identityProviderRepository) {
+    public GithubOAuth2AuthorizationRequestRedirectFilter(IdentityProviderRepository identityProviderRepository) {
         this.identityProviderRepository = identityProviderRepository;
     }
 
@@ -95,7 +96,7 @@ public class QqOAuth2AuthorizationRequestRedirectFilter extends OncePerRequestFi
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws IOException,
                                                                       ServletException {
-        RequestMatcher.MatchResult matcher = QQ_REQUEST_MATCHER.matcher(request);
+        RequestMatcher.MatchResult matcher = GITHUB_REQUEST_MATCHER.matcher(request);
         if (!matcher.isMatch()) {
             filterChain.doFilter(request, response);
             return;
@@ -108,12 +109,12 @@ public class QqOAuth2AuthorizationRequestRedirectFilter extends OncePerRequestFi
             throw new NullPointerException("未查询到身份提供商信息");
         }
         IdentityProviderEntity entity = optional.get();
-        QqIdpOauthConfig config = JSONObject.parseObject(entity.getConfig(),
-            QqIdpOauthConfig.class);
-        Assert.notNull(config, "QQ登录配置不能为空");
+        GithubIdpOauthConfig config = JSONObject.parseObject(entity.getConfig(),
+            GithubIdpOauthConfig.class);
+        Assert.notNull(config, "GITHUB登录配置不能为空");
         //构建授权请求
         OAuth2AuthorizationRequest.Builder builder = OAuth2AuthorizationRequest.authorizationCode()
-            .clientId(config.getAppId()).authorizationUri(URL_AUTHORIZE)
+            .clientId(config.getClientId()).authorizationUri(URL_AUTHORIZE)
             .redirectUri(getLoginUrl(optional.get().getCode()))
             .state(DEFAULT_STATE_GENERATOR.generateKey());
         builder.parameters(parameters -> {
@@ -132,6 +133,6 @@ public class QqOAuth2AuthorizationRequestRedirectFilter extends OncePerRequestFi
     }
 
     public static RequestMatcher getRequestMatcher() {
-        return QQ_REQUEST_MATCHER;
+        return GITHUB_REQUEST_MATCHER;
     }
 }

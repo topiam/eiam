@@ -57,6 +57,12 @@
             <artifactId>eiam-authentication-wechat</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- github -->
+        <dependency>
+            <groupId>cn.topiam</groupId>
+            <artifactId>eiam-authentication-github</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- wechatwork-->
         <dependency>
             <groupId>cn.topiam</groupId>

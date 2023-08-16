@@ -1,5 +1,5 @@
 /*
- * eiam-authentication-qq - Employee Identity and Access Management
+ * eiam-authentication-github - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,30 +15,38 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.authentication.qq.constant;
+package cn.topiam.employee.authentication.github;
+
+import java.io.Serial;
+
+import cn.topiam.employee.authentication.common.config.IdentityProviderConfig;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import jakarta.validation.constraints.NotBlank;
 
 /**
- * 企业微信
+ * GITHUB 认证配置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/12/9 22:19
+ * Created by support@topiam.cn on  2022/4/4 23:58
  */
-public final class QqAuthenticationConstants {
-    /**
-     * 获取授权码地址
-     */
-    public static final String URL_AUTHORIZE        = "https://graph.qq.com/oauth2.0/authorize";
-    /**
-     * 获取令牌地址
-     */
-    public static final String URL_GET_ACCESS_TOKEN = "https://graph.qq.com/oauth2.0/token";
-    /**
-     * 获取 openId 的地址
-     */
-    public static final String URL_GET_OPEN_ID      = "https://graph.qq.com/oauth2.0/me";
-    /**
-     * 获取用户信息的地址
-     */
-    public static final String URL_GET_USER_INFO    = "https://graph.qq.com/user/get_user_info";
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class GithubIdpOauthConfig extends IdentityProviderConfig {
+    @Serial
+    private static final long serialVersionUID = -6850223527422243176L;
 
+    /**
+     * Client ID
+     */
+    @NotBlank(message = "Client ID 不能为空")
+    private String            clientId;
+
+    /**
+     * Client Secret
+     */
+    @NotBlank(message = "Client Secret 不能为空")
+    private String            clientSecret;
 }

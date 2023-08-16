@@ -39,6 +39,7 @@ import cn.topiam.employee.authentication.common.config.IdentityProviderConfig;
 import cn.topiam.employee.authentication.dingtalk.DingTalkIdpOauthConfig;
 import cn.topiam.employee.authentication.dingtalk.DingTalkIdpScanCodeConfig;
 import cn.topiam.employee.authentication.feishu.FeiShuIdpScanCodeConfig;
+import cn.topiam.employee.authentication.github.GithubIdpOauthConfig;
 import cn.topiam.employee.authentication.qq.QqIdpOauthConfig;
 import cn.topiam.employee.authentication.wechat.WeChatIdpScanCodeConfig;
 import cn.topiam.employee.authentication.wechatwork.WeChatWorkIdpScanCodeConfig;
@@ -260,6 +261,9 @@ public interface IdentityProviderConverter {
             //飞书认证
         } else if (type.equals(FEISHU_OAUTH.value())) {
             identityProviderConfig = config.to(FeiShuIdpScanCodeConfig.class);
+            //GITHUB认证
+        } else if (type.equals(GITHUB.value())) {
+            identityProviderConfig = config.to(GithubIdpOauthConfig.class);
         } else {
             throw new TopIamException("不支持此身份提供商");
         }
@@ -310,6 +314,9 @@ public interface IdentityProviderConverter {
         }
         if (WECHAT_WEB_PAGE.value().equals(type)) {
             return WECHAT_WEB_PAGE;
+        }
+        if (GITHUB.value().equals(type)) {
+            return GITHUB;
         }
         throw new IllegalArgumentException("未知身份提供商类型");
     }
