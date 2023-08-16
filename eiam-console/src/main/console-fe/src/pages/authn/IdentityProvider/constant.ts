@@ -51,6 +51,8 @@ export const EXIST_CALLBACK = [
   IdentityProviderType.qq,
   IdentityProviderType.feishu_oauth,
   IdentityProviderType.feishu_oauth,
+  IdentityProviderType.gitee,
+  IdentityProviderType.github,
 ];
 
 export const DRAWER_FORM_ITEM_LAYOUT = {
