@@ -38,6 +38,7 @@ export default {
   'pages.authn.identity_provider.create_modal.form.type.rule.0.message': '请选择认证提供商',
   'pages.authn.identity_provider.create_modal.form.type.wechat_qr': '微信开放平台扫码认证',
   'pages.authn.identity_provider.create_modal.form.type.qq': 'QQ认证',
+  'pages.authn.identity_provider.create_modal.form.type.gitee': 'Gitee认证',
   'pages.authn.identity_provider.create_modal.form.type.github': 'Github认证',
   'pages.authn.identity_provider.create_modal.form.type.dingtalk_oauth': '钉钉认证',
   'pages.authn.identity_provider.create_modal.form.type.dingtalk_qr': '钉钉扫码认证',
@@ -56,7 +57,10 @@ export default {
   'pages.authn.identity_provider.config.ding_talk_oauth.app_secret.placeholder': '请填写AppSecret',
   'pages.authn.identity_provider.config.feishu_scan_code.app_id.extra':
     '在飞书开放平台，开发者后台 -> 企业自建应用，创建企业自建应用',
-  'pages.authn.identity_provider.config.qq_oauth.app_secret.placeholder': '请填写appKey',
+  'pages.authn.identity_provider.config.qq_oauth.app_id.placeholder': '请填写AppId',
+  'pages.authn.identity_provider.config.qq_oauth.app_secret.placeholder': '请填写AppKey',
+  'pages.authn.identity_provider.config.gitee_oauth.client_id.placeholder': '请填写ClientId',
+  'pages.authn.identity_provider.config.gitee_oauth.client_secret.placeholder': '请填写ClientSecret',
   'pages.authn.identity_provider.config.wechat_scan_code.app_id.extra':
     '微信扫码登录开发申请获取的AppId',
   'pages.authn.identity_provider.config.wechat_scan_code.app_id.placeholder': '请填写获取的AppId',

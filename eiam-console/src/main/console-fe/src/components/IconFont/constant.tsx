@@ -34,6 +34,7 @@ export const ICON_LIST = {
   wechatwork_qr: <IconFont name="icon-qiyeweixin" />,
   feishu_oauth: <IconFont name="icon-feishu" />,
   qq_oauth: <IconFont name="icon-qq" />,
+  gitee_oauth: <IconFont name="icon-gitee" />,
   weibo_oauth: <IconFont name="icon-weibo" />,
   github_oauth: <IconFont name="icon-github" />,
   google_oauth: <IconFont name="icon-google" />,

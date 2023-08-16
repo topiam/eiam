@@ -39,6 +39,7 @@ public enum IdentityProviderCategory implements BaseEnum {
                                                                  Lists.newArrayList(
                                                                      IdentityProviderType.QQ,
                                                                      IdentityProviderType.WECHAT_QR,
+                                                                     IdentityProviderType.GITHUB,
                                                                      IdentityProviderType.GITHUB)),
                                                           /**
                                                            * 企业

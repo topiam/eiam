@@ -65,6 +65,12 @@ public final class IdentityProviderType {
         "wechatwork_qr", "企业微信扫码认证", "通过企业微信同步的用户可使用企业微信扫码登录进行身份认证");
 
     /**
+     * Gitee
+     */
+    public static final IdentityProviderType GITEE_OAUTH       = new IdentityProviderType(
+        "gitee_oauth", "Gitee", "通过Gitee进行身份认证");
+
+    /**
      * QQ认证
      */
     public static final IdentityProviderType QQ                = new IdentityProviderType(

@@ -127,6 +127,12 @@ export default (props: CreateDrawerProps) => {
                     id: 'pages.authn.identity_provider.create_modal.form.type.github',
                   }),
                 },
+                {
+                  value: IdentityProviderType.gitee,
+                  label: intl.formatMessage({
+                    id: 'pages.authn.identity_provider.create_modal.form.type.gitee',
+                  }),
+                },
               ]}
             />
           </>

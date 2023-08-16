@@ -39,9 +39,9 @@ import cn.topiam.employee.authentication.common.config.IdentityProviderConfig;
 import cn.topiam.employee.authentication.dingtalk.DingTalkIdpOauthConfig;
 import cn.topiam.employee.authentication.dingtalk.DingTalkIdpScanCodeConfig;
 import cn.topiam.employee.authentication.feishu.FeiShuIdpScanCodeConfig;
+import cn.topiam.employee.authentication.gitee.GiteeIdpOAuth2Config;
 import cn.topiam.employee.authentication.github.GithubIdpOauthConfig;
 import cn.topiam.employee.authentication.qq.QqIdpOauthConfig;
-import cn.topiam.employee.authentication.wechat.WeChatIdpScanCodeConfig;
 import cn.topiam.employee.authentication.wechatwork.WeChatWorkIdpScanCodeConfig;
 import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
 import cn.topiam.employee.common.entity.authn.QIdentityProviderEntity;
@@ -245,7 +245,7 @@ public interface IdentityProviderConverter {
         IdentityProviderConfig identityProviderConfig;
         //微信扫码
         if (type.equals(WECHAT_QR.value())) {
-            identityProviderConfig = config.to(WeChatIdpScanCodeConfig.class);
+            identityProviderConfig = config.to(GiteeIdpOAuth2Config.class);
             //钉钉扫码
         } else if (type.equals(DINGTALK_QR.value())) {
             identityProviderConfig = config.to(DingTalkIdpScanCodeConfig.class);
@@ -264,6 +264,10 @@ public interface IdentityProviderConverter {
             //GITHUB认证
         } else if (type.equals(GITHUB.value())) {
             identityProviderConfig = config.to(GithubIdpOauthConfig.class);
+        }
+        //Gitee
+        else if (type.equals(GITEE_OAUTH.value())) {
+            identityProviderConfig = config.to(GiteeIdpOAuth2Config.class);
         } else {
             throw new TopIamException("不支持此身份提供商");
         }
@@ -317,6 +321,9 @@ public interface IdentityProviderConverter {
         }
         if (GITHUB.value().equals(type)) {
             return GITHUB;
+        }
+        if (GITEE_OAUTH.value().equals(type)) {
+            return GITEE_OAUTH;
         }
         throw new IllegalArgumentException("未知身份提供商类型");
     }

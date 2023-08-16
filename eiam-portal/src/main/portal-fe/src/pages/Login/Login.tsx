@@ -200,6 +200,21 @@ const Login = () => {
   };
 
   /**
+   * gitee
+   *
+   * @param id
+   */
+  const giteeOauthOnClick = (id: string) => {
+    const query = queryString.parse(history.location.search);
+    const { redirect_uri } = query as { redirect_uri: string };
+    let path = `/api/v1/authorization/gitee_oauth/${id}`;
+    if (redirect_uri) {
+      path = `${path}?redirect_uri=${redirect_uri}`;
+    }
+    window.open(path, '_self');
+  };
+
+  /**
    * 提交
    *
    * @param values
@@ -491,6 +506,11 @@ const Login = () => {
                                               //微博
                                               if (value.type === IDP_TYPE.WEIBO_OAUTH) {
                                                 weiBoOauthOnClick(value.code);
+                                                return;
+                                              }
+                                              //gitee
+                                              if (value.type === IDP_TYPE.GITEE_OAUTH) {
+                                                giteeOauthOnClick(value.code);
                                                 return;
                                               }
                                               //GITHUB，跳转页面

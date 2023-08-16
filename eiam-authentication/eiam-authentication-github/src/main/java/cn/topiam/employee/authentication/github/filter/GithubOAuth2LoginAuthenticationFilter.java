@@ -24,7 +24,6 @@ import java.util.Objects;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -49,6 +48,7 @@ import cn.topiam.employee.common.repository.authentication.IdentityProviderRepos
 import cn.topiam.employee.core.help.ServerHelp;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.trace.TraceUtils;
+import cn.topiam.employee.support.util.HttpUrlUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -156,7 +156,6 @@ public class GithubOAuth2LoginAuthenticationFilter extends
 
     }
 
-    @Nullable
     private static JSONObject request(String url, HttpMethod method, String authorization,
                                       HashMap<String, String> param) {
         RestTemplate client = new RestTemplate();
@@ -166,7 +165,7 @@ public class GithubOAuth2LoginAuthenticationFilter extends
         if (StringUtils.isNotBlank(authorization)) {
             headers.set("Authorization", authorization);
         }
-        HttpEntity requestEntity = new HttpEntity(param, headers);
+        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(param, headers);
         ResponseEntity<String> responseEntity = client.exchange(url, method, requestEntity,
             String.class);
         return JSON.parseObject(responseEntity.getBody());
@@ -175,7 +174,7 @@ public class GithubOAuth2LoginAuthenticationFilter extends
     public static String getLoginUrl(String providerId) {
         String url = ServerHelp.getPortalPublicBaseUrl() + "/" + GITHUB.getLoginPathPrefix() + "/"
                      + providerId;
-        return url.replaceAll("(?<!(http:|https:))/+", "/");
+        return HttpUrlUtils.format(url);
     }
 
     public static RequestMatcher getRequestMatcher() {

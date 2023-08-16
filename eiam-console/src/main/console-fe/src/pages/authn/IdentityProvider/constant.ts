@@ -35,6 +35,7 @@ export enum IdentityProviderType {
   ldap = 'ldap',
   //社交
   qq = 'qq_oauth',
+  gitee = 'gitee_oauth',
   wechat_qr = 'wechat_qr',
   github = 'github_oauth',
 }
