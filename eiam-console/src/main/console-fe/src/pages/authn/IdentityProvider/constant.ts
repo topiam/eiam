@@ -55,9 +55,9 @@ export const EXIST_CALLBACK = [
 
 export const DRAWER_FORM_ITEM_LAYOUT = {
   labelCol: {
-    span: 4,
+    span: 5,
   },
   wrapperCol: {
-    span: 19,
+    span: 18,
   },
 };

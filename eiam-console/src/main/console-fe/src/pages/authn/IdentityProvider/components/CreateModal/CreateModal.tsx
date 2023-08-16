@@ -67,7 +67,7 @@ export default (props: CreateDrawerProps) => {
       title={intl.formatMessage({
         id: 'pages.authn.identity_provider.create_modal_title',
       })}
-      width={600}
+      width={580}
       modalProps={{
         forceRender: true,
         onCancel: () => {
