@@ -27,7 +27,7 @@ import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.NotBlank;
 
 /**
- * 钉钉扫码配置参数
+ * 企业微信扫码配置参数
  *
  * @author TopIAM
  * Created by support@topiam.cn on  2021/12/8 21:36
