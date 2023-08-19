@@ -75,6 +75,12 @@
             <artifactId>eiam-authentication-gitee</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- alipay-->
+        <dependency>
+            <groupId>cn.topiam</groupId>
+            <artifactId>eiam-authentication-alipay</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- sms-->
         <dependency>
             <groupId>cn.topiam</groupId>

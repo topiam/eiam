@@ -39,7 +39,8 @@ public enum IdentityProviderCategory implements BaseEnum {
                                                               IdentityProviderType.QQ_OAUTH,
                                                               IdentityProviderType.WECHAT_QR,
                                                               IdentityProviderType.GITEE_OAUTH,
-                                                              IdentityProviderType.GITHUB_OAUTH)),
+                                                              IdentityProviderType.GITHUB_OAUTH,
+                                                              IdentityProviderType.ALIPAY_OAUTH)),
                                                           /**
                                                            * 企业
                                                            */

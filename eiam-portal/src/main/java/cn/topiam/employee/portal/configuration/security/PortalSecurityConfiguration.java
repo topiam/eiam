@@ -217,6 +217,8 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
         requestMatchers.add(giteeCode.getRequestMatcher());
         httpSecurity.apply(giteeCode);
 
+        //支付宝 todo
+
         //RequestMatcher
         OrRequestMatcher requestMatcher = new OrRequestMatcher(requestMatchers);
         //社交授权请求重定向匹配器

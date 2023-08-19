@@ -106,6 +106,12 @@ public final class IdentityProviderType {
     public static final IdentityProviderType GITHUB_OAUTH      = new IdentityProviderType(
         "github_oauth", "GITHUB认证", "通过GITHUB进行身份认证");
 
+    /**
+     * 支付宝认证
+     */
+    public static final IdentityProviderType ALIPAY_OAUTH      = new IdentityProviderType(
+            "alipay_oauth", "支付宝认证", "通过支付宝进行身份认证");
+
     private final String                     value;
     private final String                     name;
     private final String                     desc;
