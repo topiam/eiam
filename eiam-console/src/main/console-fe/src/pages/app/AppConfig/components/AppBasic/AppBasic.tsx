@@ -93,7 +93,7 @@ const AppBasic = (props: { appId: string }) => {
   };
   return (
     <ProCard
-      title={intl.formatMessage({ id: 'pages.app.config.basic.' })}
+      title={intl.formatMessage({ id: 'pages.app.config.basic' })}
       headerBordered
       className={styles.main}
     >
