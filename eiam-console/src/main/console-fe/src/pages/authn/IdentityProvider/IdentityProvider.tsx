@@ -31,7 +31,7 @@ import type { ActionType } from '@ant-design/pro-components';
 import { PageContainer, ProList } from '@ant-design/pro-components';
 import { useMount } from 'ahooks';
 import { App, Avatar, Button, Popconfirm, Tag, Typography } from 'antd';
-import { useRef, useState } from 'react';
+import { Fragment, useRef, useState } from 'react';
 import CreateDrawer from './components/CreateModal';
 import UpdateDrawer from './components/UpdateModal';
 import { EXIST_CALLBACK, IdentityProviderCategory } from './constant';
@@ -216,11 +216,11 @@ const List = (props: { category: IdentityProviderCategory }) => {
           },
           content: {
             search: false,
-            render: (text, row) => [<ListContent key="context" {...row} />],
+            render: (text, row) => <ListContent key="context" {...row} />,
           },
           actions: {
             render: (text, row) => [
-              <>
+              <Fragment key={'status'}>
                 {row.enabled ? (
                   <Popconfirm
                     title={intl.formatMessage({
@@ -246,7 +246,7 @@ const List = (props: { category: IdentityProviderCategory }) => {
                     cancelText={intl.formatMessage({ id: 'app.no' })}
                     key="disabled"
                   >
-                    <a key="disabled">
+                    <a>
                       {intl.formatMessage({
                         id: 'app.disable',
                       })}
@@ -269,16 +269,16 @@ const List = (props: { category: IdentityProviderCategory }) => {
                     }}
                     okText={intl.formatMessage({ id: 'app.yes' })}
                     cancelText={intl.formatMessage({ id: 'app.no' })}
-                    key="disabled"
+                    key="enabled"
                   >
-                    <a key="enabled">
+                    <a>
                       {intl.formatMessage({
                         id: 'app.enable',
                       })}
                     </a>
                   </Popconfirm>
                 )}
-              </>,
+              </Fragment>,
               <a
                 key="update"
                 onClick={() => {

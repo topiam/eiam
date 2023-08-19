@@ -27,7 +27,7 @@ import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import type { ActionType } from '@ant-design/pro-components';
 import { PageContainer, ProList } from '@ant-design/pro-components';
 import { App, Avatar, Button, Popconfirm, Tag } from 'antd';
-import { useRef, useState } from 'react';
+import { Fragment, useRef, useState } from 'react';
 import CreateModal from './components/CreateModal';
 import useStyle from './style';
 import classnames from 'classnames';
@@ -140,7 +140,7 @@ export default () => {
             },
             actions: {
               render: (text, row) => [
-                <>
+                <Fragment key={'status'}>
                   {row.enabled ? (
                     <Popconfirm
                       title={intl.formatMessage({
@@ -192,7 +192,7 @@ export default () => {
                       <a key="enabled">{intl.formatMessage({ id: 'app.enable' })}</a>
                     </Popconfirm>
                   )}
-                </>,
+                </Fragment>,
                 <a
                   key={'detail'}
                   onClick={() => {
