@@ -262,7 +262,7 @@ public interface IdentityProviderConverter {
         } else if (type.equals(FEISHU_OAUTH.value())) {
             identityProviderConfig = config.to(FeiShuIdpScanCodeConfig.class);
             //GITHUB认证
-        } else if (type.equals(GITHUB.value())) {
+        } else if (type.equals(GITHUB_OAUTH.value())) {
             identityProviderConfig = config.to(GithubIdpOauthConfig.class);
         }
         //Gitee
@@ -319,8 +319,8 @@ public interface IdentityProviderConverter {
         if (WECHAT_WEB_PAGE.value().equals(type)) {
             return WECHAT_WEB_PAGE;
         }
-        if (GITHUB.value().equals(type)) {
-            return GITHUB;
+        if (GITHUB_OAUTH.value().equals(type)) {
+            return GITHUB_OAUTH;
         }
         if (GITEE_OAUTH.value().equals(type)) {
             return GITEE_OAUTH;

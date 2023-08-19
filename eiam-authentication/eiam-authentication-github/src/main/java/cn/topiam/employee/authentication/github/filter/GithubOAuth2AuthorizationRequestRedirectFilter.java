@@ -49,7 +49,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import static cn.topiam.employee.authentication.common.IdentityProviderType.GITHUB;
+import static cn.topiam.employee.authentication.common.IdentityProviderType.GITHUB_OAUTH;
 import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.PROVIDER_CODE;
 import static cn.topiam.employee.authentication.github.constant.GithubAuthenticationConstants.URL_AUTHORIZE;
 import static cn.topiam.employee.authentication.github.filter.GithubOAuth2LoginAuthenticationFilter.getLoginUrl;
@@ -70,7 +70,7 @@ public class GithubOAuth2AuthorizationRequestRedirectFilter extends OncePerReque
      * AntPathRequestMatcher
      */
     public static final AntPathRequestMatcher                                GITHUB_REQUEST_MATCHER         = new AntPathRequestMatcher(
-        GITHUB.getAuthorizationPathPrefix() + "/" + "{" + PROVIDER_CODE + "}",
+        GITHUB_OAUTH.getAuthorizationPathPrefix() + "/" + "{" + PROVIDER_CODE + "}",
         HttpMethod.GET.name());
 
     /**

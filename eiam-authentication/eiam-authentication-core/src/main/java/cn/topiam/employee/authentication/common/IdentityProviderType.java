@@ -103,7 +103,7 @@ public final class IdentityProviderType {
     /**
      * GITHUB认证
      */
-    public static final IdentityProviderType GITHUB            = new IdentityProviderType(
+    public static final IdentityProviderType GITHUB_OAUTH      = new IdentityProviderType(
         "github_oauth", "GITHUB认证", "通过GITHUB进行身份认证");
 
     private final String                     value;

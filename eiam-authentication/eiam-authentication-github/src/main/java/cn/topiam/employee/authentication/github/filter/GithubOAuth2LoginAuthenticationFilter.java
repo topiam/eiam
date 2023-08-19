@@ -52,7 +52,7 @@ import cn.topiam.employee.support.util.HttpUrlUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import static cn.topiam.employee.authentication.common.IdentityProviderType.GITHUB;
+import static cn.topiam.employee.authentication.common.IdentityProviderType.GITHUB_OAUTH;
 import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.*;
 import static cn.topiam.employee.authentication.github.constant.GithubAuthenticationConstants.*;
 
@@ -66,7 +66,7 @@ import static cn.topiam.employee.authentication.github.constant.GithubAuthentica
 public class GithubOAuth2LoginAuthenticationFilter extends
                                                    AbstractIdpAuthenticationProcessingFilter {
     final String                              ERROR_CODE                   = "error";
-    public final static String                DEFAULT_FILTER_PROCESSES_URI = GITHUB
+    public final static String                DEFAULT_FILTER_PROCESSES_URI = GITHUB_OAUTH
         .getLoginPathPrefix() + "/" + "{" + PROVIDER_CODE + "}";
     public static final AntPathRequestMatcher REQUEST_MATCHER              = new AntPathRequestMatcher(
         DEFAULT_FILTER_PROCESSES_URI, HttpMethod.GET.name());
@@ -150,8 +150,8 @@ public class GithubOAuth2LoginAuthenticationFilter extends
         }
         // 返回
         String id = result.getString("id");
-        IdpUserDetails idpUserDetails = IdpUserDetails.builder().openId(id).providerType(GITHUB)
-            .providerCode(providerCode).providerId(providerId).build();
+        IdpUserDetails idpUserDetails = IdpUserDetails.builder().openId(id)
+            .providerType(GITHUB_OAUTH).providerCode(providerCode).providerId(providerId).build();
         return attemptAuthentication(request, response, idpUserDetails);
 
     }
@@ -172,8 +172,8 @@ public class GithubOAuth2LoginAuthenticationFilter extends
     }
 
     public static String getLoginUrl(String providerId) {
-        String url = ServerHelp.getPortalPublicBaseUrl() + "/" + GITHUB.getLoginPathPrefix() + "/"
-                     + providerId;
+        String url = ServerHelp.getPortalPublicBaseUrl() + "/" + GITHUB_OAUTH.getLoginPathPrefix()
+                     + "/" + providerId;
         return HttpUrlUtils.format(url);
     }
 
