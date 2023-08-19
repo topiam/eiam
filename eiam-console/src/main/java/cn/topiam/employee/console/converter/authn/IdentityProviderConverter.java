@@ -256,7 +256,7 @@ public interface IdentityProviderConverter {
         } else if (type.equals(WECHAT_WORK_QR.value())) {
             identityProviderConfig = config.to(WeChatWorkIdpScanCodeConfig.class);
             //QQ认证
-        } else if (type.equals(QQ.value())) {
+        } else if (type.equals(QQ_OAUTH.value())) {
             identityProviderConfig = config.to(QqIdpOauthConfig.class);
             //飞书认证
         } else if (type.equals(FEISHU_OAUTH.value())) {
@@ -304,8 +304,8 @@ public interface IdentityProviderConverter {
         if (WECHAT_WORK_QR.value().equals(type)) {
             return WECHAT_WORK_QR;
         }
-        if (QQ.value().equals(type)) {
-            return QQ;
+        if (QQ_OAUTH.value().equals(type)) {
+            return QQ_OAUTH;
         }
         if (LDAP.value().equals(type)) {
             return LDAP;

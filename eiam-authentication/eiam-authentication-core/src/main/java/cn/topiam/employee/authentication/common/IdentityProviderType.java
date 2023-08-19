@@ -73,7 +73,7 @@ public final class IdentityProviderType {
     /**
      * QQ认证
      */
-    public static final IdentityProviderType QQ                = new IdentityProviderType(
+    public static final IdentityProviderType QQ_OAUTH          = new IdentityProviderType(
         "qq_oauth", "QQ认证", "通过QQ进行身份认证");
 
     /**
