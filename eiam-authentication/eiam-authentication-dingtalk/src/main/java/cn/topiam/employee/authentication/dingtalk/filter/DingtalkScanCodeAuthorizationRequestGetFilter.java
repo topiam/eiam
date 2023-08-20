@@ -131,24 +131,9 @@ public class DingtalkScanCodeAuthorizationRequestGetFilter extends OncePerReques
                 .state(DEFAULT_STATE_GENERATOR.generateKey())
                 .attributes(attributes);
         builder.parameters(parameters -> {
-            HashMap<String, Object> linkedParameters = new LinkedHashMap<>();
-            parameters.forEach((key, value) -> {
-                if (OAuth2ParameterNames.CLIENT_ID.equals(key)) {
-                    linkedParameters.put(APP_ID, value);
-                }
-                if (OAuth2ParameterNames.SCOPE.equals(key)) {
-                    linkedParameters.put(OAuth2ParameterNames.SCOPE, value);
-                }
-                if (OAuth2ParameterNames.STATE.equals(key)) {
-                    linkedParameters.put(OAuth2ParameterNames.STATE, value);
-                }
-                if (OAuth2ParameterNames.REDIRECT_URI.equals(key)) {
-                    linkedParameters.put(OAuth2ParameterNames.REDIRECT_URI, value);
-                }
-            });
-            linkedParameters.put(RESPONSE_TYPE, CODE);
-            parameters.clear();
-            parameters.putAll(linkedParameters);
+            parameters.put(APP_ID, parameters.get(OAuth2ParameterNames.CLIENT_ID));
+            parameters.remove(OAuth2ParameterNames.CLIENT_ID);
+            parameters.put(RESPONSE_TYPE, CODE);
         });
         //@formatter:on
         this.writeForAuthorization(request, response, builder.build());

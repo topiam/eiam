@@ -58,7 +58,6 @@ import cn.topiam.employee.support.repository.page.domain.QueryDslRequest;
 import cn.topiam.employee.support.validation.ValidationUtils;
 
 import jakarta.validation.ConstraintViolationException;
-
 import static cn.topiam.employee.authentication.common.IdentityProviderType.*;
 
 /**
@@ -114,16 +113,16 @@ public interface IdentityProviderConverter {
         }
         IdentityProviderCategory category = IdentityProviderCategory.getType(param.getCategory());
         if (!category.getProviders().stream().map(IdentityProviderType::value).toList()
-                .contains(param.getType())) {
+            .contains(param.getType())) {
             throw new TopIamException("认证源类型与认证源提供商不匹配");
         }
         try {
             IdentityProviderConfig identityProviderConfig = getIdentityProviderConfig(
-                    param.getType(), param.getConfig());
+                param.getType(), param.getConfig());
             ObjectMapper objectMapper = new ObjectMapper();
             // 指定序列化输入的类型
             objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
-                    ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+                ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
             //封装数据
             IdentityProviderEntity entity = new IdentityProviderEntity();
             entity.setName(param.getName());
@@ -161,15 +160,15 @@ public interface IdentityProviderConverter {
         result.setRemark(entity.getRemark());
         //回调地址
         result.setRedirectUri(ServerHelp.getPortalPublicBaseUrl()
-                + getIdentityProviderType(entity.getType()).getLoginPathPrefix() + "/"
-                + entity.getCode());
+                              + getIdentityProviderType(entity.getType()).getLoginPathPrefix() + "/"
+                              + entity.getCode());
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             // 指定序列化输入的类型
             objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
-                    ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+                ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
             IdentityProviderConfig config = objectMapper.readValue(entity.getConfig(),
-                    IdentityProviderConfig.class);
+                IdentityProviderConfig.class);
             result.setConfig(config);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
@@ -189,7 +188,7 @@ public interface IdentityProviderConverter {
         QueryDslRequest request = new QueryDslRequest();
         QIdentityProviderEntity queryEntity = QIdentityProviderEntity.identityProviderEntity;
         Predicate predicate = ExpressionUtils.and(queryEntity.isNotNull(),
-                queryEntity.deleted.eq(Boolean.FALSE));
+            queryEntity.deleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off
         predicate = Objects.isNull(query.getCategory()) ? predicate : ExpressionUtils.and(predicate, queryEntity.category.eq(query.getCategory()));
@@ -198,7 +197,7 @@ public interface IdentityProviderConverter {
         request.setPredicate(predicate);
         //分页条件
         request.setPageRequest(QPageRequest.of(pageModel.getCurrent(), pageModel.getPageSize(),
-                queryEntity.updateTime.desc()));
+            queryEntity.updateTime.desc()));
         return request;
     }
 
@@ -213,11 +212,11 @@ public interface IdentityProviderConverter {
             return null;
         }
         IdentityProviderConfig identityProviderConfig = getIdentityProviderConfig(param.getType(),
-                param.getConfig());
+            param.getConfig());
         ObjectMapper objectMapper = new ObjectMapper();
         // 指定序列化输入的类型
         objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
-                ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+            ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
         try {
             //封装数据
             IdentityProviderEntity identityProviderEntity = new IdentityProviderEntity();
@@ -227,7 +226,7 @@ public interface IdentityProviderConverter {
             identityProviderEntity.setRemark(param.getRemark());
             //配置
             identityProviderEntity
-                    .setConfig(objectMapper.writeValueAsString(identityProviderConfig));
+                .setConfig(objectMapper.writeValueAsString(identityProviderConfig));
             return identityProviderEntity;
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
@@ -280,7 +279,7 @@ public interface IdentityProviderConverter {
             throw new NullPointerException("提供商配置不能为空");
         }
         ValidationUtils.ValidationResult<?> validationResult = ValidationUtils
-                .validateEntity(identityProviderConfig);
+            .validateEntity(identityProviderConfig);
         if (validationResult.isHasErrors()) {
             throw new ConstraintViolationException(validationResult.getConstraintViolations());
         }
