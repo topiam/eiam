@@ -115,7 +115,7 @@ public interface IdentitySourceRepository extends LogicDeleteRepository<Identity
     void deleteById(@NonNull Long id);
 
     /**
-     * 更新设分院策略
+     * 更新身份源策略
      *
      * @param id             {@link Long} 主键
      * @param strategyConfig {@link String} 策略
@@ -123,7 +123,7 @@ public interface IdentitySourceRepository extends LogicDeleteRepository<Identity
     @Transactional(rollbackFor = Exception.class)
     @Modifying
     @CacheEvict(allEntries = true)
-    @Query(value = "UPDATE IdentitySourceEntity SET strategyConfig=:strategyConfig where id=:id")
+    @Query(value = "UPDATE identity_source SET strategy_config = :strategyConfig where id_ = :id", nativeQuery = true)
     void updateStrategyConfig(@Param(value = "id") Long id,
                               @Param(value = "strategyConfig") String strategyConfig);
 

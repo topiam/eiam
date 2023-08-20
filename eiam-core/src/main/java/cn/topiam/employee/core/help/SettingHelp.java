@@ -177,9 +177,13 @@ public class SettingHelp {
     public static void addImgSrcHostContentSecurityPolicy(String value) {
         SettingEntity settingEntity = getSettingRepository()
             .findByName(SECURITY_DEFENSE_POLICY_CONTENT_SECURITY_POLICY);
-        String contentSecurityPolicy = SECURITY_DEFENSE_POLICY_DEFAULT_SETTINGS
-            .get(SECURITY_DEFENSE_POLICY_CONTENT_SECURITY_POLICY);
-        if (!Objects.isNull(settingEntity)) {
+        String contentSecurityPolicy;
+        if (Objects.isNull(settingEntity)) {
+            settingEntity = new SettingEntity();
+            settingEntity.setName(SECURITY_DEFENSE_POLICY_CONTENT_SECURITY_POLICY);
+            contentSecurityPolicy = SECURITY_DEFENSE_POLICY_DEFAULT_SETTINGS
+                .get(SECURITY_DEFENSE_POLICY_CONTENT_SECURITY_POLICY);
+        } else {
             contentSecurityPolicy = settingEntity.getValue();
         }
         Policy parse = ContentSecurityPolicyUtils.parse(contentSecurityPolicy);
