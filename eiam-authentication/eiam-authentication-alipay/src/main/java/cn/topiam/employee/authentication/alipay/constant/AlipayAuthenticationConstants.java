@@ -1,5 +1,5 @@
 /*
- * eiam-authentication-gitee - Employee Identity and Access Management
+ * eiam-authentication-alipay - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,4 +24,10 @@ package cn.topiam.employee.authentication.alipay.constant;
  * Created by support@topiam.cn on  2023/8/19 15:18
  */
 public class AlipayAuthenticationConstants {
+
+    public static final String AUTHORIZATION_REQUEST = "https://openauth.alipay.com/oauth2/publicAppAuthorize.htm";
+
+    public static final String USER_INFO_SCOPE       = "auth_user";
+
+    public static final String APP_ID                = "app_id";
 }

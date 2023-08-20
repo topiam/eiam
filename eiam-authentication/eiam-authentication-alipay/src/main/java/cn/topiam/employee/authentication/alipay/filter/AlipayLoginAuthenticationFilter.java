@@ -1,5 +1,5 @@
 /*
- * eiam-authentication-gitee - Employee Identity and Access Management
+ * eiam-authentication-alipay - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,16 +17,26 @@
  */
 package cn.topiam.employee.authentication.alipay.filter;
 
+import java.io.IOException;
+
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+
 import cn.topiam.employee.authentication.common.filter.AbstractIdpAuthenticationProcessingFilter;
 import cn.topiam.employee.authentication.common.service.UserIdpService;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
+import cn.topiam.employee.core.help.ServerHelp;
+import cn.topiam.employee.support.util.HttpUrlUtils;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-
-import java.io.IOException;
+import static cn.topiam.employee.authentication.common.IdentityProviderType.ALIPAY_OAUTH;
+import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.PROVIDER_CODE;
 
 /**
  * 支付宝 登录过滤器
@@ -36,7 +46,10 @@ import java.io.IOException;
  */
 @SuppressWarnings("DuplicatedCode")
 public class AlipayLoginAuthenticationFilter extends AbstractIdpAuthenticationProcessingFilter {
-
+    public final static String                DEFAULT_FILTER_PROCESSES_URI = ALIPAY_OAUTH
+        .getLoginPathPrefix() + "/" + "{" + PROVIDER_CODE + "}";
+    public static final AntPathRequestMatcher REQUEST_MATCHER              = new AntPathRequestMatcher(
+        DEFAULT_FILTER_PROCESSES_URI, HttpMethod.GET.name());
 
     /**
      * Creates a new instance
@@ -45,12 +58,31 @@ public class AlipayLoginAuthenticationFilter extends AbstractIdpAuthenticationPr
      * @param userIdpService             {@link  UserIdpService}
      * @param identityProviderRepository {@link IdentityProviderRepository}
      */
-    protected AlipayLoginAuthenticationFilter(String defaultFilterProcessesUrl, UserIdpService userIdpService, IdentityProviderRepository identityProviderRepository) {
+    protected AlipayLoginAuthenticationFilter(String defaultFilterProcessesUrl,
+                                              UserIdpService userIdpService,
+                                              IdentityProviderRepository identityProviderRepository) {
         super(defaultFilterProcessesUrl, userIdpService, identityProviderRepository);
     }
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+    public Authentication attemptAuthentication(HttpServletRequest request,
+                                                HttpServletResponse response) throws AuthenticationException,
+                                                                              IOException,
+                                                                              ServletException {
+        if (!REQUEST_MATCHER.matches(request)) {
+            throw new AuthenticationServiceException(
+                "Authentication method not supported: " + request.getMethod());
+        }
         return null;
+    }
+
+    public static String getLoginUrl(String providerId) {
+        String url = ServerHelp.getPortalPublicBaseUrl() + ALIPAY_OAUTH.getLoginPathPrefix() + "/"
+                     + providerId;
+        return HttpUrlUtils.format(url);
+    }
+
+    public static RequestMatcher getRequestMatcher() {
+        return REQUEST_MATCHER;
     }
 }

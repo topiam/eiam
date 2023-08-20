@@ -1,5 +1,5 @@
 /*
- * eiam-authentication-gitee - Employee Identity and Access Management
+ * eiam-authentication-alipay - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,17 +17,17 @@
  */
 package cn.topiam.employee.authentication.alipay.configurer;
 
-import cn.topiam.employee.authentication.alipay.filter.AlipayLoginAuthenticationFilter;
-import cn.topiam.employee.authentication.common.service.UserIdpService;
-import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
-import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
+
+import cn.topiam.employee.authentication.alipay.filter.AlipayAuthorizationRequestRedirectFilter;
+import cn.topiam.employee.authentication.alipay.filter.AlipayLoginAuthenticationFilter;
+import cn.topiam.employee.authentication.common.service.UserIdpService;
+import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 
 /**
  * 认证配置
@@ -36,13 +36,13 @@ import org.springframework.util.Assert;
  * Created by support@topiam.cn on  2023/8/19 15:52
  */
 public class AlipayAuthenticationConfigurer extends
-        AbstractAuthenticationFilterConfigurer<HttpSecurity, AlipayAuthenticationConfigurer, AlipayLoginAuthenticationFilter> {
+                                            AbstractAuthenticationFilterConfigurer<HttpSecurity, AlipayAuthenticationConfigurer, AlipayLoginAuthenticationFilter> {
 
     private final IdentityProviderRepository identityProviderRepository;
     private final UserIdpService             userIdpService;
 
     AlipayAuthenticationConfigurer(IdentityProviderRepository identityProviderRepository,
-                                  UserIdpService userIdpService) {
+                                   UserIdpService userIdpService) {
         Assert.notNull(identityProviderRepository, "identityProviderRepository must not be null");
         Assert.notNull(userIdpService, "userIdpService must not be null");
         this.identityProviderRepository = identityProviderRepository;
@@ -61,10 +61,13 @@ public class AlipayAuthenticationConfigurer extends
         return new AntPathRequestMatcher(loginProcessingUrl);
     }
 
-
+    public RequestMatcher getRequestMatcher() {
+        return new OrRequestMatcher(AlipayAuthorizationRequestRedirectFilter.getRequestMatcher(),
+            AlipayLoginAuthenticationFilter.getRequestMatcher());
+    }
 
     public static AlipayAuthenticationConfigurer alipayOauth(IdentityProviderRepository identityProviderRepository,
-                                                           UserIdpService userIdpService) {
+                                                             UserIdpService userIdpService) {
         return new AlipayAuthenticationConfigurer(identityProviderRepository, userIdpService);
     }
 }
