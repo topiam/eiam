@@ -82,14 +82,8 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
                 WHERE
                 	app.is_enabled = 1
                 	AND app.is_deleted = '0'
-                	AND app_acce.subject_id IN (:subjectIds)
+                	AND (app_acce.subject_id IN (:subjectIds) OR app.authorization_type = 'all_access')
                 """);
-        //用户名
-        if (StringUtils.isNoneBlank(name)) {
-            builder.append(" AND app.name_ like '%").append(name).append("%'");
-        }
-        //或者是全员可访问的应用
-        builder.append(" OR app.authorization_type = '").append("all_access'");
         //用户名
         if (StringUtils.isNoneBlank(name)) {
             builder.append(" AND app.name_ like '%").append(name).append("%'");

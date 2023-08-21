@@ -74,32 +74,31 @@ public class SendSmsOtpFilter extends OncePerRequestFilter {
         if (StringUtils.isBlank(recipient)) {
             throw new PhoneNotExistException();
         }
-        boolean isSend = sendOtp(recipient);
-        //发送OTP
-        if (isSend) {
-            HttpResponseUtils.flushResponseJson(response, HttpStatus.OK.value(),
-                ApiRestResult.ok());
-            return;
-        }
-        HttpResponseUtils.flushResponseJson(response, HttpStatus.OK.value(),
-            ApiRestResult.err().message("请输入正确的手机号"));
+        sendOtp(response, recipient);
     }
 
     public RequestMatcher getRequestMatcher() {
         return SMS_SEND_OPT_MATCHER;
     }
 
-    public boolean sendOtp(String recipient) {
+    public void sendOtp(HttpServletResponse response, String recipient) {
         if (isPhoneValidate(recipient)) {
             //判断是否存在用户
             UserEntity user = userRepository
                 .findByPhone(PhoneNumberUtils.getPhoneNumber(recipient));
-            if (!Objects.isNull(user)) {
+            if (Objects.nonNull(user)) {
                 otpContextHelp.sendOtp(recipient, SmsType.LOGIN.getCode(), SMS);
-                return true;
+                HttpResponseUtils.flushResponseJson(response, HttpStatus.OK.value(),
+                    ApiRestResult.ok());
+            } else {
+                logger.warn("发送验证码登录失败, 手机号不存在: [{" + recipient + "}]");
+                HttpResponseUtils.flushResponseJson(response, HttpStatus.OK.value(),
+                    ApiRestResult.ok());
             }
+        } else {
+            HttpResponseUtils.flushResponseJson(response, HttpStatus.OK.value(),
+                ApiRestResult.err().message("请输入正确的手机号"));
         }
-        return false;
     }
 
     private final UserRepository userRepository;

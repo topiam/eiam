@@ -64,6 +64,7 @@ public class OrganizationRepositoryCustomizedImpl implements OrganizationReposit
      * @param list {@link List}
      */
     @Override
+    @CacheEvict(allEntries = true)
     public void batchSave(List<OrganizationEntity> list) {
         jdbcTemplate.batchUpdate(
             "INSERT INTO organization (id_, code_, name_, parent_id, is_leaf, external_id, data_origin, type_, is_enabled, order_, path_, display_path, identity_source_id,create_by,create_time,update_by,update_time,remark_,is_deleted) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",

@@ -293,11 +293,15 @@ public interface UserConverter {
                 .of(s -> s.field(FieldSort.of(f -> f.field(EVENT_TIME).order(sortOrder))));
             fieldSortBuilders.add(eventTimeSortBuilder);
         });
-        return new NativeQueryBuilder().withQuery(queryBuilder.build()._toQuery())
+        NativeQueryBuilder nativeQueryBuilder = new NativeQueryBuilder()
+            .withQuery(queryBuilder.build()._toQuery())
             //分页参数
-            .withPageable(PageRequest.of(page.getCurrent(), page.getPageSize()))
+            .withPageable(PageRequest.of(page.getCurrent(), page.getPageSize()));
+        if (!CollectionUtils.isEmpty(fieldSortBuilders)) {
             //排序
-            .withSort(fieldSortBuilders).build();
+            nativeQueryBuilder.withSort(fieldSortBuilders);
+        }
+        return nativeQueryBuilder.build();
     }
 
     /**

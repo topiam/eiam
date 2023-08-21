@@ -278,4 +278,13 @@ public interface OrganizationRepository extends LogicDeleteRepository<Organizati
     @Override
     @CacheEvict(allEntries = true)
     <S extends OrganizationEntity> S save(@NotNull S entity);
+
+    /**
+     * delete all by id
+     *
+     * @param ids {@link Iterable}
+     */
+    @CacheEvict(allEntries = true)
+    @Override
+    void deleteAllById(@NotNull Iterable<? extends String> ids);
 }
