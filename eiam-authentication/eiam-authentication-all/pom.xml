@@ -57,10 +57,28 @@
             <artifactId>eiam-authentication-wechat</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- github -->
+        <dependency>
+            <groupId>cn.topiam</groupId>
+            <artifactId>eiam-authentication-github</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- wechatwork-->
         <dependency>
             <groupId>cn.topiam</groupId>
             <artifactId>eiam-authentication-wechatwork</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- gitee-->
+        <dependency>
+            <groupId>cn.topiam</groupId>
+            <artifactId>eiam-authentication-gitee</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- alipay-->
+        <dependency>
+            <groupId>cn.topiam</groupId>
+            <artifactId>eiam-authentication-alipay</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- sms-->

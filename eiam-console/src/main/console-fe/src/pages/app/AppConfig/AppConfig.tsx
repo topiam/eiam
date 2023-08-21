@@ -85,7 +85,7 @@ export default () => {
   const items: MenuProps['items'] = [
     {
       key: ConfigTabs.basic,
-      label: intl.formatMessage({ id: 'pages.app.config.basic.' }),
+      label: intl.formatMessage({ id: 'pages.app.config.basic' }),
       icon: React.createElement(() => {
         return <ProfileOutlined />;
       }),

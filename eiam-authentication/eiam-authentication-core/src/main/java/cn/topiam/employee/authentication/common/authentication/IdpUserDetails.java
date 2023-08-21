@@ -84,7 +84,7 @@ public class IdpUserDetails {
     /**
      * 额外配置
      */
-    private final Map<String, String>  additionalInfo;
+    private final Map<String, Object>  additionalInfo;
 
     public static IdpUserDetailsBuilder builder() {
         return new IdpUserDetailsBuilder();
@@ -130,7 +130,7 @@ public class IdpUserDetails {
         return providerType;
     }
 
-    public Map<String, String> getAdditionalInfo() {
+    public Map<String, Object> getAdditionalInfo() {
         return additionalInfo;
     }
 
@@ -138,7 +138,7 @@ public class IdpUserDetails {
                    final String avatarUrl, final String openId, final String stateCode,
                    final String unionId, final String providerId, final String providerCode,
                    final IdentityProviderType providerType,
-                   final Map<String, String> additionalInfo) {
+                   final Map<String, Object> additionalInfo) {
         if (providerId == null) {
             throw new NullPointerException("providerId is marked non-null but is null");
         } else if (providerType == null) {
@@ -181,7 +181,7 @@ public class IdpUserDetails {
 
         private IdentityProviderType providerType;
 
-        private Map<String, String>  additionalInfo;
+        private Map<String, Object>  additionalInfo;
 
         IdpUserDetailsBuilder() {
         }
@@ -248,7 +248,7 @@ public class IdpUserDetails {
             }
         }
 
-        public IdpUserDetailsBuilder additionalInfo(final Map<String, String> additionalInfo) {
+        public IdpUserDetailsBuilder additionalInfo(final Map<String, Object> additionalInfo) {
             this.additionalInfo = additionalInfo;
             return this;
         }

@@ -42,6 +42,9 @@
         <module>eiam-authentication-all</module>
         <module>eiam-authentication-mail</module>
         <module>eiam-authentication-sms</module>
+        <module>eiam-authentication-github</module>
+        <module>eiam-authentication-gitee</module>
+        <module>eiam-authentication-alipay</module>
     </modules>
 
     <dependencies>

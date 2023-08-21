@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 export default {
-  'pages.app.config.basic.': '基本配置',
+  'pages.app.config.basic': '基本配置',
   'pages.app.config.basic.name': '应用名称',
   'pages.app.config.basic.name.rule.0.message': '应用名称为必填项',
   'pages.app.config.basic.icon': '应用图标',

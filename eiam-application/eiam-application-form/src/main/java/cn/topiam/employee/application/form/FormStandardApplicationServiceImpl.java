@@ -210,11 +210,6 @@ public class FormStandardApplicationServiceImpl extends AbstractFormApplicationS
         return String.valueOf(appEntity.getId());
     }
 
-    @Override
-    public void delete(String appId) {
-
-    }
-
     private final AppFormConfigConverter appFormConfigConverter;
 
     protected FormStandardApplicationServiceImpl(AppAccountRepository appAccountRepository,

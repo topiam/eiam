@@ -59,7 +59,7 @@ export default (props: CreateDrawerProps) => {
       title={intl.formatMessage({
         id: 'pages.authn.identity_provider.update_modal_title',
       })}
-      width={600}
+      width={580}
       layout={'horizontal'}
       {...DRAWER_FORM_ITEM_LAYOUT}
       modalProps={{

@@ -25,6 +25,7 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.message.BasicHeader;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -46,6 +47,7 @@ import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 import cn.topiam.employee.core.help.ServerHelp;
 import cn.topiam.employee.support.util.HttpClientUtils;
+import cn.topiam.employee.support.util.HttpUrlUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -89,6 +91,10 @@ public class FeiShuLoginAuthenticationFilter extends AbstractIdpAuthenticationPr
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response) throws AuthenticationException,
                                                                               IOException {
+        if (!REQUEST_MATCHER.matches(request)) {
+            throw new AuthenticationServiceException(
+                "Authentication method not supported: " + request.getMethod());
+        }
         OAuth2AuthorizationRequest authorizationRequest = getOauth2AuthorizationRequest(request,
             response);
         RequestMatcher.MatchResult matcher = REQUEST_MATCHER.matcher(request);
@@ -148,7 +154,7 @@ public class FeiShuLoginAuthenticationFilter extends AbstractIdpAuthenticationPr
     public static String getLoginUrl(String providerId) {
         String url = ServerHelp.getPortalPublicBaseUrl() + FEISHU_OAUTH.getLoginPathPrefix() + "/"
                      + providerId;
-        return url.replaceAll("(?<!(http:|https:))/+", "/");
+        return HttpUrlUtils.format(url);
     }
 
     public static RequestMatcher getRequestMatcher() {

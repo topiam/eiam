@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -50,6 +51,7 @@ import cn.topiam.employee.common.repository.authentication.IdentityProviderRepos
 import cn.topiam.employee.core.help.ServerHelp;
 import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.support.util.HttpClientUtils;
+import cn.topiam.employee.support.util.HttpUrlUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -95,6 +97,10 @@ public class WeChatWorkScanCodeLoginAuthenticationFilter extends
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response) throws AuthenticationException,
                                                                               IOException {
+        if (!REQUEST_MATCHER.matches(request)) {
+            throw new AuthenticationServiceException(
+                "Authentication method not supported: " + request.getMethod());
+        }
         TraceUtils.put(UUID.randomUUID().toString());
         OAuth2AuthorizationRequest authorizationRequest = getOauth2AuthorizationRequest(request,
             response);
@@ -191,7 +197,7 @@ public class WeChatWorkScanCodeLoginAuthenticationFilter extends
     public static String getLoginUrl(String providerId) {
         String url = ServerHelp.getPortalPublicBaseUrl() + WECHAT_WORK_QR.getLoginPathPrefix() + "/"
                      + providerId;
-        return url.replaceAll("(?<!(http:|https:))/+", "/");
+        return HttpUrlUtils.format(url);
 
     }
 

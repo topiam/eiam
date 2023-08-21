@@ -35,7 +35,9 @@ export enum IdentityProviderType {
   ldap = 'ldap',
   //社交
   qq = 'qq_oauth',
+  gitee = 'gitee_oauth',
   wechat_qr = 'wechat_qr',
+  github = 'github_oauth',
 }
 
 /**
@@ -49,13 +51,15 @@ export const EXIST_CALLBACK = [
   IdentityProviderType.qq,
   IdentityProviderType.feishu_oauth,
   IdentityProviderType.feishu_oauth,
+  IdentityProviderType.gitee,
+  IdentityProviderType.github,
 ];
 
 export const DRAWER_FORM_ITEM_LAYOUT = {
   labelCol: {
-    span: 4,
+    span: 5,
   },
   wrapperCol: {
-    span: 19,
+    span: 18,
   },
 };

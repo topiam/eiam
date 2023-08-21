@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -48,15 +49,16 @@ import cn.topiam.employee.core.help.ServerHelp;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.support.util.HttpClientUtils;
+import cn.topiam.employee.support.util.HttpUrlUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import static com.nimbusds.oauth2.sdk.GrantType.AUTHORIZATION_CODE;
 
-import static cn.topiam.employee.authentication.common.IdentityProviderType.QQ;
+import static cn.topiam.employee.authentication.common.IdentityProviderType.QQ_OAUTH;
 import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.*;
-import static cn.topiam.employee.portal.idp.qq.constant.QqAuthenticationConstants.URL_GET_ACCESS_TOKEN;
-import static cn.topiam.employee.portal.idp.qq.constant.QqAuthenticationConstants.URL_GET_OPEN_ID;
+import static cn.topiam.employee.authentication.qq.constant.QqAuthenticationConstants.URL_GET_ACCESS_TOKEN;
+import static cn.topiam.employee.authentication.qq.constant.QqAuthenticationConstants.URL_GET_OPEN_ID;
 
 /**
  * QQ登录
@@ -67,9 +69,8 @@ import static cn.topiam.employee.portal.idp.qq.constant.QqAuthenticationConstant
 @SuppressWarnings({ "AlibabaClassNamingShouldBeCamel", "DuplicatedCode" })
 public class QqOAuth2LoginAuthenticationFilter extends AbstractIdpAuthenticationProcessingFilter {
     final String                              ERROR_CODE                   = "error";
-    public final static String                DEFAULT_FILTER_PROCESSES_URI = QQ.getLoginPathPrefix()
-                                                                             + "/" + "{"
-                                                                             + PROVIDER_CODE + "}";
+    public final static String                DEFAULT_FILTER_PROCESSES_URI = QQ_OAUTH
+        .getLoginPathPrefix() + "/" + "{" + PROVIDER_CODE + "}";
     public static final AntPathRequestMatcher REQUEST_MATCHER              = new AntPathRequestMatcher(
         DEFAULT_FILTER_PROCESSES_URI, HttpMethod.GET.name());
 
@@ -96,6 +97,10 @@ public class QqOAuth2LoginAuthenticationFilter extends AbstractIdpAuthentication
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response) throws AuthenticationException,
                                                                               IOException {
+        if (!REQUEST_MATCHER.matches(request)) {
+            throw new AuthenticationServiceException(
+                "Authentication method not supported: " + request.getMethod());
+        }
         OAuth2AuthorizationRequest authorizationRequest = getOauth2AuthorizationRequest(request,
             response);
         TraceUtils.put(UUID.randomUUID().toString());
@@ -155,16 +160,16 @@ public class QqOAuth2LoginAuthenticationFilter extends AbstractIdpAuthentication
         }
         // 返回
         String openId = result.getString(OidcScopes.OPENID);
-        IdpUserDetails idpUserDetails = IdpUserDetails.builder().openId(openId).providerType(QQ)
-            .providerCode(providerCode).providerId(providerId).build();
+        IdpUserDetails idpUserDetails = IdpUserDetails.builder().openId(openId)
+            .providerType(QQ_OAUTH).providerCode(providerCode).providerId(providerId).build();
         return attemptAuthentication(request, response, idpUserDetails);
 
     }
 
     public static String getLoginUrl(String providerId) {
-        String url = ServerHelp.getPortalPublicBaseUrl() + "/" + QQ.getLoginPathPrefix() + "/"
+        String url = ServerHelp.getPortalPublicBaseUrl() + "/" + QQ_OAUTH.getLoginPathPrefix() + "/"
                      + providerId;
-        return url.replaceAll("(?<!(http:|https:))/+", "/");
+        return HttpUrlUtils.format(url);
     }
 
     public static RequestMatcher getRequestMatcher() {

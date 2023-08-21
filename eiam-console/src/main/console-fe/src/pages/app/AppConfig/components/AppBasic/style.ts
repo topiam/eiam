@@ -24,6 +24,11 @@ const useStyle = createStyles(({ prefixCls, token }, props) => {
     main: {
       height: 'calc(100vh - 178px)',
       [`.${prefix}-descriptions`]: {
+        [`${antCls}-descriptions-item-container ${antCls}-space-item`]: {
+          span: {
+            padding: '0 !important',
+          },
+        },
         [`${antCls}-descriptions-small ${antCls}-descriptions-row > th, ${antCls}-descriptions-small ${antCls}-descriptions-row > td`]:
           {
             paddingBottom: '16px',

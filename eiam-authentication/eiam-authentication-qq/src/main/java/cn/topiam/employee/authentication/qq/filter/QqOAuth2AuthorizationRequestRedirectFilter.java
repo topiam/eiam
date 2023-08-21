@@ -49,10 +49,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import static cn.topiam.employee.authentication.common.IdentityProviderType.QQ;
+import static cn.topiam.employee.authentication.common.IdentityProviderType.QQ_OAUTH;
 import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.PROVIDER_CODE;
+import static cn.topiam.employee.authentication.qq.constant.QqAuthenticationConstants.URL_AUTHORIZE;
 import static cn.topiam.employee.authentication.qq.filter.QqOAuth2LoginAuthenticationFilter.getLoginUrl;
-import static cn.topiam.employee.portal.idp.qq.constant.QqAuthenticationConstants.URL_AUTHORIZE;
 
 /**
  * 微信扫码登录请求重定向过滤器
@@ -70,7 +70,8 @@ public class QqOAuth2AuthorizationRequestRedirectFilter extends OncePerRequestFi
      * AntPathRequestMatcher
      */
     public static final AntPathRequestMatcher                                QQ_REQUEST_MATCHER             = new AntPathRequestMatcher(
-        QQ.getAuthorizationPathPrefix() + "/" + "{" + PROVIDER_CODE + "}", HttpMethod.GET.name());
+        QQ_OAUTH.getAuthorizationPathPrefix() + "/" + "{" + PROVIDER_CODE + "}",
+        HttpMethod.GET.name());
 
     /**
      * 重定向策略

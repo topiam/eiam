@@ -65,9 +65,15 @@ public final class IdentityProviderType {
         "wechatwork_qr", "企业微信扫码认证", "通过企业微信同步的用户可使用企业微信扫码登录进行身份认证");
 
     /**
+     * Gitee
+     */
+    public static final IdentityProviderType GITEE_OAUTH       = new IdentityProviderType(
+        "gitee_oauth", "Gitee", "通过Gitee进行身份认证");
+
+    /**
      * QQ认证
      */
-    public static final IdentityProviderType QQ                = new IdentityProviderType(
+    public static final IdentityProviderType QQ_OAUTH          = new IdentityProviderType(
         "qq_oauth", "QQ认证", "通过QQ进行身份认证");
 
     /**
@@ -93,6 +99,19 @@ public final class IdentityProviderType {
      */
     public static final IdentityProviderType MAIL              = new IdentityProviderType("mail",
         "邮件验证码认证", "通过邮件验证码进行身份认证");
+
+    /**
+     * GITHUB认证
+     */
+    public static final IdentityProviderType GITHUB_OAUTH      = new IdentityProviderType(
+        "github_oauth", "GITHUB认证", "通过GITHUB进行身份认证");
+
+    /**
+     * 支付宝认证
+     */
+    public static final IdentityProviderType ALIPAY_OAUTH      = new IdentityProviderType(
+        "alipay_oauth", "支付宝认证", "通过支付宝进行身份认证");
+
     private final String                     value;
     private final String                     name;
     private final String                     desc;

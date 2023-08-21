@@ -67,7 +67,7 @@ export default (props: CreateDrawerProps) => {
       title={intl.formatMessage({
         id: 'pages.authn.identity_provider.create_modal_title',
       })}
-      width={600}
+      width={580}
       modalProps={{
         forceRender: true,
         onCancel: () => {
@@ -119,6 +119,18 @@ export default (props: CreateDrawerProps) => {
                   value: IdentityProviderType.qq,
                   label: intl.formatMessage({
                     id: 'pages.authn.identity_provider.create_modal.form.type.qq',
+                  }),
+                },
+                {
+                  value: IdentityProviderType.github,
+                  label: intl.formatMessage({
+                    id: 'pages.authn.identity_provider.create_modal.form.type.github',
+                  }),
+                },
+                {
+                  value: IdentityProviderType.gitee,
+                  label: intl.formatMessage({
+                    id: 'pages.authn.identity_provider.create_modal.form.type.gitee',
                   }),
                 },
               ]}
