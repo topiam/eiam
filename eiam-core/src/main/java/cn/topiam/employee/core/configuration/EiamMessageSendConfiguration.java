@@ -24,24 +24,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import cn.topiam.employee.common.constant.SettingConstants;
-import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.entity.setting.config.SmsConfig;
-import cn.topiam.employee.common.jackjson.encrypt.EncryptionModule;
 import cn.topiam.employee.common.message.mail.DefaultMailProviderSendImpl;
 import cn.topiam.employee.common.message.mail.MailProviderConfig;
 import cn.topiam.employee.common.message.mail.MailProviderSend;
 import cn.topiam.employee.common.message.sms.SmsNoneProviderSend;
 import cn.topiam.employee.common.message.sms.SmsProviderSend;
 import cn.topiam.employee.common.message.sms.SmsSendProviderFactory;
-import cn.topiam.employee.common.repository.setting.SettingRepository;
-import cn.topiam.employee.core.setting.constant.MessageSettingConstants;
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.MAIL_PROVIDER_SEND;
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.SMS_PROVIDER_SEND;
+import static cn.topiam.employee.core.help.SettingHelp.getMailProviderConfig;
 import static cn.topiam.employee.core.help.SettingHelp.getSmsProviderConfig;
 
 /**
@@ -72,30 +64,17 @@ public class EiamMessageSendConfiguration {
     /**
      * 邮件发送
      *
-     * @param messageSettingRepository {@link SettingRepository}
+     * @param taskExecutor {@link TaskExecutor}
      * @return {@link MailProviderSend}
      */
     @Bean(MAIL_PROVIDER_SEND)
     @RefreshScope
-    public MailProviderSend mailProviderSend(SettingRepository messageSettingRepository,
-                                             TaskExecutor taskExecutor) {
-        try {
-            SettingEntity setting = messageSettingRepository
-                .findByName(MessageSettingConstants.MESSAGE_PROVIDER_EMAIL);
-            if (!Objects.isNull(setting)
-                && !SettingConstants.NOT_CONFIG.equals(setting.getValue())) {
-                String value = setting.getValue();
-                ObjectMapper objectMapper = EncryptionModule.deserializerDecrypt();
-                // 指定序列化输入的类型
-                objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
-                    ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
-                // 根据提供商序列化
-                MailProviderConfig config = objectMapper.readValue(value, MailProviderConfig.class);
-                return new DefaultMailProviderSendImpl(config, taskExecutor);
-            }
+    public MailProviderSend mailProviderSend(TaskExecutor taskExecutor) {
+
+        MailProviderConfig config = getMailProviderConfig();
+        if (Objects.isNull(config)) {
             return null;
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
         }
+        return new DefaultMailProviderSendImpl(config, taskExecutor);
     }
 }

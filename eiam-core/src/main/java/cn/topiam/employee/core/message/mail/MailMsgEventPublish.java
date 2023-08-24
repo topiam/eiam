@@ -20,6 +20,7 @@ package cn.topiam.employee.core.message.mail;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -29,13 +30,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cn.topiam.employee.common.enums.MailType;
 import cn.topiam.employee.common.enums.MessageCategory;
 import cn.topiam.employee.common.message.enums.MessageType;
+import cn.topiam.employee.common.message.mail.MailProviderConfig;
 import cn.topiam.employee.core.mq.NoticeMessagePublisher;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.exception.TopIamException;
 
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import static cn.topiam.employee.core.help.SettingHelp.getCodeValidTime;
+import static cn.topiam.employee.core.help.SettingHelp.getMailProviderConfig;
 import static cn.topiam.employee.core.message.MsgVariable.*;
 import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIME_FORMATTER;
 
@@ -77,6 +81,11 @@ public class MailMsgEventPublish {
      */
     @SneakyThrows
     public void publish(MailType type, String receiver, Map<String, Object> parameter) {
+        MailProviderConfig config = getMailProviderConfig();
+        if (Objects.isNull(config)) {
+            throw new TopIamException("未配置邮件服务");
+        }
+
         if (StringUtils.isBlank(receiver)) {
             log.warn("发送邮件通知失败, 接受者为空, type: {}", type);
             return;
