@@ -34,11 +34,14 @@ import cn.topiam.employee.common.constant.SettingConstants;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.entity.setting.config.SmsConfig;
 import cn.topiam.employee.common.jackjson.encrypt.EncryptContextHelp;
+import cn.topiam.employee.common.jackjson.encrypt.EncryptionModule;
 import cn.topiam.employee.common.message.enums.SmsProvider;
+import cn.topiam.employee.common.message.mail.MailProviderConfig;
 import cn.topiam.employee.common.message.sms.aliyun.AliyunSmsProviderConfig;
 import cn.topiam.employee.common.message.sms.qiniu.QiNiuSmsProviderConfig;
 import cn.topiam.employee.common.message.sms.tencent.TencentSmsProviderConfig;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
+import cn.topiam.employee.core.setting.constant.MessageSettingConstants;
 import cn.topiam.employee.core.setting.constant.SecuritySettingConstants;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.exception.TopIamException;
@@ -60,7 +63,7 @@ public class SettingHelp {
     /**
      * 获取验证码提供商配置
      *
-     * @return  {@link Boolean}
+     * @return {@link SmsConfig}
      */
     public static SmsConfig getSmsProviderConfig() {
         SettingEntity setting = getSettingRepository().findByName(MESSAGE_SMS_PROVIDER);
@@ -99,6 +102,33 @@ public class SettingHelp {
             }
         }
         return new SmsConfig();
+    }
+
+    /**
+     * 获取邮箱提供商配置
+     *
+     * @return {@link MailProviderConfig}
+     */
+    public static MailProviderConfig getMailProviderConfig() {
+        try {
+            SettingEntity setting = getSettingRepository()
+                .findByName(MessageSettingConstants.MESSAGE_PROVIDER_EMAIL);
+            if (!Objects.isNull(setting)
+                && !SettingConstants.NOT_CONFIG.equals(setting.getValue())) {
+                String value = setting.getValue();
+                ObjectMapper objectMapper = EncryptionModule.deserializerDecrypt();
+                // 指定序列化输入的类型
+                objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
+                    ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+                // 根据提供商序列化
+                MailProviderConfig config = objectMapper.readValue(value, MailProviderConfig.class);
+                return config;
+            }
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+
+        }
+        return null;
     }
 
     /**

@@ -35,6 +35,7 @@ import ConfigAbout from './ConfigAbout';
 import { useIntl } from '@umijs/max';
 import { AuthorizationType } from '../CommonConfig';
 import { GetApp } from '../../../data.d';
+import { generateUUID } from '@/utils/utils';
 const formItemLayout = {
   labelCol: {
     span: 6,
@@ -64,7 +65,7 @@ export default (props: { app: GetApp | Record<string, any> }) => {
       //其他字段
       if (result?.otherField) {
         const otherField = result?.otherField.map((i: Record<string, string>) => {
-          return { key: Date.now(), fieldValue: i.fieldValue, fieldName: i.fieldName };
+          return { key: generateUUID(), fieldValue: i.fieldValue, fieldName: i.fieldName };
         });
         form.setFieldsValue({ otherField: otherField });
         setOtherFieldEditableKeys(
