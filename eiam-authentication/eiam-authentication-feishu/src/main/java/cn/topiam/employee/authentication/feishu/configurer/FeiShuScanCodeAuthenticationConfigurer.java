@@ -27,7 +27,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
 
 import cn.topiam.employee.authentication.common.service.UserIdpService;
-import cn.topiam.employee.authentication.feishu.filter.FeiShuAuthorizationRequestGetFilter;
+import cn.topiam.employee.authentication.feishu.filter.FeiShuAuthorizationRequestRedirectFilter;
 import cn.topiam.employee.authentication.feishu.filter.FeiShuLoginAuthenticationFilter;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 
@@ -76,8 +76,8 @@ public final class FeiShuScanCodeAuthenticationConfigurer extends
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        //微信扫码请求重定向
-        FeiShuAuthorizationRequestGetFilter requestRedirectFilter = new FeiShuAuthorizationRequestGetFilter(
+        //飞书请求重定向
+        FeiShuAuthorizationRequestRedirectFilter requestRedirectFilter = new FeiShuAuthorizationRequestRedirectFilter(
             identityProviderRepository);
         http.addFilterBefore(requestRedirectFilter, OAuth2AuthorizationRequestRedirectFilter.class);
         http.addFilterBefore(this.getAuthenticationFilter(), OAuth2LoginAuthenticationFilter.class);
@@ -85,7 +85,7 @@ public final class FeiShuScanCodeAuthenticationConfigurer extends
     }
 
     public RequestMatcher getRequestMatcher() {
-        return new OrRequestMatcher(FeiShuAuthorizationRequestGetFilter.getRequestMatcher(),
+        return new OrRequestMatcher(FeiShuAuthorizationRequestRedirectFilter.getRequestMatcher(),
             FeiShuLoginAuthenticationFilter.getRequestMatcher());
     }
 
