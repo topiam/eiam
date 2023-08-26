@@ -15,7 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.common.message;
+package cn.topiam.employee.common.exception;
+
+import java.io.Serial;
 
 /**
  * 邮件服务异常
@@ -24,6 +26,7 @@ package cn.topiam.employee.common.message;
  * Created by support@topiam.cn on 2020/8/19 22:53
  */
 public class SmsProviderException extends RuntimeException {
+    @Serial
     private static final long serialVersionUID = 6249098979022610064L;
 
     /**

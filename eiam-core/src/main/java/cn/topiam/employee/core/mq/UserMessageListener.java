@@ -64,7 +64,7 @@ public class UserMessageListener extends AbstractMessageListener {
     @RabbitListener(queues = { USER_SAVE, USER_DELETE }, ackMode = "MANUAL")
     @RabbitHandler()
     public void onMessage(Message message, Channel channel, @Payload String body,
-                          @Headers Map<String, Object> headers) {
+                          @Headers Map<String, Object> headers) throws IOException {
         super.onMessage(message, channel, body, headers);
         log.info("异步接收ES用户信息入参: [{}]", message);
         syncUser(message, channel, body);

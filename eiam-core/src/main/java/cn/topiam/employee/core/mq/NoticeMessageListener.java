@@ -43,9 +43,12 @@ import cn.topiam.employee.common.enums.MailType;
 import cn.topiam.employee.common.enums.MessageCategory;
 import cn.topiam.employee.common.exception.MailMessageSendException;
 import cn.topiam.employee.common.exception.MessageSendException;
+import cn.topiam.employee.common.exception.SmsMessageSendException;
+import cn.topiam.employee.common.message.mail.MailNoneProviderSend;
 import cn.topiam.employee.common.message.mail.MailProviderSend;
 import cn.topiam.employee.common.message.mail.SendMailRequest;
 import cn.topiam.employee.common.message.sms.SendSmsRequest;
+import cn.topiam.employee.common.message.sms.SmsNoneProviderSend;
 import cn.topiam.employee.common.message.sms.SmsProviderSend;
 import cn.topiam.employee.common.message.sms.SmsResponse;
 import cn.topiam.employee.common.repository.message.MailSendRecordRepository;
@@ -58,7 +61,6 @@ import cn.topiam.employee.core.message.sms.SmsMsgEventPublish;
 import cn.topiam.employee.core.setting.constant.MessageSettingConstants;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import freemarker.cache.StringTemplateLoader;
@@ -94,7 +96,7 @@ public class NoticeMessageListener extends AbstractMessageListener {
     @RabbitListener(queues = { NOTICE_SMS, NOTICE_MAIL }, ackMode = "MANUAL")
     @RabbitHandler()
     public void onMessage(Message message, Channel channel, @Payload String body,
-                          @Headers Map<String, Object> headers) {
+                          @Headers Map<String, Object> headers) throws IOException {
         super.onMessage(message, channel, body, headers);
         log.info("异步接收ES用户信息入参: [{}]", message);
         sendNotice(message, channel, body);
@@ -107,8 +109,7 @@ public class NoticeMessageListener extends AbstractMessageListener {
      * @param channel {@link Channel}
      * @param body    {@link String}
      */
-    @SneakyThrows
-    private String sendNotice(Message message, Channel channel, String body) {
+    private String sendNotice(Message message, Channel channel, String body) throws IOException {
         try {
             String queueName = message.getMessageProperties().getConsumerQueue();
             if (Objects.isNull(body)) {
@@ -139,6 +140,9 @@ public class NoticeMessageListener extends AbstractMessageListener {
      * @param smsMessage {@link SmsMessage}
      */
     private void sendSms(@NonNull SmsMessage smsMessage) {
+        if (smsProviderSend instanceof SmsNoneProviderSend) {
+            throw new SmsMessageSendException("暂未配置短信服务");
+        }
         SendSmsRequest smsParam = new SendSmsRequest();
         try {
             //@formatter:off
@@ -189,6 +193,9 @@ public class NoticeMessageListener extends AbstractMessageListener {
      * @param mailMessage {@link MailMessage}
      */
     private void sendMail(@NonNull MailMessage mailMessage) {
+        if (mailProviderSend instanceof MailNoneProviderSend) {
+            throw new MailMessageSendException("暂未配置邮件服务");
+        }
         // 邮件通知类型
         MailType type = mailMessage.getType();
         String content = htmlUnescape(MailUtils.readEmailContent(type.getContent()));

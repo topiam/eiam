@@ -17,6 +17,7 @@
  */
 package cn.topiam.employee.core.mq;
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.springframework.amqp.core.Message;
@@ -50,7 +51,7 @@ public abstract class AbstractMessageListener {
      * @param headers {@link Map}
      */
     public void onMessage(Message message, Channel channel, @Payload String body,
-                          @Headers Map<String, Object> headers) {
+                          @Headers Map<String, Object> headers) throws IOException {
         // 设置TraceId
         TraceUtils.put(String.valueOf(headers.get(TRACE_ID)));
     }
