@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.authentication.otp.sms;
+package cn.topiam.employee.authentication.otp.sms.filter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

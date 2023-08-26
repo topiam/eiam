@@ -15,18 +15,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.authentication.otp.mail;
+package cn.topiam.employee.authentication.otp.mail.configurer;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
 
+import cn.topiam.employee.authentication.otp.mail.filter.MailOtpAuthenticationFilter;
+import cn.topiam.employee.authentication.otp.mail.filter.SendMailOtpFilter;
 import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.core.security.otp.OtpContextHelp;
+
+import lombok.NonNull;
+import lombok.Setter;
+import static cn.topiam.employee.support.security.util.HttpSecurityFilterOrderRegistrationUtils.putFilterAfter;
 
 /**
  * 认证配置
@@ -37,46 +44,27 @@ import cn.topiam.employee.core.security.otp.OtpContextHelp;
 public class MailOtpAuthenticationConfigurer extends
                                              AbstractAuthenticationFilterConfigurer<HttpSecurity, MailOtpAuthenticationConfigurer, MailOtpAuthenticationFilter> {
 
-    /**
-     * Create the {@link RequestMatcher} given a loginProcessingUrl
-     *
-     * @param loginProcessingUrl creates the {@link RequestMatcher} based upon the
-     *                           loginProcessingUrl
-     * @return the {@link RequestMatcher} to use based upon the loginProcessingUrl
-     */
-    @Override
-    protected RequestMatcher createLoginProcessingUrlMatcher(String loginProcessingUrl) {
-        return new AntPathRequestMatcher(loginProcessingUrl);
-    }
+    @Setter
+    @NonNull
+    private String loginProcessingUrl = MailOtpAuthenticationFilter.DEFAULT_FILTER_PROCESSES_URI;
 
     @Override
     public void init(HttpSecurity http) throws Exception {
-        //OTP
-        MailOtpAuthenticationFilter loginAuthenticationFilter = getAbstractOtpAuthenticationFilter();
-        this.setAuthenticationFilter(loginAuthenticationFilter);
-        //处理URL
-        super.loginProcessingUrl(loginAuthenticationFilter.getFilterProcessesUri());
+        //邮箱OTP发送
+        http.addFilterBefore(new SendMailOtpFilter(userRepository, otpContextHelp),
+            OAuth2LoginAuthenticationFilter.class);
+        //邮箱OTP认证
+        this.setAuthenticationFilter(
+            new MailOtpAuthenticationFilter(userDetailsService, otpContextHelp));
+        putFilterAfter(http, this.getAuthenticationFilter(), SendMailOtpFilter.class);
+
+        //登录处理地址
+        super.loginProcessingUrl(this.loginProcessingUrl);
         super.init(http);
     }
 
-    @Override
-    public void configure(HttpSecurity http) throws Exception {
-        SendMailOtpFilter sendOtpFilter = getAbstractSendOtpFilter();
-        http.addFilterAfter(sendOtpFilter, UsernamePasswordAuthenticationFilter.class);
-        http.addFilterAfter(this.getAuthenticationFilter(), sendOtpFilter.getClass());
-        super.configure(http);
-    }
-
     public RequestMatcher getRequestMatcher() {
-        return getAbstractOtpAuthenticationFilter().getRequestMatcher();
-    }
-
-    public MailOtpAuthenticationFilter getAbstractOtpAuthenticationFilter() {
-        return new MailOtpAuthenticationFilter(userDetailsService, otpContextHelp);
-    }
-
-    public SendMailOtpFilter getAbstractSendOtpFilter() {
-        return new SendMailOtpFilter(userRepository, otpContextHelp);
+        return MailOtpAuthenticationFilter.getRequestMatcher();
     }
 
     private final UserRepository     userRepository;
@@ -93,6 +81,18 @@ public class MailOtpAuthenticationConfigurer extends
         this.userDetailsService = userDetailsService;
         this.userRepository = userRepository;
         this.otpContextHelp = otpContextHelp;
+    }
+
+    /**
+     * Create the {@link RequestMatcher} given a loginProcessingUrl
+     *
+     * @param loginProcessingUrl creates the {@link RequestMatcher} based upon the
+     *                           loginProcessingUrl
+     * @return the {@link RequestMatcher} to use based upon the loginProcessingUrl
+     */
+    @Override
+    protected RequestMatcher createLoginProcessingUrlMatcher(String loginProcessingUrl) {
+        return new AntPathRequestMatcher(loginProcessingUrl, HttpMethod.POST.name());
     }
 
     public static MailOtpAuthenticationConfigurer mailOtp(UserRepository userRepository,

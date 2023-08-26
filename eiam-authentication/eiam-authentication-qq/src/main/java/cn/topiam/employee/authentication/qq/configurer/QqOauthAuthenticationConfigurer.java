@@ -17,6 +17,7 @@
  */
 package cn.topiam.employee.authentication.qq.configurer;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
@@ -31,6 +32,10 @@ import cn.topiam.employee.authentication.qq.filter.QqOAuth2AuthorizationRequestR
 import cn.topiam.employee.authentication.qq.filter.QqOAuth2LoginAuthenticationFilter;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 
+import lombok.NonNull;
+import lombok.Setter;
+import static cn.topiam.employee.support.security.util.HttpSecurityFilterOrderRegistrationUtils.putFilterBefore;
+
 /**
  * 认证配置
  *
@@ -39,6 +44,10 @@ import cn.topiam.employee.common.repository.authentication.IdentityProviderRepos
  */
 public final class QqOauthAuthenticationConfigurer extends
                                                    AbstractAuthenticationFilterConfigurer<HttpSecurity, QqOauthAuthenticationConfigurer, QqOAuth2LoginAuthenticationFilter> {
+
+    @Setter
+    @NonNull
+    private String                           loginProcessingUrl = QqOAuth2LoginAuthenticationFilter.DEFAULT_FILTER_PROCESSES_URI;
 
     private final IdentityProviderRepository identityProviderRepository;
     private final UserIdpService             userIdpService;
@@ -60,29 +69,25 @@ public final class QqOauthAuthenticationConfigurer extends
      */
     @Override
     protected RequestMatcher createLoginProcessingUrlMatcher(String loginProcessingUrl) {
-        return new AntPathRequestMatcher(loginProcessingUrl);
+        return new AntPathRequestMatcher(loginProcessingUrl, HttpMethod.GET.name());
     }
 
     @Override
     public void init(HttpSecurity http) throws Exception {
-        //设置登录成功失败处理器
         //QQ扫码登录认证
-        QqOAuth2LoginAuthenticationFilter loginAuthenticationFilter = new QqOAuth2LoginAuthenticationFilter(
-            identityProviderRepository, userIdpService);
-        this.setAuthenticationFilter(loginAuthenticationFilter);
-        //处理URL
-        super.loginProcessingUrl(QqOAuth2LoginAuthenticationFilter.DEFAULT_FILTER_PROCESSES_URI);
-        super.init(http);
-    }
+        this.setAuthenticationFilter(
+            new QqOAuth2LoginAuthenticationFilter(identityProviderRepository, userIdpService));
+        putFilterBefore(http, this.getAuthenticationFilter(),
+            OAuth2LoginAuthenticationFilter.class);
 
-    @Override
-    public void configure(HttpSecurity http) throws Exception {
         //QQ扫码请求重定向
-        QqOAuth2AuthorizationRequestRedirectFilter requestRedirectFilter = new QqOAuth2AuthorizationRequestRedirectFilter(
-            identityProviderRepository);
-        http.addFilterBefore(requestRedirectFilter, OAuth2AuthorizationRequestRedirectFilter.class);
-        http.addFilterBefore(this.getAuthenticationFilter(), OAuth2LoginAuthenticationFilter.class);
-        super.configure(http);
+        http.addFilterBefore(
+            new QqOAuth2AuthorizationRequestRedirectFilter(identityProviderRepository),
+            OAuth2AuthorizationRequestRedirectFilter.class);
+
+        //QQ登录处理地址
+        super.loginProcessingUrl(loginProcessingUrl);
+        super.init(http);
     }
 
     public RequestMatcher getRequestMatcher() {

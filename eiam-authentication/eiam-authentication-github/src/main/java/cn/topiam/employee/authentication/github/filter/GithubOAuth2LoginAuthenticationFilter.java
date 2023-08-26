@@ -25,7 +25,6 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.*;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -80,7 +79,7 @@ public class GithubOAuth2LoginAuthenticationFilter extends
      */
     public GithubOAuth2LoginAuthenticationFilter(IdentityProviderRepository identityProviderRepository,
                                                  UserIdpService userIdpService) {
-        super(DEFAULT_FILTER_PROCESSES_URI, userIdpService, identityProviderRepository);
+        super(REQUEST_MATCHER, userIdpService, identityProviderRepository);
     }
 
     /**
@@ -95,10 +94,6 @@ public class GithubOAuth2LoginAuthenticationFilter extends
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response) throws AuthenticationException,
                                                                               IOException {
-        if (!REQUEST_MATCHER.matches(request)) {
-            throw new AuthenticationServiceException(
-                "Authentication method not supported: " + request.getMethod());
-        }
         OAuth2AuthorizationRequest authorizationRequest = getOauth2AuthorizationRequest(request,
             response);
         TraceUtils.put(UUID.randomUUID().toString());

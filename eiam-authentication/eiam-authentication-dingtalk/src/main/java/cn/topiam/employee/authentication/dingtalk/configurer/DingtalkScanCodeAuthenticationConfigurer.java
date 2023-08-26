@@ -17,6 +17,7 @@
  */
 package cn.topiam.employee.authentication.dingtalk.configurer;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
@@ -31,6 +32,10 @@ import cn.topiam.employee.authentication.dingtalk.filter.DingtalkScanCodeAuthent
 import cn.topiam.employee.authentication.dingtalk.filter.DingtalkScanCodeAuthorizationRequestGetFilter;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 
+import lombok.NonNull;
+import lombok.Setter;
+import static cn.topiam.employee.support.security.util.HttpSecurityFilterOrderRegistrationUtils.putFilterBefore;
+
 /**
  * 认证配置
  *
@@ -39,6 +44,10 @@ import cn.topiam.employee.common.repository.authentication.IdentityProviderRepos
  */
 public final class DingtalkScanCodeAuthenticationConfigurer extends
                                                             AbstractAuthenticationFilterConfigurer<HttpSecurity, DingtalkScanCodeAuthenticationConfigurer, DingtalkScanCodeAuthenticationFilter> {
+    @Setter
+    @NonNull
+    private String                           loginProcessingUrl = DingtalkScanCodeAuthenticationFilter.DEFAULT_FILTER_PROCESSES_URI;
+
     private final IdentityProviderRepository identityProviderRepository;
     private final UserIdpService             userIdpService;
 
@@ -59,28 +68,25 @@ public final class DingtalkScanCodeAuthenticationConfigurer extends
      */
     @Override
     protected RequestMatcher createLoginProcessingUrlMatcher(String loginProcessingUrl) {
-        return new AntPathRequestMatcher(loginProcessingUrl);
+        return new AntPathRequestMatcher(loginProcessingUrl, HttpMethod.GET.name());
     }
 
     @Override
     public void init(HttpSecurity http) throws Exception {
         //钉钉扫码登录认证
-        DingtalkScanCodeAuthenticationFilter loginAuthenticationFilter = new DingtalkScanCodeAuthenticationFilter(
-            identityProviderRepository, userIdpService);
-        this.setAuthenticationFilter(loginAuthenticationFilter);
-        //处理URL
-        super.loginProcessingUrl(DingtalkScanCodeAuthenticationFilter.DEFAULT_FILTER_PROCESSES_URI);
-        super.init(http);
-    }
+        this.setAuthenticationFilter(
+            new DingtalkScanCodeAuthenticationFilter(identityProviderRepository, userIdpService));
+        putFilterBefore(http, this.getAuthenticationFilter(),
+            OAuth2LoginAuthenticationFilter.class);
 
-    @Override
-    public void configure(HttpSecurity http) throws Exception {
         //钉钉请求重定向
-        DingtalkScanCodeAuthorizationRequestGetFilter requestRedirectFilter = new DingtalkScanCodeAuthorizationRequestGetFilter(
-            identityProviderRepository);
-        http.addFilterBefore(requestRedirectFilter, OAuth2AuthorizationRequestRedirectFilter.class);
-        http.addFilterBefore(this.getAuthenticationFilter(), OAuth2LoginAuthenticationFilter.class);
-        super.configure(http);
+        http.addFilterBefore(
+            new DingtalkScanCodeAuthorizationRequestGetFilter(identityProviderRepository),
+            OAuth2AuthorizationRequestRedirectFilter.class);
+
+        //登录处理网址
+        super.loginProcessingUrl(this.loginProcessingUrl);
+        super.init(http);
     }
 
     public RequestMatcher getRequestMatcher() {

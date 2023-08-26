@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.authentication.otp.mail;
+package cn.topiam.employee.authentication.otp.mail.filter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -76,8 +76,6 @@ public class MailOtpAuthenticationFilter extends AbstractAuthenticationProcessin
      * 是否值处理POST请求
      */
     private boolean                    postOnly                     = true;
-
-    public RequestMatcher              captchaLoginMatcher;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
@@ -185,8 +183,8 @@ public class MailOtpAuthenticationFilter extends AbstractAuthenticationProcessin
         this.codeParameter = codeParameter;
     }
 
-    public RequestMatcher getRequestMatcher() {
-        return captchaLoginMatcher;
+    public static RequestMatcher getRequestMatcher() {
+        return MAIL_LOGIN_MATCHER;
     }
 
     private final OtpContextHelp     otpContextHelp;
@@ -198,6 +196,5 @@ public class MailOtpAuthenticationFilter extends AbstractAuthenticationProcessin
         super(MAIL_LOGIN_MATCHER);
         this.userDetailsService = userDetailsService;
         this.otpContextHelp = otpContextHelp;
-        this.captchaLoginMatcher = MAIL_LOGIN_MATCHER;
     }
 }

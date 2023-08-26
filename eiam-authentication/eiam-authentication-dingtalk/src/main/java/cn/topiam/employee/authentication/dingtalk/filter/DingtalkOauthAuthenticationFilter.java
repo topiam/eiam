@@ -25,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -63,6 +62,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import static cn.topiam.employee.authentication.common.IdentityProviderType.DINGTALK_OAUTH;
 import static cn.topiam.employee.authentication.common.IdentityProviderType.DINGTALK_QR;
 import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.*;
+import static cn.topiam.employee.authentication.dingtalk.constant.DingTalkAuthenticationConstants.AUTH_CODE;
 
 /**
  * 钉钉认证过滤器
@@ -90,7 +90,7 @@ public class DingtalkOauthAuthenticationFilter extends AbstractIdpAuthentication
      */
     public DingtalkOauthAuthenticationFilter(IdentityProviderRepository identityProviderRepository,
                                              UserIdpService userIdpService) {
-        super(DEFAULT_FILTER_PROCESSES_URI, userIdpService, identityProviderRepository);
+        super(REQUEST_MATCHER, userIdpService, identityProviderRepository);
     }
 
     /**
@@ -105,10 +105,6 @@ public class DingtalkOauthAuthenticationFilter extends AbstractIdpAuthentication
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response) throws AuthenticationException,
                                                                               IOException {
-        if (!REQUEST_MATCHER.matches(request)) {
-            throw new AuthenticationServiceException(
-                "Authentication method not supported: " + request.getMethod());
-        }
         OAuth2AuthorizationRequest authorizationRequest = getOauth2AuthorizationRequest(request,
             response);
         TraceUtils.put(UUID.randomUUID().toString());

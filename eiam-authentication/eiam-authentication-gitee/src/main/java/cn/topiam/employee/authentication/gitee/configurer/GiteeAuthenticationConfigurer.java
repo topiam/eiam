@@ -17,6 +17,7 @@
  */
 package cn.topiam.employee.authentication.gitee.configurer;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
@@ -31,6 +32,10 @@ import cn.topiam.employee.authentication.gitee.filter.GiteeAuthorizationRequestR
 import cn.topiam.employee.authentication.gitee.filter.GiteeLoginAuthenticationFilter;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 
+import lombok.NonNull;
+import lombok.Setter;
+import static cn.topiam.employee.support.security.util.HttpSecurityFilterOrderRegistrationUtils.putFilterBefore;
+
 /**
  * 认证配置
  *
@@ -39,7 +44,9 @@ import cn.topiam.employee.common.repository.authentication.IdentityProviderRepos
  */
 public final class GiteeAuthenticationConfigurer extends
                                                  AbstractAuthenticationFilterConfigurer<HttpSecurity, GiteeAuthenticationConfigurer, GiteeLoginAuthenticationFilter> {
-
+    @Setter
+    @NonNull
+    private String                           loginProcessingUrl = GiteeLoginAuthenticationFilter.DEFAULT_FILTER_PROCESSES_URI;
     private final IdentityProviderRepository identityProviderRepository;
     private final UserIdpService             userIdpService;
 
@@ -60,28 +67,25 @@ public final class GiteeAuthenticationConfigurer extends
      */
     @Override
     protected RequestMatcher createLoginProcessingUrlMatcher(String loginProcessingUrl) {
-        return new AntPathRequestMatcher(loginProcessingUrl);
+        return new AntPathRequestMatcher(loginProcessingUrl, HttpMethod.GET.name());
     }
 
     @Override
     public void init(HttpSecurity http) throws Exception {
         //Gitee登录认证
-        GiteeLoginAuthenticationFilter loginAuthenticationFilter = new GiteeLoginAuthenticationFilter(
-            identityProviderRepository, userIdpService);
-        this.setAuthenticationFilter(loginAuthenticationFilter);
-        //处理URL
-        super.loginProcessingUrl(GiteeLoginAuthenticationFilter.DEFAULT_FILTER_PROCESSES_URI);
-        super.init(http);
-    }
+        this.setAuthenticationFilter(
+            new GiteeLoginAuthenticationFilter(identityProviderRepository, userIdpService));
+        putFilterBefore(http, this.getAuthenticationFilter(),
+            OAuth2LoginAuthenticationFilter.class);
 
-    @Override
-    public void configure(HttpSecurity http) throws Exception {
         //Gitee扫码请求重定向
-        GiteeAuthorizationRequestRedirectFilter requestRedirectFilter = new GiteeAuthorizationRequestRedirectFilter(
-            identityProviderRepository);
-        http.addFilterBefore(requestRedirectFilter, OAuth2AuthorizationRequestRedirectFilter.class);
-        http.addFilterBefore(this.getAuthenticationFilter(), OAuth2LoginAuthenticationFilter.class);
-        super.configure(http);
+        http.addFilterBefore(
+            new GiteeAuthorizationRequestRedirectFilter(identityProviderRepository),
+            OAuth2AuthorizationRequestRedirectFilter.class);
+
+        //登录处理地址
+        super.loginProcessingUrl(this.loginProcessingUrl);
+        super.init(http);
     }
 
     public RequestMatcher getRequestMatcher() {
