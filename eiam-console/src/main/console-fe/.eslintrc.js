@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 module.exports = {
-  extends: [require.resolve('@umijs/lint/dist/config/eslint')],
+  extends: [require.resolve('@umijs/max/eslint')],
   globals: {
     page: true,
     REACT_APP_ENV: true,
