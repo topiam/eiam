@@ -25,7 +25,7 @@ import org.springframework.security.oauth2.client.web.AuthorizationRequestReposi
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import com.alibaba.fastjson2.JSONObject;
 
@@ -131,7 +131,6 @@ public abstract class AbstractIdpAuthenticationProcessingFilter extends
     }
 
     public static final String                                               GET_USERINFO_ERROR_CODE = "get_userinfo_error_code";
-    public static final String                                               AUTH_CODE               = "authCode";
 
     public static final String                                               INVALID_IDP_CONFIG      = "invalid_idp_config";
 
@@ -156,14 +155,14 @@ public abstract class AbstractIdpAuthenticationProcessingFilter extends
     /**
      * Creates a new instance
      *
-     * @param defaultFilterProcessesUrl      the {@link String}
+     * @param requiresAuthenticationRequestMatcher      the {@link RequestMatcher}
      * @param userIdpService                 {@link  UserIdpService}
      * @param identityProviderRepository     {@link IdentityProviderRepository}
      */
-    protected AbstractIdpAuthenticationProcessingFilter(String defaultFilterProcessesUrl,
+    protected AbstractIdpAuthenticationProcessingFilter(RequestMatcher requiresAuthenticationRequestMatcher,
                                                         UserIdpService userIdpService,
                                                         IdentityProviderRepository identityProviderRepository) {
-        super(new AntPathRequestMatcher(defaultFilterProcessesUrl));
+        super(requiresAuthenticationRequestMatcher);
         this.userIdpService = userIdpService;
         this.identityProviderRepository = identityProviderRepository;
         this.authorizationRequestRepository = new HttpSessionOAuth2AuthorizationRequestRepository();

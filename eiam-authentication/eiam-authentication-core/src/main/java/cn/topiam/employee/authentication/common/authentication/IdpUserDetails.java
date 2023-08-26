@@ -23,12 +23,15 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 import cn.topiam.employee.authentication.common.IdentityProviderType;
 
+import lombok.Getter;
+
 /**
  * IDP用户信息
  *
  * @author TopIAM
  * Created by support@topiam.cn on  2022/9/18 21:23
  */
+@Getter
 public class IdpUserDetails {
 
     /**
@@ -88,50 +91,6 @@ public class IdpUserDetails {
 
     public static IdpUserDetailsBuilder builder() {
         return new IdpUserDetailsBuilder();
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getMobile() {
-        return mobile;
-    }
-
-    public String getNickName() {
-        return nickName;
-    }
-
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public String getOpenId() {
-        return openId;
-    }
-
-    public String getStateCode() {
-        return stateCode;
-    }
-
-    public String getUnionId() {
-        return unionId;
-    }
-
-    public String getProviderId() {
-        return providerId;
-    }
-
-    public String getProviderCode() {
-        return providerCode;
-    }
-
-    public IdentityProviderType getProviderType() {
-        return providerType;
-    }
-
-    public Map<String, Object> getAdditionalInfo() {
-        return additionalInfo;
     }
 
     IdpUserDetails(final String email, final String mobile, final String nickName,
