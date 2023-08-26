@@ -65,7 +65,7 @@ public final class FeiShuScanCodeAuthenticationConfigurer extends
 
     @Override
     public void init(HttpSecurity http) throws Exception {
-        //微信扫码登录认证
+        //飞书登录认证
         FeiShuLoginAuthenticationFilter loginAuthenticationFilter = new FeiShuLoginAuthenticationFilter(
             identityProviderRepository, userIdpService);
         this.setAuthenticationFilter(loginAuthenticationFilter);
