@@ -20,41 +20,55 @@ import CallbackUrl from './CallbackUrl';
 import { useIntl } from '@umijs/max';
 
 /**
- * Gitee Oauth 登录
+ * AliPay Oauth 登录
  *
  * @constructor
  */
-const GiteeOauthConfig = (props: { isCreate: boolean }) => {
+const QqOauthConfig = (props: { isCreate: boolean }) => {
   const { isCreate } = props;
   const intl = useIntl();
 
   return (
     <>
       <ProFormText
-        name={['config', 'clientId']}
+        name={['config', 'appId']}
         label={intl.formatMessage({
-          id: 'pages.authn.identity_provider.config.gitee_oauth.client_id',
+          id: 'pages.authn.identity_provider.config.alipay_oauth.app_id',
         })}
         rules={[{ required: true }]}
         fieldProps={{ autoComplete: 'off' }}
         placeholder={intl.formatMessage({
-          id: 'pages.authn.identity_provider.config.gitee_oauth.client_id.placeholder',
+          id: 'pages.authn.identity_provider.config.alipay_oauth.app_id.placeholder',
         })}
         extra={intl.formatMessage({
-          id: 'pages.authn.identity_provider.config.gitee_oauth.client_id.extra',
+          id: 'pages.authn.identity_provider.config.alipay_oauth.app_id.extra',
         })}
       />
       <ProFormText.Password
         rules={[{ required: true }]}
-        name={['config', 'clientSecret']}
+        name={['config', 'appPrivateKey']}
         label={intl.formatMessage({
-          id: 'pages.authn.identity_provider.config.gitee_oauth.client_secret',
+          id: 'pages.authn.identity_provider.config.alipay_oauth.app_private_key',
         })}
         placeholder={intl.formatMessage({
-          id: 'pages.authn.identity_provider.config.gitee_oauth.client_secret.placeholder',
+          id: 'pages.authn.identity_provider.config.alipay_oauth.app_private_key.placeholder',
         })}
         extra={intl.formatMessage({
-          id: 'pages.authn.identity_provider.config.gitee_oauth.client_secret.extra',
+          id: 'pages.authn.identity_provider.config.alipay_oauth.app_private_key.extra',
+        })}
+        fieldProps={{ autoComplete: 'off' }}
+      />
+      <ProFormText.Password
+        rules={[{ required: true }]}
+        name={['config', 'alipayPublicKey']}
+        label={intl.formatMessage({
+          id: 'pages.authn.identity_provider.config.alipay_oauth.alipay_public_key',
+        })}
+        placeholder={intl.formatMessage({
+          id: 'pages.authn.identity_provider.config.alipay_oauth.alipay_public_key.placeholder',
+        })}
+        extra={intl.formatMessage({
+          id: 'pages.authn.identity_provider.config.alipay_oauth.alipay_public_key.extra',
         })}
         fieldProps={{ autoComplete: 'off' }}
       />
@@ -62,4 +76,4 @@ const GiteeOauthConfig = (props: { isCreate: boolean }) => {
     </>
   );
 };
-export default GiteeOauthConfig;
+export default QqOauthConfig;

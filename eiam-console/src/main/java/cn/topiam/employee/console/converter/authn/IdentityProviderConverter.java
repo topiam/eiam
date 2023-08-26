@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 
+import cn.topiam.employee.authentication.alipay.AlipayIdpOAuth2Config;
 import cn.topiam.employee.authentication.common.IdentityProviderCategory;
 import cn.topiam.employee.authentication.common.IdentityProviderType;
 import cn.topiam.employee.authentication.common.config.IdentityProviderConfig;
@@ -249,7 +250,7 @@ public interface IdentityProviderConverter {
             //钉钉扫码
         } else if (type.equals(DINGTALK_QR.value())) {
             identityProviderConfig = config.to(DingTalkIdpScanCodeConfig.class);
-            //钉钉Oauth
+            //钉钉OAuth
         } else if (type.equals(DINGTALK_OAUTH.value())) {
             identityProviderConfig = config.to(DingTalkIdpOauthConfig.class);
             //企业微信扫码
@@ -271,7 +272,7 @@ public interface IdentityProviderConverter {
         }
         //支付宝认证
         else if (type.equals(ALIPAY_OAUTH.value())) {
-            identityProviderConfig = config.to(GiteeIdpOAuth2Config.class);
+            identityProviderConfig = config.to(AlipayIdpOAuth2Config.class);
         } else {
             throw new TopIamException("不支持此身份提供商");
         }

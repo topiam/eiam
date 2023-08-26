@@ -215,6 +215,21 @@ const Login = () => {
   };
 
   /**
+   * alipay
+   *
+   * @param id
+   */
+  const alipayOauthOnClick = (id: string) => {
+    const query = queryString.parse(history.location.search);
+    const { redirect_uri } = query as { redirect_uri: string };
+    let path = `/api/v1/authorization/alipay_oauth/${id}`;
+    if (redirect_uri) {
+      path = `${path}?redirect_uri=${redirect_uri}`;
+    }
+    window.open(path, '_self');
+  };
+
+  /**
    * 提交
    *
    * @param values
@@ -516,6 +531,11 @@ const Login = () => {
                                               //GITHUB，跳转页面
                                               if (value.type === IDP_TYPE.GITHUB_OAUTH) {
                                                 githubOauthOnClick(value.code);
+                                                return;
+                                              }
+                                              //支付宝，跳转页面
+                                              if (value.type === IDP_TYPE.ALIPAY_OAUTH) {
+                                                alipayOauthOnClick(value.code);
                                                 return;
                                               }
                                               //其他方式，跳转页面

@@ -33,10 +33,23 @@ import jakarta.validation.constraints.NotBlank;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class AlipayIdpOAuth2Config extends IdentityProviderConfig {
+
     /**
      * 商户ID
      */
     @NotBlank(message = "商户ID不能为空")
     private String appId;
+
+    /**
+     * 应用私钥
+     */
+    @NotBlank(message = "应用私钥")
+    private String appPrivateKey;
+
+    /**
+     * 支付宝公钥
+     */
+    @NotBlank(message = "支付宝公钥")
+    private String alipayPublicKey;
 
 }

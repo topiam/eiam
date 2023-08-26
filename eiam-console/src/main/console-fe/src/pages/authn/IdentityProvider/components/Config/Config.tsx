@@ -26,6 +26,7 @@ import WeWorkScanCode from './WeWorkScanCodeConfig';
 import GithubOauthConfig from './GithubOauthConfig';
 import GiteeOauthConfig from './GiteeOauthConfig';
 import { useIntl } from '@umijs/max';
+import AliPayOauthConfig from '@/pages/authn/IdentityProvider/components/Config/AliPayOauthConfig';
 
 /**
  * Config
@@ -43,10 +44,11 @@ const Config = (props: { type: IdentityProviderType | string; isCreate?: boolean
       {type === IdentityProviderType.wechatwork_qr && <WeWorkScanCode isCreate={isCreate} />}
       {type === IdentityProviderType.dingtalk_qr && <DingTalkScanCode isCreate={isCreate} />}
       {type === IdentityProviderType.dingtalk_oauth && <DingTalkOauthConfig isCreate={isCreate} />}
-      {type === IdentityProviderType.qq && <QqOauthConfig isCreate={isCreate} />}
+      {type === IdentityProviderType.qq_oauth && <QqOauthConfig isCreate={isCreate} />}
       {type === IdentityProviderType.feishu_oauth && <FeiShuScanCodeConfig isCreate={isCreate} />}
-      {type === IdentityProviderType.gitee && <GiteeOauthConfig isCreate={isCreate} />}
-      {type === IdentityProviderType.github && <GithubOauthConfig isCreate={isCreate} />}
+      {type === IdentityProviderType.gitee_oauth && <GiteeOauthConfig isCreate={isCreate} />}
+      {type === IdentityProviderType.github_oauth && <GithubOauthConfig isCreate={isCreate} />}
+      {type === IdentityProviderType.alipay_oauth && <AliPayOauthConfig isCreate={isCreate} />}
       <ProFormSwitch
         name={['displayed']}
         extra={intl.formatMessage({

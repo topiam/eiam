@@ -17,15 +17,15 @@
  */
 package cn.topiam.employee.portal.configuration.security;
 
-import cn.topiam.employee.authentication.alipay.filter.AlipayAuthorizationRequestRedirectFilter;
-import cn.topiam.employee.authentication.gitee.filter.GiteeAuthorizationRequestRedirectFilter;
-import cn.topiam.employee.authentication.github.filter.GithubOAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import cn.topiam.employee.authentication.alipay.filter.AlipayAuthorizationRequestRedirectFilter;
 import cn.topiam.employee.authentication.dingtalk.filter.DingtalkOAuth2AuthorizationRequestRedirectFilter;
 import cn.topiam.employee.authentication.dingtalk.filter.DingtalkScanCodeAuthorizationRequestGetFilter;
 import cn.topiam.employee.authentication.feishu.filter.FeiShuAuthorizationRequestRedirectFilter;
+import cn.topiam.employee.authentication.gitee.filter.GiteeAuthorizationRequestRedirectFilter;
+import cn.topiam.employee.authentication.github.filter.GithubOAuth2AuthorizationRequestRedirectFilter;
 import cn.topiam.employee.authentication.qq.filter.QqOAuth2AuthorizationRequestRedirectFilter;
 import cn.topiam.employee.authentication.wechat.filter.WeChatScanCodeAuthorizationRequestRedirectFilter;
 import cn.topiam.employee.authentication.wechatwork.filter.WeChatWorkScanCodeAuthorizationRequestRedirectFilter;

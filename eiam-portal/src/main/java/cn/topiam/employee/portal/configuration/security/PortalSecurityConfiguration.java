@@ -51,6 +51,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.topiam.employee.audit.event.AuditEventPublish;
+import cn.topiam.employee.authentication.alipay.configurer.AlipayAuthenticationConfigurer;
 import cn.topiam.employee.authentication.common.configurer.IdpBindAuthenticationConfigurer;
 import cn.topiam.employee.authentication.common.jackjson.AuthenticationJacksonModule;
 import cn.topiam.employee.authentication.common.service.UserIdpService;
@@ -59,8 +60,8 @@ import cn.topiam.employee.authentication.dingtalk.configurer.DingtalkScanCodeAut
 import cn.topiam.employee.authentication.feishu.configurer.FeiShuScanCodeAuthenticationConfigurer;
 import cn.topiam.employee.authentication.gitee.configurer.GiteeAuthenticationConfigurer;
 import cn.topiam.employee.authentication.github.configurer.GithubOauthAuthenticationConfigurer;
-import cn.topiam.employee.authentication.otp.mail.MailOtpAuthenticationConfigurer;
-import cn.topiam.employee.authentication.otp.sms.SmsOtpAuthenticationConfigurer;
+import cn.topiam.employee.authentication.otp.mail.configurer.MailOtpAuthenticationConfigurer;
+import cn.topiam.employee.authentication.otp.sms.configurer.SmsOtpAuthenticationConfigurer;
 import cn.topiam.employee.authentication.qq.configurer.QqOauthAuthenticationConfigurer;
 import cn.topiam.employee.authentication.wechat.configurer.WeChatScanCodeAuthenticationConfigurer;
 import cn.topiam.employee.authentication.wechatwork.configurer.WeChatWorkScanCodeAuthenticationConfigurer;
@@ -90,14 +91,15 @@ import cn.topiam.employee.support.security.savedredirect.LoginRedirectParameterF
 import static org.springframework.http.HttpMethod.*;
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import static cn.topiam.employee.authentication.alipay.configurer.AlipayAuthenticationConfigurer.alipayOauth;
 import static cn.topiam.employee.authentication.common.configurer.IdpBindAuthenticationConfigurer.idpBind;
 import static cn.topiam.employee.authentication.dingtalk.configurer.DingtalkOAuth2AuthenticationConfigurer.dingtalkOAuth2;
 import static cn.topiam.employee.authentication.dingtalk.configurer.DingtalkScanCodeAuthenticationConfigurer.dingtalkScanCode;
 import static cn.topiam.employee.authentication.feishu.configurer.FeiShuScanCodeAuthenticationConfigurer.feiShuScanCode;
 import static cn.topiam.employee.authentication.gitee.configurer.GiteeAuthenticationConfigurer.giteeOauth;
 import static cn.topiam.employee.authentication.github.configurer.GithubOauthAuthenticationConfigurer.github;
-import static cn.topiam.employee.authentication.otp.mail.MailOtpAuthenticationConfigurer.mailOtp;
-import static cn.topiam.employee.authentication.otp.sms.SmsOtpAuthenticationConfigurer.smsOtp;
+import static cn.topiam.employee.authentication.otp.mail.configurer.MailOtpAuthenticationConfigurer.mailOtp;
+import static cn.topiam.employee.authentication.otp.sms.configurer.SmsOtpAuthenticationConfigurer.smsOtp;
 import static cn.topiam.employee.authentication.qq.configurer.QqOauthAuthenticationConfigurer.qq;
 import static cn.topiam.employee.authentication.wechat.configurer.WeChatScanCodeAuthenticationConfigurer.weChatScanCode;
 import static cn.topiam.employee.authentication.wechatwork.configurer.WeChatWorkScanCodeAuthenticationConfigurer.weChatWorkScanCode;
@@ -217,7 +219,13 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
         requestMatchers.add(giteeCode.getRequestMatcher());
         httpSecurity.apply(giteeCode);
 
-        //支付宝 todo
+        //支付宝
+        AlipayAuthenticationConfigurer alipayOauth = alipayOauth(identityProviderRepository, userIdpService)
+                .successHandler(successHandler)
+                .failureHandler(failureHandler)
+                .authenticationDetailsSource(authenticationDetailsSource);
+        requestMatchers.add(alipayOauth.getRequestMatcher());
+        httpSecurity.apply(alipayOauth);
 
         //RequestMatcher
         OrRequestMatcher requestMatcher = new OrRequestMatcher(requestMatchers);
