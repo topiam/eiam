@@ -40,9 +40,6 @@ const QqOauthConfig = (props: { isCreate: boolean }) => {
         placeholder={intl.formatMessage({
           id: 'pages.authn.identity_provider.config.alipay_oauth.app_id.placeholder',
         })}
-        extra={intl.formatMessage({
-          id: 'pages.authn.identity_provider.config.alipay_oauth.app_id.extra',
-        })}
       />
       <ProFormText.Password
         rules={[{ required: true }]}
@@ -52,9 +49,6 @@ const QqOauthConfig = (props: { isCreate: boolean }) => {
         })}
         placeholder={intl.formatMessage({
           id: 'pages.authn.identity_provider.config.alipay_oauth.app_private_key.placeholder',
-        })}
-        extra={intl.formatMessage({
-          id: 'pages.authn.identity_provider.config.alipay_oauth.app_private_key.extra',
         })}
         fieldProps={{ autoComplete: 'off' }}
       />
@@ -66,9 +60,6 @@ const QqOauthConfig = (props: { isCreate: boolean }) => {
         })}
         placeholder={intl.formatMessage({
           id: 'pages.authn.identity_provider.config.alipay_oauth.alipay_public_key.placeholder',
-        })}
-        extra={intl.formatMessage({
-          id: 'pages.authn.identity_provider.config.alipay_oauth.alipay_public_key.extra',
         })}
         fieldProps={{ autoComplete: 'off' }}
       />

@@ -42,7 +42,6 @@ import cn.topiam.employee.common.entity.setting.MailTemplateEntity;
 import cn.topiam.employee.common.enums.MailType;
 import cn.topiam.employee.common.enums.MessageCategory;
 import cn.topiam.employee.common.exception.MailMessageSendException;
-import cn.topiam.employee.common.exception.MessageSendException;
 import cn.topiam.employee.common.exception.SmsMessageSendException;
 import cn.topiam.employee.common.message.mail.MailNoneProviderSend;
 import cn.topiam.employee.common.message.mail.MailProviderSend;
@@ -183,7 +182,7 @@ public class NoticeMessageListener extends AbstractMessageListener {
             }
         } catch (Exception e) {
             log.error("发送短信消息异常 params:{}, error: {}", smsParam, e.getMessage());
-            throw new MessageSendException(e);
+            throw new SmsMessageSendException(e);
         }
     }
 
@@ -254,7 +253,7 @@ public class NoticeMessageListener extends AbstractMessageListener {
             mailSendRecordRepository.save(record);
         } catch (Exception e) {
             log.error("邮件信息发送失败: {}", e.getMessage());
-            throw new MailMessageSendException("邮件信息发送失败！", e);
+            throw new MailMessageSendException(e);
         }
     }
 

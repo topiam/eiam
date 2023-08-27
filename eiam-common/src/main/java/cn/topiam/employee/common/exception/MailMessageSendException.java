@@ -17,6 +17,8 @@
  */
 package cn.topiam.employee.common.exception;
 
+import org.springframework.http.HttpStatus;
+
 import cn.topiam.employee.support.exception.TopIamException;
 
 /**
@@ -26,6 +28,15 @@ import cn.topiam.employee.support.exception.TopIamException;
  * Created by support@topiam.cn on  2021/9/25 21:43
  */
 public class MailMessageSendException extends TopIamException {
+
+    public MailMessageSendException() {
+        super("message_send_error", "发送邮件消息失败", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    public MailMessageSendException(Throwable cause) {
+        super(cause, "message_send_error", "发送邮件消息失败", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     /**
      * Constructs a new runtime exception with the specified detail message.
      * The cause is not initialized, and may subsequently be initialized by a

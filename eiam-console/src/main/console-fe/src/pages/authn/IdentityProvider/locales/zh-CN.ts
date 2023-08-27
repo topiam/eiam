@@ -65,33 +65,19 @@ export default {
   'pages.authn.identity_provider.config.gitee_oauth.client_secret': '客户端秘钥',
   'pages.authn.identity_provider.config.gitee_oauth.client_secret.placeholder':
     '请填写ClientSecret',
-  'pages.authn.identity_provider.config.gitee_oauth.client_id.extra': 'Gitee应用的Client ID',
-  'pages.authn.identity_provider.config.gitee_oauth.client_secret.extra':
-    'Gitee应用生成的Client secret',
-  'pages.authn.identity_provider.config.github_oauth.client_id':
-      '客户端ID',
+  'pages.authn.identity_provider.config.github_oauth.client_id': '客户端ID',
   'pages.authn.identity_provider.config.github_oauth.client_id.placeholder': '请填写Client ID',
-  'pages.authn.identity_provider.config.github_oauth.client_secret':
-      '客户端秘钥',
+  'pages.authn.identity_provider.config.github_oauth.client_secret': '客户端秘钥',
   'pages.authn.identity_provider.config.github_oauth.client_secret.placeholder':
     '请填写Client Secret',
-  'pages.authn.identity_provider.config.github_oauth.client_id.extra': 'GitHub应用的Client ID',
-  'pages.authn.identity_provider.config.github_oauth.client_secret.extra':
-    'GitHub应用生成的Client secret',
 
   'pages.authn.identity_provider.config.alipay_oauth.app_id': '应用ID',
   'pages.authn.identity_provider.config.alipay_oauth.app_id.placeholder': '请填写应用ID',
-  'pages.authn.identity_provider.config.alipay_oauth.app_id.extra': 'xxxxxxxxx',
-  'pages.authn.identity_provider.config.alipay_oauth.app_id.placeholder.extra': 'xxxxxxx',
   'pages.authn.identity_provider.config.alipay_oauth.app_private_key': '应用私钥',
-  'pages.authn.identity_provider.config.alipay_oauth.app_private_key.placeholder':
-    '请填写应用私钥',
-  'pages.authn.identity_provider.config.alipay_oauth.app_private_key.extra': 'xxxxxxxxxxx',
+  'pages.authn.identity_provider.config.alipay_oauth.app_private_key.placeholder': '请填写应用私钥',
   'pages.authn.identity_provider.config.alipay_oauth.alipay_public_key': '支付宝公钥',
   'pages.authn.identity_provider.config.alipay_oauth.alipay_public_key.placeholder':
     '请填写支付宝公钥',
-  'pages.authn.identity_provider.config.alipay_oauth.alipay_public_key.extra': 'xxxxxxxxxxxxx',
-
   'pages.authn.identity_provider.config.wechat_scan_code.app_id.extra':
     '微信扫码登录开发申请获取的AppId',
   'pages.authn.identity_provider.config.wechat_scan_code.app_id.placeholder': '请填写获取的AppId',

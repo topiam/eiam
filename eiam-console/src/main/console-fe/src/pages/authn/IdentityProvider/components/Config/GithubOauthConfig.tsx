@@ -40,9 +40,6 @@ const QqOauthConfig = (props: { isCreate: boolean }) => {
         placeholder={intl.formatMessage({
           id: 'pages.authn.identity_provider.config.github_oauth.client_id.placeholder',
         })}
-        extra={intl.formatMessage({
-          id: 'pages.authn.identity_provider.config.github_oauth.client_id.extra',
-        })}
       />
       <ProFormText.Password
         rules={[{ required: true }]}
@@ -52,9 +49,6 @@ const QqOauthConfig = (props: { isCreate: boolean }) => {
         })}
         placeholder={intl.formatMessage({
           id: 'pages.authn.identity_provider.config.github_oauth.client_secret.placeholder',
-        })}
-        extra={intl.formatMessage({
-          id: 'pages.authn.identity_provider.config.github_oauth.client_secret.extra',
         })}
         fieldProps={{ autoComplete: 'off' }}
       />
