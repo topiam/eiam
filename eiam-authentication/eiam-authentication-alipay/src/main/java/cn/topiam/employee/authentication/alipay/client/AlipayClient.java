@@ -56,14 +56,18 @@ public class AlipayClient {
             }
             retryTimes = retryTimes + 1;
             try {
+                //@formatter:off
                 java.util.Map<String, String> systemParams = TeaConverter.buildMap(
                     new TeaPair("method", "alipay.system.oauth.token"),
                     new TeaPair("app_id", kernel.getConfig("appId")),
-                    new TeaPair("timestamp", kernel.getTimestamp()), new TeaPair("format", "json"),
+                    new TeaPair("timestamp", kernel.getTimestamp()),
+                    new TeaPair("format", "json"),
+                    new TeaPair("version", "1.0"),
                     new TeaPair("charset", "UTF-8"),
                     new TeaPair("sign_type", kernel.getConfig("signType")),
                     new TeaPair("app_cert_sn", kernel.getMerchantCertSN()),
                     new TeaPair("alipay_root_cert_sn", kernel.getAlipayRootCertSN()));
+                //@formatter:no
                 java.util.Map<String, Object> bizParams = new java.util.HashMap<>();
                 java.util.Map<String, String> textParams = TeaConverter.buildMap(
                     new TeaPair("grant_type", "authorization_code"), new TeaPair("code", code));
@@ -83,73 +87,6 @@ public class AlipayClient {
                     if (kernel.verify(respMap, kernel.getConfig("alipayPublicKey"))) {
                         return TeaModel.toModel(kernel.toRespModel(respMap),
                             new AlipaySystemOauthTokenResponse());
-                    }
-
-                }
-
-                throw new TeaException(
-                    TeaConverter.buildMap(new TeaPair("message", "验签失败，请检查支付宝公钥设置是否正确。")));
-            } catch (Exception e) {
-                if (Tea.isRetryable(e)) {
-                    continue;
-                }
-                throw new RuntimeException(e);
-            }
-        }
-
-        throw new TeaUnretryableException(request);
-    }
-
-    /**
-     * 获取用户信息
-     *
-     * @param authToken {@link String}
-     * @return {@link AlipaySystemOauthTokenResponse}
-     * @throws Exception Exception
-     */
-    public AlipaySystemUserInfoShareResponse getUserInfo(String authToken) throws Exception {
-        java.util.Map<String, Object> runtime = getRuntime();
-
-        TeaRequest request = null;
-        long now = System.currentTimeMillis();
-        int retryTimes = 0;
-        while (Tea.allowRetry((java.util.Map<String, Object>) runtime.get("retry"), retryTimes,
-            now)) {
-            if (retryTimes > 0) {
-                int backoffTime = Tea.getBackoffTime(runtime.get("backoff"), retryTimes);
-                if (backoffTime > 0) {
-                    Tea.sleep(backoffTime);
-                }
-            }
-            retryTimes = retryTimes + 1;
-            try {
-                java.util.Map<String, String> systemParams = TeaConverter.buildMap(
-                    new TeaPair("method", "alipay.user.info.share"),
-                    new TeaPair("app_id", kernel.getConfig("appId")),
-                    new TeaPair("timestamp", kernel.getTimestamp()), new TeaPair("format", "json"),
-                    new TeaPair("charset", "UTF-8"),
-                    new TeaPair("sign_type", kernel.getConfig("signType")),
-                    new TeaPair("app_cert_sn", kernel.getMerchantCertSN()),
-                    new TeaPair("alipay_root_cert_sn", kernel.getAlipayRootCertSN()));
-                java.util.Map<String, Object> bizParams = new java.util.HashMap<>();
-                java.util.Map<String, String> textParams = TeaConverter
-                    .buildMap(new TeaPair("auth_token", authToken));
-                request = getRequest(systemParams, bizParams, textParams);
-                TeaResponse response = Tea.doAction(request, runtime);
-
-                java.util.Map<String, Object> respMap = kernel.readAsJson(response,
-                    "alipay.user.info.share");
-                if (kernel.isCertMode()) {
-                    if (kernel.verify(respMap,
-                        kernel.extractAlipayPublicKey(kernel.getAlipayCertSN(respMap)))) {
-                        return TeaModel.toModel(kernel.toRespModel(respMap),
-                            new AlipaySystemUserInfoShareResponse());
-                    }
-
-                } else {
-                    if (kernel.verify(respMap, kernel.getConfig("alipayPublicKey"))) {
-                        return TeaModel.toModel(kernel.toRespModel(respMap),
-                            new AlipaySystemUserInfoShareResponse());
                     }
 
                 }

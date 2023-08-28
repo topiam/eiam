@@ -41,7 +41,6 @@ import com.alipay.easysdk.kernel.Context;
 import cn.topiam.employee.authentication.alipay.AlipayIdpOAuth2Config;
 import cn.topiam.employee.authentication.alipay.client.AlipayClient;
 import cn.topiam.employee.authentication.alipay.client.AlipaySystemOauthTokenResponse;
-import cn.topiam.employee.authentication.alipay.client.AlipaySystemUserInfoShareResponse;
 import cn.topiam.employee.authentication.common.authentication.IdpUserDetails;
 import cn.topiam.employee.authentication.common.filter.AbstractIdpAuthenticationProcessingFilter;
 import cn.topiam.employee.authentication.common.service.UserIdpService;
@@ -136,16 +135,10 @@ public class AlipayLoginAuthenticationFilter extends AbstractIdpAuthenticationPr
                 logger.error("支付宝认证获取 access_token 失败: [" + token.getHttpBody() + "]");
                 throw new TopIamException(token.getSubMsg());
             }
-            String accessToken = token.getAccessToken();
-            AlipaySystemUserInfoShareResponse userInfo = client.getUserInfo(accessToken);
-            if (!StringUtils.isBlank(userInfo.getCode())) {
-                logger.error("支付宝认证获取用户信息失败: [" + userInfo.getHttpBody() + "]");
-                throw new TopIamException(userInfo.getSubMsg());
-            }
             //执行逻辑
             IdpUserDetails idpUserDetails = IdpUserDetails.builder().openId(token.getOpenId())
                 .providerType(ALIPAY_OAUTH).providerCode(providerCode).providerId(providerId)
-                .avatarUrl(userInfo.getAvatar()).nickName(userInfo.getNickName()).build();
+                .build();
             return attemptAuthentication(request, response, idpUserDetails);
         } catch (Exception e) {
             throw new RuntimeException(e);
