@@ -373,7 +373,6 @@ declare namespace AccountAPI {
   };
 }
 
-
 /**
  * 应用管理API类型定义
  *
@@ -381,7 +380,6 @@ declare namespace AccountAPI {
  * Created by support@topiam.cn on  2020/9/13 11:26
  */
 declare namespace AppAPI {
-
   /**
    * 应用账户列表
    */
@@ -409,5 +407,55 @@ declare namespace AppAPI {
     appProtocol: string;
     //Effect
     effect: string;
+  };
+
+  /**
+   * 应用列表
+   */
+  export type AppList = {
+    id: string;
+    name: string;
+    icon?: string;
+    protocol: string;
+    enabled: boolean;
+    type: string;
+    template: string;
+    remark: string;
+  };
+
+  /**
+   * 应用模板
+   */
+  export type ListTemplate = {
+    protocol: string;
+    type: string;
+    code: string;
+    icon: string;
+    name: string;
+    desc: string;
+  };
+
+  /**
+   * 应用信息
+   */
+  export type GetApp = {
+    id: string;
+    type: string;
+    name: string;
+    icon: string;
+    template: string;
+    protocol: string;
+    protocolName: string;
+    clientId: string;
+    clientSecret: string;
+    //sso发起方
+    initLoginType: string;
+    //sso登录链接
+    initLoginUrl: string;
+    nameIdValueType: string;
+    //授权范围
+    authorizationType: string;
+    enabled: boolean;
+    remark: string;
   };
 }

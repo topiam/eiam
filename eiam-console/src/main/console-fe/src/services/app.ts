@@ -18,7 +18,6 @@
 import { download, filterParamConverter, sortParamConverter } from '@/utils/utils';
 import type { RequestData } from '@ant-design/pro-components';
 import type { SortOrder } from 'antd/es/table/interface';
-import type { ReactText } from 'react';
 import { request } from '@umijs/max';
 import type { UploadFile } from 'antd/es/upload/interface';
 
@@ -28,7 +27,7 @@ import type { UploadFile } from 'antd/es/upload/interface';
 export async function getAppTemplateList(
   params: Record<string, any>,
   sort: Record<string, SortOrder>,
-  filter: Record<string, ReactText[] | null>,
+  filter: Record<string, string[] | null>,
 ): Promise<RequestData<AppAPI.ListTemplate>> {
   return request<API.ApiResult<AppAPI.ListTemplate>>('/api/v1/app/template/list', {
     params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },
@@ -59,7 +58,7 @@ export async function getAppTemplateFormSchema(
 export async function getAppList(
   params?: Record<string, any>,
   sort?: Record<string, SortOrder>,
-  filter?: Record<string, ReactText[] | null>,
+  filter?: Record<string, string[] | null>,
 ): Promise<RequestData<AppAPI.AppList>> {
   return request<API.ApiResult<AppAPI.AppList>>('/api/v1/app/list', {
     params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },
@@ -190,7 +189,7 @@ export async function getCertList(
 export async function getAppAccountList(
   params: Record<string, any>,
   sort: Record<string, SortOrder>,
-  filter: Record<string, ReactText[] | null>,
+  filter: Record<string, string[] | null>,
 ): Promise<RequestData<AppAPI.AppAccountList>> {
   return request<API.ApiResult<AppAPI.AppAccountList>>('/api/v1/app/account/list', {
     params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },
@@ -232,7 +231,7 @@ export async function removeAccount(id: string): Promise<API.ApiResult<boolean>>
 export async function getAppAccessPolicyList(
   params: Record<string, any>,
   sort: Record<string, SortOrder>,
-  filter: Record<string, ReactText[] | null>,
+  filter: Record<string, string[] | null>,
 ): Promise<RequestData<AppAPI.AppAccessPolicyList>> {
   return request<API.ApiResult<AppAPI.AppAccessPolicyList>>('/api/v1/app/access_policy/list', {
     params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },
