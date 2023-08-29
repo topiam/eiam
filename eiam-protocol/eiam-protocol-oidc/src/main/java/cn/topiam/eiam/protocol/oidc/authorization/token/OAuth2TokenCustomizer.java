@@ -65,6 +65,8 @@ public class OAuth2TokenCustomizer implements
                         boolean hasCustomClaims=false;
                         OidcUserInfo.Builder userInfoBuilder = OidcUserInfo.builder();
                         // Customize headers/claims for id_token
+                        // 用户主体
+                        userInfoBuilder.subject(user.getId().toString());
                         if (authorizedScopes.contains(EMAIL)) {
                             hasCustomClaims=true;
                             userInfoBuilder.email(StringUtils.defaultString(user.getEmail(), ""));
@@ -77,8 +79,11 @@ public class OAuth2TokenCustomizer implements
                         }
                         if (authorizedScopes.contains(PROFILE)) {
                             hasCustomClaims=true;
-                            userInfoBuilder.preferredUsername(StringUtils.defaultString(user.getFullName(), ""));
+                            //用户名
+                            userInfoBuilder.preferredUsername(user.getUsername());
+                            //昵称
                             userInfoBuilder.nickname(StringUtils.defaultString(user.getNickName(), ""));
+                            userInfoBuilder.picture(user.getAvatar());
                             userInfoBuilder.updatedAt(user.getUpdateTime().format(DEFAULT_DATE_TIME_FORMATTER));
                         }
                         if (hasCustomClaims){
