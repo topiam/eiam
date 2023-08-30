@@ -144,7 +144,7 @@ public interface UserConverter {
         }
         userEntity.setFullName(param.getFullName());
         userEntity.setNickName(param.getNickName());
-        userEntity.setLastUpdatePasswordTime(java.time.LocalDateTime.now());
+        userEntity.setLastUpdatePasswordTime(LocalDateTime.now());
         userEntity.setStatus(cn.topiam.employee.common.enums.UserStatus.ENABLE);
         userEntity.setAvatar(CommonConstants.getRandomAvatar());
         userEntity.setDataOrigin(cn.topiam.employee.common.enums.DataOrigin.INPUT);
