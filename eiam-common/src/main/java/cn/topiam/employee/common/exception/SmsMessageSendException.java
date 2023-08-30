@@ -22,19 +22,18 @@ import org.springframework.http.HttpStatus;
 import cn.topiam.employee.support.exception.TopIamException;
 
 /**
- * 邮件消息发送失败
+ * 短信消息发送失败
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/25 21:43
+ * Created by support@topiam.cn on  2023/8/26 18:01
  */
-public class MailMessageSendException extends TopIamException {
-
-    public MailMessageSendException() {
-        super("message_send_error", "发送邮件消息失败", HttpStatus.INTERNAL_SERVER_ERROR);
+public class SmsMessageSendException extends TopIamException {
+    public SmsMessageSendException() {
+        super("message_send_error", "发送短信消息失败", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public MailMessageSendException(Throwable cause) {
-        super(cause, "message_send_error", "发送邮件消息失败", HttpStatus.INTERNAL_SERVER_ERROR);
+    public SmsMessageSendException(Throwable cause) {
+        super(cause, "message_send_error", "发送短信消息失败", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -45,7 +44,7 @@ public class MailMessageSendException extends TopIamException {
      * @param message the detail message. The detail message is saved for
      *                later retrieval by the {@link #getMessage()} method.
      */
-    public MailMessageSendException(String message) {
+    public SmsMessageSendException(String message) {
         super(message);
     }
 
@@ -63,7 +62,7 @@ public class MailMessageSendException extends TopIamException {
      *                unknown.)
      * @since 1.4
      */
-    public MailMessageSendException(String message, Throwable cause) {
+    public SmsMessageSendException(String message, Throwable cause) {
         super(message, cause);
     }
 }

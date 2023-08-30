@@ -20,7 +20,7 @@ import CallbackUrl from './CallbackUrl';
 import { useIntl } from '@umijs/max';
 
 /**
- * Github Oauth 登录
+ * AliPay Oauth 登录
  *
  * @constructor
  */
@@ -31,24 +31,35 @@ const QqOauthConfig = (props: { isCreate: boolean }) => {
   return (
     <>
       <ProFormText
-        name={['config', 'clientId']}
+        name={['config', 'appId']}
         label={intl.formatMessage({
-          id: 'pages.authn.identity_provider.config.github_oauth.client_id',
+          id: 'pages.authn.identity_provider.config.alipay_oauth.app_id',
         })}
         rules={[{ required: true }]}
         fieldProps={{ autoComplete: 'off' }}
         placeholder={intl.formatMessage({
-          id: 'pages.authn.identity_provider.config.github_oauth.client_id.placeholder',
+          id: 'pages.authn.identity_provider.config.alipay_oauth.app_id.placeholder',
         })}
       />
       <ProFormText.Password
         rules={[{ required: true }]}
-        name={['config', 'clientSecret']}
+        name={['config', 'appPrivateKey']}
         label={intl.formatMessage({
-          id: 'pages.authn.identity_provider.config.github_oauth.client_secret',
+          id: 'pages.authn.identity_provider.config.alipay_oauth.app_private_key',
         })}
         placeholder={intl.formatMessage({
-          id: 'pages.authn.identity_provider.config.github_oauth.client_secret.placeholder',
+          id: 'pages.authn.identity_provider.config.alipay_oauth.app_private_key.placeholder',
+        })}
+        fieldProps={{ autoComplete: 'off' }}
+      />
+      <ProFormText.Password
+        rules={[{ required: true }]}
+        name={['config', 'alipayPublicKey']}
+        label={intl.formatMessage({
+          id: 'pages.authn.identity_provider.config.alipay_oauth.alipay_public_key',
+        })}
+        placeholder={intl.formatMessage({
+          id: 'pages.authn.identity_provider.config.alipay_oauth.alipay_public_key.placeholder',
         })}
         fieldProps={{ autoComplete: 'off' }}
       />

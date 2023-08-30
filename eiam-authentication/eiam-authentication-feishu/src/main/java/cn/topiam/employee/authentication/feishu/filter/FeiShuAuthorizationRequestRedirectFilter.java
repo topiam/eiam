@@ -64,10 +64,10 @@ import static cn.topiam.employee.authentication.feishu.filter.FeiShuLoginAuthent
  * @author TopIAM
  * Created by support@topiam.cn on  2021/12/8 21:11
  */
-public class FeiShuAuthorizationRequestGetFilter extends OncePerRequestFilter {
+public class FeiShuAuthorizationRequestRedirectFilter extends OncePerRequestFilter {
 
     private final Logger                                                     logger                            = LoggerFactory
-        .getLogger(FeiShuAuthorizationRequestGetFilter.class);
+        .getLogger(FeiShuAuthorizationRequestRedirectFilter.class);
 
     /**
      * AntPathRequestMatcher
@@ -85,7 +85,7 @@ public class FeiShuAuthorizationRequestGetFilter extends OncePerRequestFilter {
         Base64.getUrlEncoder());
     private final IdentityProviderRepository                                 identityProviderRepository;
 
-    public FeiShuAuthorizationRequestGetFilter(IdentityProviderRepository identityProviderRepository) {
+    public FeiShuAuthorizationRequestRedirectFilter(IdentityProviderRepository identityProviderRepository) {
         this.identityProviderRepository = identityProviderRepository;
     }
 

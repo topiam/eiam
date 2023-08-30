@@ -24,7 +24,7 @@ import org.springframework.http.HttpStatus;
 import cn.topiam.employee.support.exception.TopIamException;
 
 /**
- * 邮件服务异常
+ * 邮件提供商异常
  *
  * @author TopIAM
  * Created by support@topiam.cn on 2020/8/19 22:53

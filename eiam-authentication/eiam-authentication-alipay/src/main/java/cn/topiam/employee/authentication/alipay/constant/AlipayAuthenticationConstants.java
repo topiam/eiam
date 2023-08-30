@@ -30,4 +30,9 @@ public class AlipayAuthenticationConstants {
     public static final String USER_INFO_SCOPE       = "auth_user";
 
     public static final String APP_ID                = "app_id";
+
+    public static final String AUTH_CODE             = "auth_code";
+
+    public static final String SUCCESS_CODE          = "200";
+
 }

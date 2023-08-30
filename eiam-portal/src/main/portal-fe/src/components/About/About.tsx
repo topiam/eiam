@@ -56,7 +56,7 @@ const About: React.FC = () => {
           <Image width={200} src={'/full-logo.svg'} preview={false} />
           <Space direction="vertical">
             <Text>产品：TopIAM 企业数字身份管控平台</Text>
-            <Text>版本：社区版 1.0.0 </Text>
+            <Text>版本：社区版 1.0.1 </Text>
             <Link href="https://eiam.topiam.cn" target="_blank">
               https://eiam.topiam.cn
             </Link>

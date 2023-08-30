@@ -32,7 +32,9 @@ const GiteeOauthConfig = (props: { isCreate: boolean }) => {
     <>
       <ProFormText
         name={['config', 'clientId']}
-        label="ClientId"
+        label={intl.formatMessage({
+          id: 'pages.authn.identity_provider.config.gitee_oauth.client_id',
+        })}
         rules={[{ required: true }]}
         fieldProps={{ autoComplete: 'off' }}
         placeholder={intl.formatMessage({
@@ -42,7 +44,9 @@ const GiteeOauthConfig = (props: { isCreate: boolean }) => {
       <ProFormText.Password
         rules={[{ required: true }]}
         name={['config', 'clientSecret']}
-        label="ClientSecret"
+        label={intl.formatMessage({
+          id: 'pages.authn.identity_provider.config.gitee_oauth.client_secret',
+        })}
         placeholder={intl.formatMessage({
           id: 'pages.authn.identity_provider.config.gitee_oauth.client_secret.placeholder',
         })}

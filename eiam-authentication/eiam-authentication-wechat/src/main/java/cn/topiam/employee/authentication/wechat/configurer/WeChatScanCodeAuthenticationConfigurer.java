@@ -17,6 +17,7 @@
  */
 package cn.topiam.employee.authentication.wechat.configurer;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
@@ -31,6 +32,10 @@ import cn.topiam.employee.authentication.wechat.filter.WeChatScanCodeAuthorizati
 import cn.topiam.employee.authentication.wechat.filter.WeChatScanCodeLoginAuthenticationFilter;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 
+import lombok.NonNull;
+import lombok.Setter;
+import static cn.topiam.employee.support.security.util.HttpSecurityFilterOrderRegistrationUtils.putFilterBefore;
+
 /**
  * 认证配置
  *
@@ -39,7 +44,9 @@ import cn.topiam.employee.common.repository.authentication.IdentityProviderRepos
  */
 public final class WeChatScanCodeAuthenticationConfigurer extends
                                                           AbstractAuthenticationFilterConfigurer<HttpSecurity, WeChatScanCodeAuthenticationConfigurer, WeChatScanCodeLoginAuthenticationFilter> {
-
+    @Setter
+    @NonNull
+    private String                           loginProcessingUrl = WeChatScanCodeLoginAuthenticationFilter.DEFAULT_FILTER_PROCESSES_URI;
     private final IdentityProviderRepository identityProviderRepository;
     private final UserIdpService             userIdpService;
 
@@ -60,29 +67,25 @@ public final class WeChatScanCodeAuthenticationConfigurer extends
      */
     @Override
     protected RequestMatcher createLoginProcessingUrlMatcher(String loginProcessingUrl) {
-        return new AntPathRequestMatcher(loginProcessingUrl);
+        return new AntPathRequestMatcher(loginProcessingUrl, HttpMethod.GET.name());
     }
 
     @Override
     public void init(HttpSecurity http) throws Exception {
-        //微信扫码登录认证
-        WeChatScanCodeLoginAuthenticationFilter loginAuthenticationFilter = new WeChatScanCodeLoginAuthenticationFilter(
-            identityProviderRepository, userIdpService);
-        this.setAuthenticationFilter(loginAuthenticationFilter);
-        //处理URL
-        super.loginProcessingUrl(
-            WeChatScanCodeLoginAuthenticationFilter.DEFAULT_FILTER_PROCESSES_URI);
-        super.init(http);
-    }
+        //扫码登录重定向地址
+        http.addFilterBefore(
+            new WeChatScanCodeAuthorizationRequestRedirectFilter(identityProviderRepository),
+            OAuth2AuthorizationRequestRedirectFilter.class);
 
-    @Override
-    public void configure(HttpSecurity http) throws Exception {
-        //微信扫码请求重定向
-        WeChatScanCodeAuthorizationRequestRedirectFilter requestRedirectFilter = new WeChatScanCodeAuthorizationRequestRedirectFilter(
-            identityProviderRepository);
-        http.addFilterBefore(requestRedirectFilter, OAuth2AuthorizationRequestRedirectFilter.class);
-        http.addFilterBefore(this.getAuthenticationFilter(), OAuth2LoginAuthenticationFilter.class);
-        super.configure(http);
+        //微信扫码登录认证
+        this.setAuthenticationFilter(new WeChatScanCodeLoginAuthenticationFilter(
+            identityProviderRepository, userIdpService));
+        putFilterBefore(http, this.getAuthenticationFilter(),
+            OAuth2LoginAuthenticationFilter.class);
+
+        //登录处理地址
+        super.loginProcessingUrl(loginProcessingUrl);
+        super.init(http);
     }
 
     public RequestMatcher getRequestMatcher() {

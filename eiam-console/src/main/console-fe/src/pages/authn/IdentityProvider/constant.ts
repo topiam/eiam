@@ -34,10 +34,11 @@ export enum IdentityProviderType {
   dingtalk_oauth = 'dingtalk_oauth',
   ldap = 'ldap',
   //社交
-  qq = 'qq_oauth',
-  gitee = 'gitee_oauth',
+  qq_oauth = 'qq_oauth',
+  gitee_oauth = 'gitee_oauth',
   wechat_qr = 'wechat_qr',
-  github = 'github_oauth',
+  github_oauth = 'github_oauth',
+  alipay_oauth = 'alipay_oauth',
 }
 
 /**
@@ -48,11 +49,11 @@ export const EXIST_CALLBACK = [
   IdentityProviderType.dingtalk_qr,
   IdentityProviderType.dingtalk_oauth,
   IdentityProviderType.wechat_qr,
-  IdentityProviderType.qq,
+  IdentityProviderType.qq_oauth,
   IdentityProviderType.feishu_oauth,
   IdentityProviderType.feishu_oauth,
-  IdentityProviderType.gitee,
-  IdentityProviderType.github,
+  IdentityProviderType.gitee_oauth,
+  IdentityProviderType.github_oauth,
 ];
 
 export const DRAWER_FORM_ITEM_LAYOUT = {

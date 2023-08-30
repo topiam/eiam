@@ -116,19 +116,25 @@ export default (props: CreateDrawerProps) => {
                   }),
                 },
                 {
-                  value: IdentityProviderType.qq,
+                  value: IdentityProviderType.qq_oauth,
                   label: intl.formatMessage({
                     id: 'pages.authn.identity_provider.create_modal.form.type.qq',
                   }),
                 },
                 {
-                  value: IdentityProviderType.github,
+                  value: IdentityProviderType.alipay_oauth,
+                  label: intl.formatMessage({
+                    id: 'pages.authn.identity_provider.create_modal.form.type.alipay_oauth',
+                  }),
+                },
+                {
+                  value: IdentityProviderType.github_oauth,
                   label: intl.formatMessage({
                     id: 'pages.authn.identity_provider.create_modal.form.type.github',
                   }),
                 },
                 {
-                  value: IdentityProviderType.gitee,
+                  value: IdentityProviderType.gitee_oauth,
                   label: intl.formatMessage({
                     id: 'pages.authn.identity_provider.create_modal.form.type.gitee',
                   }),

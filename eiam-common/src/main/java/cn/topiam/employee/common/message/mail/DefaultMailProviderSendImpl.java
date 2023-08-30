@@ -27,10 +27,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
-import cn.topiam.employee.common.message.SendMessageException;
+import cn.topiam.employee.common.exception.MailMessageSendException;
 import cn.topiam.employee.common.message.enums.MailProvider;
 import cn.topiam.employee.common.message.enums.MailSafetyType;
-import cn.topiam.employee.common.message.enums.MessageType;
 
 import jakarta.mail.internet.MimeMessage;
 import static org.apache.commons.codec.CharEncoding.UTF_8;
@@ -120,7 +119,7 @@ public class DefaultMailProviderSendImpl implements MailProviderSend {
             taskExecutor.execute(() -> javaMailSender.send(mimeMessage));
         } catch (Exception e) {
             log.info("发送邮件消息失败： {}", e.getMessage());
-            throw new SendMessageException(MessageType.MAIL, e.getMessage());
+            throw new MailMessageSendException(e.getMessage(), e);
         }
     }
 

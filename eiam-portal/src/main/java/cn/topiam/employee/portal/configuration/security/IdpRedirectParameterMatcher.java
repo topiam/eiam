@@ -20,9 +20,12 @@ package cn.topiam.employee.portal.configuration.security;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import cn.topiam.employee.authentication.alipay.filter.AlipayAuthorizationRequestRedirectFilter;
 import cn.topiam.employee.authentication.dingtalk.filter.DingtalkOAuth2AuthorizationRequestRedirectFilter;
 import cn.topiam.employee.authentication.dingtalk.filter.DingtalkScanCodeAuthorizationRequestGetFilter;
-import cn.topiam.employee.authentication.feishu.filter.FeiShuAuthorizationRequestGetFilter;
+import cn.topiam.employee.authentication.feishu.filter.FeiShuAuthorizationRequestRedirectFilter;
+import cn.topiam.employee.authentication.gitee.filter.GiteeAuthorizationRequestRedirectFilter;
+import cn.topiam.employee.authentication.github.filter.GithubOAuth2AuthorizationRequestRedirectFilter;
 import cn.topiam.employee.authentication.qq.filter.QqOAuth2AuthorizationRequestRedirectFilter;
 import cn.topiam.employee.authentication.wechat.filter.WeChatScanCodeAuthorizationRequestRedirectFilter;
 import cn.topiam.employee.authentication.wechatwork.filter.WeChatWorkScanCodeAuthorizationRequestRedirectFilter;
@@ -57,8 +60,14 @@ public class IdpRedirectParameterMatcher implements RequestMatcher {
                 DingtalkOAuth2AuthorizationRequestRedirectFilter.getRequestMatcher(),
                 // 钉钉扫码
                 DingtalkScanCodeAuthorizationRequestGetFilter.getRequestMatcher(),
-                //飞书
-                FeiShuAuthorizationRequestGetFilter.getRequestMatcher()
+                // 飞书
+                FeiShuAuthorizationRequestRedirectFilter.getRequestMatcher(),
+                // Gitee
+                GiteeAuthorizationRequestRedirectFilter.getRequestMatcher(),
+                // GitHub
+                GithubOAuth2AuthorizationRequestRedirectFilter.getRequestMatcher(),
+                // 支付宝
+                AlipayAuthorizationRequestRedirectFilter.getRequestMatcher()
         );
         //@formatter:on
         return orRequestMatcher.matches(request);

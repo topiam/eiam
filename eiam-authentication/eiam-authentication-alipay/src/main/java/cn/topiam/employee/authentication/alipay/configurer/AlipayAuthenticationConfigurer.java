@@ -17,8 +17,11 @@
  */
 package cn.topiam.employee.authentication.alipay.configurer;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -29,6 +32,10 @@ import cn.topiam.employee.authentication.alipay.filter.AlipayLoginAuthentication
 import cn.topiam.employee.authentication.common.service.UserIdpService;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 
+import lombok.NonNull;
+import lombok.Setter;
+import static cn.topiam.employee.support.security.util.HttpSecurityFilterOrderRegistrationUtils.putFilterBefore;
+
 /**
  * 认证配置
  *
@@ -37,6 +44,9 @@ import cn.topiam.employee.common.repository.authentication.IdentityProviderRepos
  */
 public class AlipayAuthenticationConfigurer extends
                                             AbstractAuthenticationFilterConfigurer<HttpSecurity, AlipayAuthenticationConfigurer, AlipayLoginAuthenticationFilter> {
+    @Setter
+    @NonNull
+    private String                           loginProcessingUrl = AlipayLoginAuthenticationFilter.DEFAULT_FILTER_PROCESSES_URI;
 
     private final IdentityProviderRepository identityProviderRepository;
     private final UserIdpService             userIdpService;
@@ -49,6 +59,24 @@ public class AlipayAuthenticationConfigurer extends
         this.userIdpService = userIdpService;
     }
 
+    @Override
+    public void init(HttpSecurity http) throws Exception {
+        //支付宝登录认证
+        this.setAuthenticationFilter(
+            new AlipayLoginAuthenticationFilter(userIdpService, identityProviderRepository));
+        putFilterBefore(http, this.getAuthenticationFilter(),
+            OAuth2LoginAuthenticationFilter.class);
+
+        //支付宝请求重定向
+        http.addFilterBefore(
+            new AlipayAuthorizationRequestRedirectFilter(identityProviderRepository),
+            OAuth2AuthorizationRequestRedirectFilter.class);
+
+        //登录处理地址
+        super.loginProcessingUrl(this.loginProcessingUrl);
+        super.init(http);
+    }
+
     /**
      * Create the {@link RequestMatcher} given a loginProcessingUrl
      *
@@ -58,7 +86,7 @@ public class AlipayAuthenticationConfigurer extends
      */
     @Override
     protected RequestMatcher createLoginProcessingUrlMatcher(String loginProcessingUrl) {
-        return new AntPathRequestMatcher(loginProcessingUrl);
+        return new AntPathRequestMatcher(loginProcessingUrl, HttpMethod.GET.name());
     }
 
     public RequestMatcher getRequestMatcher() {
