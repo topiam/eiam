@@ -414,6 +414,27 @@ public enum EventType {
                         * 重置管理员密码
                         */
                        RESET_ADMINISTRATOR_PASSWORD(SettingEventType.RESET_ADMINISTRATOR_PASSWORD),
+                       /**
+                        * 添加分组
+                        */
+                       ADD_CATEGORY(AppEventType.ADD_CATEGORY),
+                       /**
+                        * 启用分组
+                        */
+                       ENABLE_CATEGORY(AppEventType.ENABLE_CATEGORY),
+                       /**
+                        * 禁用分组
+                        */
+                       DISABLE_CATEGORY(AppEventType.DISABLE_CATEGORY),
+                       /**
+                        * 修改分组
+                        */
+                       UPDATE_CATEGORY(AppEventType.UPDATE_CATEGORY),
+
+                       /**
+                        * 删除应用
+                        */
+                       DELETE_CATEGORY(AppEventType.DELETE_CATEGORY),
 
                        /**
                         * 添加角色

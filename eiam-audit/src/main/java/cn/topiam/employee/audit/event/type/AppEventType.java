@@ -87,6 +87,33 @@ public class AppEventType {
         "eiam:event:app:delete_app_account", "删除应用账户", APP_RESOURCE, List.of(UserType.ADMIN));
 
     /**
+     * 添加分组
+     */
+    public static Type ADD_CATEGORY                    = new Type("eiam:event:category:create",
+        "添加分组", APP_RESOURCE, List.of(UserType.ADMIN));
+    /**
+     * 启用分组
+     */
+    public static Type ENABLE_CATEGORY                 = new Type("eiam:event:category:enabled",
+        "启用分组", APP_RESOURCE, List.of(UserType.ADMIN));
+    /**
+     * 禁用分组
+     */
+    public static Type DISABLE_CATEGORY                = new Type("eiam:event:category:disabled",
+        "禁用分组", APP_RESOURCE, List.of(UserType.ADMIN));
+    /**
+     * 编辑分组
+     */
+    public static Type UPDATE_CATEGORY                 = new Type("eiam:event:category:update",
+        "修改分组", APP_RESOURCE, List.of(UserType.ADMIN));
+
+    /**
+     * 删除分组
+     */
+    public static Type DELETE_CATEGORY                 = new Type("eiam:event:category:delete",
+        "删除分组", APP_RESOURCE, List.of(UserType.ADMIN));
+
+    /**
      * 保存SSO配置
      */
     public static Type SAVE_SSO_CONFIG                 = new Type("eiam:event:app:save_sso_config",

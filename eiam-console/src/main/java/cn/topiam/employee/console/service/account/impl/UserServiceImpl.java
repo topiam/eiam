@@ -44,6 +44,7 @@ import cn.topiam.employee.audit.entity.AuditElasticSearchEntity;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.common.entity.account.*;
+import cn.topiam.employee.common.entity.account.QUserEntity;
 import cn.topiam.employee.common.entity.account.po.UserPO;
 import cn.topiam.employee.common.entity.account.query.UserListNotInGroupQuery;
 import cn.topiam.employee.common.entity.account.query.UserListQuery;
