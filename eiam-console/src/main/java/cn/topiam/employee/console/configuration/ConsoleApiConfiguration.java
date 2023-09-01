@@ -36,7 +36,6 @@ import static cn.topiam.employee.common.constant.AnalysisConstants.ANALYSIS_PATH
 import static cn.topiam.employee.common.constant.AppConstants.APP_GROUP_NAME;
 import static cn.topiam.employee.common.constant.AppConstants.APP_PATH;
 import static cn.topiam.employee.common.constant.AuthnConstants.AUTHN_PATH;
-import static cn.topiam.employee.common.constant.CategoryConstants.CATEGORY_GROUP_NAME;
 import static cn.topiam.employee.common.constant.SettingConstants.SETTING_GROUP_NAME;
 import static cn.topiam.employee.common.constant.SettingConstants.SETTING_PATH;
 
@@ -72,17 +71,6 @@ public class ConsoleApiConfiguration {
     @Bean
     public GroupedOpenApi applicationRestApi() {
         return GroupedOpenApi.builder().group(APP_GROUP_NAME).pathsToMatch(APP_PATH + "/**")
-            .build();
-    }
-
-    /**
-     * 分组管理 RestAPI
-     *
-     * @return {@link GroupedOpenApi}
-     */
-    @Bean
-    public GroupedOpenApi categoryRestApi() {
-        return GroupedOpenApi.builder().group(CATEGORY_GROUP_NAME).pathsToMatch(APP_PATH + "/**")
             .build();
     }
 

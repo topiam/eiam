@@ -68,11 +68,6 @@ public enum TargetType {
                         APPLICATION("application", "应用"),
 
                         /**
-                         * 分组
-                         */
-                        CATEGORY("category", "分组"),
-
-                        /**
                          * 应用账户
                          */
                         APPLICATION_ACCOUNT("application_account", "应用账户"),
