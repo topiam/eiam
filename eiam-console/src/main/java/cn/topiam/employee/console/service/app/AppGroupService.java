@@ -15,81 +15,80 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.console.service.category;
+package cn.topiam.employee.console.service.app;
 
-import cn.topiam.employee.console.pojo.query.category.CategoryQuery;
-import cn.topiam.employee.console.pojo.result.category.CategoryCreateResult;
-import cn.topiam.employee.console.pojo.result.category.CategoryGetResult;
-import cn.topiam.employee.console.pojo.result.category.CategoryListResult;
-import cn.topiam.employee.console.pojo.save.category.CategoryCreateParam;
-import cn.topiam.employee.console.pojo.update.category.CategoryUpdateParam;
+import cn.topiam.employee.console.pojo.query.app.AppGroupQuery;
+import cn.topiam.employee.console.pojo.result.app.AppGroupGetResult;
+import cn.topiam.employee.console.pojo.result.app.AppGroupListResult;
+import cn.topiam.employee.console.pojo.save.app.AppGroupCreateParam;
+import cn.topiam.employee.console.pojo.update.app.AppGroupUpdateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 
 /**
  * <p>
- * 分组管理 服务类
+ * 应用分组管理 服务类
  * </p>
  *
  * @author TopIAM
  * Created by support@topiam.cn on  2023-08-31
  */
-public interface CategoryService {
+public interface AppGroupService {
 
     /**
-     * 获取分组（分页）
+     * 获取应用分组（分页）
      *
      * @param pageModel {@link PageModel}
-     * @param query     {@link CategoryQuery}
-     * @return {@link CategoryListResult}
+     * @param query     {@link AppGroupQuery}
+     * @return {@link AppGroupListResult}
      */
-    Page<CategoryListResult> getCategoryList(PageModel pageModel, CategoryQuery query);
+    Page<AppGroupListResult> getAppGroupList(PageModel pageModel, AppGroupQuery query);
 
     /**
-     * 创建分组
+     * 创建应用分组
      *
-     * @param param {@link CategoryCreateParam}
-     * @return {@link CategoryCreateResult}
-     */
-    Boolean createCategory(CategoryCreateParam param);
-
-    /**
-     * 修改分组
-     *
-     * @param param {@link CategoryUpdateParam}
+     * @param param {@link AppGroupCreateParam}
      * @return {@link Boolean}
      */
-    boolean updateCategory(CategoryUpdateParam param);
+    Boolean createAppGroup(AppGroupCreateParam param);
 
     /**
-     * 删除分组
+     * 修改应用分组
+     *
+     * @param param {@link AppGroupUpdateParam}
+     * @return {@link Boolean}
+     */
+    boolean updateAppGroup(AppGroupUpdateParam param);
+
+    /**
+     * 删除应用分组
      *
      * @param id {@link  Long}
      * @return {@link Boolean}
      */
-    boolean deleteCategory(Long id);
+    boolean deleteAppGroup(Long id);
 
     /**
-     * 获取单个分组详情
+     * 获取单个应用分组详情
      *
      * @param id {@link Long}
-     * @return {@link CategoryGetResult}
+     * @return {@link AppGroupGetResult}
      */
-    CategoryGetResult getCategory(Long id);
+    AppGroupGetResult getAppGroup(Long id);
 
     /**
-     * 启用分组
+     * 启用应用分组
      *
      * @param id {@link String}
      * @return {@link Boolean}
      */
-    Boolean enableCategory(String id);
+    Boolean enableAppGroup(String id);
 
     /**
-     * 禁用分组
+     * 禁用应用分组
      *
      * @param id {@link String}
      * @return {@link Boolean}
      */
-    Boolean disableCategory(String id);
+    Boolean disableAppGroup(String id);
 }

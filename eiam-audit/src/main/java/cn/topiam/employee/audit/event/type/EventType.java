@@ -482,7 +482,28 @@ public enum EventType {
                        /**
                         * 下线会话
                         */
-                       DOWN_LINE_SESSION(MonitorEventType.DOWN_LINE_SESSION),;
+                       DOWN_LINE_SESSION(MonitorEventType.DOWN_LINE_SESSION),
+
+                       /**
+                        * 添加应用分组
+                        */
+                       ADD_APP_GROUP(AppEventType.ADD_APP_GROUP),
+                       /**
+                        * 启用应用分组
+                        */
+                       ENABLE_APP_GROUP(AppEventType.ENABLE_APP_GROUP),
+                       /**
+                        * 禁用应用分组
+                        */
+                       DISABLE_APP_GROUP(AppEventType.DISABLE_APP_GROUP),
+                       /**
+                        * 修改应用分组
+                        */
+                       UPDATE_APP_GROUP(AppEventType.UPDATE_APP_GROUP),
+                       /**
+                        * 删除应用分组
+                        */
+                       DELETE_APP_GROUP(AppEventType.DELETE_APP_GROUP);
 
     /**
      * code

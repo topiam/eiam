@@ -15,11 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.console.pojo.query.category;
+package cn.topiam.employee.console.pojo.result.app;
 
 import java.io.Serializable;
-
-import org.springdoc.core.annotations.ParameterObject;
+import java.time.LocalDateTime;
 
 import lombok.Data;
 
@@ -27,26 +26,46 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
- * 查询分组列表入参
+ * 获取分组返回
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2023/8/31 9:08
+ * Created by support@topiam.cn on 2023/8/31 11:25
  */
 @Data
-@Schema(description = "查询分组列表入参")
-@ParameterObject
-public class CategoryQuery implements Serializable {
-
+@Schema(description = "获取分组返回响应")
+public class AppGroupGetResult implements Serializable {
+    /**
+     * ID
+     */
+    @Parameter(description = "ID")
+    private String        id;
     /**
      * 分组名称
      */
     @Parameter(description = "分组名称")
-    private String  name;
+    private String        name;
 
     /**
-     * 分组是否启用
+     * 分组编码
+     */
+    @Parameter(description = "分组编码")
+    private String        code;
+
+    /**
+     * 是否启用
      */
     @Parameter(description = "分组是否启用")
-    private Boolean enabled;
+    private Boolean       enabled;
 
+    /**
+     * 创建时间
+     */
+    @Parameter(description = "创建时间")
+    private LocalDateTime createTime;
+
+    /**
+     * 备注
+     */
+    @Parameter(description = "备注")
+    private String        remark;
 }

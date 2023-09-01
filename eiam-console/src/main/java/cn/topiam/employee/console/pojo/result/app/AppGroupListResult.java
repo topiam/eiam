@@ -15,37 +15,53 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.console.pojo.save.category;
+package cn.topiam.employee.console.pojo.result.app;
 
 import java.io.Serializable;
-import java.util.Map;
 
 import lombok.Data;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 
 /**
- * 更新分组配置入参
+ * 分组列表返回
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/8/31 11:25
+ * Created by support@topiam.cn on 2023/8/31 10:29
  */
 @Data
-@Schema(description = "更新分组配置入参")
-public class CategorySaveConfigParam implements Serializable {
+@Schema(description = "分组列表返回")
+public class AppGroupListResult implements Serializable {
 
     /**
-     * id
+     * ID
      */
-    @Schema(description = "分组id")
-    @NotNull(message = "ID不能为空")
-    private Long                id;
+    @Parameter(description = "ID")
+    private String  id;
 
     /**
-     * 配置
+     * 分组名称
      */
-    @Schema(description = "配置")
-    @NotNull(message = "配置不能为空")
-    private Map<String, Object> config;
+    @Parameter(description = "分组名称")
+    private String  name;
+
+    /**
+     * 分组编码
+     */
+    @Parameter(description = "分组编码")
+    private String  code;
+
+    /**
+     * 是否启用
+     */
+    @Parameter(description = "是否启用")
+    private Boolean enabled;
+
+    /**
+     * 备注
+     */
+    @Parameter(description = "备注")
+    private String  remark;
+
 }

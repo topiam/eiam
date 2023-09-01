@@ -122,4 +122,10 @@ public class ConsoleResource extends Resource {
      */
     public static ConsoleResource SESSION_RESOURCE         = new ConsoleResource(
         "eiam:event:resource:session", "会话管理");
+
+    /**
+     * 应用分组
+     */
+    public static ConsoleResource APP_GROUP_RESOURCE       = new ConsoleResource(
+        "eiam:event:resource:app_group", "应用分组管理");
 }

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.common.repository.category;
+package cn.topiam.employee.common.repository.app;
 
 import java.util.Optional;
 
@@ -30,42 +30,32 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import cn.topiam.employee.common.entity.app.AppEntity;
-import cn.topiam.employee.common.entity.category.CategoryEntity;
+import cn.topiam.employee.common.entity.app.AppGroupEntity;
 import cn.topiam.employee.support.repository.LogicDeleteRepository;
-import static cn.topiam.employee.common.constant.CategoryConstants.CATEGORY_CACHE_NAME;
+import static cn.topiam.employee.common.constant.AppGroupConstants.APP_GROUP_CACHE_NAME;
 
 /**
  * @author TopIAM
  */
 @Repository
-@CacheConfig(cacheNames = { CATEGORY_CACHE_NAME })
-public interface CategoryRepository extends LogicDeleteRepository<CategoryEntity, Long>,
-                                    QuerydslPredicateExecutor<CategoryEntity> {
-
-    /**
-     * 根据分组ID查询已启用应用
-     *
-     * @param id {@link Long}
-     * @return {@link AppEntity}
-     */
-    @Cacheable
-    Optional<CategoryEntity> findByIdAndEnabledTrue(Long id);
+@CacheConfig(cacheNames = { APP_GROUP_CACHE_NAME })
+public interface AppGroupRepository extends LogicDeleteRepository<AppGroupEntity, Long>,
+                                    QuerydslPredicateExecutor<AppGroupEntity> {
 
     /**
      * save
      *
      * @param entity must not be {@literal null}.
      * @param <S>    {@link S}
-     * @return {@link AppEntity}
+     * @return {@link AppGroupEntity}
      */
     @NotNull
     @Override
     @CacheEvict(allEntries = true)
-    <S extends CategoryEntity> S save(@NotNull S entity);
+    <S extends AppGroupEntity> S save(@NotNull S entity);
 
     /**
-     * 更新应用状态
+     * 更新应用分组状态
      *
      * @param id      {@link  Long}
      * @param enabled {@link  Boolean}
@@ -74,8 +64,8 @@ public interface CategoryRepository extends LogicDeleteRepository<CategoryEntity
     @Modifying
     @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
-    @Query(value = "UPDATE category SET is_enabled = :enabled WHERE id_ = :id", nativeQuery = true)
-    Integer updateCategoryStatus(@Param(value = "id") Long id,
+    @Query(value = "UPDATE app_group SET is_enabled = :enabled WHERE id_ = :id", nativeQuery = true)
+    Integer updateAppGroupStatus(@Param(value = "id") Long id,
                                  @Param(value = "enabled") Boolean enabled);
 
     /**
@@ -91,22 +81,21 @@ public interface CategoryRepository extends LogicDeleteRepository<CategoryEntity
      * find by id
      *
      * @param id must not be {@literal null}.
-     * @return {@link AppEntity}
+     * @return {@link AppGroupEntity}
      */
     @NotNull
     @Override
-    @Cacheable
-    Optional<CategoryEntity> findById(@NotNull @Param(value = "id") Long id);
+    Optional<AppGroupEntity> findById(@NotNull Long id);
 
     /**
      * find by id
      *
      * @param id must not be {@literal null}.
-     * @return {@link AppEntity}
+     * @return {@link AppGroupEntity}
      */
     @NotNull
     @Cacheable
-    @Query(value = "SELECT * FROM category WHERE id_ = :id", nativeQuery = true)
-    Optional<AppEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") Long id);
+    @Query(value = "SELECT * FROM app_group WHERE id_ = :id", nativeQuery = true)
+    Optional<AppGroupEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") Long id);
 
 }

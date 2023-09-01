@@ -1,5 +1,5 @@
 /*
- * eiam-console - Employee Identity and Access Management
+ * eiam-portal - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,30 +15,44 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.console.pojo.result.category;
-
-import java.io.Serializable;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
+package cn.topiam.employee.portal.pojo.result;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.List;
 
 /**
- * 分组创建返回结果
+ * 获取应用列表
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/8/31 11:25
+ * Created by support@topiam.cn on  2023/9/1 11:58
  */
 @Data
-@AllArgsConstructor
-@Schema(description = "分组创建返回响应")
-public class CategoryCreateResult implements Serializable {
+@Schema(description = "获取应用列表")
+public class GetAppGroupListResult implements Serializable {
+
+    @Serial
+    private static final long      serialVersionUID = 1263170640092199401L;
+    /**
+     * name
+     */
+    @Parameter(description = "name")
+    private String                 name;
 
     /**
-     * ID
+     * appCount
      */
-    @Parameter(description = "ID")
-    private String id;
+    @Parameter(description = "appCount")
+    private Integer                appCount;
+
+    /**
+     * 应用类型
+     */
+    @Parameter(description = "应用类型")
+    private List<GetAppListResult> list;
+
 }

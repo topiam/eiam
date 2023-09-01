@@ -26,25 +26,25 @@ import static cn.topiam.employee.support.constant.EiamConstants.V1_API_PATH;
  * @author TopIAM
  * Created by support@topiam.cn on 2023/8/31 11:07
  */
-public final class CategoryConstants {
+public final class AppGroupConstants {
 
     /**
      * 分组管理API路径
      */
-    public final static String CATEGORY_PATH              = V1_API_PATH + "/category";
+    public final static String APP_GROUP_PATH              = V1_API_PATH + "/app_group";
 
     /**
      * 组名称
      */
-    public static final String CATEGORY_GROUP_NAME        = "分组管理";
+    public static final String APP_GROUP_GROUP_NAME        = "分组管理";
 
     /**
      * 分组配置缓存前缀
      */
-    public static final String CATEGORY_CACHE_NAME_PREFIX = "category" + COLON;
+    public static final String APP_GROUP_CACHE_NAME_PREFIX = "app_group" + COLON;
 
     /**
      * 分组基本信息
      */
-    public static final String CATEGORY_CACHE_NAME        = CATEGORY_CACHE_NAME_PREFIX + "basic";
+    public static final String APP_GROUP_CACHE_NAME        = APP_GROUP_CACHE_NAME_PREFIX + "basic";
 }

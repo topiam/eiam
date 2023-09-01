@@ -15,51 +15,42 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.console.pojo.result.category;
+package cn.topiam.employee.console.pojo.save.app;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 
 /**
- * 获取分组返回
+ * 分组保存入参
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2023/8/31 11:25
+ * Created by support@topiam.cn on  2023/8/31 23:26
  */
 @Data
-@Schema(description = "获取分组返回响应")
-public class CategoryGetResult implements Serializable {
-    /**
-     * ID
-     */
-    @Parameter(description = "ID")
-    private String        id;
+@Schema(description = "分组保存入参")
+public class AppGroupCreateParam implements Serializable {
+
     /**
      * 分组名称
      */
-    @Parameter(description = "分组名称")
-    private String        name;
-
-    /**
-     * 是否启用
-     */
-    @Parameter(description = "分组是否启用")
-    private Boolean       enabled;
-
-    /**
-     * 创建时间
-     */
-    @Parameter(description = "创建时间")
-    private LocalDateTime createTime;
+    @NotBlank(message = "分组名称不能为空")
+    @Schema(description = "分组名称")
+    private String name;
 
     /**
      * 备注
      */
-    @Parameter(description = "备注")
-    private String        remark;
+    @Schema(description = "备注")
+    private String remark;
+
+    /**
+     * 分组编码
+     */
+    @Schema(description = "分组编码")
+    private String code;
+
 }

@@ -92,10 +92,11 @@ public interface ApplicationService {
      * @param name {@link String} 名称
      * @param icon {@link String} 图标
      * @param remark {@link String} 备注
-     * @return {@link String} 应用ID
+     * @param groupId {@link String} 分组id
+     * @return {@link Long} 应用ID
      */
     @Transactional(rollbackFor = Exception.class)
-    String create(String name, String icon, String remark);
+    String create(String name, String icon, String remark, Long groupId);
 
     /**
      * 删除应用
@@ -136,10 +137,11 @@ public interface ApplicationService {
      * @param name {@link String}
      * @param icon  {@link String}
      * @param remark  {@link String}
+     * @param groupId {@link Long} 分组id
      * @param initLoginType  {@link InitLoginType}
      * @param authorizationType {@link AuthorizationType}
      * @return {@link AppEntity}
      */
-    AppEntity createApp(String name, String icon, String remark, InitLoginType initLoginType,
-                        AuthorizationType authorizationType);
+    AppEntity createApp(String name, String icon, String remark, Long groupId,
+                        InitLoginType initLoginType, AuthorizationType authorizationType);
 }

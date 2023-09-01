@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.common.entity.category;
+package cn.topiam.employee.common.entity.app;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -44,10 +44,10 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
 @ToString
 @Entity
 @Accessors(chain = true)
-@Table(name = "category")
-@SQLDelete(sql = "update category set " + SOFT_DELETE_SET + " where id_ = ?")
+@Table(name = "app_group")
+@SQLDelete(sql = "update app_group set " + SOFT_DELETE_SET + " where id_ = ?")
 @Where(clause = SOFT_DELETE_WHERE)
-public class CategoryEntity extends LogicDeleteEntity<Long> {
+public class AppGroupEntity extends LogicDeleteEntity<Long> {
 
     /**
      * 分组名称
@@ -56,10 +56,10 @@ public class CategoryEntity extends LogicDeleteEntity<Long> {
     private String  name;
 
     /**
-     * 排序
+     * 分组编码
      */
-    @Column(name = "sort")
-    private Integer sort;
+    @Column(name = "code_")
+    private String  code;
 
     /**
      * 是否启用

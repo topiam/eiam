@@ -15,9 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.console.pojo.result.category;
+package cn.topiam.employee.console.pojo.query.app;
 
 import java.io.Serializable;
+
+import org.springdoc.core.annotations.ParameterObject;
 
 import lombok.Data;
 
@@ -25,20 +27,15 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
- * 分组列表返回
+ * 查询分组列表入参
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2023/8/31 10:29
+ * Created by support@topiam.cn on 2023/8/31 9:08
  */
 @Data
-@Schema(description = "分组列表返回")
-public class CategoryListResult implements Serializable {
-
-    /**
-     * ID
-     */
-    @Parameter(description = "ID")
-    private String  id;
+@Schema(description = "查询分组列表入参")
+@ParameterObject
+public class AppGroupQuery implements Serializable {
 
     /**
      * 分组名称
@@ -47,20 +44,15 @@ public class CategoryListResult implements Serializable {
     private String  name;
 
     /**
-     * 是否启用
+     * 分组是否启用
      */
-    @Parameter(description = "是否启用")
+    @Parameter(description = "分组是否启用")
     private Boolean enabled;
 
     /**
-     * 备注
+     * 分组编码
      */
-    @Parameter(description = "备注")
-    private String  remark;
+    @Parameter(description = "分组编码")
+    private String  code;
 
-    /**
-     * 排序
-     */
-    @Parameter(description = "排序")
-    private Integer sort;
 }
