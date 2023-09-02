@@ -17,6 +17,9 @@
  */
 package cn.topiam.employee.portal.service.impl;
 
+import cn.topiam.employee.common.entity.app.AppGroupEntity;
+import cn.topiam.employee.common.repository.app.AppGroupRepository;
+import cn.topiam.employee.portal.pojo.result.GetAppGroupListResult;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +32,11 @@ import cn.topiam.employee.portal.service.AppService;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.security.util.SecurityUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * AppService
@@ -49,16 +57,45 @@ public class AppServiceImpl implements AppService {
     public Page<GetAppListResult> getAppList(GetAppListQuery query, PageModel pageModel) {
         Long userId = Long.valueOf(SecurityUtils.getCurrentUserId());
         org.springframework.data.domain.Page<AppEntity> list = appRepository.getAppList(userId,
-            query.getName(), QPageRequest.of(pageModel.getCurrent(), pageModel.getPageSize()));
+            query.getName(), query.getGroupId(),
+            QPageRequest.of(pageModel.getCurrent(), pageModel.getPageSize()));
         return appConverter.entityConvertToAppListResult(list);
     }
 
-    private final AppRepository appRepository;
+    @Override
+    public List<GetAppGroupListResult> getAppGroupList() {
 
-    private final AppConverter  appConverter;
+        List<AppEntity> appList = appRepository.getAppGroupList();
+        List<GetAppGroupListResult> resut = new ArrayList<>(appList.size());
+        List<AppGroupEntity> appGroupList = appGroupRepository.getAppGroupList();
+        // 使用Java 8的Stream API来将AppEntity列表按照groupID分组
+        Map<Long, List<AppEntity>> appMap = appList.stream()
+            .collect(Collectors.groupingBy(AppEntity::getGroupId));
+        GetAppGroupListResult getAppGroupListResult = new GetAppGroupListResult();
+        List<AppEntity> collect;
+        for (AppGroupEntity e : appGroupList) {
+            collect = appList.stream().filter(t -> t.getGroupId().equals(e.getId()))
+                .collect(Collectors.toList());
+            getAppGroupListResult = new GetAppGroupListResult();
+            getAppGroupListResult.setName(e.getName());
+            getAppGroupListResult.setList(appConverter.entityConvertToAppListResult(collect));
+            getAppGroupListResult.setAppCount(collect.size());
+            resut.add(getAppGroupListResult);
+            collect.clear();
+        }
+        return resut;
+    }
 
-    public AppServiceImpl(AppRepository appRepository, AppConverter appConverter) {
+    private final AppRepository      appRepository;
+
+    private final AppGroupRepository appGroupRepository;
+
+    private final AppConverter       appConverter;
+
+    public AppServiceImpl(AppRepository appRepository, AppGroupRepository appGroupRepository,
+                          AppConverter appConverter) {
         this.appRepository = appRepository;
+        this.appGroupRepository = appGroupRepository;
         this.appConverter = appConverter;
     }
 

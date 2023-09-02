@@ -44,4 +44,9 @@ public class GetAppListQuery implements Serializable {
      */
     private String            name;
 
+    /**
+     * groupId
+     */
+    private Long              groupId;
+
 }

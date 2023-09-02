@@ -17,13 +17,14 @@
  */
 package cn.topiam.employee.portal.pojo.result;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+
+import lombok.Data;
+
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 获取应用列表
@@ -32,7 +33,7 @@ import java.util.List;
  * Created by support@topiam.cn on  2023/9/1 11:58
  */
 @Data
-@Schema(description = "获取应用列表")
+@Schema(description = "获取分组应用列表")
 public class GetAppGroupListResult implements Serializable {
 
     @Serial

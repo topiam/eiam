@@ -20,7 +20,6 @@ package cn.topiam.employee.console.service.app.impl;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import cn.topiam.employee.common.entity.app.QAppGroupEntity;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +31,7 @@ import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.common.entity.app.AppGroupEntity;
-import cn.topiam.employee.common.entity.app.QAppEntity;
+import cn.topiam.employee.common.entity.app.QAppGroupEntity;
 import cn.topiam.employee.common.repository.app.AppGroupRepository;
 import cn.topiam.employee.console.converter.app.AppGroupConverter;
 import cn.topiam.employee.console.pojo.query.app.AppGroupQuery;

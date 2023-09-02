@@ -129,4 +129,9 @@ public class AppEntity extends LogicDeleteEntity<Long> {
      */
     @Column(name = "is_enabled")
     private Boolean           enabled;
+
+    /**
+     * 应用分组名称
+     */
+    private String            groupName;
 }

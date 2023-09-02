@@ -17,19 +17,6 @@
  */
 package cn.topiam.employee.common.repository.app.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Repository;
-
-import com.google.common.collect.Lists;
-
 import cn.topiam.employee.common.entity.account.OrganizationMemberEntity;
 import cn.topiam.employee.common.entity.account.UserGroupMemberEntity;
 import cn.topiam.employee.common.entity.app.AppEntity;
@@ -37,8 +24,18 @@ import cn.topiam.employee.common.repository.account.OrganizationMemberRepository
 import cn.topiam.employee.common.repository.account.UserGroupMemberRepository;
 import cn.topiam.employee.common.repository.app.AppRepositoryCustomized;
 import cn.topiam.employee.common.repository.app.impl.mapper.AppEntityMapper;
-
+import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * App Repository Customized
@@ -54,12 +51,12 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
      * 获取我的应用列表
      *
      * @param name     {@link  String}
-     * @param userId {@link  Long}
+     * @param userId   {@link  Long}
      * @param pageable {@link  String}
      * @return {@link List}
      */
     @Override
-    public Page<AppEntity> getAppList(Long userId, String name, Pageable pageable) {
+    public Page<AppEntity> getAppList(Long userId, String name, Long groupId, Pageable pageable) {
         List<Object> paramList = Lists.newArrayList();
         //当前用户加入的用户组Id
         List<Long> groupIdList = userGroupMemberRepository.findByUserId(userId).stream()
@@ -87,6 +84,10 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
         //用户名
         if (StringUtils.isNoneBlank(name)) {
             builder.append(" AND app.name_ like '%").append(name).append("%'");
+        }
+        //分组id
+        if (null!=groupId) {
+            builder.append(" AND app.group_id = ").append(groupId);
         }
         //@formatter:on
         String sql = builder.toString();

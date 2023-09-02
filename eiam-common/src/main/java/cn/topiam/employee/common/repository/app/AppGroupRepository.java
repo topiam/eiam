@@ -17,6 +17,7 @@
  */
 package cn.topiam.employee.common.repository.app;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.jetbrains.annotations.NotNull;
@@ -97,5 +98,8 @@ public interface AppGroupRepository extends LogicDeleteRepository<AppGroupEntity
     @Cacheable
     @Query(value = "SELECT * FROM app_group WHERE id_ = :id", nativeQuery = true)
     Optional<AppGroupEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") Long id);
+
+    @Query(value = "SELECT * FROM app_group WHERE is_deleted = 0", nativeQuery = true)
+    List<AppGroupEntity> getAppGroupList();
 
 }

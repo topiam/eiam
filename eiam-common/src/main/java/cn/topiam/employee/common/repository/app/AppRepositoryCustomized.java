@@ -41,5 +41,5 @@ public interface AppRepositoryCustomized {
      * @param pageable    {@link  Pageable}
      * @return {@link List}
      */
-    Page<AppEntity> getAppList(Long userId, String name, Pageable pageable);
+    Page<AppEntity> getAppList(Long userId, String name, Long groupId, Pageable pageable);
 }
