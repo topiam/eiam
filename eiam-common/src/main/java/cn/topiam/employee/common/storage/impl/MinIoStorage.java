@@ -67,8 +67,8 @@ public class MinIoStorage extends AbstractStorage {
                 .credentials(minioConfig.getAccessKey(), minioConfig.getSecretKey()).build();
             createBucket(this.minioClient, minioConfig);
         } catch (Exception e) {
-            log.error("Create bucket excception: {}", e.getMessage(), e);
-            throw new StorageProviderException("Create bucket excception", e);
+            log.error("Create bucket exception: {}", e.getMessage(), e);
+            throw new StorageProviderException("Create bucket exception", e);
         }
     }
 
@@ -100,7 +100,7 @@ public class MinIoStorage extends AbstractStorage {
                    + SEPARATOR
                    + URLEncoder.encode(key, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         } catch (Exception e) {
-            log.error("minio download exception: {}", e.getMessage(), e);
+            log.error("minio upload exception: {}", e.getMessage(), e);
             throw new StorageProviderException("minio upload exception", e);
         }
     }
@@ -117,7 +117,7 @@ public class MinIoStorage extends AbstractStorage {
             return downloadUrl.replace(minioConfig.getEndpoint(), minioConfig.getDomain());
         } catch (Exception e) {
             log.error("minio download exception: {}", e.getMessage(), e);
-            throw new StorageProviderException("minio upload exception", e);
+            throw new StorageProviderException("minio download exception", e);
         }
     }
 
