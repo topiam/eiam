@@ -123,7 +123,7 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
         // TODO 等 spring-authorization-server 授权服务器支持后更改
         Duration idTokenTtl = Duration.of(30, ChronoUnit.MINUTES);
         Duration max = authorization.getRefreshToken() == null ? accessTokenTtl
-            : Collections.max(Arrays.asList(accessTokenTtl, refreshTokenTtl));
+            : Collections.max(Arrays.asList(accessTokenTtl, refreshTokenTtl, idTokenTtl));
 
         final String authorizationId = authorization.getId();
         final String idToAuthorizationKey = getIdToAuthorizationKey(authorizationId);
@@ -266,8 +266,8 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
         return prefix + REFRESH_TO_AUTHORIZATION + generateKey(refreshToken);
     }
 
-    private String getIdTokenToAuthorization(String refreshToken) {
-        return prefix + UID_TO_AUTHORIZATIONS + generateKey(refreshToken);
+    private String getIdTokenToAuthorization(String idToken) {
+        return prefix + UID_TO_AUTHORIZATIONS + generateKey(idToken);
     }
 
     private String getIdToCorrelations(String authorizationId) {
