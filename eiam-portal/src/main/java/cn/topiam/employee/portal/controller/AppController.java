@@ -17,23 +17,22 @@
  */
 package cn.topiam.employee.portal.controller;
 
-import cn.topiam.employee.portal.pojo.result.GetAppGroupListResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import cn.topiam.employee.portal.pojo.query.GetAppListQuery;
+import cn.topiam.employee.portal.pojo.result.AppGroupListResult;
 import cn.topiam.employee.portal.pojo.result.GetAppListResult;
 import cn.topiam.employee.portal.service.AppService;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.result.ApiRestResult;
-
-import lombok.AllArgsConstructor;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.List;
+
 import static cn.topiam.employee.common.constant.AppConstants.APP_PATH;
 
 /**
@@ -63,12 +62,12 @@ public class AppController {
     /**
      * 获取分组应用列表
      *
-     * @return {@link GetAppGroupListResult}
+     * @return {@link AppGroupListResult}
      */
     @Operation(summary = "获取分组应用列表")
     @GetMapping(value = "/getAppGroupList")
-    public ApiRestResult<List<GetAppGroupListResult>> getAppGroupList() {
-        List<GetAppGroupListResult> appGroupList = appService.getAppGroupList();
+    public ApiRestResult<List<AppGroupListResult>> getAppGroupList() {
+        List<AppGroupListResult> appGroupList = appService.getAppGroupList();
         return ApiRestResult.ok(appGroupList);
     }
 

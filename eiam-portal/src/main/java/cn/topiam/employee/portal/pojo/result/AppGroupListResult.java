@@ -17,14 +17,11 @@
  */
 package cn.topiam.employee.portal.pojo.result;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.List;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * 获取应用列表
@@ -34,26 +31,20 @@ import io.swagger.v3.oas.annotations.media.Schema;
  */
 @Data
 @Schema(description = "获取分组应用列表")
-public class GetAppGroupListResult implements Serializable {
+public class AppGroupListResult implements Serializable {
 
     @Serial
-    private static final long      serialVersionUID = 1263170640092199401L;
+    private static final long serialVersionUID = 1263170640092199401L;
     /**
-     * name
+     * 应用分组名称
      */
-    @Parameter(description = "name")
-    private String                 name;
+    @Schema(description = "应用分组名称")
+    private String            name;
 
     /**
-     * appCount
+     * APP数量
      */
-    @Parameter(description = "appCount")
-    private Integer                appCount;
-
-    /**
-     * 应用类型
-     */
-    @Parameter(description = "应用类型")
-    private List<GetAppListResult> list;
+    @Schema(description = "APP数量")
+    private Integer           appCount;
 
 }
