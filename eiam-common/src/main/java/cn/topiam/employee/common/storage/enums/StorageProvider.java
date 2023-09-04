@@ -51,7 +51,11 @@ public enum StorageProvider implements Serializable {
                                                      /**
                                                       * minio
                                                       */
-                                                     MINIO("minio", "minio", MinIoStorage.class);
+                                                     MINIO("minio", "minio", MinIoStorage.class),
+                                                     /**
+                                                      * S3
+                                                      */
+                                                     S3("s3", "s3", S3Storage.class);
 
     /**
      * code

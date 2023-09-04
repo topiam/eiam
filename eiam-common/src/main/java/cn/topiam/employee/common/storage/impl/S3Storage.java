@@ -17,25 +17,36 @@
  */
 package cn.topiam.employee.common.storage.impl;
 
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.URL;
+import org.jetbrains.annotations.NotNull;
+
+import cn.topiam.employee.common.jackjson.encrypt.JsonPropertyEncrypt;
 import cn.topiam.employee.common.storage.AbstractStorage;
 import cn.topiam.employee.common.storage.StorageConfig;
 import cn.topiam.employee.common.storage.StorageProviderException;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
+
+import jakarta.validation.constraints.NotEmpty;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.core.waiters.WaiterResponse;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
-import software.amazon.awssdk.services.s3.waiters.S3Waiter;
-
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
+import static cn.topiam.employee.common.constant.StorageConstants.URL_REGEXP;
 
 /**
  * S3 协议实现
@@ -46,86 +57,55 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class S3Storage extends AbstractStorage {
 
-    private final S3Client             s3Client;
+    private final S3Client    s3Client;
 
-    private final StorageConfig.Config config;
+    private final S3Presigner s3Presigner;
+
+    private final Config      s3Config;
 
     public S3Storage(StorageConfig config) {
         super(config);
-        // 创建连接
-
-        // 凭证
-        AwsBasicCredentials creds;
-        this.config = config.getConfig();
-        try {
-            // 阿里云
-            if (this.config instanceof AliYunOssStorage.Config) {
-                String accessKeyId = ((AliYunOssStorage.Config) this.config).getAccessKeyId();
-                String accessKeySecret = ((AliYunOssStorage.Config) this.config)
-                    .getAccessKeySecret();
-                String endpoint = ((AliYunOssStorage.Config) this.config).getEndpoint();
-                creds = AwsBasicCredentials.create(accessKeyId, accessKeySecret);
-                this.s3Client = S3Client.builder()
-                    .serviceConfiguration(b -> b.checksumValidationEnabled(false))
-                    .credentialsProvider(StaticCredentialsProvider.create(creds))
-                    .endpointOverride(new URI(endpoint)).build();
-            }
-            // MiniO
-            else if (this.config instanceof MinIoStorage.Config) {
-                String accessKey = ((MinIoStorage.Config) this.config).getAccessKey();
-                String secretKey = ((MinIoStorage.Config) this.config).getSecretKey();
-                String endpoint = ((MinIoStorage.Config) this.config).getEndpoint();
-                creds = AwsBasicCredentials.create(accessKey, secretKey);
-                this.s3Client = S3Client.builder()
-                    .serviceConfiguration(b -> b.checksumValidationEnabled(false))
-                    .credentialsProvider(StaticCredentialsProvider.create(creds))
-                    .endpointOverride(new URI(endpoint)).build();
-            }
-            // 七牛云
-            else if (this.config instanceof QiNiuKodoStorage.Config) {
-                String accessKey = ((QiNiuKodoStorage.Config) this.config).getAccessKey();
-                String secretKey = ((QiNiuKodoStorage.Config) this.config).getSecretKey();
-                String domain = this.config.getDomain();
-                creds = AwsBasicCredentials.create(accessKey, secretKey);
-                this.s3Client = S3Client.builder()
-                    .serviceConfiguration(b -> b.checksumValidationEnabled(false))
-                    .credentialsProvider(StaticCredentialsProvider.create(creds))
-                    .endpointOverride(new URI(domain)).build();
-            }
-            // 腾讯云
-            else if (this.config instanceof TencentCosStorage.Config) {
-                String secretId = ((TencentCosStorage.Config) this.config).getSecretId();
-                String secretKey = ((TencentCosStorage.Config) this.config).getSecretKey();
-                String domain = this.config.getDomain();
-                String region = ((TencentCosStorage.Config) this.config).getRegion();
-                creds = AwsBasicCredentials.create(secretId, secretKey);
-                this.s3Client = S3Client.builder()
-                    .serviceConfiguration(b -> b.checksumValidationEnabled(false))
-                    .credentialsProvider(StaticCredentialsProvider.create(creds))
-                    .region(Region.of(region)).endpointOverride(new URI(domain)).build();
-            }
-            // 错误
-            else {
-                throw new StorageProviderException("s3Client initialize exception");
-            }
-            createBucket(getBucket());
-        } catch (Exception e) {
-            log.error("s3Client initialize exception: {}", e.getMessage(), e);
-            throw new StorageProviderException("s3Client initialize exception", e);
-        }
+        // 获取客户端
+        this.s3Config = (Config) this.config.getConfig();
+        this.s3Client = getS3Client();
+        this.s3Presigner = getS3Presigner();
+        createBucket();
     }
 
-    private void createBucket(String bucket) throws Exception {
+    private S3Client getS3Client() {
+        return S3Client.builder().serviceConfiguration(b -> b.checksumValidationEnabled(false))
+            .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials
+                .create(s3Config.getAccessKeyId(), s3Config.getSecretAccessKey())))
+            .region(getRegion()).endpointOverride(URI.create(s3Config.getEndpoint())).build();
+    }
+
+    private S3Presigner getS3Presigner() {
+        return S3Presigner.builder().region(getRegion())
+            .endpointOverride(URI.create(s3Config.getEndpoint()))
+            .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials
+                .create(s3Config.getAccessKeyId(), s3Config.getSecretAccessKey())))
+            .build();
+    }
+
+    /**
+     * 创建Bucket
+     */
+    protected void createBucket() {
         try {
-            // 创建bucket
-            S3Waiter s3Waiter = this.s3Client.waiter();
-            CreateBucketRequest bucketRequest = CreateBucketRequest.builder().bucket(bucket).build();
             // 获取bucket是否存在
-            this.s3Client.createBucket(bucketRequest);
-            HeadBucketRequest bucketRequestWait = HeadBucketRequest.builder().bucket(bucket).build();
-            WaiterResponse<HeadBucketResponse> waiterResponse = s3Waiter
-                .waitUntilBucketExists(bucketRequestWait);
-            waiterResponse.matched().response().ifPresent(System.out::println);
+            HeadBucketRequest bucketRequestWait = HeadBucketRequest.builder()
+                .bucket(this.s3Config.getBucket()).build();
+            s3Client.headBucket(bucketRequestWait);
+        } catch (S3Exception se) {
+            if (se.statusCode() == 404) {
+                // 创建bucket
+                CreateBucketRequest bucketRequest = CreateBucketRequest.builder()
+                    .bucket(this.s3Config.getBucket()).build();
+                this.s3Client.createBucket(bucketRequest);
+            } else {
+                log.error("查询bucket是否存在异常:[{}]", se.getMessage(), se);
+                throw se;
+            }
         } catch (Exception e) {
             log.error("create bucket exception: {}", e.getMessage(), e);
             throw new StorageProviderException("create bucket exception", e);
@@ -136,57 +116,76 @@ public class S3Storage extends AbstractStorage {
     public String upload(@NotNull String fileName,
                          InputStream inputStream) throws StorageProviderException {
         try {
-            super.upload(fileName, inputStream);
-            String bucket = getBucket();
-            String key = this.config.getLocation() + SEPARATOR + getFileName(fileName);
-            // 写object
-            PutObjectRequest putOb = PutObjectRequest.builder().bucket(bucket).key(key).build();
-            this.s3Client.putObject(putOb,
-                RequestBody.fromInputStream(inputStream, inputStream.readAllBytes().length));
-            return this.config.getDomain() + SEPARATOR + bucket + SEPARATOR
+            String key = s3Config.getLocation() + SEPARATOR + getFileName(fileName);
+            PutObjectRequest putOb = PutObjectRequest.builder().bucket(s3Config.getBucket())
+                .key(key).build();
+            this.s3Client.putObject(putOb, RequestBody.fromBytes(inputStream.readAllBytes()));
+            return this.s3Config.getDomain() + SEPARATOR
                    + URLEncoder.encode(key, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         } catch (Exception e) {
-            log.error("s3Client upload exception: {}", e.getMessage(), e);
-            throw new StorageProviderException("s3Client upload exception", e);
+            log.error("[{}] upload exception: {}", this.config.getProvider(), e.getMessage(), e);
+            throw new StorageProviderException("upload exception", e);
         }
     }
 
     @Override
     public String download(String path) throws StorageProviderException {
         try {
-            super.download(path);
-            String bucket = getBucket();
-            GetUrlRequest request = GetUrlRequest.builder().bucket(bucket).key(path).build();
-
-            URL url = this.s3Client.utilities().getUrl(request);
-            return url.toString();
+            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(this.s3Config.getBucket()).key(path).build();
+            GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofSeconds(EXPIRY_SECONDS))
+                .getObjectRequest(getObjectRequest).build();
+            PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner
+                .presignGetObject(getObjectPresignRequest);
+            String downloadUrl = presignedGetObjectRequest.url().toString();
+            return downloadUrl.replace(this.s3Config.getEndpoint(), this.s3Config.getDomain());
         } catch (Exception e) {
-            log.error("s3Client download exception: {}", e.getMessage(), e);
-            throw new StorageProviderException("s3Client download exception", e);
+            log.error("[{}] download exception: {}", this.config.getProvider(), e.getMessage(), e);
+            throw new StorageProviderException("download exception", e);
         }
     }
 
-    private String getBucket() {
-        String bucket = "";
-        if (this.config instanceof AliYunOssStorage.Config) {
-            bucket = ((AliYunOssStorage.Config) this.config).getBucket();
+    private Region getRegion() {
+        if (StringUtils.isNotBlank(s3Config.getRegion())) {
+            return Region.of(s3Config.getRegion());
         }
-        // MiniO
-        else if (this.config instanceof MinIoStorage.Config) {
-            bucket = ((MinIoStorage.Config) this.config).getBucket();
-        }
-        // 七牛云
-        else if (this.config instanceof QiNiuKodoStorage.Config) {
-            bucket = ((QiNiuKodoStorage.Config) this.config).getBucket();
-        }
-        // 腾讯云
-        else if (this.config instanceof TencentCosStorage.Config) {
-            bucket = ((TencentCosStorage.Config) this.config).getBucket();
-        }
-        // 错误
-        else {
-            throw new StorageProviderException("getBucket exception");
-        }
-        return bucket;
+        return Region.AWS_GLOBAL;
+    }
+
+    @EqualsAndHashCode(callSuper = true)
+    @Data
+    public static class Config extends StorageConfig.Config {
+
+        /**
+         * AccessKeyId
+         */
+        @NotEmpty(message = "AccessKeyId不能为空")
+        private String accessKeyId;
+
+        /**
+         * SecretAccessKey
+         */
+        @JsonPropertyEncrypt
+        @NotEmpty(message = "SecretAccessKey不能为空")
+        private String secretAccessKey;
+
+        /**
+         * endpoint
+         */
+        @URL(message = "Endpoint格式不正确", regexp = URL_REGEXP)
+        @NotEmpty(message = "Endpoint不能为空")
+        private String endpoint;
+
+        /**
+         * bucket
+         */
+        @NotEmpty(message = "Bucket不能为空")
+        private String bucket;
+
+        /**
+         * Region
+         */
+        private String region;
     }
 }
