@@ -17,6 +17,7 @@
  */
 package cn.topiam.employee.common.entity.app;
 
+import jakarta.persistence.Transient;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -133,5 +134,6 @@ public class AppEntity extends LogicDeleteEntity<Long> {
     /**
      * 应用分组名称
      */
+    @Transient
     private String            groupName;
 }
