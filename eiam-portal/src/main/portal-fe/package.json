@@ -52,7 +52,7 @@
     "ahooks": "^3.7.8",
     "antd": "^5.8.6",
     "antd-img-crop": "^4.12.2",
-    "antd-style": "^3.4.4",
+    "antd-style": "^3.4.5",
     "classnames": "^2.3.2",
     "crypto-js": "^4.1.1",
     "dayjs": "^1.11.9",
@@ -80,7 +80,7 @@
   "devDependencies": {
     "@ant-design/antd-theme-variable": "^1.0.0",
     "@types/classnames": "^2.3.1",
-    "@types/crypto-js": "^4.1.1",
+    "@types/crypto-js": "^4.1.2",
     "@types/google-libphonenumber": "^7.4.26",
     "@types/history": "^4.7.11",
     "@types/js-yaml": "^4.0.5",
