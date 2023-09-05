@@ -17,11 +17,12 @@
  */
 package cn.topiam.employee.portal.pojo.result;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import java.io.Serial;
 import java.io.Serializable;
+
+import lombok.Data;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 获取应用列表
@@ -35,6 +36,13 @@ public class AppGroupListResult implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1263170640092199401L;
+
+    /**
+     * 应用分组ID
+     */
+    @Schema(description = "应用分组ID")
+    private Long              id;
+
     /**
      * 应用分组名称
      */

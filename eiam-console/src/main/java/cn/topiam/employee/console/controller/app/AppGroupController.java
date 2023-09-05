@@ -40,7 +40,6 @@ import lombok.AllArgsConstructor;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import static cn.topiam.employee.common.constant.AppConstants.APP_PATH;
 
 /**

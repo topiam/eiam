@@ -17,13 +17,13 @@
  */
 package cn.topiam.employee.portal.service;
 
+import java.util.List;
+
 import cn.topiam.employee.portal.pojo.query.GetAppListQuery;
 import cn.topiam.employee.portal.pojo.result.AppGroupListResult;
 import cn.topiam.employee.portal.pojo.result.GetAppListResult;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
-
-import java.util.List;
 
 /**
  * AppService

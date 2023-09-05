@@ -17,7 +17,6 @@
  */
 package cn.topiam.employee.common.entity.app;
 
-import jakarta.persistence.Transient;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -130,10 +129,4 @@ public class AppEntity extends LogicDeleteEntity<Long> {
      */
     @Column(name = "is_enabled")
     private Boolean           enabled;
-
-    /**
-     * 应用分组名称
-     */
-    @Transient
-    private String            groupName;
 }
