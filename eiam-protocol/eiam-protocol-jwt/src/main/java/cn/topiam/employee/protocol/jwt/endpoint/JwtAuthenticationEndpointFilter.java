@@ -191,12 +191,13 @@ public final class JwtAuthenticationEndpointFilter extends OncePerRequestFilter 
             }
             this.authenticationFailureHandler.onAuthenticationFailure(request, response, ex);
         } catch (Exception ex) {
-            JwtError error = new JwtError(JwtErrorCodes.SERVER_ERROR,ex.getMessage(),JWT_ERROR_URI);
+            JwtError error = new JwtError(JwtErrorCodes.SERVER_ERROR, ex.getMessage(),
+                JWT_ERROR_URI);
             if (this.logger.isTraceEnabled()) {
                 this.logger.trace(error, ex);
             }
             this.authenticationFailureHandler.onAuthenticationFailure(request, response,
-                    new JwtAuthenticationException(error));
+                new JwtAuthenticationException(error));
         }
     }
 

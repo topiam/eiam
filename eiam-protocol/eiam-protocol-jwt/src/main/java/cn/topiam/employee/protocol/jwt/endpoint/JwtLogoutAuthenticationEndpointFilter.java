@@ -60,48 +60,48 @@ public final class JwtLogoutAuthenticationEndpointFilter extends OncePerRequestF
     /**
      * 端点匹配器
      */
-    private final RequestMatcher                 requestMatcher;
+    private final RequestMatcher                               requestMatcher;
 
     /**
      * 身份验证失败处理程序
      */
-    private AuthenticationFailureHandler         authenticationFailureHandler = new JwtAuthenticationFailureHandler();
+    private AuthenticationFailureHandler                       authenticationFailureHandler = new JwtAuthenticationFailureHandler();
 
     /**
      * AuthenticationSuccessHandler
      */
-    private AuthenticationSuccessHandler authenticationSuccessHandler=this::sendAuthorizationResponse;
+    private AuthenticationSuccessHandler                       authenticationSuccessHandler = this::sendAuthorizationResponse;
 
     /**
      * LogoutHandler
      */
-    private final LogoutHandler logoutHandler;
+    private final LogoutHandler                                logoutHandler;
 
     /**
      * 认证转换器
      */
-    private AuthenticationConverter authenticationConverter;
+    private AuthenticationConverter                            authenticationConverter;
 
     /**
      * AuthenticationDetailsSource
      */
-    private AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource   = new WebAuthenticationDetailsSource();
+    private AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource  = new WebAuthenticationDetailsSource();
 
     /**
      * 认证管理器
      */
-    private final AuthenticationManager authenticationManager;
-
+    private final AuthenticationManager                        authenticationManager;
 
     public JwtLogoutAuthenticationEndpointFilter(RequestMatcher requestMatcher,
-                                                 SessionRegistry sessionRegistry, AuthenticationManager authenticationManager) {
+                                                 SessionRegistry sessionRegistry,
+                                                 AuthenticationManager authenticationManager) {
         Assert.notNull(requestMatcher, "requestMatcher cannot be empty");
         Assert.notNull(sessionRegistry, "sessionRegistry cannot be empty");
         Assert.notNull(sessionRegistry, "authenticationManager cannot be empty");
         this.authenticationManager = authenticationManager;
         this.logoutHandler = new SecurityContextLogoutHandler();
         this.requestMatcher = requestMatcher;
-        authenticationConverter=new JwtLogoutAuthenticationConverter();
+        authenticationConverter = new JwtLogoutAuthenticationConverter();
     }
 
     public void setAuthenticationFailureHandler(AuthenticationFailureHandler authenticationFailureHandler) {
@@ -150,13 +150,15 @@ public final class JwtLogoutAuthenticationEndpointFilter extends OncePerRequestF
             return;
         }
         try {
-            Authentication authentication=  authenticationConverter.convert(request);
+            Authentication authentication = authenticationConverter.convert(request);
             if (authentication instanceof AbstractAuthenticationToken) {
                 ((AbstractAuthenticationToken) authentication)
-                        .setDetails(this.authenticationDetailsSource.buildDetails(request));
+                    .setDetails(this.authenticationDetailsSource.buildDetails(request));
             }
-            Authentication authenticationResult= authenticationManager.authenticate(authentication);
-            authenticationSuccessHandler.onAuthenticationSuccess(request,response,authenticationResult);
+            Authentication authenticationResult = authenticationManager
+                .authenticate(authentication);
+            authenticationSuccessHandler.onAuthenticationSuccess(request, response,
+                authenticationResult);
         } catch (JwtAuthenticationException ex) {
             if (this.logger.isTraceEnabled()) {
                 this.logger.trace(LogMessage.format("JWT logout request failed: %s", ex.getError()),
@@ -164,15 +166,15 @@ public final class JwtLogoutAuthenticationEndpointFilter extends OncePerRequestF
             }
             this.authenticationFailureHandler.onAuthenticationFailure(request, response, ex);
         } catch (Exception ex) {
-            JwtError error = new JwtError(JwtErrorCodes.SERVER_ERROR,ex.getMessage(),JWT_ERROR_URI);
+            JwtError error = new JwtError(JwtErrorCodes.SERVER_ERROR, ex.getMessage(),
+                JWT_ERROR_URI);
             if (this.logger.isTraceEnabled()) {
                 this.logger.trace(error, ex);
             }
             this.authenticationFailureHandler.onAuthenticationFailure(request, response,
-                    new JwtAuthenticationException(error));
+                new JwtAuthenticationException(error));
         }
     }
-
 
     /**
      * 发送成功响应
@@ -183,13 +185,13 @@ public final class JwtLogoutAuthenticationEndpointFilter extends OncePerRequestF
      */
     private void sendAuthorizationResponse(HttpServletRequest request, HttpServletResponse response,
                                            Authentication authentication) {
-        JwtLogoutAuthenticationToken jwtLogoutAuthentication= (JwtLogoutAuthenticationToken) authentication;
+        JwtLogoutAuthenticationToken jwtLogoutAuthentication = (JwtLogoutAuthenticationToken) authentication;
         // Check for active user session
-        if (jwtLogoutAuthentication.isPrincipalAuthenticated() &&
-                StringUtils.hasText(jwtLogoutAuthentication.getSessionId())) {
+        if (jwtLogoutAuthentication.isPrincipalAuthenticated()
+            && StringUtils.hasText(jwtLogoutAuthentication.getSessionId())) {
             // Perform logout
             this.logoutHandler.logout(request, response,
-                    (Authentication) jwtLogoutAuthentication.getPrincipal());
+                (Authentication) jwtLogoutAuthentication.getPrincipal());
         }
     }
 

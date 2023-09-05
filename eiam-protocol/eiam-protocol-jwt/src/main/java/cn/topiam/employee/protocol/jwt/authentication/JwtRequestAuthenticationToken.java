@@ -56,7 +56,6 @@ public class JwtRequestAuthenticationToken extends AbstractAuthenticationToken {
     @Getter
     private final Map<String, Object> additionalParameters;
 
-
     public JwtRequestAuthenticationToken(Authentication principal, String targetUrl,
                                          JwtProtocolConfig config,
                                          Map<String, Object> additionalParameters) {
