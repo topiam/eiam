@@ -15,36 +15,44 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.portal.service;
+package cn.topiam.employee.portal.pojo.result;
 
-import java.util.List;
+import java.io.Serial;
+import java.io.Serializable;
 
-import cn.topiam.employee.portal.pojo.query.GetAppListQuery;
-import cn.topiam.employee.portal.pojo.result.AppGroupListResult;
-import cn.topiam.employee.portal.pojo.result.GetAppListResult;
-import cn.topiam.employee.support.repository.page.domain.Page;
-import cn.topiam.employee.support.repository.page.domain.PageModel;
+import lombok.Data;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
- * AppService
+ * 获取应用列表
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/7/6 22:35
+ * Created by support@topiam.cn on  2023/9/1 11:58
  */
-public interface AppService {
-    /**
-     * 获取应用列表
-     *
-     * @param query     {@link GetAppListQuery}
-     * @param pageModel {@link PageModel}
-     * @return {@link Page}
-     */
-    Page<GetAppListResult> getAppList(GetAppListQuery query, PageModel pageModel);
+@Data
+@Schema(description = "获取分组应用列表")
+public class AppGroupListResult implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1263170640092199401L;
 
     /**
-     * 查询应用分组
-     *
-     * @return {@link AppGroupListResult}
+     * 应用分组ID
      */
-    List<AppGroupListResult> getAppGroupList();
+    @Schema(description = "应用分组ID")
+    private Long              id;
+
+    /**
+     * 应用分组名称
+     */
+    @Schema(description = "应用分组名称")
+    private String            name;
+
+    /**
+     * APP数量
+     */
+    @Schema(description = "APP数量")
+    private Integer           appCount;
+
 }

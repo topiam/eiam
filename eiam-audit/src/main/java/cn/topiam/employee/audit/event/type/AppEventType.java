@@ -21,6 +21,7 @@ import java.util.List;
 
 import cn.topiam.employee.audit.event.Type;
 import cn.topiam.employee.support.security.userdetails.UserType;
+import static cn.topiam.employee.audit.event.ConsoleResource.APP_GROUP_RESOURCE;
 import static cn.topiam.employee.audit.event.ConsoleResource.APP_RESOURCE;
 
 /**
@@ -153,5 +154,32 @@ public class AppEventType {
     public static Type DELETE_APP_PERMISSION_ROLE      = new Type(
         "eiam:event:app:delete_app_permission_role", "删除应用角色", APP_RESOURCE,
         List.of(UserType.ADMIN));
+
+    /**
+     * 添加应用分组
+     */
+    public static Type ADD_APP_GROUP                   = new Type("eiam:event:app_group:create",
+        "添加应用分组", APP_GROUP_RESOURCE, List.of(UserType.ADMIN));
+    /**
+     * 启用应用分组
+     */
+    public static Type ENABLE_APP_GROUP                = new Type("eiam:event:app_group:enabled",
+        "启用应用分组", APP_GROUP_RESOURCE, List.of(UserType.ADMIN));
+    /**
+     * 禁用应用分组
+     */
+    public static Type DISABLE_APP_GROUP               = new Type("eiam:event:app_group:disabled",
+        "禁用应用分组", APP_GROUP_RESOURCE, List.of(UserType.ADMIN));
+    /**
+     * 编辑应用分组
+     */
+    public static Type UPDATE_APP_GROUP                = new Type("eiam:event:app_group:update",
+        "修改应用分组", APP_GROUP_RESOURCE, List.of(UserType.ADMIN));
+
+    /**
+     * 删除应用分组
+     */
+    public static Type DELETE_APP_GROUP                = new Type("eiam:event:app_group:delete",
+        "删除应用分组", APP_GROUP_RESOURCE, List.of(UserType.ADMIN));
 
 }

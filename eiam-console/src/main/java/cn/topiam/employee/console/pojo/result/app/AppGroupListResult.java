@@ -15,55 +15,53 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.console.pojo.save.app;
+package cn.topiam.employee.console.pojo.result.app;
 
 import java.io.Serializable;
 
 import lombok.Data;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 /**
- * 应用保存入参
+ * 分组列表返回
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/7/18 23:26
+ * Created by support@topiam.cn on 2023/8/31 10:29
  */
 @Data
-@Schema(description = "应用保存入参")
-public class AppCreateParam implements Serializable {
+@Schema(description = "分组列表返回")
+public class AppGroupListResult implements Serializable {
 
     /**
-     * 应用名称
+     * ID
      */
-    @NotBlank(message = "应用名称不能为空")
-    @Schema(description = "应用名称")
-    private String name;
+    @Parameter(description = "ID")
+    private String  id;
 
     /**
-     * 应用模版
+     * 分组名称
      */
-    @NotNull(message = "应用模版不能为空")
-    @Schema(description = "应用模版")
-    private String template;
+    @Parameter(description = "分组名称")
+    private String  name;
 
     /**
-     * 应用图标
+     * 分组编码
      */
-    @Schema(description = "应用图标")
-    private String icon;
+    @Parameter(description = "分组编码")
+    private String  code;
+
+    /**
+     * 是否启用
+     */
+    @Parameter(description = "是否启用")
+    private Boolean enabled;
 
     /**
      * 备注
      */
-    @Schema(description = "备注")
-    private String remark;
+    @Parameter(description = "备注")
+    private String  remark;
 
-    /**
-     * 应用分组id
-     */
-    @Schema(description = "应用分组id")
-    private Long   groupId;
 }

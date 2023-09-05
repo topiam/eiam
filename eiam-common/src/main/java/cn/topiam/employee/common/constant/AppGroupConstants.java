@@ -15,31 +15,36 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.common.repository.app;
+package cn.topiam.employee.common.constant;
 
-import java.util.List;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
-import cn.topiam.employee.common.entity.app.AppEntity;
+import static cn.topiam.employee.support.constant.EiamConstants.COLON;
+import static cn.topiam.employee.support.constant.EiamConstants.V1_API_PATH;
 
 /**
- * 应用 Repository Customized
+ * 分组管理常量
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/5/26 23:40
+ * Created by support@topiam.cn on 2023/8/31 11:07
  */
-public interface AppRepositoryCustomized {
+public final class AppGroupConstants {
 
     /**
-     *
-     * 获取我的应用列表
-     *
-     * @param name {@link  String}
-     * @param userId {@link  Long}
-     * @param pageable    {@link  Pageable}
-     * @return {@link List}
+     * 分组管理API路径
      */
-    Page<AppEntity> getAppList(Long userId, String name, Long groupId, Pageable pageable);
+    public final static String APP_GROUP_PATH              = V1_API_PATH + "/app_group";
+
+    /**
+     * 组名称
+     */
+    public static final String APP_GROUP_GROUP_NAME        = "分组管理";
+
+    /**
+     * 分组配置缓存前缀
+     */
+    public static final String APP_GROUP_CACHE_NAME_PREFIX = "app_group" + COLON;
+
+    /**
+     * 分组基本信息
+     */
+    public static final String APP_GROUP_CACHE_NAME        = APP_GROUP_CACHE_NAME_PREFIX + "basic";
 }

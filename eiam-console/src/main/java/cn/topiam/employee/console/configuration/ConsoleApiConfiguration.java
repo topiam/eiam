@@ -33,8 +33,7 @@ import static cn.topiam.employee.common.constant.AccountConstants.ACCOUNT_API_DO
 import static cn.topiam.employee.common.constant.AccountConstants.ACCOUNT_API_PATHS;
 import static cn.topiam.employee.common.constant.AnalysisConstants.ANALYSIS_GROUP_NAME;
 import static cn.topiam.employee.common.constant.AnalysisConstants.ANALYSIS_PATH;
-import static cn.topiam.employee.common.constant.AppConstants.APP_GROUP_NAME;
-import static cn.topiam.employee.common.constant.AppConstants.APP_PATH;
+import static cn.topiam.employee.common.constant.AppConstants.*;
 import static cn.topiam.employee.common.constant.AuthnConstants.AUTHN_PATH;
 import static cn.topiam.employee.common.constant.SettingConstants.SETTING_GROUP_NAME;
 import static cn.topiam.employee.common.constant.SettingConstants.SETTING_PATH;

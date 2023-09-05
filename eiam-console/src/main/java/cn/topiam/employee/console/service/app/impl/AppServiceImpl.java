@@ -101,7 +101,7 @@ public class AppServiceImpl implements AppService {
         ApplicationService applicationService = applicationServiceLoader
             .getApplicationService(param.getTemplate());
         String appId = applicationService.create(param.getName(), param.getIcon(),
-            param.getRemark());
+            param.getRemark(), param.getGroupId());
         AuditContext.setTarget(Target.builder().id(appId).type(TargetType.APPLICATION).build());
         return new AppCreateResult(appId);
     }

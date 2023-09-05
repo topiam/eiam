@@ -55,11 +55,12 @@ public abstract class AbstractApplicationService implements ApplicationService {
     }
 
     @Override
-    public AppEntity createApp(String name, String icon, String remark, InitLoginType initLoginType,
-                               AuthorizationType authorizationType) {
+    public AppEntity createApp(String name, String icon, String remark, Long groupId,
+                               InitLoginType initLoginType, AuthorizationType authorizationType) {
         AppEntity appEntity = new AppEntity();
         appEntity.setName(name);
         appEntity.setIcon(icon);
+        appEntity.setGroupId(null == groupId ? 0L : groupId);
         appEntity.setCode(RandomStringUtils.randomAlphanumeric(32).toLowerCase());
         appEntity.setTemplate(getCode());
         appEntity.setType(getType());

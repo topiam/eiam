@@ -17,11 +17,14 @@
  */
 package cn.topiam.employee.portal.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.topiam.employee.portal.pojo.query.GetAppListQuery;
+import cn.topiam.employee.portal.pojo.result.AppGroupListResult;
 import cn.topiam.employee.portal.pojo.result.GetAppListResult;
 import cn.topiam.employee.portal.service.AppService;
 import cn.topiam.employee.support.repository.page.domain.Page;
@@ -55,6 +58,18 @@ public class AppController {
     public ApiRestResult<Page<GetAppListResult>> getAppList(GetAppListQuery query,
                                                             PageModel pageModel) {
         Page<GetAppListResult> list = appService.getAppList(query, pageModel);
+        return ApiRestResult.ok(list);
+    }
+
+    /**
+     * 获取分组应用列表
+     *
+     * @return {@link AppGroupListResult}
+     */
+    @Operation(summary = "获取分组应用列表")
+    @GetMapping(value = "/getAppGroupList")
+    public ApiRestResult<List<AppGroupListResult>> getAppGroupList() {
+        List<AppGroupListResult> list = appService.getAppGroupList();
         return ApiRestResult.ok(list);
     }
 

@@ -15,55 +15,53 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.console.pojo.save.app;
+package cn.topiam.employee.console.pojo.update.app;
 
 import java.io.Serializable;
 
 import lombok.Data;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 /**
- * 应用保存入参
+ * 分组修改入参
  *
  * @author TopIAM
  * Created by support@topiam.cn on  2021/7/18 23:26
  */
 @Data
-@Schema(description = "应用保存入参")
-public class AppCreateParam implements Serializable {
+@Schema(description = "分组修改入参")
+public class AppGroupUpdateParam implements Serializable {
 
     /**
-     * 应用名称
+     * id
      */
-    @NotBlank(message = "应用名称不能为空")
-    @Schema(description = "应用名称")
-    private String name;
+    @Schema(description = "分组id")
+    @NotNull(message = "ID不能为空")
+    private Long    id;
 
     /**
-     * 应用模版
+     * 分组名称
      */
-    @NotNull(message = "应用模版不能为空")
-    @Schema(description = "应用模版")
-    private String template;
+    @Schema(description = "分组名称")
+    private String  name;
 
     /**
-     * 应用图标
+     * 分组排序
      */
-    @Schema(description = "应用图标")
-    private String icon;
+    @Schema(description = "分组编码")
+    private String  code;
+
+    /**
+     * 分组是否启用
+     */
+    @Schema(description = "分组是否启用")
+    private Boolean enabled;
 
     /**
      * 备注
      */
     @Schema(description = "备注")
-    private String remark;
-
-    /**
-     * 应用分组id
-     */
-    @Schema(description = "应用分组id")
-    private Long   groupId;
+    private String  remark;
 }

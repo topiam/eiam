@@ -95,6 +95,43 @@ public interface AppConverter {
         return page;
     }
 
+    default List<GetAppListResult> entityConvertToAppListResult(List<AppEntity> list) {
+        //@formatter:off
+        List<GetAppListResult> results = new ArrayList<>();
+        for (AppEntity entity : list) {
+            GetAppListResult result = new GetAppListResult();
+            result.setId(entity.getId().toString());
+            result.setName(entity.getName());
+            result.setType(entity.getType());
+            result.setProtocol(entity.getProtocol());
+            result.setTemplate(entity.getTemplate());
+            result.setInitLoginType(entity.getInitLoginType());
+            //登录发起URL
+            if (PORTAL_OR_APP.equals(entity.getInitLoginType())){
+                result.setInitLoginUrl(StringUtils.defaultIfBlank(entity.getInitLoginUrl(), getIdpInitUrl(entity.getProtocol(), entity.getCode())));
+            }
+            result.setIcon(entity.getIcon());
+            //图标未配置，所以先从模版中拿
+            if (StringUtils.isBlank(entity.getIcon())){
+                ApplicationService applicationService = getApplicationServiceLoader()
+                        .getApplicationService(entity.getTemplate());
+                result.setIcon(applicationService.getBase64Icon());
+            }
+            if (StringUtils.isNotBlank(entity.getRemark())){
+                result.setDescription(entity.getRemark());
+            }else {
+                ApplicationServiceLoader loader = ApplicationContextHelp.getBean(ApplicationServiceLoader.class);
+                ApplicationService applicationService = loader.getApplicationService(entity.getTemplate());
+                if (!Objects.isNull(applicationService)){
+                    result.setDescription(applicationService.getDescription());
+                }
+            }
+            results.add(result);
+        }
+        //@formatter:on
+        return results;
+    }
+
     /**
      * 获取idp init url
      *

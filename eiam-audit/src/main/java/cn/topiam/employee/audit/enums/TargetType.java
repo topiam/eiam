@@ -91,6 +91,11 @@ public enum TargetType {
                          * 应用权限策略
                          */
                         APP_PERMISSION_ROLE("app_permission_role", "应用权限角色"),
+
+                        /**
+                         * 应用分组
+                         */
+                        APP_GROUP("app_group", "应用分组"),
                         /**
                          * 系统角色
                          */

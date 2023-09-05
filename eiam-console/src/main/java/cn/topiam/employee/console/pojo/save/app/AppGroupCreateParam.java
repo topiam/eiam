@@ -1,5 +1,5 @@
 /*
- * eiam-common - Employee Identity and Access Management
+ * eiam-console - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,31 +15,42 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.common.repository.app;
+package cn.topiam.employee.console.pojo.save.app;
 
-import java.util.List;
+import java.io.Serializable;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import lombok.Data;
 
-import cn.topiam.employee.common.entity.app.AppEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 
 /**
- * 应用 Repository Customized
+ * 分组保存入参
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/5/26 23:40
+ * Created by support@topiam.cn on  2023/8/31 23:26
  */
-public interface AppRepositoryCustomized {
+@Data
+@Schema(description = "分组保存入参")
+public class AppGroupCreateParam implements Serializable {
 
     /**
-     *
-     * 获取我的应用列表
-     *
-     * @param name {@link  String}
-     * @param userId {@link  Long}
-     * @param pageable    {@link  Pageable}
-     * @return {@link List}
+     * 分组名称
      */
-    Page<AppEntity> getAppList(Long userId, String name, Long groupId, Pageable pageable);
+    @NotBlank(message = "分组名称不能为空")
+    @Schema(description = "分组名称")
+    private String name;
+
+    /**
+     * 备注
+     */
+    @Schema(description = "备注")
+    private String remark;
+
+    /**
+     * 分组编码
+     */
+    @Schema(description = "分组编码")
+    private String code;
+
 }
