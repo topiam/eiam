@@ -1,0 +1,165 @@
+<!--
+
+    eiam-common - Employee Identity and Access Management
+    Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd
+          http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/pro/liquibase-pro-4.3.xsd">
+    <!--init-->
+    <changeSet author="TopIAM" id="1.1.0">
+        <createTable remarks="应用权限资源" tableName="app_permission_resource">
+            <column name="id_" remarks="主键ID" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name_" remarks="资源名称" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code_" remarks="资源编码" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="desc_" remarks="资源描述" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="app_id" remarks="所属应用" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_enabled" remarks="是否启用" type="TINYINT(1)"/>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="应用权限角色表" tableName="app_permission_role">
+            <column name="id_" remarks="主键ID" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name_" remarks="角色名称" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code_" remarks="角色编码" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="app_id" remarks="所属应用" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_enabled" remarks="是否启用" type="TINYINT(1)"/>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="应用权限项" tableName="app_permission_action">
+            <column name="id_" remarks="主键ID" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="value_" remarks="操作编码" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type_" remarks="权限类型" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name_" remarks="权限描述" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="resource_id" remarks="所属资源" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <createTable remarks="应用权限策略" tableName="app_permission_policy">
+            <column name="id_" type="BIGINT" remarks="主键ID">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="app_id" remarks="所属应用" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="subject_id" remarks="权限主体ID（用户、角色、分组、组织机构）" type="VARCHAR2(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="subject_type" remarks="权限主体类型（用户、角色、分组、组织机构）" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="object_id" remarks="权限客体ID（操作权限、角色）" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="object_type" remarks="权限客体类型（操作权限、角色）" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="effect_" remarks="效果（Allow（允许）、Deny（拒绝））" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" remarks="创建者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="create_time" remarks="创建时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_by" remarks="修改者" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="update_time" remarks="修改时间" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="remark_" remarks="备注" type="TEXT"/>
+            <column name="is_deleted" remarks="删除标记" type="TINYINT(1)" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

@@ -25,11 +25,11 @@ import { Badge, DatePicker, Select, Space, Tag } from 'antd';
 import dayjs from 'dayjs';
 import { useRef, useState } from 'react';
 import ExpandedCard from './components/ExpandedCard';
-import { EventStatus, UserType } from './data.d';
+import { AuditList, AuditTypeGroup, EventStatus, UserType } from './data.d';
 import useStyles from './style';
 import classNames from 'classnames';
 import { useIntl } from '@umijs/max';
-import { AuditList, AuditTypeGroup } from './data.d';
+
 const { OptGroup } = Select;
 const { Option } = Select;
 const { RangePicker } = DatePicker;

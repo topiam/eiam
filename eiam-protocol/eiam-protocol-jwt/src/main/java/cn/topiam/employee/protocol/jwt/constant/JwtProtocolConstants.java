@@ -17,8 +17,8 @@
  */
 package cn.topiam.employee.protocol.jwt.constant;
 
-import static cn.topiam.employee.common.constant.AuthorizeConstants.AUTHORIZE_PATH;
-import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CODE_VARIABLE;
+import static cn.topiam.employee.protocol.code.constant.ProtocolConstants.PROTOCOL_CACHE_PREFIX;
+import static cn.topiam.employee.support.constant.EiamConstants.COLON;
 
 /**
  * 协议常量
@@ -29,18 +29,19 @@ import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CODE_VARI
 public class JwtProtocolConstants {
 
     /**
-     * JWT IDP SSO 发起
+     * 协议缓存前缀
      */
-    public static final String IDP_JWT_SSO_INITIATOR = AUTHORIZE_PATH + "/jwt/" + APP_CODE_VARIABLE
-                                                       + "/initiator";
+    public static final String JWT_PROTOCOL_CACHE_PREFIX = PROTOCOL_CACHE_PREFIX + "jwt" + COLON;
 
-    public static final String TARGET_URL            = "target_url";
-    public static final String ID_TOKEN              = "id_token";
-    public static final String NONCE                 = "nonce";
+    public static final String TARGET_URL                = "target_url";
+    public static final String ID_TOKEN                  = "id_token";
+    public static final String NONCE                     = "nonce";
 
-    public static final String URL                   = "url";
-    public static final String BINDING_TYPE          = "binding_type";
+    public static final String URL                       = "url";
+    public static final String BINDING_TYPE              = "binding_type";
 
-    public static final String JWT_ERROR_URI         = "https://eiam.topiam.cn";
+    public static final String JWT_ERROR_URI             = "https://eiam.topiam.cn";
+
+    public static final String S_ID                      = "sid";
 
 }

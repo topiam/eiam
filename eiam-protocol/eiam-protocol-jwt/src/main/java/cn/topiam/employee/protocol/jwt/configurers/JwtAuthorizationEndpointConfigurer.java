@@ -27,6 +27,7 @@ import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import cn.topiam.employee.protocol.code.configurer.AbstractConfigurer;
+import cn.topiam.employee.protocol.code.util.ProtocolConfigUtils;
 import cn.topiam.employee.protocol.jwt.authentication.JwtRequestAuthenticationTokenProvider;
 import cn.topiam.employee.protocol.jwt.authorization.JwtAuthorizationService;
 import cn.topiam.employee.protocol.jwt.endpoint.JwtAuthenticationEndpointFilter;
@@ -73,9 +74,11 @@ public class JwtAuthorizationEndpointConfigurer extends AbstractConfigurer {
             .getSharedObject(AuthenticationManager.class);
         JwtAuthorizationService authorizationService = JwtAuthenticationUtils
             .getAuthorizationService(httpSecurity);
-        JwtAuthenticationEndpointFilter initSingleSignOnEndpointFilter = new JwtAuthenticationEndpointFilter(
+        JwtAuthenticationEndpointFilter jwtAuthenticationEndpointFilter = new JwtAuthenticationEndpointFilter(
             requestMatcher, authenticationManager, authorizationService);
-        httpSecurity.addFilterBefore(postProcess(initSingleSignOnEndpointFilter),
+        jwtAuthenticationEndpointFilter.setAuthenticationDetailsSource(
+            ProtocolConfigUtils.getAuthenticationDetailsSource(httpSecurity));
+        httpSecurity.addFilterBefore(postProcess(jwtAuthenticationEndpointFilter),
             AuthorizationFilter.class);
     }
 

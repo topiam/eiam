@@ -28,8 +28,7 @@ import { AccountSettingsStateKey } from './data.d';
 import classnames from 'classnames';
 import useStyle from './style';
 import queryString from 'query-string';
-import { useLocation } from '@umijs/max';
-import { useIntl } from '@umijs/max';
+import { useIntl, useLocation } from '@umijs/max';
 
 const prefixCls = 'account';
 

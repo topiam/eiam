@@ -25,6 +25,8 @@ import org.springframework.security.core.Authentication;
 
 import cn.topiam.employee.application.jwt.model.JwtProtocolConfig;
 
+import lombok.Getter;
+
 /**
  *
  * @author TopIAM
@@ -39,25 +41,21 @@ public class JwtRequestAuthenticationToken extends AbstractAuthenticationToken {
     /**
      * 目标URL
      */
+    @Getter
     private String                    targetUrl;
 
     /**
      * 协议配置
      */
+    @Getter
     private final JwtProtocolConfig   config;
 
     /**
      * 额外参数
      */
+    @Getter
     private final Map<String, Object> additionalParameters;
 
-    public JwtRequestAuthenticationToken(Authentication principal, JwtProtocolConfig config,
-                                         Map<String, Object> additionalParameters) {
-        super(new ArrayList<>());
-        this.principal = principal;
-        this.config = config;
-        this.additionalParameters = additionalParameters;
-    }
 
     public JwtRequestAuthenticationToken(Authentication principal, String targetUrl,
                                          JwtProtocolConfig config,
@@ -99,19 +97,8 @@ public class JwtRequestAuthenticationToken extends AbstractAuthenticationToken {
         return principal;
     }
 
-    public JwtProtocolConfig getConfig() {
-        return config;
-    }
-
     public void setTargetUrl(String targetUrl) {
         this.targetUrl = targetUrl;
     }
 
-    public String getTargetUrl() {
-        return targetUrl;
-    }
-
-    public Map<String, Object> getAdditionalParameters() {
-        return additionalParameters;
-    }
 }

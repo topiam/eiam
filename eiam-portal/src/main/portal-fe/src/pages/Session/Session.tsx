@@ -18,7 +18,7 @@
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
-import { Badge, App, Popconfirm, Space, Table } from 'antd';
+import { App, Badge, Popconfirm, Space, Table } from 'antd';
 import { useRef } from 'react';
 import type { SessionList } from './data.d';
 import { getSessions, removeSessions } from './service';

@@ -15,31 +15,31 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {getUserGroup, updateUserGroup} from '@/services/account';
-import {history} from '@@/core/history';
+import { getUserGroup, updateUserGroup } from '@/services/account';
+import { history } from '@@/core/history';
 
-import {PageContainer, ProDescriptions, RouteContext} from '@ant-design/pro-components';
-import {useAsyncEffect, useMount} from 'ahooks';
-import {App, Skeleton} from 'antd';
-import {useState} from 'react';
+import { PageContainer, ProDescriptions, RouteContext } from '@ant-design/pro-components';
+import { useAsyncEffect, useMount } from 'ahooks';
+import { App, Skeleton } from 'antd';
+import { useState } from 'react';
 import MemberList from './components/MemberList';
-import {UserGroupDetailTabs} from './constant';
+import { UserGroupDetailTabs } from './constant';
 import queryString from 'query-string';
-import {useIntl, useLocation} from '@umijs/max';
-import useStyles from "./style";
-import AccessStrategy from "@/pages/account/UserGroupDetail/components/AccessStrategy";
+import { useIntl, useLocation } from '@umijs/max';
+import useStyles from './style';
+import AccessStrategy from '@/pages/account/UserGroupDetail/components/AccessStrategy';
 
 /**
  * 用户组详情
  */
 export default () => {
   const intl = useIntl();
-  const {styles} = useStyles();
-  const {message} = App.useApp();
+  const { styles } = useStyles();
+  const { message } = App.useApp();
   const location = useLocation();
   const query = queryString.parse(location.search);
-  const {id} = query as { id: string };
-  const {type} = query as {
+  const { id } = query as { id: string };
+  const { type } = query as {
     type: UserGroupDetailTabs;
   };
 
@@ -50,7 +50,7 @@ export default () => {
   useMount(() => {
     if (!id) {
       message
-        .warning(intl.formatMessage({id: 'pages.account.user_group_detail.use_mount.message'}))
+        .warning(intl.formatMessage({ id: 'pages.account.user_group_detail.use_mount.message' }))
         .then();
       history.push(`/account/user-group`);
       return;
@@ -59,7 +59,7 @@ export default () => {
       setTabActiveKey(UserGroupDetailTabs.member);
       history.push({
         pathname: location.pathname,
-        search: queryString.stringify({type: UserGroupDetailTabs.member, id: id}),
+        search: queryString.stringify({ type: UserGroupDetailTabs.member, id: id }),
       });
       return;
     }
@@ -69,7 +69,7 @@ export default () => {
   useAsyncEffect(async () => {
     if (id) {
       setLoading(true);
-      const {success, result} = await getUserGroup(id);
+      const { success, result } = await getUserGroup(id);
       if (success) {
         setDetail(result);
         setLoading(false);
@@ -80,9 +80,9 @@ export default () => {
 
   const description = (
     <RouteContext.Consumer>
-      {({isMobile}) =>
+      {({ isMobile }) =>
         loading ? (
-          <Skeleton active paragraph={{rows: 1}}/>
+          <Skeleton active paragraph={{ rows: 1 }} />
         ) : (
           <ProDescriptions<Record<string, string>>
             size="small"
@@ -91,17 +91,17 @@ export default () => {
             editable={{
               onSave: async (key, record) => {
                 let success: boolean;
-                const result = await updateUserGroup({...record});
+                const result = await updateUserGroup({ ...record });
                 success = result.success;
                 if (success) {
-                  message.success(intl.formatMessage({id: 'app.operation_success'}));
-                  setDetail({...record});
+                  message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                  setDetail({ ...record });
                   return Promise.resolve(true);
                 }
                 return Promise.resolve(false);
               },
             }}
-            dataSource={{...detail}}
+            dataSource={{ ...detail }}
           >
             <ProDescriptions.Item
               dataIndex="name"
@@ -125,7 +125,7 @@ export default () => {
               className={styles.descriptionRemark}
               dataIndex="remark"
               valueType={'textarea'}
-              fieldProps={{rows: 2, maxLength: 20}}
+              fieldProps={{ rows: 2, maxLength: 20 }}
             />
           </ProDescriptions>
         )
@@ -139,13 +139,13 @@ export default () => {
         history.push('/account/user-group');
       }}
       title={
-        loading ? <Skeleton.Input style={{width: 50}} active size={'small'}/> : detail?.name
+        loading ? <Skeleton.Input style={{ width: 50 }} active size={'small'} /> : detail?.name
       }
       content={<>{description}</>}
       tabList={[
         {
           key: UserGroupDetailTabs.member,
-          tab: intl.formatMessage({id: 'pages.account.user_group_detail.tab_list.member'}),
+          tab: intl.formatMessage({ id: 'pages.account.user_group_detail.tab_list.member' }),
         },
         {
           key: UserGroupDetailTabs.access_policy,
@@ -159,14 +159,14 @@ export default () => {
         setTabActiveKey(key);
         history.replace({
           pathname: location.pathname,
-          search: queryString.stringify({id, type: key}),
+          search: queryString.stringify({ id, type: key }),
         });
       }}
     >
       {/*成员信息*/}
-      {type === UserGroupDetailTabs.member && <MemberList id={id}/>}
+      {type === UserGroupDetailTabs.member && <MemberList id={id} />}
       {/*授权应用*/}
-      {type === UserGroupDetailTabs.access_policy && <AccessStrategy userGroupId={id}/>}
+      {type === UserGroupDetailTabs.access_policy && <AccessStrategy userGroupId={id} />}
     </PageContainer>
   );
 };

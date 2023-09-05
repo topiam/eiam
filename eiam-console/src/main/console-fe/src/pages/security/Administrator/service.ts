@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { SortOrder } from 'antd/es/table/interface';
-import { ReactText } from 'react';
 import { RequestData } from '@ant-design/pro-components';
 import { request } from '@@/exports';
 import { filterParamConverter, sortParamConverter } from '@/utils/utils';
+import { SortOrder } from 'antd/es/table/interface';
+import { AdministratorList } from './data';
 
 /**
  * 查询管理员列表
@@ -27,15 +27,12 @@ import { filterParamConverter, sortParamConverter } from '@/utils/utils';
 export async function getAdministratorList(
   params: Record<string, any>,
   sort: Record<string, SortOrder>,
-  filter: Record<string, ReactText[] | null>,
-): Promise<RequestData<SettingAPI.AdministratorList>> {
-  return request<API.ApiResult<SettingAPI.AdministratorList>>(
-    '/api/v1/setting/administrator/list',
-    {
-      params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },
-    },
-  ).then((result: API.ApiResult<SettingAPI.AdministratorList>) => {
-    const data: RequestData<SettingAPI.AdministratorList> = {
+  filter: Record<string, (string | number)[] | null>,
+): Promise<RequestData<AdministratorList>> {
+  return request<API.ApiResult<AdministratorList>>('/api/v1/setting/administrator/list', {
+    params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },
+  }).then((result: API.ApiResult<AdministratorList>) => {
+    const data: RequestData<AdministratorList> = {
       data: result?.result?.list ? result?.result?.list : [],
       success: result?.success,
       total: result?.result?.pagination ? result?.result?.pagination.total : 0,

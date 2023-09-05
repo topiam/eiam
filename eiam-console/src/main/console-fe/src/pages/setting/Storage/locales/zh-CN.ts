@@ -97,4 +97,29 @@ export default {
   'pages.setting.storage_provider.minio.endpoint.rule.0.message': 'MinIO  Endpoint为必填项',
   'pages.setting.storage_provider.minio.bucket.placeholder': '请输入MinIO  Bucket',
   'pages.setting.storage_provider.minio.bucket.rule.0.message': 'MinIO  Bucket为必填项',
+  'pages.setting.storage_provider.provider.s3': 'S3',
+  'pages.setting.storage_provider.provider.s3.endpoint': 'S3 域名',
+  'pages.setting.storage_provider.provider.s3.endpoint.placeholder':
+    '请输入 S3 域名',
+  'pages.setting.storage_provider.provider.qiniu_kodo.endpoint.rule.0.message':
+    '七牛云Kodo S3 域名为必填项',
+  'pages.setting.storage_provider.provider.s3.domain': '外链域名',
+  'pages.setting.storage_provider.provider.s3.domain.placeholder':
+    '请输入S3 外链域名',
+  'pages.setting.storage_provider.provider.s3.domain.rule.0.message':
+    'S3 外链域名为必填项',
+  'pages.setting.storage_provider.provider.s3.access_key_id.placeholder':
+    '请输入S3 AccessKeyId',
+  'pages.setting.storage_provider.provider.s3.access_key_id.rule.0.message':
+    'S3 AccessKeyId为必填项',
+  'pages.setting.storage_provider.provider.s3.secret_access_key.placeholder':
+    '请输入S3 SecretAccessKey',
+  'pages.setting.storage_provider.provider.s3.secret_access_key.rule.0.message':
+    'S3 SecretAccessKey为必填项',
+  'pages.setting.storage_provider.provider.s3.region.placeholder':
+    '请输入S3 Region',
+  'pages.setting.storage_provider.provider.s3.bucket.placeholder':
+    '请输入S3 Bucket',
+  'pages.setting.storage_provider.provider.s3.bucket.rule.0.message':
+    'S3 Bucket为必填项',
 };

@@ -134,7 +134,7 @@ const UpdateUser = (props: UpdateFormProps) => {
               if (values.phone) {
                 params = { ...params, phone: `${values.phoneAreaCode}${values.phone}` };
               }
-              if (values.expireDate){
+              if (values.expireDate) {
                 params = { ...params, expireDate: dayjs(values.expireDate).format('YYYY-MM-DD') };
               }
               const { success, result } = await updateUser(params).finally(() => {

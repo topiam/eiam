@@ -81,11 +81,6 @@ export default (props: { app: GetApp | Record<string, any> }) => {
       form.setFieldsValue({
         appId: id,
         ...result,
-        //重定向URI
-        redirectUris: result.redirectUris?.length > 0 ? result.redirectUris : [undefined],
-        //登出重定向URI
-        postLogoutRedirectUris:
-          result.postLogoutRedirectUris?.length > 0 ? result.postLogoutRedirectUris : [undefined],
       });
       //设置Endpoint相关
       setProtocolEndpoint(result.protocolEndpoint);
@@ -224,7 +219,7 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                   </span>
                 </>
               ),
-            }
+            },
           ]}
         />
         <ProFormDependency name={['authGrantTypes']}>
@@ -250,18 +245,20 @@ export default (props: { app: GetApp | Record<string, any> }) => {
             {
               validator: async (_, value) => {
                 if (value && value.length > 0) {
-                  return;
+                  return null;
                 }
-                throw new Error(
-                  intl.formatMessage({
-                    id: 'pages.app.config.items.login_access.protocol_config.oidc.redirect_uris.rule.0.message',
-                  }),
+                return Promise.reject(
+                  new Error(
+                    intl.formatMessage({
+                      id: 'pages.app.config.items.login_access.protocol_config.oidc.redirect_uris.rule.0.message',
+                    }),
+                  ),
                 );
               },
             },
           ]}
         >
-          {(fields, { add, remove }, {}) => (
+          {(fields, { add, remove }, { errors }) => (
             <>
               {fields.map((field, index) => (
                 <Form.Item
@@ -274,12 +271,6 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                           id: 'pages.app.config.items.login_access.protocol_config.oidc.redirect_uris',
                         })
                       : ''
-                  }
-                  extra={
-                    index === fields.length - 1 &&
-                    intl.formatMessage({
-                      id: 'pages.app.config.items.login_access.protocol_config.oidc.redirect_uris.extra',
-                    })
                   }
                 >
                   <div
@@ -314,13 +305,24 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                         })}
                       />
                     </Form.Item>
-                    {fields.length > 1 ? (
-                      <DeleteOutlined onClick={() => remove(field.name)} />
-                    ) : null}
+                    <DeleteOutlined onClick={() => remove(field.name)} />
                   </div>
                 </Form.Item>
               ))}
-              <Form.Item {...formItemLayoutWithOutLabel}>
+              <Form.Item
+                {...(fields.length === 0 ? formItemLayout : formItemLayoutWithOutLabel)}
+                required={true}
+                label={
+                  fields.length === 0
+                    ? intl.formatMessage({
+                        id: 'pages.app.config.items.login_access.protocol_config.oidc.redirect_uris',
+                      })
+                    : ''
+                }
+                extra={intl.formatMessage({
+                  id: 'pages.app.config.items.login_access.protocol_config.oidc.redirect_uris.extra',
+                })}
+              >
                 <Button
                   type="dashed"
                   onClick={() => add()}
@@ -329,27 +331,12 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                 >
                   {intl.formatMessage({ id: 'app.add' })}
                 </Button>
+                <Form.ErrorList errors={errors} />
               </Form.Item>
             </>
           )}
         </Form.List>
-        <Form.List
-          name="postLogoutRedirectUris"
-          rules={[
-            {
-              validator: async (_, value) => {
-                if (value && value.length > 0) {
-                  return;
-                }
-                throw new Error(
-                  intl.formatMessage({
-                    id: 'pages.app.config.items.login_access.protocol_config.oidc.post_logout_redirect_uris.rule.0.message',
-                  }),
-                );
-              },
-            },
-          ]}
-        >
+        <Form.List name="postLogoutRedirectUris">
           {(fields, { add, remove }, {}) => (
             <>
               {fields.map((field, index) => {
@@ -357,19 +344,12 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                   <Form.Item
                     {...(index === 0 ? formItemLayout : formItemLayoutWithOutLabel)}
                     key={field.key}
-                    required={true}
                     label={
                       index === 0
                         ? intl.formatMessage({
                             id: 'pages.app.config.items.login_access.protocol_config.oidc.post_logout_redirect_uris',
                           })
                         : ''
-                    }
-                    extra={
-                      index === fields.length - 1 &&
-                      intl.formatMessage({
-                        id: 'pages.app.config.items.login_access.protocol_config.oidc.post_logout_redirect_uris.extra',
-                      })
                     }
                   >
                     <div
@@ -404,14 +384,24 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                           })}
                         />
                       </Form.Item>
-                      {fields.length > 1 ? (
-                        <DeleteOutlined onClick={() => remove(field.name)} />
-                      ) : null}
+                      <DeleteOutlined onClick={() => remove(field.name)} />
                     </div>
                   </Form.Item>
                 );
               })}
-              <Form.Item {...formItemLayoutWithOutLabel}>
+              <Form.Item
+                {...(fields.length === 0 ? formItemLayout : formItemLayoutWithOutLabel)}
+                label={
+                  fields.length === 0
+                    ? intl.formatMessage({
+                        id: 'pages.app.config.items.login_access.protocol_config.oidc.post_logout_redirect_uris',
+                      })
+                    : ''
+                }
+                extra={intl.formatMessage({
+                  id: 'pages.app.config.items.login_access.protocol_config.oidc.post_logout_redirect_uris.extra',
+                })}
+              >
                 <Button
                   type="dashed"
                   onClick={() => add()}

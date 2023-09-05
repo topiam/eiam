@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { SortOrder } from 'antd/es/table/interface';
-import { ReactText } from 'react';
 import { RequestData } from '@ant-design/pro-components';
 import { request } from '@@/exports';
 import { filterParamConverter, sortParamConverter } from '@/utils/utils';
@@ -27,7 +26,7 @@ import { filterParamConverter, sortParamConverter } from '@/utils/utils';
 export async function getIdentityProviderList(
   params: Record<string, any>,
   sort: Record<string, SortOrder>,
-  filter: Record<string, ReactText[] | null>,
+  filter: Record<string, (string | number)[] | null>,
 ): Promise<RequestData<AccountAPI.ListIdentitySource>> {
   return request<API.ApiResult<AccountAPI.ListIdentitySource>>('/api/v1/identity_source/list', {
     params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },

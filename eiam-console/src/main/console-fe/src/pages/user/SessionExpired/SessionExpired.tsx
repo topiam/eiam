@@ -17,11 +17,10 @@
  */
 import { LOGIN_PATH } from '@/utils/utils';
 import { history } from '@@/core/history';
-import { useModel } from '@umijs/max';
+import { useIntl, useLocation, useModel } from '@umijs/max';
 import { useMount } from 'ahooks';
 import { App } from 'antd';
 import queryString from 'query-string';
-import { useIntl, useLocation } from '@umijs/max';
 
 export default () => {
   const { setInitialState } = useModel('@@initialState');

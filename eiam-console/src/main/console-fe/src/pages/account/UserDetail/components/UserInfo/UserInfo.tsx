@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { Avatar, Image, App, Popconfirm, Skeleton } from 'antd';
+import { App, Avatar, Image, Popconfirm, Skeleton } from 'antd';
 import {
   ActionType,
   ProCard,

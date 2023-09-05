@@ -18,6 +18,7 @@
 package cn.topiam.employee.protocol.jwt.authentication;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,12 +26,17 @@ import org.springframework.security.core.Authentication;
 import cn.topiam.employee.application.jwt.model.JwtProtocolConfig;
 import cn.topiam.employee.protocol.jwt.token.IdToken;
 
+import lombok.Getter;
+
 /**
  *
  * @author TopIAM
  * Created by support@topiam.cn on  2023/7/8 00:08
  */
 public class JwtAuthenticationToken extends AbstractAuthenticationToken {
+
+    @Getter
+    private final String            id;
 
     /**
      * principal
@@ -40,11 +46,13 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
     /**
      * idToken
      */
+    @Getter
     private final IdToken           idToken;
 
     /**
      * 协议配置
      */
+    @Getter
     private final JwtProtocolConfig config;
 
     /**
@@ -60,6 +68,7 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
         this.principal = principal;
         this.idToken = idToken;
         this.config = config;
+        this.id = UUID.randomUUID().toString();
         setAuthenticated(true);
     }
 
@@ -93,11 +102,4 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
         return this.principal;
     }
 
-    public IdToken getIdToken() {
-        return idToken;
-    }
-
-    public JwtProtocolConfig getConfig() {
-        return config;
-    }
 }

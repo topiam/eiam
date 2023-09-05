@@ -424,18 +424,6 @@ declare namespace AppAPI {
   };
 
   /**
-   * 应用模板
-   */
-  export type ListTemplate = {
-    protocol: string;
-    type: string;
-    code: string;
-    icon: string;
-    name: string;
-    desc: string;
-  };
-
-  /**
    * 应用信息
    */
   export type GetApp = {

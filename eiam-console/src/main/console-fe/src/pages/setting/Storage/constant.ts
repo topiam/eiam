@@ -26,6 +26,7 @@ export enum OssProvider {
   QINIU_KODO = 'qiniu_kodo',
   LOCAL = 'local',
   MINIO = 'minio',
+  S3 = 's3',
 }
 export enum Language {
   ZH = 'zh',

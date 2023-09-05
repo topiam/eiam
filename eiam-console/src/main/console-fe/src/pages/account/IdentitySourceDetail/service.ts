@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { SortOrder } from 'antd/es/table/interface';
-import { ReactText } from 'react';
 import { RequestData } from '@ant-design/pro-components';
 import { request } from '@@/exports';
 import { filterParamConverter, sortParamConverter } from '@/utils/utils';
@@ -92,7 +91,7 @@ export async function identitySourceConfigValidator(data: {
 export async function getIdentitySourceSyncHistoryList(
   params: Record<string, any>,
   sort: Record<string, SortOrder>,
-  filter: Record<string, ReactText[] | null>,
+  filter: Record<string, (string | number)[] | null>,
 ): Promise<RequestData<AccountAPI.ListIdentitySourceSyncHistory>> {
   return request(`/api/v1/identity_source/sync/history_list`, {
     params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },
@@ -112,7 +111,7 @@ export async function getIdentitySourceSyncHistoryList(
 export async function getIdentitySourceSyncRecordList(
   params: Record<string, any>,
   sort: Record<string, SortOrder>,
-  filter: Record<string, ReactText[] | null>,
+  filter: Record<string, (string | number)[] | null>,
 ): Promise<RequestData<AccountAPI.ListIdentitySourceSyncRecord>> {
   return request(`/api/v1/identity_source/sync/record_list`, {
     params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },
@@ -132,7 +131,7 @@ export async function getIdentitySourceSyncRecordList(
 export async function getIdentitySourceEventRecordList(
   params: Record<string, any>,
   sort: Record<string, SortOrder>,
-  filter: Record<string, ReactText[] | null>,
+  filter: Record<string, (string | number)[] | null>,
 ): Promise<RequestData<AccountAPI.ListIdentitySourceEventRecord>> {
   return request(`/api/v1/identity_source/event/record_list`, {
     params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },

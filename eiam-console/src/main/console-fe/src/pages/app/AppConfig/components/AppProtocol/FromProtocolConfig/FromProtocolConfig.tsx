@@ -17,7 +17,7 @@
  */
 import { getAppConfig, saveAppConfig } from '@/services/app';
 import { useAsyncEffect } from 'ahooks';
-import { Alert, Divider, Form, App, Spin } from 'antd';
+import { Alert, App, Divider, Form, Spin } from 'antd';
 import React, { useState } from 'react';
 import {
   EditableProTable,
@@ -36,6 +36,7 @@ import { useIntl } from '@umijs/max';
 import { AuthorizationType } from '../CommonConfig';
 import { GetApp } from '../../../data.d';
 import { generateUUID } from '@/utils/utils';
+
 const formItemLayout = {
   labelCol: {
     span: 6,

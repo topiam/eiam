@@ -15,4 +15,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-///
+/**
+ * 管理员列表
+ */
+export interface AdministratorList {
+  id: string;
+  username: string;
+  fullName: string;
+  avatar: string;
+  email: string;
+  phone: string;
+  status: string;
+  emailVerified: boolean;
+  phoneVerified: boolean;
+  authTotal: number;
+  lastAuthIp: string;
+  lastAuthTime: Date;
+  initialized: boolean;
+}

@@ -37,6 +37,7 @@ import cn.topiam.employee.protocol.jwt.token.IdToken;
 import cn.topiam.employee.protocol.jwt.token.IdTokenContext;
 import cn.topiam.employee.protocol.jwt.token.IdTokenGenerator;
 import cn.topiam.employee.protocol.jwt.token.JwtIdTokenGenerator;
+import cn.topiam.employee.support.security.authentication.WebAuthenticationDetails;
 import cn.topiam.employee.support.security.userdetails.UserDetails;
 import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CODE_VARIABLE;
 import static cn.topiam.employee.common.constant.ProtocolConstants.JwtEndpointConstants.JWT_SSO_PATH;
@@ -80,11 +81,12 @@ public final class JwtRequestAuthenticationTokenProvider implements Authenticati
             JwtProtocolConfig config = requestAuthenticationToken.getConfig();
             String issuer = ServerHelp.getPortalPublicBaseUrl() + JWT_SSO_PATH.replace(APP_CODE_VARIABLE, config.getAppCode());
             String subject = getSubject(config,(UserDetails) principal.getPrincipal());
-
+            WebAuthenticationDetails details = (WebAuthenticationDetails) requestAuthenticationToken.getDetails();
             IdTokenContext tokenContext = IdTokenContext.builder()
                     .issuer(issuer)
                     .subject(subject)
                     .audience(config.getAppCode())
+                    .sessionId(details.getSessionId())
                     .idTokenTimeToLive(config.getIdTokenTimeToLive())
                     .privateKey(config.getJwtPrivateKey())
                     .build();

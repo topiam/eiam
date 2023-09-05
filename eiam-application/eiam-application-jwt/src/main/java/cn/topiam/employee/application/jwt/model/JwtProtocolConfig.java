@@ -26,6 +26,7 @@ import cn.topiam.employee.common.enums.app.JwtIdTokenSubjectType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
+import lombok.extern.jackson.Jacksonized;
 
 /**
  * Form 协议配置
@@ -36,6 +37,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @SuperBuilder
+@Jacksonized
 public class JwtProtocolConfig extends AbstractProtocolConfig {
 
     @Serial

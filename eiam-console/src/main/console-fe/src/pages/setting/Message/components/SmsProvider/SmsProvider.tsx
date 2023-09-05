@@ -38,7 +38,7 @@ import {
   ProFormText,
 } from '@ant-design/pro-components';
 import { useAsyncEffect } from 'ahooks';
-import { Form, App, Segmented, Spin } from 'antd';
+import { App, Form, Segmented, Spin } from 'antd';
 import React, { useRef, useState } from 'react';
 import AliCloud from './AliCloud';
 import QiNiu from './QiNiu';

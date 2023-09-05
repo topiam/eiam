@@ -33,10 +33,7 @@ import cn.topiam.employee.common.jackjson.encrypt.EncryptionModule;
 import cn.topiam.employee.common.storage.StorageConfig;
 import cn.topiam.employee.common.storage.StorageProviderException;
 import cn.topiam.employee.common.storage.enums.StorageProvider;
-import cn.topiam.employee.common.storage.impl.AliYunOssStorage;
-import cn.topiam.employee.common.storage.impl.MinIoStorage;
-import cn.topiam.employee.common.storage.impl.QiNiuKodoStorage;
-import cn.topiam.employee.common.storage.impl.TencentCosStorage;
+import cn.topiam.employee.common.storage.impl.*;
 import cn.topiam.employee.console.pojo.result.setting.StorageProviderConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.StorageConfigSaveParam;
 import cn.topiam.employee.support.validation.ValidationUtils;
@@ -45,7 +42,7 @@ import jakarta.validation.ValidationException;
 import static cn.topiam.employee.core.setting.constant.StorageProviderSettingConstants.STORAGE_PROVIDER_KEY;
 
 /**
- * 消息设置转换器
+ * 对象存储设置转换器
  *
  * @author TopIAM
  * Created by support@topiam.cn on  2021/10/1 23:18
@@ -119,6 +116,21 @@ public interface StorageSettingConverter {
                 BeanUtils.copyProperties(config, unencryptedConfig);
                 unencryptedConfig.setSecretKey(param.getConfig().getString("secretKey"));
                 checkStorage(MinIoStorage::new, unencryptedConfig);
+            }
+            //S3
+            else if (provider.equals(StorageProvider.S3)) {
+                S3Storage.Config config = objectMapper.readValue(param.getConfig().toJSONString(),
+                    S3Storage.Config.class);
+                config.setEndpoint(getUrl(config.getEndpoint()));
+                config.setDomain(getUrl(config.getDomain()));
+                builder.config(config);
+                validateEntity(ValidationUtils.validateEntity(config));
+
+                S3Storage.Config unencryptedConfig = new S3Storage.Config();
+                BeanUtils.copyProperties(config, unencryptedConfig);
+                unencryptedConfig
+                    .setSecretAccessKey(param.getConfig().getString("secretAccessKey"));
+                checkStorage(S3Storage::new, unencryptedConfig);
             }
             entity.setName(STORAGE_PROVIDER_KEY);
             // 指定序列化输入的类型

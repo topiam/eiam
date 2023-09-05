@@ -48,7 +48,9 @@ export default (props: { id: string }) => {
    */
   const columns: ProColumns<AccountAPI.ListUser>[] = [
     {
-      title: intl.formatMessage({ id: 'pages.account.user_group_detail.add_member.columns.full_name' }),
+      title: intl.formatMessage({
+        id: 'pages.account.user_group_detail.add_member.columns.full_name',
+      }),
       dataIndex: 'fullName',
       fixed: 'left',
       ellipsis: true,
