@@ -18,7 +18,7 @@
 package cn.topiam.employee.portal.service;
 
 import cn.topiam.employee.portal.pojo.query.GetAppListQuery;
-import cn.topiam.employee.portal.pojo.result.GetAppGroupListResult;
+import cn.topiam.employee.portal.pojo.result.AppGroupListResult;
 import cn.topiam.employee.portal.pojo.result.GetAppListResult;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
@@ -41,5 +41,10 @@ public interface AppService {
      */
     Page<GetAppListResult> getAppList(GetAppListQuery query, PageModel pageModel);
 
-    List<GetAppGroupListResult> getAppGroupList();
+    /**
+     * 查询应用分组
+     *
+     * @return {@link AppGroupListResult}
+     */
+    List<AppGroupListResult> getAppGroupList();
 }

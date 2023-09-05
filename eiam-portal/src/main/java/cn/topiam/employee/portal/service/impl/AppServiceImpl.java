@@ -17,26 +17,24 @@
  */
 package cn.topiam.employee.portal.service.impl;
 
+import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.AppGroupEntity;
 import cn.topiam.employee.common.repository.app.AppGroupRepository;
-import cn.topiam.employee.portal.pojo.result.GetAppGroupListResult;
-import org.springframework.data.querydsl.QPageRequest;
-import org.springframework.stereotype.Service;
-
-import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.repository.app.AppRepository;
 import cn.topiam.employee.portal.converter.AppConverter;
+import cn.topiam.employee.portal.converter.AppGroupConverter;
 import cn.topiam.employee.portal.pojo.query.GetAppListQuery;
+import cn.topiam.employee.portal.pojo.result.AppGroupListResult;
 import cn.topiam.employee.portal.pojo.result.GetAppListResult;
 import cn.topiam.employee.portal.service.AppService;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.security.util.SecurityUtils;
+import com.querydsl.core.types.Predicate;
+import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * AppService
@@ -62,41 +60,45 @@ public class AppServiceImpl implements AppService {
         return appConverter.entityConvertToAppListResult(list);
     }
 
+    /**
+     * 查询应用分组
+     *
+     * @return {@link AppGroupListResult}
+     */
     @Override
-    public List<GetAppGroupListResult> getAppGroupList() {
-
-        List<AppEntity> appList = appRepository.getAppGroupList();
-        List<GetAppGroupListResult> resut = new ArrayList<>(appList.size());
-        List<AppGroupEntity> appGroupList = appGroupRepository.getAppGroupList();
-        // 使用Java 8的Stream API来将AppEntity列表按照groupID分组
-        Map<Long, List<AppEntity>> appMap = appList.stream()
-            .collect(Collectors.groupingBy(AppEntity::getGroupId));
-        GetAppGroupListResult getAppGroupListResult = new GetAppGroupListResult();
-        List<AppEntity> collect;
-        for (AppGroupEntity e : appGroupList) {
-            collect = appList.stream().filter(t -> t.getGroupId().equals(e.getId()))
-                .collect(Collectors.toList());
-            getAppGroupListResult = new GetAppGroupListResult();
-            getAppGroupListResult.setName(e.getName());
-            getAppGroupListResult.setList(appConverter.entityConvertToAppListResult(collect));
-            getAppGroupListResult.setAppCount(collect.size());
-            resut.add(getAppGroupListResult);
-            collect.clear();
-        }
-        return resut;
+    public List<AppGroupListResult> getAppGroupList() {
+        Predicate predicate = appGroupConverter.queryPredicate();
+        //查询映射
+        List<AppGroupEntity> list = (List<AppGroupEntity>) appGroupRepository.findAll(predicate);
+        return appGroupConverter.entityConvertToAppGroupListResult(list);
     }
 
+    /**
+     * AppRepository
+     */
     private final AppRepository      appRepository;
 
+    /**
+     * AppGroupRepository
+     */
     private final AppGroupRepository appGroupRepository;
 
+    /**
+     * AppConverter
+     */
     private final AppConverter       appConverter;
 
+    /**
+     * AppGroupConverter
+     */
+    private final AppGroupConverter  appGroupConverter;
+
     public AppServiceImpl(AppRepository appRepository, AppGroupRepository appGroupRepository,
-                          AppConverter appConverter) {
+                          AppConverter appConverter, AppGroupConverter appGroupConverter) {
         this.appRepository = appRepository;
         this.appGroupRepository = appGroupRepository;
         this.appConverter = appConverter;
+        this.appGroupConverter = appGroupConverter;
     }
 
 }
