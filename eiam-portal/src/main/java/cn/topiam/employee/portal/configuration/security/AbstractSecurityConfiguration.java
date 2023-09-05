@@ -20,6 +20,10 @@ package cn.topiam.employee.portal.configuration.security;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.springframework.boot.autoconfigure.cache.CacheProperties;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -44,6 +48,7 @@ import cn.topiam.employee.portal.handler.PortalAccessDeniedHandler;
 import cn.topiam.employee.portal.handler.PortalAuthenticationEntryPoint;
 import cn.topiam.employee.portal.handler.PortalLogoutSuccessHandler;
 import cn.topiam.employee.portal.listener.PortalSessionInformationExpiredStrategy;
+import cn.topiam.employee.support.redis.KeyStringRedisSerializer;
 import cn.topiam.employee.support.security.csrf.SpaCsrfTokenRequestHandler;
 import static org.springframework.security.web.header.writers.XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK;
 import static org.springframework.web.cors.CorsConfiguration.ALL;
@@ -200,6 +205,18 @@ public class AbstractSecurityConfiguration {
      */
     public Customizer<SecurityContextConfigurer<HttpSecurity>> securityContext() {
         return configurer -> configurer.requireExplicitSave(false);
+    }
+
+    public RedisTemplate<String, String> getRedisTemplate(RedisConnectionFactory redisConnectionFactory,
+                                                          CacheProperties cacheProperties) {
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        KeyStringRedisSerializer keyStringRedisSerializer = new KeyStringRedisSerializer(
+            cacheProperties.getRedis().getKeyPrefix());
+        redisTemplate.setKeySerializer(keyStringRedisSerializer);
+        redisTemplate.setValueSerializer(StringRedisSerializer.UTF_8);
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
     }
 
     private final SettingRepository settingRepository;

@@ -22,25 +22,6 @@ import { request } from '@umijs/max';
 import type { UploadFile } from 'antd/es/upload/interface';
 
 /**
- * 获取应用模板列表
- */
-export async function getAppTemplateList(
-  params: Record<string, any>,
-  sort: Record<string, SortOrder>,
-  filter: Record<string, string[] | null>,
-): Promise<RequestData<AppAPI.ListTemplate>> {
-  return request<API.ApiResult<AppAPI.ListTemplate>>('/api/v1/app/template/list', {
-    params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },
-  }).then((result: API.ApiResult<AppAPI.ListTemplate>) => {
-    const data: RequestData<AppAPI.ListTemplate> = {
-      data: result ? result?.result : [],
-      success: result?.success,
-    };
-    return Promise.resolve(data);
-  });
-}
-
-/**
  * Get Application Template FormSchema
  */
 export async function getAppTemplateFormSchema(
@@ -58,7 +39,7 @@ export async function getAppTemplateFormSchema(
 export async function getAppList(
   params?: Record<string, any>,
   sort?: Record<string, SortOrder>,
-  filter?: Record<string, string[] | null>,
+  filter?: Record<string, (string | number)[] | null>,
 ): Promise<RequestData<AppAPI.AppList>> {
   return request<API.ApiResult<AppAPI.AppList>>('/api/v1/app/list', {
     params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },
@@ -74,19 +55,6 @@ export async function getAppList(
 }
 
 /**
- * Create Application
- */
-export async function createApp(
-  params: Record<string, string>,
-): Promise<API.ApiResult<Record<string, string>>> {
-  return request<API.ApiResult<Record<string, string>>>(`/api/v1/app/create`, {
-    method: 'POST',
-    data: params,
-    requestType: 'json',
-  });
-}
-
-/**
  * Update Application
  */
 export async function updateApp(params: Record<string, string>): Promise<API.ApiResult<boolean>> {
@@ -98,35 +66,12 @@ export async function updateApp(params: Record<string, string>): Promise<API.Api
 }
 
 /**
- * Remove Application
- */
-export async function removeApp(id: string): Promise<API.ApiResult<boolean>> {
-  return request<API.ApiResult<boolean>>(`/api/v1/app/delete/${id}`, {
-    method: 'DELETE',
-  });
-}
-
-/**
  * Get Application
  */
 export async function getApp(id: string): Promise<API.ApiResult<AppAPI.GetApp>> {
   return request<API.ApiResult<AppAPI.GetApp>>(`/api/v1/app/get/${id}`, {
     method: 'GET',
   });
-}
-
-/**
- * 启用应用
- */
-export async function enableApp(id: string): Promise<API.ApiResult<boolean>> {
-  return request(`/api/v1/app/enable/${id}`, { method: 'PUT' });
-}
-
-/**
- * 禁用应用
- */
-export async function disableApp(id: string): Promise<API.ApiResult<boolean>> {
-  return request(`/api/v1/app/disable/${id}`, { method: 'PUT' });
 }
 
 /**
@@ -189,7 +134,7 @@ export async function getCertList(
 export async function getAppAccountList(
   params: Record<string, any>,
   sort: Record<string, SortOrder>,
-  filter: Record<string, string[] | null>,
+  filter: Record<string, (string | number)[] | null>,
 ): Promise<RequestData<AppAPI.AppAccountList>> {
   return request<API.ApiResult<AppAPI.AppAccountList>>('/api/v1/app/account/list', {
     params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },
@@ -231,7 +176,7 @@ export async function removeAccount(id: string): Promise<API.ApiResult<boolean>>
 export async function getAppAccessPolicyList(
   params: Record<string, any>,
   sort: Record<string, SortOrder>,
-  filter: Record<string, string[] | null>,
+  filter: Record<string, (string | number)[] | null>,
 ): Promise<RequestData<AppAPI.AppAccessPolicyList>> {
   return request<API.ApiResult<AppAPI.AppAccessPolicyList>>('/api/v1/app/access_policy/list', {
     params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },

@@ -19,7 +19,7 @@ import { filterParamConverter, sortParamConverter } from '@/utils/utils';
 import type { RequestData } from '@ant-design/pro-components';
 import type { SortOrder } from 'antd/es/table/interface';
 import qs from 'qs';
-import type { Key, ReactText } from 'react';
+import type { Key } from 'react';
 import { request } from '@umijs/max';
 import { ParamCheckType } from '@/constant';
 
@@ -129,7 +129,7 @@ export async function moveOrganization(
 export async function getUserList(
   params: Record<string, any>,
   sort?: Record<string, SortOrder>,
-  filter?: Record<string, ReactText[] | null>,
+  filter?: Record<string, (string | number)[] | null>,
 ): Promise<RequestData<AccountAPI.ListUser>> {
   return request<API.ApiResult<AccountAPI.ListUser>>('/api/v1/user/list', {
     params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },
@@ -171,7 +171,7 @@ export async function batchGetUser(ids: string[]): Promise<API.ApiResult<Account
 export async function getLoginAuditList(
   params: Record<string, any>,
   sort?: Record<string, SortOrder>,
-  filter?: Record<string, ReactText[] | null>,
+  filter?: Record<string, (string | number)[] | null>,
 ): Promise<RequestData<AccountAPI.UserLoginAuditList>> {
   return request<API.ApiResult<AccountAPI.UserLoginAuditList>>('/api/v1/user/login_audit/list', {
     method: 'GET',
@@ -334,7 +334,7 @@ export async function disableUser(id: string): Promise<API.ApiResult<boolean>> {
 export async function getUserListNotInGroup(
   params: Record<string, any>,
   sort: Record<string, SortOrder>,
-  filter: Record<string, ReactText[] | null>,
+  filter: Record<string, (string | number)[] | null>,
 ): Promise<RequestData<AccountAPI.ListUser>> {
   return request<API.ApiResult<AccountAPI.ListUser>>(`/api/v1/user/notin_group_list`, {
     params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },
@@ -354,7 +354,7 @@ export async function getUserListNotInGroup(
 export async function getUserGroupList(
   params: Record<string, any>,
   sort?: Record<string, SortOrder>,
-  filter?: Record<string, ReactText[] | null>,
+  filter?: Record<string, (string | number)[] | null>,
 ): Promise<RequestData<AccountAPI.ListUserGroup>> {
   return request<API.ApiResult<AccountAPI.ListUserGroup>>('/api/v1/user_group/list', {
     params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },
@@ -434,7 +434,7 @@ export async function removeUserGroupMember(
 export async function getUserGroupMemberList(
   params: Record<string, any>,
   sort?: Record<string, SortOrder>,
-  filter?: Record<string, ReactText[] | null>,
+  filter?: Record<string, (string | number)[] | null>,
 ): Promise<RequestData<AccountAPI.ListUser>> {
   return request<API.ApiResult<AccountAPI.ListUser>>(
     `/api/v1/user_group/${params.id}/member_list`,

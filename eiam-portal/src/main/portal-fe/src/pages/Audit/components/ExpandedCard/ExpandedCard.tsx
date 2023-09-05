@@ -18,9 +18,10 @@
 import { Collapse, Typography } from 'antd';
 import Paragraph from 'antd/es/typography/Paragraph';
 import moment from 'moment';
-import { EventStatus, AuditList } from '../../data.d';
+import { AuditList, EventStatus } from '../../data.d';
 import useStyles from './style';
 import { useIntl } from '@umijs/max';
+
 const { Text } = Typography;
 
 interface ExpandedCardProps {

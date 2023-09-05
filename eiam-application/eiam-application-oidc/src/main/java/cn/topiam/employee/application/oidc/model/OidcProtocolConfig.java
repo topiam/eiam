@@ -28,6 +28,7 @@ import cn.topiam.employee.application.AbstractProtocolConfig;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
+import lombok.extern.jackson.Jacksonized;
 
 /**
  * Oidc 协议配置
@@ -38,6 +39,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @SuperBuilder
+@Jacksonized
 public class OidcProtocolConfig extends AbstractProtocolConfig {
 
     @Serial

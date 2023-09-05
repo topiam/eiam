@@ -18,7 +18,6 @@
 import { filterParamConverter, sortParamConverter } from '@/utils/utils';
 import type { RequestData } from '@ant-design/pro-components';
 import type { SortOrder } from 'antd/es/table/interface';
-import type { ReactText } from 'react';
 import { request } from '@umijs/max';
 import { AuditList, AuditTypeGroup } from './data.d';
 
@@ -28,7 +27,7 @@ import { AuditList, AuditTypeGroup } from './data.d';
 export async function getAuditList(
   params: Record<string, any>,
   sort: Record<string, SortOrder>,
-  filter: Record<string, ReactText[] | null>,
+  filter: Record<string, (string | number)[] | null>,
 ): Promise<RequestData<AuditList>> {
   return request<API.ApiResult<AuditList>>(`/api/v1/audit/list`, {
     params: {

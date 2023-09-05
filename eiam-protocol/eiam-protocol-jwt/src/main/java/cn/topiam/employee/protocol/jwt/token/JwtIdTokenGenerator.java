@@ -27,6 +27,7 @@ import cn.topiam.employee.protocol.jwt.exception.IdTokenGenerateException;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import static cn.topiam.employee.protocol.jwt.constant.JwtProtocolConstants.S_ID;
 
 /**
  *
@@ -50,6 +51,7 @@ public class JwtIdTokenGenerator implements IdTokenGenerator {
                     .setAudience(context.getAudience())
                     .setExpiration(new Date(expiresAt.toEpochMilli()))
                     .signWith(rsaPrivateKey, SignatureAlgorithm.RS256)
+                    .claim(S_ID,context.getSessionId())
                     .compact();
             return IdToken.builder().tokenValue(tokenValue)
                     .issuedAt(issuedAt)

@@ -26,6 +26,8 @@ import org.springframework.util.Assert;
 import cn.topiam.employee.application.form.model.FormProtocolConfig;
 import cn.topiam.employee.application.jwt.model.JwtProtocolConfig;
 
+import lombok.Getter;
+
 /**
  *
  * @author TopIAM
@@ -41,16 +43,19 @@ public class FormAuthenticationToken extends AbstractAuthenticationToken {
     /**
      * 账户名称
      */
+    @Getter
     private final String             accountUsername;
 
     /**
      * 账户凭据
      */
+    @Getter
     private final String             accountCredential;
 
     /**
      * 协议配置
      */
+    @Getter
     private final FormProtocolConfig config;
 
     /**
@@ -105,15 +110,4 @@ public class FormAuthenticationToken extends AbstractAuthenticationToken {
         return this.principal;
     }
 
-    public String getAccountUsername() {
-        return accountUsername;
-    }
-
-    public String getAccountCredential() {
-        return accountCredential;
-    }
-
-    public FormProtocolConfig getConfig() {
-        return config;
-    }
 }

@@ -146,14 +146,8 @@ public class OidcProtocolSecurityConfiguration extends AbstractSecurityConfigura
                                                            CacheProperties cacheProperties,
                                                            RegisteredClientRepository clientRepository,
                                                            AutowireCapableBeanFactory beanFactory) {
-        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory);
-        KeyStringRedisSerializer keyStringRedisSerializer = new KeyStringRedisSerializer(
-            cacheProperties.getRedis().getKeyPrefix());
-        redisTemplate.setKeySerializer(keyStringRedisSerializer);
-        redisTemplate.setValueSerializer(StringRedisSerializer.UTF_8);
-        redisTemplate.afterPropertiesSet();
-        return new RedisOAuth2AuthorizationServiceWrapper(redisTemplate, clientRepository,
+        return new RedisOAuth2AuthorizationServiceWrapper(
+            getRedisTemplate(redisConnectionFactory, cacheProperties), clientRepository,
             beanFactory);
     }
 

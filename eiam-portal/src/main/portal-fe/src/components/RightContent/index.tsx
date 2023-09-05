@@ -59,7 +59,7 @@ const GlobalHeaderRight: React.FC = () => {
   return (
     <div className={styles.main}>
       <Helmet>
-        <link rel="icon" href={initialState?.globalConfig?.appearance?.favicon} />
+        <link rel="icon" href={'/favicon.ico'} />
       </Helmet>
       <About />
       <SelectLang className={styles.action} />

@@ -21,7 +21,7 @@ import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ModalForm, ProFormText, ProTable } from '@ant-design/pro-components';
 
-import { Alert, Button, Form, App, Popconfirm, Table } from 'antd';
+import { Alert, App, Button, Form, Popconfirm, Table } from 'antd';
 import { useRef } from 'react';
 import { AppProtocolType } from '@/constant';
 import { Base64 } from 'js-base64';

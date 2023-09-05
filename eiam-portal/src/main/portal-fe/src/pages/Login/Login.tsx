@@ -22,7 +22,7 @@ import { getCurrentStatus, getLoginEncryptSecret } from '@/services';
 import { aesEcbEncrypt } from '@/utils/aes';
 import { ProCard, ProForm, ProFormCheckbox, ProFormInstance } from '@ant-design/pro-components';
 import { useAsyncEffect, useRequest, useSafeState } from 'ahooks';
-import { Alert, Avatar, App, Skeleton, Space, Spin, Tabs, Tooltip } from 'antd';
+import { Alert, App, Avatar, Skeleton, Space, Spin, Tabs, Tooltip } from 'antd';
 import { nanoid } from 'nanoid';
 import { useRef, useState } from 'react';
 import { FormattedMessage, Helmet, history, useIntl } from '@umijs/max';

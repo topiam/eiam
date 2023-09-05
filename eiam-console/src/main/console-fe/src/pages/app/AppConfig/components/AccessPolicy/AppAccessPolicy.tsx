@@ -34,10 +34,11 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 
-import { Button, Form, App, Popconfirm, Table } from 'antd';
-import { useRef, useState } from 'react';
+import { App, Button, Form, Popconfirm, Table } from 'antd';
 import * as React from 'react';
+import { useRef, useState } from 'react';
 import { useIntl } from '@umijs/max';
+
 /**
  * 添加授权
  *

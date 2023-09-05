@@ -18,6 +18,7 @@
 import { SsoScope } from '@/pages/app/AppConfig/constant';
 import { ProFormSelect } from '@ant-design/pro-components';
 import { useIntl } from '@@/exports';
+
 /**
  * 授权类型组件
  *

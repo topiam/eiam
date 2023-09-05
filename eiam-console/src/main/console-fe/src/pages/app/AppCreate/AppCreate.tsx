@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { createApp, getAppTemplateList } from '@/services/app';
 import { history } from '@@/core/history';
 import {
   ActionType,
@@ -36,8 +35,9 @@ import { useRef, useState } from 'react';
 import useStyle from './style';
 import { useIntl } from '@umijs/max';
 import classnames from 'classnames';
-import { ListTemplate } from '@/pages/app/AppCreate/data.d';
+import { ListTemplate } from './data.d';
 import { AppType } from '@/constant';
+import { createApp, getAppTemplateList } from './service';
 
 const { Paragraph } = Typography;
 const prefixCls = 'topiam-create-app';

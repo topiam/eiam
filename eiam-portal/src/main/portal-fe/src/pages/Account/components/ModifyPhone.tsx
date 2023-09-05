@@ -22,13 +22,17 @@ import { aesEcbEncrypt } from '@/utils/aes';
 import { onGetEncryptSecret, phoneIsValidNumber } from '@/utils/utils';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import type { CaptFieldRef, ProFormInstance } from '@ant-design/pro-components';
-import { ModalForm, ProFormCaptcha, ProFormText } from '@ant-design/pro-components';
-import { ConfigProvider, App, Spin } from 'antd';
+import {
+  ModalForm,
+  ProFormCaptcha,
+  ProFormText,
+  useStyle as useAntdStyle,
+} from '@ant-design/pro-components';
+import { App, ConfigProvider, Spin } from 'antd';
 import { omit } from 'lodash';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { FormLayout } from './constant';
 import classnames from 'classnames';
-import { useStyle as useAntdStyle } from '@ant-design/pro-components';
 import { ConfigContext } from 'antd/es/config-provider';
 import { useIntl } from '@@/exports';
 import PhoneAreaCodeSelect from '@/components/PhoneAreaCodeSelect';

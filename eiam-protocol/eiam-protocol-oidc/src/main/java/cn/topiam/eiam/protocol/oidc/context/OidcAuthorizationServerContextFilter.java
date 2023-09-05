@@ -50,7 +50,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.GRANT_TYPE;
 import static org.springframework.security.oauth2.server.authorization.settings.ConfigurationSettingNames.Token.ACCESS_TOKEN_FORMAT;
 
 import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CODE;
@@ -91,7 +90,6 @@ public final class OidcAuthorizationServerContextFilter extends OncePerRequestFi
             return;
         }
         try {
-            request.getParameterValues(GRANT_TYPE);
             //@formatter:off
             Map<String, String> variables = matcher.getVariables();
             String appCode = variables.get(APP_CODE);

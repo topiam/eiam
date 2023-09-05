@@ -17,5 +17,37 @@
  */
 package cn.topiam.employee.protocol.jwt.authorization;
 
+import cn.topiam.employee.protocol.jwt.authentication.JwtAuthenticationToken;
+
+/**
+ * 内存
+ *
+ * @author TopIAM
+ * Created by support@topiam.cn
+ */
 public class InMemoryJwtAuthorizationService implements JwtAuthorizationService {
+    /**
+     * save
+     *
+     * @param token {@link JwtAuthenticationToken}
+     */
+    @Override
+    public void save(JwtAuthenticationToken token) {
+
+    }
+
+    @Override
+    public void remove(JwtAuthenticationToken authorization) {
+
+    }
+
+    @Override
+    public JwtAuthenticationToken findById(String id) {
+        return null;
+    }
+
+    @Override
+    public JwtAuthenticationToken findByToken(String token) {
+        return null;
+    }
 }

@@ -17,7 +17,7 @@
  */
 import { getAppConfig, saveAppConfig } from '@/services/app';
 import { useAsyncEffect } from 'ahooks';
-import { Divider, Form, App, Spin, Alert } from 'antd';
+import { Alert, App, Divider, Form, Spin } from 'antd';
 import React, { useState } from 'react';
 import {
   FooterToolbar,
@@ -32,6 +32,7 @@ import { omit } from 'lodash';
 import { useIntl } from '@umijs/max';
 import { AuthorizationType } from '../CommonConfig';
 import { GetApp } from '../../../data.d';
+
 const layout = {
   labelCol: {
     xs: { span: 24 },
@@ -89,7 +90,7 @@ export default (props: { app: GetApp | Record<string, any> }) => {
           </span>
         }
       />
-      <br/>
+      <br />
       <ProForm
         layout={'horizontal'}
         {...layout}

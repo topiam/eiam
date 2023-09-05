@@ -16,8 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { UploadOutlined } from '@ant-design/icons';
-import { ProForm, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
-import { Avatar, Button, Form, App, Skeleton, Upload } from 'antd';
+import {
+  ProForm,
+  ProFormText,
+  ProFormTextArea,
+  useStyle as useAntdStyle,
+} from '@ant-design/pro-components';
+import { App, Avatar, Button, Form, Skeleton, Upload } from 'antd';
 import { useState } from 'react';
 
 import { changeBaseInfo } from '@/pages/Account/service';
@@ -28,7 +33,6 @@ import ImgCrop from 'antd-img-crop';
 import { uploadFile } from '@/services/upload';
 import { useModel } from '@umijs/max';
 import classnames from 'classnames';
-import { useStyle as useAntdStyle } from '@ant-design/pro-components';
 import { useIntl } from '@@/exports';
 
 const prefixCls = 'account-base';

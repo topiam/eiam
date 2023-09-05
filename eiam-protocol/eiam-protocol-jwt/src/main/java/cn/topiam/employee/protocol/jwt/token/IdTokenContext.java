@@ -38,6 +38,9 @@ public class IdTokenContext {
     @NonNull
     private String  audience;
 
+    @NonNull
+    private String  sessionId;
+
     /**
      * Token 过期时间（秒）
      */

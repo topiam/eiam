@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { disableApp, enableApp, getAppList, removeApp } from '@/services/app';
+import { getAppList } from '@/services/app';
 import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import type { ActionType } from '@ant-design/pro-components';
 import { PageContainer, ProList } from '@ant-design/pro-components';
@@ -25,6 +25,7 @@ import { history, useIntl } from '@umijs/max';
 import useStyle from './style';
 import classnames from 'classnames';
 import { AppList } from './data.d';
+import { disableApp, enableApp, removeApp } from './service';
 
 const prefixCls = 'app-list';
 

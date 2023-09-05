@@ -24,15 +24,11 @@ import org.apache.commons.compress.utils.CharsetNames;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.entity.ContentType;
 import org.springframework.core.log.LogMessage;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -44,6 +40,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import cn.topiam.employee.application.jwt.model.JwtProtocolConfig;
 import cn.topiam.employee.protocol.code.exception.TemplateNotExistException;
+import cn.topiam.employee.protocol.jwt.authentication.JwtAuthenticationFailureHandler;
 import cn.topiam.employee.protocol.jwt.authentication.JwtAuthenticationToken;
 import cn.topiam.employee.protocol.jwt.authentication.JwtRequestAuthenticationToken;
 import cn.topiam.employee.protocol.jwt.authorization.JwtAuthorizationService;
@@ -51,7 +48,6 @@ import cn.topiam.employee.protocol.jwt.endpoint.authentication.JwtRequestAuthent
 import cn.topiam.employee.protocol.jwt.exception.JwtAuthenticationException;
 import cn.topiam.employee.protocol.jwt.exception.JwtError;
 import cn.topiam.employee.protocol.jwt.exception.JwtErrorCodes;
-import cn.topiam.employee.protocol.jwt.http.converter.JwtErrorHttpMessageConverter;
 import cn.topiam.employee.protocol.jwt.token.IdToken;
 
 import freemarker.cache.ClassTemplateLoader;
@@ -62,6 +58,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import static cn.topiam.employee.protocol.jwt.constant.JwtProtocolConstants.*;
+import static cn.topiam.employee.protocol.jwt.endpoint.JwtAuthenticationEndpointUtils.throwError;
 
 /**
  * @author TopIAM
@@ -90,11 +87,6 @@ public final class JwtAuthenticationEndpointFilter extends OncePerRequestFilter 
     private final JwtAuthorizationService                      authorizationService;
 
     /**
-     * 错误响应处理器
-     */
-    private final HttpMessageConverter<JwtError>               errorHttpResponseConverter    = new JwtErrorHttpMessageConverter();
-
-    /**
      * 授权端点匹配器
      */
     private final RequestMatcher                               authorizationEndpointMatcher;
@@ -107,7 +99,7 @@ public final class JwtAuthenticationEndpointFilter extends OncePerRequestFilter 
     /**
      * 身份验证失败处理程序
      */
-    private AuthenticationFailureHandler                       authenticationFailureHandler  = this::sendErrorResponse;
+    private AuthenticationFailureHandler                       authenticationFailureHandler  = new JwtAuthenticationFailureHandler();
 
     /**
      * 会话身份策略
@@ -198,6 +190,13 @@ public final class JwtAuthenticationEndpointFilter extends OncePerRequestFilter 
                     LogMessage.format("Authorization request failed: %s", ex.getError()), ex);
             }
             this.authenticationFailureHandler.onAuthenticationFailure(request, response, ex);
+        } catch (Exception ex) {
+            JwtError error = new JwtError(JwtErrorCodes.SERVER_ERROR,ex.getMessage(),JWT_ERROR_URI);
+            if (this.logger.isTraceEnabled()) {
+                this.logger.trace(error, ex);
+            }
+            this.authenticationFailureHandler.onAuthenticationFailure(request, response,
+                    new JwtAuthenticationException(error));
         }
     }
 
@@ -229,34 +228,13 @@ public final class JwtAuthenticationEndpointFilter extends OncePerRequestFilter 
             data.put(ID_TOKEN, idToken.getTokenValue());
             data.put(TARGET_URL, targetUri);
             template.process(data, response.getWriter());
-
+            //save
+            authorizationService.save(authenticationToken);
         } catch (Exception e) {
             JwtError error = new JwtError(JwtErrorCodes.SERVER_ERROR,e.getMessage(),JWT_ERROR_URI);
-            throw new JwtAuthenticationException(error);
+            throwError(error);
         }
         //@formatter:on
-    }
-
-    /**
-     * 发送异常响应
-     *
-     * @param request   {@link HttpServletRequest}
-     * @param response  {@link HttpServletResponse}
-     * @param exception {@link AuthenticationException}
-     */
-    private void sendErrorResponse(HttpServletRequest request, HttpServletResponse response,
-                                   AuthenticationException exception) throws IOException {
-        if (exception instanceof JwtAuthenticationException) {
-            ServletServerHttpResponse httpResponse = new ServletServerHttpResponse(response);
-            JwtError error = ((JwtAuthenticationException) exception).getError();
-            if (error.getErrorCode().equals(JwtErrorCodes.SERVER_ERROR)) {
-                httpResponse.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-            if (error.getErrorCode().equals(JwtErrorCodes.INVALID_REQUEST)) {
-                httpResponse.setStatusCode(HttpStatus.BAD_REQUEST);
-            }
-            errorHttpResponseConverter.write(error, null, httpResponse);
-        }
     }
 
     private void configFreemarkerTemplate() {

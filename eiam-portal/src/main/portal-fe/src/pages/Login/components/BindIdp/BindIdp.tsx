@@ -24,7 +24,7 @@ import { history } from '@@/core/history';
 import { LockTwoTone, UserOutlined } from '@ant-design/icons';
 import { ProForm, ProFormText } from '@ant-design/pro-components';
 import { useMount, useSafeState } from 'ahooks';
-import { Col, Form, App, Row, Spin, Typography, Alert } from 'antd';
+import { Alert, App, Col, Form, Row, Spin, Typography } from 'antd';
 import { idpBindUser } from '../../service';
 import { useIntl } from '@@/plugin-locale';
 import { createStyles } from 'antd-style';

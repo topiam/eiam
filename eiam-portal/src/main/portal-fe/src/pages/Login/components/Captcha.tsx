@@ -22,7 +22,7 @@ import { ProFormCaptcha, ProFormText } from '@ant-design/pro-components';
 import { App } from 'antd';
 import { useImperativeHandle, useRef } from 'react';
 import { sendLoginCaptchaOpt } from '../service';
-import { phoneIsValidNumber, phoneParseNumber, emailValidator } from '@/utils/utils';
+import { emailValidator, phoneIsValidNumber, phoneParseNumber } from '@/utils/utils';
 import { createStyles } from 'antd-style';
 
 const useStyle = createStyles(({ token }) => {

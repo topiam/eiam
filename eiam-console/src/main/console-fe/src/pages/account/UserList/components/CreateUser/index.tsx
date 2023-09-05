@@ -16,4 +16,5 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import CreateUser from './CreateUser';
+
 export default CreateUser;

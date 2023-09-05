@@ -30,6 +30,7 @@ import { forgetPasswordCode } from '@/pages/Login/service';
 import Title from '@/components/Title';
 import { useRef } from 'react';
 import { phoneIsValidNumber, phoneParseNumber } from '@/utils/utils';
+
 const { Paragraph } = Typography;
 const Code = (props: ProFormProps) => {
   const intl = useIntl();

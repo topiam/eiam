@@ -21,7 +21,7 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 
-import { Badge, App, Popconfirm, Table } from 'antd';
+import { App, Badge, Popconfirm, Table } from 'antd';
 import { useRef } from 'react';
 import { useIntl } from '@umijs/max';
 

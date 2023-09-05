@@ -17,7 +17,7 @@
  */
 import { disableCustomTemplate, getMailTemplate, saveMailTemplate } from '../../service';
 import { useAsyncEffect } from 'ahooks';
-import { Button, Drawer, Form, Input, App, Spin, Switch } from 'antd';
+import { App, Button, Drawer, Form, Input, Spin, Switch } from 'antd';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/clike/clike';
 import 'codemirror/mode/cmake/cmake';

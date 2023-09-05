@@ -17,9 +17,25 @@
  */
 package cn.topiam.employee.protocol.jwt.authorization;
 
+import org.springframework.lang.Nullable;
+
+import cn.topiam.employee.protocol.jwt.authentication.JwtAuthenticationToken;
+
 /**
+ *
  * @author TopIAM
  * Created by support@topiam.cn on  2023/7/8 00:23
  */
 public interface JwtAuthorizationService {
+
+    void save(JwtAuthenticationToken token);
+
+    void remove(JwtAuthenticationToken authorization);
+
+    @Nullable
+    JwtAuthenticationToken findById(String id);
+
+    @Nullable
+    JwtAuthenticationToken findByToken(String token);
+
 }

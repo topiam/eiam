@@ -26,7 +26,7 @@ import {
   ProFormSwitch,
 } from '@ant-design/pro-components';
 import { useAsyncEffect } from 'ahooks';
-import { Form, App, Space, Spin } from 'antd';
+import { App, Form, Space, Spin } from 'antd';
 import { useState } from 'react';
 import AliCloudOss from './components/AliCloud';
 import MinIO from './components/MinIo';

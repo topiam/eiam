@@ -195,6 +195,13 @@ public final class FormAuthenticationEndpointFilter extends OncePerRequestFilter
                     LogMessage.format("Authorization request failed: %s", ex.getError()), ex);
             }
             this.authenticationFailureHandler.onAuthenticationFailure(request, response, ex);
+        } catch (Exception ex) {
+            FormError error = new FormError(SERVER_ERROR,ex.getMessage(),FORM_ERROR_URI);
+            if (this.logger.isTraceEnabled()) {
+                this.logger.trace(error, ex);
+            }
+            this.authenticationFailureHandler.onAuthenticationFailure(request, response,
+                    new FormAuthenticationException(error));
         }
     }
 

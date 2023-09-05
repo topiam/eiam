@@ -18,7 +18,6 @@
 import { filterParamConverter, sortParamConverter } from '@/utils/utils';
 import type { RequestData } from '@ant-design/pro-components';
 import type { SortOrder } from 'antd/es/table/interface';
-import type { ReactText } from 'react';
 import { request } from '@umijs/max';
 import { GetIdentityProvider, ListIdentityProvider } from './data.d';
 
@@ -28,7 +27,7 @@ import { GetIdentityProvider, ListIdentityProvider } from './data.d';
 export async function getIdpList(
   params: Record<string, any>,
   sort: Record<string, SortOrder>,
-  filter: Record<string, ReactText[] | null>,
+  filter: Record<string, (string | number)[] | null>,
 ): Promise<RequestData<ListIdentityProvider>> {
   return request<API.ApiResult<ListIdentityProvider>>('/api/v1/authn/idp/list', {
     params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },

@@ -18,6 +18,7 @@
 import { Button } from 'antd';
 import useStyle from './style';
 import { useIntl } from '@@/exports';
+
 const prefixCls = 'topiam-forget-password';
 
 const Success = ({ close }: { close: () => void }) => {

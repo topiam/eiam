@@ -20,7 +20,7 @@ import { DesktopOutlined, ProfileOutlined } from '@ant-design/icons';
 import { GridContent, PageContainer } from '@ant-design/pro-components';
 import { useAsyncEffect } from 'ahooks';
 import type { MenuProps } from 'antd';
-import { Menu, App } from 'antd';
+import { App, Menu } from 'antd';
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import AccessPolicy from './components/AccessPolicy';
 import AppAccount from './components/AppAccount';

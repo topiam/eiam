@@ -23,6 +23,7 @@ import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
+import lombok.extern.jackson.Jacksonized;
 
 /**
  *
@@ -31,6 +32,7 @@ import lombok.NonNull;
  */
 @Data
 @Builder
+@Jacksonized
 public class IdToken {
 
     @NonNull
