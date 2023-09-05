@@ -17,6 +17,13 @@
  */
 package cn.topiam.employee.portal.service.impl;
 
+import java.util.List;
+
+import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.stereotype.Service;
+
+import com.querydsl.core.types.Predicate;
+
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.AppGroupEntity;
 import cn.topiam.employee.common.repository.app.AppGroupRepository;
@@ -30,11 +37,6 @@ import cn.topiam.employee.portal.service.AppService;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.security.util.SecurityUtils;
-import com.querydsl.core.types.Predicate;
-import org.springframework.data.querydsl.QPageRequest;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * AppService
@@ -68,9 +70,10 @@ public class AppServiceImpl implements AppService {
     @Override
     public List<AppGroupListResult> getAppGroupList() {
         Predicate predicate = appGroupConverter.queryPredicate();
+        List<AppEntity> appList = appRepository.getAppListByGroup();
         //查询映射
         List<AppGroupEntity> list = (List<AppGroupEntity>) appGroupRepository.findAll(predicate);
-        return appGroupConverter.entityConvertToAppGroupListResult(list);
+        return appGroupConverter.entityConvertToAppGroupListResult(list, appList);
     }
 
     /**

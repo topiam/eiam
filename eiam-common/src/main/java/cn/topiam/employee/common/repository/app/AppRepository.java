@@ -114,8 +114,8 @@ public interface AppRepository extends LogicDeleteRepository<AppEntity, Long>,
      * @return {@link AppEntity}
      */
     @NotNull
-    @Query(value = "SELECT ag.name_ AS group_name,a.* from app a LEFT JOIN app_group ag on a.group_id =ag.id_\n", nativeQuery = true)
-    List<AppEntity> getAppGroupList();
+    @Query(value = "SELECT a.* from app a LEFT JOIN app_group ag on a.group_id =ag.id_ WHERE a.group_id IS NOT NULL", nativeQuery = true)
+    List<AppEntity> getAppListByGroup();
 
     /**
      * 根据clientId获取配置

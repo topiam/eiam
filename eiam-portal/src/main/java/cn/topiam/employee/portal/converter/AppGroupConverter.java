@@ -17,15 +17,18 @@
  */
 package cn.topiam.employee.portal.converter;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.mapstruct.Mapper;
+
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
+
+import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.AppGroupEntity;
 import cn.topiam.employee.common.entity.app.QAppGroupEntity;
 import cn.topiam.employee.portal.pojo.result.AppGroupListResult;
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
-import org.mapstruct.Mapper;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 分组映射
@@ -53,13 +56,19 @@ public interface AppGroupConverter {
     /**
      * 实体转分组管理列表
      *
-     * @param list {@link AppGroupEntity}
+     * @param list    {@link AppGroupEntity}
+     * @param appList {@link AppEntity}
      * @return {@link AppGroupListResult}
      */
-    default List<AppGroupListResult> entityConvertToAppGroupListResult(List<AppGroupEntity> list) {
+    default List<AppGroupListResult> entityConvertToAppGroupListResult(List<AppGroupEntity> list,
+                                                                       List<AppEntity> appList) {
         List<AppGroupListResult> results = new ArrayList<>();
         for (AppGroupEntity entity : list) {
-            results.add(appGroupEntityConverterToResult(entity));
+            AppGroupListResult result = appGroupEntityConverterToResult(entity);
+            Long count = appList.stream().filter(t -> t.getGroupId().equals(entity.getId()))
+                .count();
+            result.setAppCount(Integer.valueOf(count.toString()));
+            results.add(result);
         }
         return results;
     }

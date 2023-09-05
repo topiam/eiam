@@ -17,15 +17,10 @@
  */
 package cn.topiam.employee.common.repository.app.impl;
 
-import cn.topiam.employee.common.entity.account.OrganizationMemberEntity;
-import cn.topiam.employee.common.entity.account.UserGroupMemberEntity;
-import cn.topiam.employee.common.entity.app.AppEntity;
-import cn.topiam.employee.common.repository.account.OrganizationMemberRepository;
-import cn.topiam.employee.common.repository.account.UserGroupMemberRepository;
-import cn.topiam.employee.common.repository.app.AppRepositoryCustomized;
-import cn.topiam.employee.common.repository.app.impl.mapper.AppEntityMapper;
-import com.google.common.collect.Lists;
-import lombok.AllArgsConstructor;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -33,9 +28,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.Lists;
+
+import cn.topiam.employee.common.entity.account.OrganizationMemberEntity;
+import cn.topiam.employee.common.entity.account.UserGroupMemberEntity;
+import cn.topiam.employee.common.entity.app.AppEntity;
+import cn.topiam.employee.common.repository.account.OrganizationMemberRepository;
+import cn.topiam.employee.common.repository.account.UserGroupMemberRepository;
+import cn.topiam.employee.common.repository.app.AppRepositoryCustomized;
+import cn.topiam.employee.common.repository.app.impl.mapper.AppEntityMapper;
+
+import lombok.AllArgsConstructor;
 
 /**
  * App Repository Customized
