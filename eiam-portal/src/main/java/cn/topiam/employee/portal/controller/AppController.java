@@ -67,7 +67,7 @@ public class AppController {
      * @return {@link AppGroupListResult}
      */
     @Operation(summary = "获取分组应用列表")
-    @GetMapping(value = "/getAppGroupList")
+    @GetMapping(value = "/group_list")
     public ApiRestResult<List<AppGroupListResult>> getAppGroupList() {
         List<AppGroupListResult> list = appService.getAppGroupList();
         return ApiRestResult.ok(list);
