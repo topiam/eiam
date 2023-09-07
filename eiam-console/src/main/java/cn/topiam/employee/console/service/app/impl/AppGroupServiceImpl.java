@@ -18,25 +18,36 @@
 package cn.topiam.employee.console.service.app.impl;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.collect.Lists;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
+import cn.topiam.employee.common.entity.app.AppEntity;
+import cn.topiam.employee.common.entity.app.AppGroupAssociationEntity;
 import cn.topiam.employee.common.entity.app.AppGroupEntity;
 import cn.topiam.employee.common.entity.app.QAppGroupEntity;
+import cn.topiam.employee.common.entity.app.query.AppGroupAssociationListQuery;
+import cn.topiam.employee.common.repository.app.AppGroupAssociationRepository;
 import cn.topiam.employee.common.repository.app.AppGroupRepository;
+import cn.topiam.employee.console.converter.app.AppConverter;
 import cn.topiam.employee.console.converter.app.AppGroupConverter;
 import cn.topiam.employee.console.pojo.query.app.AppGroupQuery;
 import cn.topiam.employee.console.pojo.result.app.AppGroupGetResult;
 import cn.topiam.employee.console.pojo.result.app.AppGroupListResult;
+import cn.topiam.employee.console.pojo.result.app.AppListResult;
 import cn.topiam.employee.console.pojo.save.app.AppGroupCreateParam;
 import cn.topiam.employee.console.pojo.update.app.AppGroupUpdateParam;
 import cn.topiam.employee.console.service.app.AppGroupService;
@@ -93,7 +104,6 @@ public class AppGroupServiceImpl implements AppGroupService {
     public Boolean createAppGroup(AppGroupCreateParam param) {
         // TODO 创建后没有数据权限
         AppGroupEntity entity = appGroupConverter.appGroupCreateParamConvertToEntity(param);
-        entity.setEnabled(true);
         appGroupRepository.save(entity);
         AuditContext.setTarget(
             Target.builder().id(String.valueOf(entity.getId())).type(TargetType.APP_GROUP).build());
@@ -195,12 +205,91 @@ public class AppGroupServiceImpl implements AppGroupService {
     }
 
     /**
+     * 添加应用
+     *
+     * @param appIds  {@link String}
+     * @param groupId {@link String}
+     * @return {@link Boolean}
+     */
+    @Override
+    public Boolean addAssociation(String groupId, String[] appIds) {
+        Optional<AppGroupEntity> optional = appGroupRepository.findById(Long.valueOf(groupId));
+        //用户组不存在
+        if (optional.isEmpty()) {
+            AuditContext.setContent("操作失败，应用组不存在");
+            log.warn(AuditContext.getContent());
+            throw new TopIamException(AuditContext.getContent());
+        }
+        List<AppGroupAssociationEntity> list = new ArrayList<>();
+        Lists.newArrayList(appIds).forEach(id -> {
+            AppGroupAssociationEntity member = new AppGroupAssociationEntity();
+            member.setGroupId(Long.valueOf(groupId));
+            member.setAppId(Long.valueOf(id));
+            list.add(member);
+        });
+        //添加
+        appGroupAssociationRepository.saveAll(list);
+        List<Target> targets = new ArrayList<>(Arrays.stream(appIds)
+            .map(i -> Target.builder().id(i).type(TargetType.APPLICATION).build()).toList());
+        targets.add(Target.builder().id(groupId).type(TargetType.APP_GROUP).build());
+        AuditContext.setTarget(targets);
+        return true;
+    }
+
+    /**
+     * 批量移除应用
+     *
+     * @param appIds {@link String}
+     * @param id      {@link String}
+     * @return {@link Boolean}
+     */
+    @Override
+    public Boolean batchRemoveAssociation(String id, List<String> appIds) {
+        Optional<AppGroupEntity> optional = appGroupRepository.findById(Long.valueOf(id));
+        //用户组不存在
+        if (optional.isEmpty()) {
+            AuditContext.setContent("操作失败，应用组不存在");
+            log.warn(AuditContext.getContent());
+            throw new TopIamException(AuditContext.getContent());
+        }
+        appIds.forEach(userId -> appGroupAssociationRepository
+            .deleteByGroupIdAndAppId(Long.valueOf(id), Long.valueOf(userId)));
+        List<Target> targets = new ArrayList<>(appIds.stream()
+            .map(i -> Target.builder().id(i).type(TargetType.APPLICATION).build()).toList());
+        targets.add(Target.builder().id(id).type(TargetType.APP_GROUP).build());
+        AuditContext.setTarget(targets);
+        return true;
+    }
+
+    /**
+     * 获取应用组内应用列表
+     *
+     * @param query {@link AppGroupAssociationListQuery}
+     * @return {@link AppListResult}
+     */
+    @Override
+    public Page<AppListResult> getAppGroupAssociationList(PageModel model,
+                                                          AppGroupAssociationListQuery query) {
+        org.springframework.data.domain.Page<AppEntity> page = appGroupAssociationRepository
+            .getAppGroupAssociationList(query,
+                PageRequest.of(model.getCurrent(), model.getPageSize()));
+        return appConverter.entityConvertToAppListResult(page);
+    }
+
+    /**
      * AppGroupRepository
      */
-    private final AppGroupRepository appGroupRepository;
+    private final AppGroupRepository            appGroupRepository;
 
     /**
      * AppGroupConverter
      */
-    private final AppGroupConverter  appGroupConverter;
+    private final AppGroupConverter             appGroupConverter;
+
+    private final AppConverter                  appConverter;
+
+    /**
+     * AppGroupAssociationRepository
+     */
+    private final AppGroupAssociationRepository appGroupAssociationRepository;
 }

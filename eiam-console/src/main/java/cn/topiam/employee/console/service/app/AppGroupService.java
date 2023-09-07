@@ -17,9 +17,13 @@
  */
 package cn.topiam.employee.console.service.app;
 
+import java.util.List;
+
+import cn.topiam.employee.common.entity.app.query.AppGroupAssociationListQuery;
 import cn.topiam.employee.console.pojo.query.app.AppGroupQuery;
 import cn.topiam.employee.console.pojo.result.app.AppGroupGetResult;
 import cn.topiam.employee.console.pojo.result.app.AppGroupListResult;
+import cn.topiam.employee.console.pojo.result.app.AppListResult;
 import cn.topiam.employee.console.pojo.save.app.AppGroupCreateParam;
 import cn.topiam.employee.console.pojo.update.app.AppGroupUpdateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
@@ -91,4 +95,32 @@ public interface AppGroupService {
      * @return {@link Boolean}
      */
     Boolean disableAppGroup(String id);
+
+    /**
+     * 添加应用
+     *
+     * @param appIds {@link String}
+     * @param groupId {@link String}
+     * @return {@link Boolean}
+     */
+    Boolean addAssociation(String groupId, String[] appIds);
+
+    /**
+     * 批量移除应用
+     *
+     * @param id      {@link String}
+     * @param appIds {@link String}
+     * @return {@link Boolean}
+     */
+    Boolean batchRemoveAssociation(String id, List<String> appIds);
+
+    /**
+     * 获取应用组内应用列表
+     *
+     * @param query {@link AppGroupAssociationListQuery}
+     * @param page  {@link PageModel}
+     * @return {@link AppListResult}
+     */
+    Page<AppListResult> getAppGroupAssociationList(PageModel page,
+                                                   AppGroupAssociationListQuery query);
 }

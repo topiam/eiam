@@ -101,12 +101,6 @@ public class AppEntity extends LogicDeleteEntity<Long> {
     private String            icon;
 
     /**
-     * 应用分组id
-     */
-    @Column(name = "group_id")
-    private Long              groupId;
-
-    /**
      * SSO 发起登录类型
      */
     @Column(name = "init_login_type")
