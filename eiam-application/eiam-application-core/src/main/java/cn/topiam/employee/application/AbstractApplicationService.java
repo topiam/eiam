@@ -60,7 +60,6 @@ public abstract class AbstractApplicationService implements ApplicationService {
         AppEntity appEntity = new AppEntity();
         appEntity.setName(name);
         appEntity.setIcon(icon);
-        appEntity.setGroupId(null == groupId ? 0L : groupId);
         appEntity.setCode(RandomStringUtils.randomAlphanumeric(32).toLowerCase());
         appEntity.setTemplate(getCode());
         appEntity.setType(getType());

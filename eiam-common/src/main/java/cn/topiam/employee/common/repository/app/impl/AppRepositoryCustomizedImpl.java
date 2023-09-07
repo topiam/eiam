@@ -79,6 +79,7 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
                 FROM
                 	app
                 	LEFT JOIN app_access_policy app_acce ON app.id_ = app_acce.app_id AND app_acce.is_deleted = '0'
+                	LEFT JOIN app_group_association ass ON app.id_ = ass.app_id AND ass.is_deleted = '0'
                 WHERE
                 	app.is_enabled = 1
                 	AND app.is_deleted = '0'
@@ -90,7 +91,7 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
         }
         //分组id
         if (null!=groupId) {
-            builder.append(" AND app.group_id = ").append(groupId);
+            builder.append(" AND ass.group_id = ").append(groupId);
         }
         //@formatter:on
         String sql = builder.toString();
