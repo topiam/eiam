@@ -20,7 +20,7 @@ package cn.topiam.employee.console.service.app;
 import java.util.List;
 
 import cn.topiam.employee.common.entity.app.query.AppGroupAssociationListQuery;
-import cn.topiam.employee.console.pojo.query.app.AppGroupQuery;
+import cn.topiam.employee.common.entity.app.query.AppGroupQuery;
 import cn.topiam.employee.console.pojo.result.app.AppGroupGetResult;
 import cn.topiam.employee.console.pojo.result.app.AppGroupListResult;
 import cn.topiam.employee.console.pojo.result.app.AppListResult;

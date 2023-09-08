@@ -35,7 +35,6 @@
             <column name="code_" remarks="分组编码" type="VARCHAR(64)">
                 <constraints nullable="false"/>
             </column>
-            <column name="is_enabled" remarks="是否启用" type="TINYINT(1)" defaultValueNumeric="0"/>
             <column name="create_by" remarks="创建者" type="VARCHAR(64)">
                 <constraints nullable="false"/>
             </column>

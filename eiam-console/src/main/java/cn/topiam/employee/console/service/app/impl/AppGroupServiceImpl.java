@@ -17,20 +17,16 @@
  */
 package cn.topiam.employee.console.service.app.impl;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Lists;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Predicate;
 
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
@@ -38,13 +34,13 @@ import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.AppGroupAssociationEntity;
 import cn.topiam.employee.common.entity.app.AppGroupEntity;
-import cn.topiam.employee.common.entity.app.QAppGroupEntity;
+import cn.topiam.employee.common.entity.app.po.AppGroupPO;
 import cn.topiam.employee.common.entity.app.query.AppGroupAssociationListQuery;
+import cn.topiam.employee.common.entity.app.query.AppGroupQuery;
 import cn.topiam.employee.common.repository.app.AppGroupAssociationRepository;
 import cn.topiam.employee.common.repository.app.AppGroupRepository;
 import cn.topiam.employee.console.converter.app.AppConverter;
 import cn.topiam.employee.console.converter.app.AppGroupConverter;
-import cn.topiam.employee.console.pojo.query.app.AppGroupQuery;
 import cn.topiam.employee.console.pojo.result.app.AppGroupGetResult;
 import cn.topiam.employee.console.pojo.result.app.AppGroupListResult;
 import cn.topiam.employee.console.pojo.result.app.AppListResult;
@@ -81,15 +77,9 @@ public class AppGroupServiceImpl implements AppGroupService {
      */
     @Override
     public Page<AppGroupListResult> getAppGroupList(PageModel pageModel, AppGroupQuery query) {
-        //查询条件
-        Predicate predicate = appGroupConverter.queryAppGroupListParamConvertToPredicate(query);
-        OrderSpecifier<LocalDateTime> desc = QAppGroupEntity.appGroupEntity.updateTime.desc();
-        //分页条件
-        QPageRequest request = QPageRequest.of(pageModel.getCurrent(), pageModel.getPageSize(),
-            desc);
         //查询映射
-        org.springframework.data.domain.Page<AppGroupEntity> list = appGroupRepository
-            .findAll(predicate, request);
+        org.springframework.data.domain.Page<AppGroupPO> list = appGroupRepository
+                .getAppGroupList(query, PageRequest.of(pageModel.getCurrent(), pageModel.getPageSize()));
         return appGroupConverter.entityConvertToAppGroupListResult(list);
     }
 
