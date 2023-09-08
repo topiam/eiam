@@ -52,12 +52,6 @@ public class AppGroupGetResult implements Serializable {
     private String        code;
 
     /**
-     * 是否启用
-     */
-    @Parameter(description = "分组是否启用")
-    private Boolean       enabled;
-
-    /**
      * 创建时间
      */
     @Parameter(description = "创建时间")

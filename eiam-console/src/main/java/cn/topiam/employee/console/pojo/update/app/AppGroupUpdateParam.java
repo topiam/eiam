@@ -39,23 +39,23 @@ public class AppGroupUpdateParam implements Serializable {
      */
     @Schema(description = "分组id")
     @NotNull(message = "ID不能为空")
-    private Long    id;
+    private Long   id;
 
     /**
      * 分组名称
      */
     @Schema(description = "分组名称")
-    private String  name;
+    private String name;
 
     /**
      * 分组排序
      */
     @Schema(description = "分组编码")
-    private String  code;
+    private String code;
 
     /**
      * 备注
      */
     @Schema(description = "备注")
-    private String  remark;
+    private String remark;
 }

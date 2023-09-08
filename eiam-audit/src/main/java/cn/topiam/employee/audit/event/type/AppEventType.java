@@ -183,13 +183,6 @@ public class AppEventType {
         "删除应用分组", APP_GROUP_RESOURCE, List.of(UserType.ADMIN));
 
     /**
-     * 添加应用分组关联
-     */
-    public static Type ADD_APP_GROUP_ASSOCIATION       = new Type(
-        "eiam:event:add_app_group_association", "添加应用分组关联", APP_GROUP_RESOURCE,
-        List.of(UserType.ADMIN));
-
-    /**
      * 移除应用分组关联
      */
     public static Type REMOVE_APP_GROUP_ASSOCIATION    = new Type(

@@ -505,10 +505,6 @@ public enum EventType {
                         */
                        DELETE_APP_GROUP(AppEventType.DELETE_APP_GROUP),
                        /**
-                        * 添加应用组关联
-                        */
-                       ADD_APP_GROUP_ASSOCIATION(AppEventType.ADD_APP_GROUP_ASSOCIATION),
-                       /**
                         * 移除应用组关联
                         */
                        REMOVE_APP_GROUP_ASSOCIATION(AppEventType.REMOVE_APP_GROUP_ASSOCIATION);
