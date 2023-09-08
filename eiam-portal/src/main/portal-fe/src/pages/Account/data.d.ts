@@ -40,7 +40,7 @@ export interface GetBoundIdpList {
  * 账户菜单类型
  */
 export enum AccountSettingsStateKey {
-  BASE = 'base',
-  SECURITY = 'security',
-  BIND = 'bind',
+  base = 'base',
+  security = 'security',
+  bind = 'bind',
 }

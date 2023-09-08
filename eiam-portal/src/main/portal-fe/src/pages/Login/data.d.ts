@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import type { IDP_TYPE, MFA_FACTOR } from '@/constants';
+import type { IDP_TYPE } from '@/constants';
 
 /**
  * 登录参数类型
@@ -43,10 +43,4 @@ export type IdpList = {
 
 export type LoginConfig = {
   idps: IdpList[];
-};
-
-export type MfaFactor = {
-  factor: MFA_FACTOR;
-  target?: string;
-  usable: boolean;
 };

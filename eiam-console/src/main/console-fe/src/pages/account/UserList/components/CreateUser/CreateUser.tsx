@@ -136,7 +136,7 @@ const CreateUser = (props: CreateUserProps) => {
    */
   const cancel = async () => {
     if (onCancel) {
-      await onCancel();
+      onCancel();
     }
     setSubmitLoading(false);
     form.resetFields();

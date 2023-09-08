@@ -31,9 +31,15 @@ export enum InitLoginType {
   /**
    * 仅允许应用发起 SSO
    */
-  ONLY_APP_INIT_SSO = 'only_app_init_sso',
+  only_app_init_sso = 'only_app_init_sso',
   /**
    * 门户或应用发起 SSO
    */
-  PORTAL_OR_APP_INIT_SSO = 'portal_or_app_init_sso',
+  portal_or_app_init_sso = 'portal_or_app_init_sso',
 }
+
+export type AppGroupList = {
+  id: string;
+  name: string;
+  appCount: number;
+};
