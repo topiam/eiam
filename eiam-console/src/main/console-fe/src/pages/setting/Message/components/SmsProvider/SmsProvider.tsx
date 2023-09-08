@@ -45,6 +45,7 @@ import QiNiu from './QiNiu';
 import Tencent from './Tencent';
 import { Container } from '@/components/Container';
 import { useIntl } from '@umijs/max';
+import { SmsTemplateList } from '@/pages/setting/Message/data';
 
 const layout = {
   labelCol: {
@@ -130,7 +131,7 @@ const TestModal = (props: {
 };
 export default (props: { visible: boolean }) => {
   const [form] = Form.useForm();
-  const editorFormRef = useRef<EditableFormInstance<SettingAPI.SmsTemplateList>>();
+  const editorFormRef = useRef<EditableFormInstance<SmsTemplateList>>();
   const intl = useIntl();
   const { message, modal } = App.useApp();
   const actionRef = useRef<ActionType>();
@@ -144,7 +145,7 @@ export default (props: { visible: boolean }) => {
   const [enabled, setEnabled] = useState<boolean>(false);
   const [language, setLanguage] = useState<string>(Language.ZH);
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>();
-  const [smsTemplateList, setSmsTemplateList] = useState<SettingAPI.SmsTemplateList[]>();
+  const [smsTemplateList, setSmsTemplateList] = useState<SmsTemplateList[]>();
 
   const columns: ProColumns[] = [
     {
@@ -380,7 +381,7 @@ export default (props: { visible: boolean }) => {
               label={intl.formatMessage({ id: 'pages.setting.message.sms_provider.provider' })}
               rules={[{ required: true }]}
               fieldProps={{
-                onChange: async (value) => {
+                onChange: async (value: string) => {
                   setLoading(true);
                   setProvider(value);
                   //清理
