@@ -45,15 +45,15 @@ const AccountSettings = () => {
   const intl = useIntl();
   const [initConfig, setInitConfig] = useState<AccountSettingState>({
     mode: 'inline',
-    selectKey: AccountSettingsStateKey.BASE,
+    selectKey: AccountSettingsStateKey.base,
   });
 
   useAsyncEffect(async () => {
-    if (!type || !AccountSettingsStateKey[type.toUpperCase()]) {
-      setInitConfig({ ...initConfig, selectKey: AccountSettingsStateKey.BASE });
+    if (!type || !AccountSettingsStateKey[type]) {
+      setInitConfig({ ...initConfig, selectKey: AccountSettingsStateKey.base });
       history.replace({
         pathname: location.pathname,
-        search: queryString.stringify({ type: AccountSettingsStateKey.BASE }),
+        search: queryString.stringify({ type: AccountSettingsStateKey.base }),
       });
       return;
     }
@@ -62,19 +62,19 @@ const AccountSettings = () => {
 
   const menu: ItemType[] = [
     {
-      key: AccountSettingsStateKey.BASE,
+      key: AccountSettingsStateKey.base,
       label: intl.formatMessage({
         id: 'page.account.menu.base',
       }),
     },
     {
-      key: AccountSettingsStateKey.SECURITY,
+      key: AccountSettingsStateKey.security,
       label: intl.formatMessage({
         id: 'page.account.menu.security',
       }),
     },
     {
-      key: AccountSettingsStateKey.BIND,
+      key: AccountSettingsStateKey.bind,
       label: intl.formatMessage({
         id: 'page.account.menu.bind',
       }),
@@ -113,11 +113,11 @@ const AccountSettings = () => {
   const renderChildren = () => {
     const { selectKey } = initConfig;
     switch (selectKey) {
-      case AccountSettingsStateKey.BASE:
+      case AccountSettingsStateKey.base:
         return <BaseView />;
-      case AccountSettingsStateKey.SECURITY:
+      case AccountSettingsStateKey.security:
         return <SecurityView />;
-      case AccountSettingsStateKey.BIND:
+      case AccountSettingsStateKey.bind:
         return <BindingView />;
       default:
         return null;

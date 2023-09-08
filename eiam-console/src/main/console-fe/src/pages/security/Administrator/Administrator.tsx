@@ -39,6 +39,7 @@ import CreateAdministrator from './components/CreateAdministrator';
 import UpdateAdministrator from './components/UpdateAdministrator';
 import ResetPassword from './components/ResetAdministratorPassword';
 import Avatar from '@/components/UserAvatar';
+import { AdministratorList } from './data';
 
 export const Administrator = () => {
   const intl = useIntl();
@@ -49,7 +50,7 @@ export const Administrator = () => {
   const [resetPasswordVisible, setResetPasswordVisible] = useState<boolean>(false);
   const [id, setId] = useState<string>();
   const [loading, setLoading] = useState(false);
-  const columns: ProColumns<SettingAPI.AdministratorList>[] = [
+  const columns: ProColumns<AdministratorList>[] = [
     {
       title: intl.formatMessage({ id: 'pages.setting.administrator.table.columns.username' }),
       dataIndex: 'username',
@@ -289,7 +290,7 @@ export const Administrator = () => {
       }
     >
       <>
-        <ProTable<SettingAPI.AdministratorList>
+        <ProTable<AdministratorList>
           actionRef={actionRef}
           columns={columns}
           rowKey={'id'}
