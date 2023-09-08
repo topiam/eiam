@@ -59,7 +59,7 @@ import static cn.topiam.employee.common.constant.AppConstants.APP_PATH;
 @Tag(name = "应用分组管理")
 @RestController
 @AllArgsConstructor
-@RequestMapping(value = APP_PATH + "/app_group", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = APP_PATH + "/group", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AppGroupController {
 
     /**

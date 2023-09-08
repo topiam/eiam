@@ -26,6 +26,7 @@ import MailTemplateConfig from './MailTemplateConfig';
 import useStyle from './style';
 import classnames from 'classnames';
 import { useIntl } from '@umijs/max';
+import { EmailTemplateList } from '../../data.d';
 
 const prefixCls = 'setting-mail-template';
 
@@ -36,7 +37,7 @@ export default (props: { visible: boolean }) => {
   const [content, setContent] = useState<string>('');
   const [configType, setConfigType] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const [dataSource, setDataSource] = useState<SettingAPI.EmailTemplateList[]>([]);
+  const [dataSource, setDataSource] = useState<EmailTemplateList[]>([]);
   const [browseVisible, setBrowseVisible] = useState<boolean>(false);
   const { styles } = useStyle(prefixCls);
   const intl = useIntl();
@@ -85,7 +86,7 @@ export default (props: { visible: boolean }) => {
     <div className={styles.main}>
       <ProCard className={`${prefixCls}`}>
         <Spin spinning={loading}>
-          <ProList<SettingAPI.EmailTemplateList>
+          <ProList<EmailTemplateList>
             rowKey="type"
             split
             cardProps={{ bodyStyle: { padding: 0 } }}

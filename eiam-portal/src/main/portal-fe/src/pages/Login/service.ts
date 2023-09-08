@@ -16,15 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { request } from '@umijs/max';
-import type { LoginConfig, LoginParamsType, MfaFactor } from './data.d';
+import type { LoginConfig, LoginParamsType } from './data.d';
 import { stringify } from 'querystring';
-
-/**
- * 获取 Mfa 因素
- */
-export async function getMfaFactors(): Promise<API.ApiResult<MfaFactor>> {
-  return request('/api/v1/login/mfa/factors');
-}
 
 /**
  * 账户登录
@@ -75,32 +68,6 @@ export async function sendLoginCaptchaOpt(
 }
 
 /**
- * 发送MFA短信验证码
- */
-export async function sendMfaSmsOtp(): Promise<API.ApiResult<boolean>> {
-  return request(`/api/v1/login/mfa/send`, {
-    method: 'POST',
-    data: stringify({ channel: 'sms' }),
-    skipErrorHandler: true,
-  }).catch((e) => {
-    throw e;
-  });
-}
-
-/**
- * 发送MFA邮件验证码
- */
-export async function sendMfaEmailOtp(): Promise<API.ApiResult<boolean>> {
-  return request(`/api/v1/login/mfa/send`, {
-    method: 'POST',
-    data: stringify({ channel: 'mail' }),
-    skipErrorHandler: true,
-  }).catch((e) => {
-    throw e;
-  });
-}
-
-/**
  * 获取钉钉授权URL
  *
  * @param id
@@ -112,22 +79,6 @@ export async function getDingtalkAuthorizeUrl(
 ): Promise<API.ApiResult<string>> {
   return request(`/api/v1/authorization/dingtalk_qr/${id}`, {
     params: { redirect_uri: redirect_uri },
-  });
-}
-
-/**
- * 获取钉钉授权URL
- *
- * @param params
- */
-export async function loginMfaValidate(
-  params: Record<string, any>,
-): Promise<API.ApiResult<string>> {
-  return request(`/api/v1/login/mfa/validate`, {
-    params: params,
-    skipErrorHandler: true,
-  }).catch(({ response: { data } }) => {
-    return data;
   });
 }
 

@@ -55,7 +55,7 @@ export default () => {
       history.push(`/account/user-group`);
       return;
     }
-    if (!type) {
+    if (!type || !UserGroupDetailTabs[type]) {
       setTabActiveKey(UserGroupDetailTabs.member);
       history.push({
         pathname: location.pathname,

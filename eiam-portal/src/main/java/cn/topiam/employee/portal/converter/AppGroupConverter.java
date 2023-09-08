@@ -30,6 +30,7 @@ import cn.topiam.employee.common.entity.app.AppGroupEntity;
 import cn.topiam.employee.common.entity.app.QAppGroupAssociationEntity;
 import cn.topiam.employee.common.entity.app.QAppGroupEntity;
 import cn.topiam.employee.portal.pojo.result.AppGroupListResult;
+import org.mapstruct.Mapping;
 
 /**
  * 分组映射
@@ -61,9 +62,7 @@ public interface AppGroupConverter {
      */
     default Predicate queryAppGroupAssociationPredicate() {
         QAppGroupAssociationEntity appGroupAssociation = QAppGroupAssociationEntity.appGroupAssociationEntity;
-        Predicate predicate = appGroupAssociation.deleted.eq(Boolean.FALSE);
-        //@formatter:on
-        return predicate;
+        return appGroupAssociation.deleted.eq(Boolean.FALSE);
     }
 
     /**
@@ -78,9 +77,9 @@ public interface AppGroupConverter {
         List<AppGroupListResult> results = new ArrayList<>();
         for (AppGroupEntity entity : list) {
             AppGroupListResult result = appGroupEntityConverterToResult(entity);
-            Long count = appGroupAssociationList.stream()
+            long count = appGroupAssociationList.stream()
                 .filter(t -> t.getGroupId().equals(entity.getId())).count();
-            result.setAppCount(Integer.valueOf(count.toString()));
+            result.setAppCount(Integer.valueOf(Long.toString(count)));
             results.add(result);
         }
         return results;
@@ -92,6 +91,7 @@ public interface AppGroupConverter {
      * @param entity {@link AppGroupEntity}
      * @return {@link AppGroupEntity}
      */
+    @Mapping(target = "appCount", ignore = true)
     AppGroupListResult appGroupEntityConverterToResult(AppGroupEntity entity);
 
 }

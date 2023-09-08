@@ -18,6 +18,7 @@
 package cn.topiam.employee.console.pojo.result.app;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 import lombok.Data;
 
@@ -57,6 +58,12 @@ public class AppGroupListResult implements Serializable {
      */
     @Parameter(description = "是否启用")
     private Boolean enabled;
+
+    /**
+     * 创建时间
+     */
+    @Parameter(description = "创建时间")
+    private LocalDateTime createTime;
 
     /**
      * 备注

@@ -38,3 +38,105 @@ export type GetApp = {
   enabled: boolean;
   remark: string;
 };
+
+/**
+ * 应用权限列表
+ */
+export type AppAccessPolicyList = {
+  id: string;
+  //主体ID
+  subjectId: string;
+  //主体名称
+  subjectName: string;
+  //主体类型
+  subjectType: string;
+  //应用类型
+  appType: string;
+  appProtocol: string;
+  //Effect
+  effect: string;
+};
+
+/**
+ * 角色列表
+ */
+type AppPermissionRoleList = {
+  id: string;
+  name: string;
+  code: string;
+  enabled: boolean;
+  appId: string;
+  remark: string;
+};
+
+/**
+ * 角色列表
+ */
+type GetAppPermissionRole = {
+  id: string;
+  name: string;
+  code: string;
+  enabled: boolean;
+  appId: string;
+  remark: string;
+};
+
+/**
+ * 资源列表
+ */
+type AppPermissionResourceList = {
+  id: string;
+  name: string;
+  code: string;
+  enabled: boolean;
+  desc: string;
+  appId: string;
+};
+
+/**
+ * 权限资源点
+ */
+type AppPermissionResourceActionList = {
+  id: string;
+  name: string;
+  code: string;
+  desc: string;
+  appId: string;
+  menus: {
+    access: string;
+    id: string;
+    name: string;
+  }[];
+  datas: {
+    access: string;
+    id: string;
+    name: string;
+  }[];
+  buttons: {
+    access: string;
+    id: string;
+    name: string;
+  }[];
+  apis: {
+    access: string;
+    id: string;
+    name: string;
+  }[];
+  others: {
+    access: string;
+    id: string;
+    name: string;
+  }[];
+};
+
+/**
+ * 权限授权列表
+ */
+type AppPermissionPolicyList = {
+  id: string;
+  name: string;
+  code: string;
+  enabled: boolean;
+  desc: string;
+  appId: string;
+};

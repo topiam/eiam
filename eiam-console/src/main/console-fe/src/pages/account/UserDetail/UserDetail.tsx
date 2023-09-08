@@ -46,7 +46,7 @@ export default () => {
       history.push(`/account/user`);
       return;
     }
-    if (!type) {
+    if (!type || !UserDetailTabs[type]) {
       setTabActiveKey(UserDetailTabs.user_info);
       history.replace({
         pathname: location.pathname,

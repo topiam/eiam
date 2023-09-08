@@ -48,8 +48,10 @@ export default (props: {
       preserve={false}
       width="500px"
       open={visible}
-      onOpenChange={() => {
-        form.setFieldsValue({ code: random(9) });
+      onOpenChange={(visible) => {
+        if (visible) {
+          form.setFieldsValue({ code: random(9) });
+        }
       }}
       modalProps={{
         maskClosable: true,
@@ -58,9 +60,9 @@ export default (props: {
       }}
       onFinish={async (values: AccountAPI.BaseUserGroup) => {
         setLoading(true);
-        const result = await onFinish(values);
-        setLoading(false);
-        return !!result;
+        await onFinish(values).finally(() => {
+          setLoading(false);
+        });
       }}
     >
       <Spin spinning={loading}>

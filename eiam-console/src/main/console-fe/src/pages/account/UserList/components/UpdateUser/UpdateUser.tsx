@@ -99,7 +99,7 @@ const UpdateUser = (props: UpdateFormProps) => {
    */
   const cancel = async () => {
     if (onCancel) {
-      await onCancel();
+      onCancel();
     }
     setSubmitLoading(false);
     form.resetFields();

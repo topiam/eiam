@@ -22,18 +22,6 @@ import { request } from '@umijs/max';
 import type { UploadFile } from 'antd/es/upload/interface';
 
 /**
- * Get Application Template FormSchema
- */
-export async function getAppTemplateFormSchema(
-  code: string,
-): Promise<API.ApiResult<Record<string, any>>> {
-  return request<API.ApiResult<AppAPI.GetApp>>(`/api/v1/app/template/form_schema`, {
-    method: 'GET',
-    params: { code: code },
-  });
-}
-
-/**
  * 获取应用列表
  */
 export async function getAppList(
@@ -62,15 +50,6 @@ export async function updateApp(params: Record<string, string>): Promise<API.Api
     method: 'PUT',
     data: params,
     requestType: 'json',
-  });
-}
-
-/**
- * Get Application
- */
-export async function getApp(id: string): Promise<API.ApiResult<AppAPI.GetApp>> {
-  return request<API.ApiResult<AppAPI.GetApp>>(`/api/v1/app/get/${id}`, {
-    method: 'GET',
   });
 }
 

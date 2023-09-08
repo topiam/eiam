@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { Avatar, Image } from 'antd';
-import { AvatarSize } from 'antd/es/avatar/SizeContext';
+import { AvatarSize } from 'antd/es/avatar/AvatarContext';
 
 export default (props: {
   avatar: string;

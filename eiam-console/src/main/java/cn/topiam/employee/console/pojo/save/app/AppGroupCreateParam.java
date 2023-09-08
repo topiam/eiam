@@ -31,7 +31,7 @@ import jakarta.validation.constraints.NotBlank;
  * Created by support@topiam.cn on  2023/8/31 23:26
  */
 @Data
-@Schema(description = "分组保存入参")
+@Schema(description = "应用分组保存入参")
 public class AppGroupCreateParam implements Serializable {
 
     /**
@@ -42,15 +42,16 @@ public class AppGroupCreateParam implements Serializable {
     private String name;
 
     /**
+     * 分组编码
+     */
+    @NotBlank(message = "分组编码不能为空")
+    @Schema(description = "分组编码")
+    private String code;
+
+    /**
      * 备注
      */
     @Schema(description = "备注")
     private String remark;
-
-    /**
-     * 分组编码
-     */
-    @Schema(description = "分组编码")
-    private String code;
 
 }

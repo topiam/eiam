@@ -35,7 +35,7 @@ export default (): React.ReactNode => {
     const { type } = query as {
       type: TabType;
     };
-    if (!type) {
+    if (!type || !TabType[type]) {
       setActiveKey(TabType.mail_template);
       history.replace({
         pathname: location.pathname,
