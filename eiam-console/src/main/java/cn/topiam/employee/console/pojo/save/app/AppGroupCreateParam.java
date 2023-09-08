@@ -54,11 +54,4 @@ public class AppGroupCreateParam implements Serializable {
      */
     @Schema(description = "备注")
     private String remark;
-
-    /**
-     * 应用分组ID
-     */
-    @Parameter(description = "应用分组ID")
-    private String[] groupId;
-
 }

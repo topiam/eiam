@@ -96,7 +96,7 @@ public interface ApplicationService {
      * @return {@link Long} 应用ID
      */
     @Transactional(rollbackFor = Exception.class)
-    String create(String name, String icon, String remark, Long groupId);
+    String create(String name, String icon, String remark, Long[] groupId);
 
     /**
      * 删除应用
@@ -142,6 +142,6 @@ public interface ApplicationService {
      * @param authorizationType {@link AuthorizationType}
      * @return {@link AppEntity}
      */
-    AppEntity createApp(String name, String icon, String remark, Long groupId,
+    AppEntity createApp(String name, String icon, String remark, Long[] groupId,
                         InitLoginType initLoginType, AuthorizationType authorizationType);
 }

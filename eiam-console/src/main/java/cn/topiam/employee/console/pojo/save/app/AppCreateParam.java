@@ -64,6 +64,6 @@ public class AppCreateParam implements Serializable {
     /**
      * 应用分组id
      */
-    @Schema(description = "应用分组id")
-    private Long   groupId;
+    @Schema(description = "应用分组ID")
+    private Long[] groupId;
 }

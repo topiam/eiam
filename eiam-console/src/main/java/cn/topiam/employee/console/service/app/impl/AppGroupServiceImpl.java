@@ -94,14 +94,6 @@ public class AppGroupServiceImpl implements AppGroupService {
     public Boolean createAppGroup(AppGroupCreateParam param) {
         AppGroupEntity entity = appGroupConverter.appGroupCreateParamConvertToEntity(param);
         appGroupRepository.save(entity);
-        List<AppGroupAssociationEntity> list = new ArrayList<>();
-        for (String groupId : param.getGroupId()) {
-            AppGroupAssociationEntity appGroupAssociationEntity = new AppGroupAssociationEntity();
-            appGroupAssociationEntity.setGroupId(Long.valueOf(groupId));
-            appGroupAssociationEntity.setAppId(entity.getId());
-            list.add(appGroupAssociationEntity);
-        }
-        appGroupAssociationRepository.saveAll(list);
         AuditContext.setTarget(
             Target.builder().id(String.valueOf(entity.getId())).type(TargetType.APP_GROUP).build());
         return true;

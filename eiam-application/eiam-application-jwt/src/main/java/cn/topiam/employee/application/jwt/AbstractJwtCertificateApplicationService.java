@@ -102,8 +102,10 @@ public abstract class AbstractJwtCertificateApplicationService extends
                                                        AppCertRepository appCertRepository,
                                                        AppRepository appRepository,
                                                        AppAccountRepository appAccountRepository,
+                                                       AppGroupAssociationRepository appGroupAssociationRepository,
                                                        AppAccessPolicyRepository appAccessPolicyRepository) {
-        super(appCertRepository, appAccountRepository, appAccessPolicyRepository, appRepository);
+        super(appCertRepository, appAccountRepository, appAccessPolicyRepository,
+            appGroupAssociationRepository, appRepository);
         this.appCertRepository = appCertRepository;
         this.appRepository = appRepository;
         this.appJwtConfigRepository = appJwtConfigRepository;

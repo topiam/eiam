@@ -137,8 +137,10 @@ public abstract class AbstractOidcCertificateApplicationService extends
                                                         AppAccountRepository appAccountRepository,
                                                         AppAccessPolicyRepository appAccessPolicyRepository,
                                                         AppRepository appRepository,
+                                                        AppGroupAssociationRepository appGroupAssociationRepository,
                                                         AppOidcConfigRepository appOidcConfigRepository) {
-        super(appCertRepository, appAccountRepository, appAccessPolicyRepository, appRepository);
+        super(appCertRepository, appAccountRepository, appAccessPolicyRepository,
+            appGroupAssociationRepository, appRepository);
         this.appCertRepository = appCertRepository;
         this.appRepository = appRepository;
         this.appOidcConfigRepository = appOidcConfigRepository;

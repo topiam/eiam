@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
+import cn.topiam.employee.common.repository.app.*;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,10 +33,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.topiam.employee.common.entity.app.AppCertEntity;
 import cn.topiam.employee.common.enums.app.AppCertUsingType;
-import cn.topiam.employee.common.repository.app.AppAccessPolicyRepository;
-import cn.topiam.employee.common.repository.app.AppAccountRepository;
-import cn.topiam.employee.common.repository.app.AppCertRepository;
-import cn.topiam.employee.common.repository.app.AppRepository;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.util.CertUtils;
 import cn.topiam.employee.support.util.RsaUtils;
@@ -128,8 +125,9 @@ public abstract class AbstractCertificateApplicationService extends AbstractAppl
     protected AbstractCertificateApplicationService(AppCertRepository appCertRepository,
                                                     AppAccountRepository appAccountRepository,
                                                     AppAccessPolicyRepository appAccessPolicyRepository,
+                                                    AppGroupAssociationRepository appGroupAssociationRepository,
                                                     AppRepository appRepository) {
-        super(appAccountRepository, appRepository);
+        super(appAccountRepository, appGroupAssociationRepository, appRepository);
         this.appCertRepository = appCertRepository;
         this.appAccessPolicyRepository = appAccessPolicyRepository;
         this.idGenerator = new AlternativeJdkIdGenerator();

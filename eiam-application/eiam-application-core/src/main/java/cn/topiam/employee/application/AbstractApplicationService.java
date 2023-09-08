@@ -17,6 +17,8 @@
  */
 package cn.topiam.employee.application;
 
+import cn.topiam.employee.common.entity.app.AppGroupAssociationEntity;
+import cn.topiam.employee.common.repository.app.AppGroupAssociationRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.util.AlternativeJdkIdGenerator;
 import org.springframework.util.IdGenerator;
@@ -32,6 +34,9 @@ import cn.topiam.employee.common.repository.app.AppAccountRepository;
 import cn.topiam.employee.common.repository.app.AppRepository;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * AbstractApplicationService
@@ -55,7 +60,7 @@ public abstract class AbstractApplicationService implements ApplicationService {
     }
 
     @Override
-    public AppEntity createApp(String name, String icon, String remark, Long groupId,
+    public AppEntity createApp(String name, String icon, String remark, Long[] groupId,
                                InitLoginType initLoginType, AuthorizationType authorizationType) {
         AppEntity appEntity = new AppEntity();
         appEntity.setName(name);
@@ -70,28 +75,44 @@ public abstract class AbstractApplicationService implements ApplicationService {
         appEntity.setInitLoginType(initLoginType);
         appEntity.setAuthorizationType(authorizationType);
         appEntity.setRemark(remark);
-        return appRepository.save(appEntity);
+        appRepository.save(appEntity);
+        List<AppGroupAssociationEntity> list = new ArrayList<>();
+        for (Long id : groupId) {
+            AppGroupAssociationEntity appGroupAssociationEntity = new AppGroupAssociationEntity();
+            appGroupAssociationEntity.setGroupId(id);
+            appGroupAssociationEntity.setAppId(appEntity.getId());
+            list.add(appGroupAssociationEntity);
+        }
+        appGroupAssociationRepository.saveAll(list);
+        return appEntity;
     }
 
     /**
      * AppAccountRepository
      */
-    protected final AppAccountRepository appAccountRepository;
+    protected final AppAccountRepository          appAccountRepository;
+
+    /**
+     * AppGroupAssociationRepository
+     */
+    protected final AppGroupAssociationRepository appGroupAssociationRepository;
 
     /**
      * ApplicationRepository
      */
-    protected final AppRepository        appRepository;
+    protected final AppRepository                 appRepository;
 
     /**
      * IdGenerator
      */
-    protected final IdGenerator          idGenerator;
+    protected final IdGenerator                   idGenerator;
 
     protected AbstractApplicationService(AppAccountRepository appAccountRepository,
+                                         AppGroupAssociationRepository appGroupAssociationRepository,
                                          AppRepository appRepository) {
         this.appAccountRepository = appAccountRepository;
         this.appRepository = appRepository;
+        this.appGroupAssociationRepository = appGroupAssociationRepository;
         this.idGenerator = new AlternativeJdkIdGenerator();
     }
 }
