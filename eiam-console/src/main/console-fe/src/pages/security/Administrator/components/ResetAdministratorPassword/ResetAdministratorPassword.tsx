@@ -53,8 +53,11 @@ export default (props: {
         onCancel: onCancel,
       }}
       onFinish={(formData: { password: string }) => {
+        setLoading(true);
         const password = Base64.encode(formData.password, true);
-        return onFinish({ id, password });
+        onFinish({ id, password }).finally(() => {
+          setLoading(false);
+        });
       }}
     >
       <Spin spinning={loading}>
