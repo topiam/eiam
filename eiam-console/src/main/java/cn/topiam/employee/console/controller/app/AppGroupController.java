@@ -28,7 +28,7 @@ import cn.topiam.employee.audit.annotation.Audit;
 import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.common.entity.account.query.UserGroupMemberListQuery;
 import cn.topiam.employee.common.entity.app.query.AppGroupAssociationListQuery;
-import cn.topiam.employee.console.pojo.query.app.AppGroupQuery;
+import cn.topiam.employee.common.entity.app.query.AppGroupQuery;
 import cn.topiam.employee.console.pojo.result.app.AppGroupGetResult;
 import cn.topiam.employee.console.pojo.result.app.AppGroupListResult;
 import cn.topiam.employee.console.pojo.result.app.AppListResult;

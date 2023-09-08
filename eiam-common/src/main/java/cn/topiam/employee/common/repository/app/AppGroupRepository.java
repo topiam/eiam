@@ -41,7 +41,8 @@ import static cn.topiam.employee.common.constant.AppGroupConstants.APP_GROUP_CAC
 @Repository
 @CacheConfig(cacheNames = { APP_GROUP_CACHE_NAME })
 public interface AppGroupRepository extends LogicDeleteRepository<AppGroupEntity, Long>,
-                                    QuerydslPredicateExecutor<AppGroupEntity> {
+                                    QuerydslPredicateExecutor<AppGroupEntity>,
+                                    AppGroupRepositoryCustomized {
 
     /**
      * save

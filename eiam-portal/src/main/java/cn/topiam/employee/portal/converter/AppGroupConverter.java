@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 
 import cn.topiam.employee.common.entity.app.AppGroupAssociationEntity;
@@ -30,7 +30,6 @@ import cn.topiam.employee.common.entity.app.AppGroupEntity;
 import cn.topiam.employee.common.entity.app.QAppGroupAssociationEntity;
 import cn.topiam.employee.common.entity.app.QAppGroupEntity;
 import cn.topiam.employee.portal.pojo.result.AppGroupListResult;
-import org.mapstruct.Mapping;
 
 /**
  * 分组映射
@@ -49,8 +48,6 @@ public interface AppGroupConverter {
     default Predicate queryPredicate() {
         QAppGroupEntity appGroup = QAppGroupEntity.appGroupEntity;
         Predicate predicate = appGroup.deleted.eq(Boolean.FALSE);
-        //@formatter:off
-        predicate = ExpressionUtils.and(predicate, appGroup.enabled.eq(Boolean.TRUE));
         //@formatter:on
         return predicate;
     }

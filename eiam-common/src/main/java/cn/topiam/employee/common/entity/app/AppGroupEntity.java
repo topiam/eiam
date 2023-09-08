@@ -53,17 +53,11 @@ public class AppGroupEntity extends LogicDeleteEntity<Long> {
      * 分组名称
      */
     @Column(name = "name_")
-    private String  name;
+    private String name;
 
     /**
      * 分组编码
      */
     @Column(name = "code_")
-    private String  code;
-
-    /**
-     * 是否启用
-     */
-    @Column(name = "is_enabled")
-    private Boolean enabled;
+    private String code;
 }

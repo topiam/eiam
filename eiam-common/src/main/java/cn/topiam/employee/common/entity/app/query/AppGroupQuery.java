@@ -1,5 +1,5 @@
 /*
- * eiam-console - Employee Identity and Access Management
+ * eiam-common - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.console.pojo.query.app;
+package cn.topiam.employee.common.entity.app.query;
 
 import java.io.Serializable;
 
@@ -41,18 +41,12 @@ public class AppGroupQuery implements Serializable {
      * 分组名称
      */
     @Parameter(description = "分组名称")
-    private String  name;
-
-    /**
-     * 分组是否启用
-     */
-    @Parameter(description = "分组是否启用")
-    private Boolean enabled;
+    private String name;
 
     /**
      * 分组编码
      */
     @Parameter(description = "分组编码")
-    private String  code;
+    private String code;
 
 }
