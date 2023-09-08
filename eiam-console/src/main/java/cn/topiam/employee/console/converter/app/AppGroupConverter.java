@@ -96,21 +96,7 @@ public interface AppGroupConverter {
      * @param entity {@link AppGroupEntity}
      * @return {@link AppGroupListResult}
      */
-    default AppGroupListResult entityConvertToAppGroupListResult(AppGroupEntity entity) {
-        if (entity == null) {
-            return null;
-        }
-
-        AppGroupListResult appGroupListResult = new AppGroupListResult();
-        if (entity.getId() != null) {
-            appGroupListResult.setId(String.valueOf(entity.getId()));
-        }
-        appGroupListResult.setName(entity.getName());
-        appGroupListResult.setCode(entity.getCode());
-        appGroupListResult.setEnabled(entity.getEnabled());
-        appGroupListResult.setRemark(entity.getRemark());
-        return appGroupListResult;
-    }
+     AppGroupListResult entityConvertToAppGroupListResult(AppGroupEntity entity);
 
     /**
      * 实体转分组返回
@@ -118,20 +104,7 @@ public interface AppGroupConverter {
      * @param entity {@link AppGroupEntity}
      * @return {@link AppGroupGetResult}
      */
-    default AppGroupGetResult entityConvertToAppGroupResult(AppGroupEntity entity) {
-        if (entity == null) {
-            return null;
-        }
-        AppGroupGetResult appGroupGetResult = new AppGroupGetResult();
-
-        if (entity.getId() != null) {
-            appGroupGetResult.setId(String.valueOf(entity.getId()));
-        }
-        appGroupGetResult.setName(entity.getName());
-        appGroupGetResult.setEnabled(entity.getEnabled());
-        appGroupGetResult.setCreateTime(entity.getCreateTime());
-        return appGroupGetResult;
-    }
+     AppGroupGetResult entityConvertToAppGroupResult(AppGroupEntity entity);
 
     /**
      * 将分组修改对象转换为entity
@@ -139,12 +112,12 @@ public interface AppGroupConverter {
      * @param param {@link AppGroupUpdateParam}
      * @return {@link AppGroupEntity}
      */
+    @Mapping(target = "enabled", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "updateTime", ignore = true)
     @Mapping(target = "updateBy", ignore = true)
     @Mapping(target = "createTime", ignore = true)
     @Mapping(target = "createBy", ignore = true)
-    @Mapping(target = "enabled", ignore = false)
     AppGroupEntity appGroupUpdateParamConverterToEntity(AppGroupUpdateParam param);
 
     /**
@@ -153,6 +126,7 @@ public interface AppGroupConverter {
      * @param param {@link AppAccountCreateParam}
      * @return {@link AppAccountEntity}
      */
+    @Mapping(target = "enabled", expression = "java(Boolean.TRUE)")
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "updateTime", ignore = true)

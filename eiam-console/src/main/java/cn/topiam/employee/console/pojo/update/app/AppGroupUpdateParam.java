@@ -54,12 +54,6 @@ public class AppGroupUpdateParam implements Serializable {
     private String  code;
 
     /**
-     * 分组是否启用
-     */
-    @Schema(description = "分组是否启用")
-    private Boolean enabled;
-
-    /**
      * 备注
      */
     @Schema(description = "备注")
