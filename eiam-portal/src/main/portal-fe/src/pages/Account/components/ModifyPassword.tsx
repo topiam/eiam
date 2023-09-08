@@ -70,7 +70,7 @@ const ModifyPassword = (props: {
         destroyOnClose: true,
         maskClosable: false,
         onCancel: async () => {
-          await setVisible(false);
+          setVisible(false);
         },
       }}
       onFinish={async (formData: Record<string, any>) => {
@@ -89,7 +89,7 @@ const ModifyPassword = (props: {
             ),
           );
           if (success && result) {
-            await setVisible(false);
+            setVisible(false);
             message.success(intl.formatMessage({ id: 'page.account.modify_password.success' }));
             setRefresh(true);
             return Promise.resolve();
