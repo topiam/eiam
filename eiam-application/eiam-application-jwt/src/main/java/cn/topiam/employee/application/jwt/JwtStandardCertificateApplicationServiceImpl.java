@@ -204,7 +204,7 @@ public class JwtStandardCertificateApplicationServiceImpl extends
      * @param groupId {@link Long} 分组id
      */
     @Override
-    public String create(String name, String icon, String remark, Long groupId) {
+    public String create(String name, String icon, String remark, Long[] groupId) {
         //1、创建应用
         AppEntity appEntity = createApp(name, icon, remark, groupId, InitLoginType.PORTAL_OR_APP,
             AuthorizationType.AUTHORIZATION);
@@ -229,9 +229,10 @@ public class JwtStandardCertificateApplicationServiceImpl extends
                                                         AppCertRepository appCertRepository,
                                                         AppRepository appRepository,
                                                         AppAccountRepository appAccountRepository,
+                                                        AppGroupAssociationRepository appGroupAssociationRepository,
                                                         AppAccessPolicyRepository appAccessPolicyRepository) {
         super(appJwtConfigRepository, appCertRepository, appRepository, appAccountRepository,
-            appAccessPolicyRepository);
+            appGroupAssociationRepository, appAccessPolicyRepository);
         this.appJwtConfigConverter = appJwtConfigConverter;
     }
 }

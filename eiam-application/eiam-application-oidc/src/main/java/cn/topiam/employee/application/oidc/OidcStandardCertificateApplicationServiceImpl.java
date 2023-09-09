@@ -78,7 +78,7 @@ public class OidcStandardCertificateApplicationServiceImpl extends
      * @param groupId {@link Long} 分组id
      */
     @Override
-    public String create(String name, String icon, String remark, Long groupId) {
+    public String create(String name, String icon, String remark, Long[] groupId) {
         //1、创建应用
         AppEntity appEntity = createApp(name, icon, remark, groupId, InitLoginType.APP,
             AuthorizationType.AUTHORIZATION);
@@ -275,9 +275,10 @@ public class OidcStandardCertificateApplicationServiceImpl extends
                                                             AppAccessPolicyRepository appAccessPolicyRepository,
                                                             AppRepository appRepository,
                                                             AppOidcConfigRepository appOidcConfigRepository,
+                                                            AppGroupAssociationRepository appGroupAssociationRepository,
                                                             AppOidcStandardConfigConverter appOidcStandardConfigConverter) {
         super(appCertRepository, appAccountRepository, appAccessPolicyRepository, appRepository,
-            appOidcConfigRepository);
+            appGroupAssociationRepository, appOidcConfigRepository);
         this.appOidcStandardConfigConverter = appOidcStandardConfigConverter;
     }
 }

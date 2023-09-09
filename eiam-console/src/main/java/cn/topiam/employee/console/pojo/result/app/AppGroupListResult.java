@@ -39,25 +39,19 @@ public class AppGroupListResult implements Serializable {
      * ID
      */
     @Parameter(description = "ID")
-    private String  id;
+    private String        id;
 
     /**
      * 分组名称
      */
     @Parameter(description = "分组名称")
-    private String  name;
+    private String        name;
 
     /**
      * 分组编码
      */
     @Parameter(description = "分组编码")
-    private String  code;
-
-    /**
-     * 是否启用
-     */
-    @Parameter(description = "是否启用")
-    private Boolean enabled;
+    private String        code;
 
     /**
      * 创建时间
@@ -69,6 +63,6 @@ public class AppGroupListResult implements Serializable {
      * 备注
      */
     @Parameter(description = "备注")
-    private String  remark;
+    private String        remark;
 
 }

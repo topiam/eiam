@@ -78,8 +78,8 @@ public class AppGroupServiceImpl implements AppGroupService {
     @Override
     public Page<AppGroupListResult> getAppGroupList(PageModel pageModel, AppGroupQuery query) {
         //查询映射
-        org.springframework.data.domain.Page<AppGroupPO> list = appGroupRepository
-                .getAppGroupList(query, PageRequest.of(pageModel.getCurrent(), pageModel.getPageSize()));
+        org.springframework.data.domain.Page<AppGroupPO> list = appGroupRepository.getAppGroupList(
+            query, PageRequest.of(pageModel.getCurrent(), pageModel.getPageSize()));
         return appGroupConverter.entityConvertToAppGroupListResult(list);
     }
 
@@ -92,7 +92,6 @@ public class AppGroupServiceImpl implements AppGroupService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean createAppGroup(AppGroupCreateParam param) {
-        // TODO 创建后没有数据权限
         AppGroupEntity entity = appGroupConverter.appGroupCreateParamConvertToEntity(param);
         appGroupRepository.save(entity);
         AuditContext.setTarget(
@@ -230,7 +229,7 @@ public class AppGroupServiceImpl implements AppGroupService {
      * 批量移除应用
      *
      * @param appIds {@link String}
-     * @param id      {@link String}
+     * @param id     {@link String}
      * @return {@link Boolean}
      */
     @Override

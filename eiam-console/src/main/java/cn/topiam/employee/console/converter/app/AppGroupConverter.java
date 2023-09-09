@@ -73,7 +73,7 @@ public interface AppGroupConverter {
      * @param appGroupPo {@link AppGroupPO}
      * @return {@link AppGroupListResult}
      */
-     AppGroupListResult entityConvertToAppGroupListResult(AppGroupPO appGroupPo);
+    AppGroupListResult entityConvertToAppGroupListResult(AppGroupPO appGroupPo);
 
     /**
      * 实体转分组返回
@@ -81,7 +81,7 @@ public interface AppGroupConverter {
      * @param entity {@link AppGroupEntity}
      * @return {@link AppGroupGetResult}
      */
-     AppGroupGetResult entityConvertToAppGroupResult(AppGroupEntity entity);
+    AppGroupGetResult entityConvertToAppGroupResult(AppGroupEntity entity);
 
     /**
      * 将分组修改对象转换为entity

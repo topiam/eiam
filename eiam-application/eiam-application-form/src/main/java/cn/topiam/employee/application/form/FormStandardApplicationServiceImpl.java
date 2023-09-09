@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import cn.topiam.employee.common.repository.app.AppGroupAssociationRepository;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -199,7 +200,7 @@ public class FormStandardApplicationServiceImpl extends AbstractFormApplicationS
      * @param groupId {@link Long} 分组id
      */
     @Override
-    public String create(String name, String icon, String remark, Long groupId) {
+    public String create(String name, String icon, String remark, Long[] groupId) {
         //1、创建应用
         AppEntity appEntity = createApp(name, icon, remark, groupId, InitLoginType.PORTAL_OR_APP,
             AuthorizationType.AUTHORIZATION);
@@ -216,8 +217,10 @@ public class FormStandardApplicationServiceImpl extends AbstractFormApplicationS
     protected FormStandardApplicationServiceImpl(AppAccountRepository appAccountRepository,
                                                  AppFormConfigRepository appFormConfigRepository,
                                                  AppRepository appRepository,
+                                                 AppGroupAssociationRepository appGroupAssociationRepository,
                                                  AppFormConfigConverter appFormConfigConverter) {
-        super(appRepository, appAccountRepository, appFormConfigRepository);
+        super(appRepository, appAccountRepository, appGroupAssociationRepository,
+            appFormConfigRepository);
         this.appFormConfigConverter = appFormConfigConverter;
     }
 

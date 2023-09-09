@@ -21,6 +21,7 @@ import java.io.Serializable;
 
 import lombok.Data;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
@@ -53,5 +54,4 @@ public class AppGroupCreateParam implements Serializable {
      */
     @Schema(description = "备注")
     private String remark;
-
 }

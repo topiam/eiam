@@ -177,25 +177,6 @@ public class AppGroupController {
     }
 
     /**
-     * 添加分组用户
-     *
-     * @param appIds {@link String}
-     * @return {@link Boolean}
-     */
-    @Lock
-    @Preview
-    @Validated
-    @Operation(summary = "添加应用组关联")
-    @Audit(type = EventType.ADD_APP_GROUP_ASSOCIATION)
-    @PostMapping(value = "/add_association/{id}")
-    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
-    public ApiRestResult<Boolean> addAssociation(@PathVariable(value = "id") String id,
-                                                 @Parameter(description = "应用ID") String[] appIds) {
-        return ApiRestResult.<Boolean> builder().result(appGroupService.addAssociation(id, appIds))
-            .build();
-    }
-
-    /**
      * 移除分组用户
      *
      * @param id {@link String}
