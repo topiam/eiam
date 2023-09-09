@@ -101,6 +101,7 @@ public interface AppPermissionRoleConverter {
      * @param param {@link PermissionRoleUpdateParam} 更新参数
      * @return {@link AppPermissionRoleEntity} 角色实体
      */
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "appId", ignore = true)
     @Mapping(target = "enabled", ignore = true)
     @Mapping(target = "updateTime", ignore = true)
