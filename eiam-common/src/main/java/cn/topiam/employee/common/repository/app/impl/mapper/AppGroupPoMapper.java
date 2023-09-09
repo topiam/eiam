@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import org.springframework.jdbc.core.RowMapper;
 
 import cn.topiam.employee.common.entity.app.po.AppGroupPO;
+import cn.topiam.employee.common.enums.app.AppGroupType;
 
 /**
  * @author TopIAM
@@ -47,8 +48,9 @@ public class AppGroupPoMapper implements RowMapper<AppGroupPO> {
     public AppGroupPO mapRow(ResultSet rs, int rowNum) throws SQLException {
         AppGroupPO appGroup = new AppGroupPO();
         appGroup.setId(rs.getLong("id_"));
-        appGroup.setCode(rs.getString("code_"));
         appGroup.setName(rs.getString("name_"));
+        appGroup.setCode(rs.getString("code_"));
+        appGroup.setType(AppGroupType.getType(rs.getString("type_")));
         appGroup.setRemark(rs.getString("remark_"));
         appGroup.setAppCount(rs.getInt("app_count"));
         appGroup.setCreateTime(rs.getObject("create_time", LocalDateTime.class));

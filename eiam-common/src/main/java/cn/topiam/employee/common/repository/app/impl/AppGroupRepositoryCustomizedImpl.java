@@ -58,6 +58,7 @@ public class AppGroupRepositoryCustomizedImpl implements AppGroupRepositoryCusto
                 	`group`.id_,
                 	`group`.name_,
                 	`group`.code_,
+                	`group`.type_,
                 	`group`.create_time,
                 	`group`.remark_,
                 	 IFNULL( ass.app_count, 0 ) AS app_count

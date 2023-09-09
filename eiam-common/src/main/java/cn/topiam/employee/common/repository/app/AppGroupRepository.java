@@ -24,12 +24,10 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.app.AppGroupEntity;
 import cn.topiam.employee.support.repository.LogicDeleteRepository;
@@ -55,20 +53,6 @@ public interface AppGroupRepository extends LogicDeleteRepository<AppGroupEntity
     @Override
     @CacheEvict(allEntries = true)
     <S extends AppGroupEntity> S save(@NotNull S entity);
-
-    /**
-     * 更新应用分组状态
-     *
-     * @param id      {@link  Long}
-     * @param enabled {@link  Boolean}
-     * @return {@link  Boolean}
-     */
-    @Modifying
-    @CacheEvict(allEntries = true)
-    @Transactional(rollbackFor = Exception.class)
-    @Query(value = "UPDATE app_group SET is_enabled = :enabled WHERE id_ = :id", nativeQuery = true)
-    Integer updateAppGroupStatus(@Param(value = "id") Long id,
-                                 @Param(value = "enabled") Boolean enabled);
 
     /**
      * delete

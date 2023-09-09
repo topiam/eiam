@@ -143,41 +143,7 @@ public class AppGroupController {
     }
 
     /**
-     * 启用应用分组
-     *
-     * @param id {@link String}
-     * @return {@link Boolean}
-     */
-    @Lock
-    @Preview
-    @Operation(summary = "启用应用分组")
-    @Audit(type = EventType.ENABLE_APP_GROUP)
-    @PutMapping(value = "/enable/{id}")
-    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
-    public ApiRestResult<Boolean> enableAppGroup(@PathVariable(value = "id") String id) {
-        boolean result = appGroupService.enableAppGroup(id);
-        return ApiRestResult.<Boolean> builder().result(result).build();
-    }
-
-    /**
-     * 禁用应用分组
-     *
-     * @param id {@link String}
-     * @return {@link Boolean}
-     */
-    @Lock
-    @Preview
-    @Operation(summary = "禁用应用分组")
-    @Audit(type = EventType.DISABLE_APP_GROUP)
-    @PutMapping(value = "/disable/{id}")
-    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
-    public ApiRestResult<Boolean> disableAppGroup(@PathVariable(value = "id") String id) {
-        boolean result = appGroupService.disableAppGroup(id);
-        return ApiRestResult.<Boolean> builder().result(result).build();
-    }
-
-    /**
-     * 移除分组用户
+     * 移除应用组关联
      *
      * @param id {@link String}
      * @return {@link Boolean}
