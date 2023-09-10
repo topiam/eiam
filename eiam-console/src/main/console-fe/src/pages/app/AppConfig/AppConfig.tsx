@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { history } from '@@/core/history';
-import { DesktopOutlined, ProfileOutlined } from '@ant-design/icons';
+import { DesktopOutlined, ProfileOutlined, SafetyOutlined } from '@ant-design/icons';
 import { GridContent, PageContainer } from '@ant-design/pro-components';
 import { useAsyncEffect } from 'ahooks';
 import type { MenuProps } from 'antd';
@@ -32,6 +32,8 @@ import { useIntl, useLocation } from '@umijs/max';
 import useStyle from './style';
 import classNames from 'classnames';
 import { AppProtocolType } from '@/constant';
+import PermissionResource from './components/PermissionResource';
+import PermissionRole from './components/PermissionRole';
 
 const prefixCls = 'app-config';
 
@@ -118,6 +120,27 @@ export default () => {
         },
       ],
     },
+    {
+      key: ConfigTabs.app_permission,
+      label: intl.formatMessage({ id: 'pages.app.config.items.app_permission' }),
+      icon: React.createElement(() => {
+        return <SafetyOutlined />;
+      }),
+      children: [
+        {
+          key: ConfigTabs.permission_resource,
+          label: intl.formatMessage({
+            id: 'pages.app.config.items.app_permission.permission_resource',
+          }),
+        },
+        {
+          key: ConfigTabs.permission_role,
+          label: intl.formatMessage({
+            id: 'pages.app.config.items.app_permission.permission_role',
+          }),
+        },
+      ],
+    },
   ];
 
   useAsyncEffect(async () => {
@@ -126,12 +149,12 @@ export default () => {
       history.push('/app');
       return;
     }
-    if (!type) {
-      setKeys([ConfigTabs.protocol_config]);
+    if (!type || !ConfigTabs[type]) {
+      setKeys([ConfigTabs.basic]);
       history.replace({
         pathname: location.pathname,
         search: queryString.stringify({
-          type: ConfigTabs.protocol_config,
+          type: ConfigTabs.basic,
           id,
           protocol,
           name,
@@ -152,6 +175,8 @@ export default () => {
       [ConfigTabs.protocol_config]: AppProtocol,
       [ConfigTabs.app_account]: AppAccount,
       [ConfigTabs.access_policy]: AccessPolicy,
+      [ConfigTabs.permission_resource]: PermissionResource,
+      [ConfigTabs.permission_role]: PermissionRole,
     };
     const Component = components[key];
     return <Component {...rest} />;
