@@ -19,15 +19,14 @@ import { download, filterParamConverter, sortParamConverter } from '@/utils/util
 import type { RequestData } from '@ant-design/pro-components';
 import type { SortOrder } from 'antd/es/table/interface';
 import { request } from '@umijs/max';
-import type { UploadFile } from 'antd/es/upload/interface';
 
 /**
  * 获取应用列表
  */
 export async function getAppList(
-  params?: Record<string, any>,
-  sort?: Record<string, SortOrder>,
-  filter?: Record<string, (string | number)[] | null>,
+  params: Record<string, any>,
+  sort: Record<string, SortOrder>,
+  filter: Record<string, (string | number)[] | null>,
 ): Promise<RequestData<AppAPI.AppList>> {
   return request<API.ApiResult<AppAPI.AppList>>('/api/v1/app/list', {
     params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },
@@ -192,32 +191,61 @@ export async function removeAppAccessPolicy(id: string): Promise<API.ApiResult<b
 }
 
 /**
- * parse Saml2 MetadataUrl
+ * 获取应用分组列表
  */
-export async function parseSaml2MetadataUrl(
-  metadataUrl: string,
-): Promise<API.ApiResult<Record<string, any>>> {
-  return request(`/api/v1/app/saml2/parse/metadata_url`, {
-    method: 'POST',
-    params: { metadataUrl },
-  }).catch(({ response: { data } }) => {
-    return data;
+export async function getAppGroupList(
+  params: Record<string, any>,
+  sort: Record<string, SortOrder>,
+  filter: Record<string, (string | number)[] | null>,
+): Promise<RequestData<AppAPI.AppGroupList>> {
+  return request<API.ApiResult<AppAPI.AppGroupList>>('/api/v1/app/group/list', {
+    params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },
+  }).then((result: API.ApiResult<AppAPI.AppGroupList>) => {
+    const data: RequestData<AppAPI.AppGroupList> = {
+      data: result?.result?.list ? result?.result?.list : [],
+      success: result?.success,
+      total: result?.result?.pagination ? result?.result?.pagination.total : 0,
+      totalPages: result?.result?.pagination?.totalPages,
+    };
+    return Promise.resolve(data);
   });
 }
 
-/**
- * parse Saml2 MetadataFile
- */
-export async function parseSaml2MetadataFile(
-  file: UploadFile,
-): Promise<API.ApiResult<Record<string, any>>> {
-  return request(`/api/v1/app/saml2/parse/metadata_file`, {
-    method: 'POST',
-    data: { file: file.originFileObj },
-    headers: {
-      'content-type': 'multipart/form-data',
-    },
-  }).catch(({ response: { data } }) => {
-    return data;
-  });
+export async function getAllAppGroupList(
+  params: Record<string, any>,
+  sort: Record<string, SortOrder>,
+  filter: Record<string, (string | number)[] | null>,
+): Promise<RequestData<AppAPI.AppGroupList>> {
+  let pageSize = 100,
+    current = 1;
+  // 存储所有数据的数组
+  let result: RequestData<AppAPI.AppGroupList> = {
+    data: [],
+    success: false,
+    total: undefined,
+  };
+
+  while (true) {
+    // 调用分页接口
+    const { success, data, total } = await getAppGroupList(
+      { current, pageSize, ...params },
+      sort,
+      filter,
+    );
+    if (success && data) {
+      // 如果当前页没有数据，表示已经加载完全部数据，退出循环
+      if (data?.length === 0) {
+        break;
+      }
+      result = { data: result.data?.concat(data), success: success, total: total };
+      // 增加当前页码
+      if (total && total <= pageSize * current) {
+        break;
+      } else {
+        current = current + 1;
+      }
+    }
+  }
+
+  return result;
 }

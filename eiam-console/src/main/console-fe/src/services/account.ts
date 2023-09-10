@@ -128,8 +128,8 @@ export async function moveOrganization(
  */
 export async function getUserList(
   params: Record<string, any>,
-  sort?: Record<string, SortOrder>,
-  filter?: Record<string, (string | number)[] | null>,
+  sort: Record<string, SortOrder>,
+  filter: Record<string, (string | number)[] | null>,
 ): Promise<RequestData<AccountAPI.ListUser>> {
   return request<API.ApiResult<AccountAPI.ListUser>>('/api/v1/user/list', {
     params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },
@@ -170,8 +170,8 @@ export async function batchGetUser(ids: string[]): Promise<API.ApiResult<Account
  */
 export async function getLoginAuditList(
   params: Record<string, any>,
-  sort?: Record<string, SortOrder>,
-  filter?: Record<string, (string | number)[] | null>,
+  sort: Record<string, SortOrder>,
+  filter: Record<string, (string | number)[] | null>,
 ): Promise<RequestData<AccountAPI.UserLoginAuditList>> {
   return request<API.ApiResult<AccountAPI.UserLoginAuditList>>('/api/v1/user/login_audit/list', {
     method: 'GET',
@@ -353,8 +353,8 @@ export async function getUserListNotInGroup(
  */
 export async function getUserGroupList(
   params: Record<string, any>,
-  sort?: Record<string, SortOrder>,
-  filter?: Record<string, (string | number)[] | null>,
+  sort: Record<string, SortOrder>,
+  filter: Record<string, (string | number)[] | null>,
 ): Promise<RequestData<AccountAPI.ListUserGroup>> {
   return request<API.ApiResult<AccountAPI.ListUserGroup>>('/api/v1/user_group/list', {
     params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },
@@ -433,8 +433,8 @@ export async function removeUserGroupMember(
  */
 export async function getUserGroupMemberList(
   params: Record<string, any>,
-  sort?: Record<string, SortOrder>,
-  filter?: Record<string, (string | number)[] | null>,
+  sort: Record<string, SortOrder>,
+  filter: Record<string, (string | number)[] | null>,
 ): Promise<RequestData<AccountAPI.ListUser>> {
   return request<API.ApiResult<AccountAPI.ListUser>>(
     `/api/v1/user_group/${params.id}/member_list`,

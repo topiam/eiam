@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { AppProtocolType } from '@/constant';
-import { getApp } from '@/services/app';
+import { getApp } from '../../service';
 import { ProCard } from '@ant-design/pro-components';
 
 import { useAsyncEffect } from 'ahooks';
@@ -25,7 +25,7 @@ import { useState } from 'react';
 import FromConfig from './FromProtocolConfig';
 import JwtConfig from './JwtProtocolConfig';
 import OidcConfig from './OidcProtocolConfig';
-import { GetApp } from '../../data';
+import { GetApp } from '../../data.d';
 import { useIntl } from '@@/exports';
 
 export default (props: { appId: string }) => {
