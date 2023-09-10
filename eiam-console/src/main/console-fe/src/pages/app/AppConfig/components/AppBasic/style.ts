@@ -23,6 +23,9 @@ const useStyle = createStyles(({ prefixCls, token }, props) => {
   return {
     main: {
       height: 'calc(100vh - 178px)',
+      [`${antCls}-pro-card-body`]: {
+        overflow: 'auto !important',
+      },
       [`.${prefix}-descriptions`]: {
         [`${antCls}-descriptions-item-container ${antCls}-space-item`]: {
           span: {
