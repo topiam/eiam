@@ -74,9 +74,9 @@ export default (props: CreateDrawerProps) => {
       scrollToFirstError
       onFinish={async (values: Record<string, string>) => {
         setUpdateLoading(true);
-        const result = await onFinish(values);
-        setUpdateLoading(false);
-        return !!result;
+        await onFinish(values).finally(() => {
+          setUpdateLoading(false);
+        });
       }}
       open={visible}
     >

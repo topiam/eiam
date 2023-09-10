@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { getApp, updateApp } from '@/services/app';
+import { updateApp } from '@/services/app';
 
 import { ProCard, ProDescriptions } from '@ant-design/pro-components';
 import { useAsyncEffect } from 'ahooks';
@@ -30,6 +30,7 @@ import classNames from 'classnames';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { uploadFile } from '@/services/upload';
 import { GetApp } from '@/pages/app/AppConfig/data';
+import { getApp } from '../../service';
 
 const prefixCls = 'app-basic-info';
 const AppBasic = (props: { appId: string }) => {

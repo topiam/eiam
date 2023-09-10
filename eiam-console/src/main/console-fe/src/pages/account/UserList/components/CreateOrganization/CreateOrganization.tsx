@@ -78,7 +78,7 @@ export default (props: CreateOrganizationFormProps<AccountAPI.CreateOrganization
    */
   const cancel = async () => {
     if (onCancel) {
-      await onCancel();
+      onCancel();
     }
     form.resetFields();
   };

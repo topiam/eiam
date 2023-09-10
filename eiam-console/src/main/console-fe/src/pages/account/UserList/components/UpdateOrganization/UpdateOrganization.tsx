@@ -61,7 +61,7 @@ export default (props: UpdateOrganizationFormProps<AccountAPI.UpdateOrganization
    */
   const cancel = async () => {
     if (onCancel) {
-      await onCancel();
+      onCancel();
     }
     form.resetFields();
   };

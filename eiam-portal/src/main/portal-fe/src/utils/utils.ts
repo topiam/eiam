@@ -18,7 +18,6 @@
 import { getEncryptSecret } from '@/services';
 import type { SortOrder } from 'antd/es/table/interface';
 import { parse } from 'querystring';
-import type { ReactText } from 'react';
 import { history, matchPath } from '@umijs/max';
 import { PhoneNumber } from 'google-libphonenumber';
 
@@ -94,7 +93,7 @@ export const sortParamConverter = (value: Record<string, SortOrder> | undefined)
  *
  * @param value
  */
-export const filterParamConverter = (value: Record<string, ReactText[] | null> | undefined) => {
+export const filterParamConverter = (value: Record<string, (string | number)[] | null>) => {
   const param: Record<string, any> = {};
   if (value)
     Object.entries(value).forEach(([key], index) => {

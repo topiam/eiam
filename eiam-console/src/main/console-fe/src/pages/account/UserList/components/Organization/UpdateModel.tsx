@@ -78,9 +78,9 @@ const UpdateModel = (props: UpdateFormProps<AccountAPI.UpdateOrganization>) => {
       open={visible}
       onFinish={async (values: AccountAPI.UpdateOrganization) => {
         setUpdateLoading(true);
-        const result = await onFinish(values);
-        setUpdateLoading(false);
-        return !!result;
+        await onFinish(values).finally(() => {
+          setUpdateLoading(false);
+        });
       }}
     >
       <Skeleton loading={loading} active={true}>

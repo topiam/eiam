@@ -39,6 +39,8 @@ export default {
   'menu.account.logout': '退出登录',
   'menu.social-bind': '用户绑定',
   'menu.app': '应用管理',
+  'menu.app.list': '应用列表',
+  'menu.app.group': '应用分组',
   'menu.app.create': '创建应用',
   'menu.app.config': '应用配置',
   'menu.account': '账户管理',

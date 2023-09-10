@@ -18,7 +18,7 @@
 import { getUserGroupList } from '@/services/account';
 import type { SelectProps } from 'antd';
 import { Select, Spin } from 'antd';
-import { ReactText, useState } from 'react';
+import { useState } from 'react';
 import { useAsyncEffect } from 'ahooks';
 import { SortOrder } from 'antd/es/table/interface';
 import { RequestData } from '@ant-design/pro-components';
@@ -35,9 +35,9 @@ export type UserGroupSelectProps<ValueType = UserData> = Omit<
 >;
 
 async function getAllUserGroupList(
-  params?: Record<string, any>,
-  sort?: Record<string, SortOrder>,
-  filter?: Record<string, ReactText[] | null>,
+  params: Record<string, any>,
+  sort: Record<string, SortOrder>,
+  filter: Record<string, (string | number)[] | null>,
 ): Promise<RequestData<AccountAPI.ListUserGroup>> {
   let pageSize = 100,
     current = 1;
@@ -79,7 +79,7 @@ const UserGroupSelect = (props: UserGroupSelectProps) => {
 
   useAsyncEffect(async () => {
     setFetching(true);
-    const { success, data } = await getAllUserGroupList().finally(() => {
+    const { success, data } = await getAllUserGroupList({}, {}, {}).finally(() => {
       setFetching(false);
     });
     if (success && data) {

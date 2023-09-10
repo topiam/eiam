@@ -422,4 +422,13 @@ declare namespace AppAPI {
     template: string;
     remark: string;
   };
+
+  export type AppGroupList = {
+    id: string;
+    name: string;
+    code: string;
+    type: string;
+    appCount: string;
+    remark: string;
+  };
 }

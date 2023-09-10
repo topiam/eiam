@@ -26,16 +26,16 @@ export default () => {
       <ProFormText
         name={['config', 'domain']}
         label={intl.formatMessage({
-          id: 'pages.setting.storage_provider.provider.tencent_cos.domain',
+          id: 'pages.setting.storage_provider.provider.aliyun_oss.domain',
         })}
         placeholder={intl.formatMessage({
-          id: 'pages.setting.storage_provider.provider.tencent_cos.domain.placeholder',
+          id: 'pages.setting.storage_provider.provider.aliyun_oss.domain.placeholder',
         })}
         rules={[
           {
             required: true,
             message: intl.formatMessage({
-              id: 'pages.setting.storage_provider.provider.tencent_cos.domain.rule.0.message',
+              id: 'pages.setting.storage_provider.provider.aliyun_oss.domain.rule.0.message',
             }),
           },
         ]}

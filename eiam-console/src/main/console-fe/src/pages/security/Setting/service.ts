@@ -16,13 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { request } from '@umijs/max';
+import { BasicSettingConfig, SecurityDefensePolicyConfig } from './data.d';
 
 /**
  * 获取基础配置
  */
-export async function getBasicSettingConfig(): Promise<
-  API.ApiResult<SettingAPI.AdvancedSettingConfig>
-> {
+export async function getBasicSettingConfig(): Promise<API.ApiResult<BasicSettingConfig>> {
   return request('/api/v1/setting/security/basic/config');
 }
 
@@ -30,7 +29,7 @@ export async function getBasicSettingConfig(): Promise<
  * 保存基础配置
  */
 export async function saveBasicSettingConfig(
-  params: Record<string, any>,
+  params: BasicSettingConfig,
 ): Promise<API.ApiResult<boolean>> {
   return request('/api/v1/setting/security/basic/save', {
     method: 'POST',
@@ -43,7 +42,7 @@ export async function saveBasicSettingConfig(
  * 获取内容安全策略配置
  */
 export async function getSecurityDefensePolicyConfig(): Promise<
-  API.ApiResult<SettingAPI.SecurityDefensePolicyConfig>
+  API.ApiResult<SecurityDefensePolicyConfig>
 > {
   return request('/api/v1/setting/security/defense_policy/config');
 }
@@ -52,7 +51,7 @@ export async function getSecurityDefensePolicyConfig(): Promise<
  * 保存内容安全策略配置
  */
 export async function saveSecurityDefensePolicyConfig(
-  params: Record<string, any>,
+  params: SecurityDefensePolicyConfig,
 ): Promise<API.ApiResult<boolean>> {
   return request('/api/v1/setting/security/defense_policy/save', {
     method: 'POST',
