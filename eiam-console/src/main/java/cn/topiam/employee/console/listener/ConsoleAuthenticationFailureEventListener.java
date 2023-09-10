@@ -36,6 +36,7 @@ import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.security.userdetails.UserDetails;
 import cn.topiam.employee.support.security.userdetails.UserType;
 import static cn.topiam.employee.core.security.util.SecurityUtils.getFailureMessage;
+import static cn.topiam.employee.support.security.util.SecurityUtils.getPrincipal;
 
 /**
  * 认证失败
@@ -59,13 +60,7 @@ public class ConsoleAuthenticationFailureEventListener implements
         AuditEventPublish publish = ApplicationContextHelp.getBean(AuditEventPublish.class);
         String content = getFailureMessage(event);
         logger.error("认证失败 [{}]",content);
-        String principal = (String) event.getAuthentication().getPrincipal();
-        if (event.getAuthentication().getPrincipal() instanceof String){
-            principal = (String) event.getAuthentication().getPrincipal();
-        }
-        if (event.getAuthentication().getPrincipal() instanceof UserDetails || event.getAuthentication().getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails){
-            principal = ((UserDetails) event.getAuthentication().getPrincipal()).getUsername();
-        }
+        String principal = getPrincipal(event);
         if (StringUtils.isNotBlank(principal)){
             Optional<AdministratorEntity> optional = getAdministratorRepository().findByUsername(principal);
             if (optional.isEmpty()) {

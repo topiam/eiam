@@ -43,6 +43,7 @@ import cn.topiam.employee.support.util.PhoneNumberUtils;
 import static cn.topiam.employee.core.help.SettingHelp.getLoginFailureDuration;
 import static cn.topiam.employee.core.security.util.SecurityUtils.getFailureMessage;
 import static cn.topiam.employee.support.security.userdetails.UserType.USER;
+import static cn.topiam.employee.support.security.util.SecurityUtils.getPrincipal;
 
 /**
  * 认证失败
@@ -67,13 +68,7 @@ public class PortalAuthenticationFailureEventListener implements
         AuditEventPublish publish = ApplicationContextHelp.getBean(AuditEventPublish.class);
         String content = getFailureMessage(event);
         logger.error("认证失败", event.getException());
-        String principal = null;
-        if (event.getAuthentication().getPrincipal() instanceof String) {
-            principal = (String) event.getAuthentication().getPrincipal();
-        }
-        if (event.getAuthentication().getPrincipal() instanceof UserDetails || event.getAuthentication().getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails) {
-            principal = ((UserDetails) event.getAuthentication().getPrincipal()).getUsername();
-        }
+        String principal = getPrincipal(event);
         if (StringUtils.isNotBlank(principal)) {
             UserEntity user = getUserRepository().findByUsername(principal);
             if (ObjectUtils.isEmpty(user)) {
