@@ -56,6 +56,12 @@ public class AppGroupListResult implements Serializable {
     private String        code;
 
     /**
+     * 应用数量
+     */
+    @Parameter(description = "应用数量")
+    private Integer       appCount;
+
+    /**
      * 分组类型
      */
     @Parameter(description = "分组类型")

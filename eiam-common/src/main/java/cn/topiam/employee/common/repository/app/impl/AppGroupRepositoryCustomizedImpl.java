@@ -19,6 +19,7 @@ package cn.topiam.employee.common.repository.app.impl;
 
 import java.util.List;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -75,6 +76,11 @@ public class AppGroupRepositoryCustomizedImpl implements AppGroupRepositoryCusto
         //分组编码
         if (StringUtils.isNoneBlank(query.getCode())) {
             builder.append(" AND `group`.code_ like '%").append(query.getCode()).append("%'");
+        }
+
+        //分组类型
+        if (ObjectUtils.isNotEmpty(query.getType())) {
+            builder.append(" AND `group`.type_ like '%").append(query.getType().getCode()).append("%'");
         }
 
         builder.append(" ORDER BY `group`.create_time DESC");

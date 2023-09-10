@@ -21,6 +21,8 @@ import java.io.Serializable;
 
 import org.springdoc.core.annotations.ParameterObject;
 
+import cn.topiam.employee.common.enums.app.AppGroupType;
+
 import lombok.Data;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -41,12 +43,18 @@ public class AppGroupQuery implements Serializable {
      * 分组名称
      */
     @Parameter(description = "分组名称")
-    private String name;
+    private String       name;
 
     /**
      * 分组编码
      */
     @Parameter(description = "分组编码")
-    private String code;
+    private String       code;
+
+    /**
+     * 分组类型
+     */
+    @Parameter(description = "分组类型")
+    private AppGroupType type;
 
 }
