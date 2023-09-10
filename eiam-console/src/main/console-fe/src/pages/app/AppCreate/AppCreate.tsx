@@ -21,6 +21,7 @@ import {
   ModalForm,
   PageContainer,
   ProCard,
+  ProFormSelect,
   ProFormText,
   ProFormTextArea,
   ProList,
@@ -38,6 +39,7 @@ import classnames from 'classnames';
 import { ListTemplate } from './data.d';
 import { AppType } from '@/constant';
 import { createApp, getAppTemplateList } from './service';
+import { getAllAppGroupList } from '@/services/app';
 
 const { Paragraph } = Typography;
 const prefixCls = 'topiam-create-app';
@@ -106,7 +108,7 @@ const CreateApp = (props: {
               onOk: () => {
                 successModal.destroy();
                 history.push(
-                  `/app/config?id=${result.id}&name=${values.name}&protocol=${protocol}`,
+                  `/app/list/config?id=${result.id}&name=${values.name}&protocol=${protocol}`,
                 );
               },
             });
@@ -127,6 +129,23 @@ const CreateApp = (props: {
               message: intl.formatMessage({ id: 'pages.app.create.modal_form.name.rule.0' }),
             },
           ]}
+        />
+        <ProFormSelect
+          name="groups"
+          mode="multiple"
+          label={'归属分组'}
+          request={async () => {
+            setLoading(true);
+            const { success, data } = await getAllAppGroupList({}, {}, {}).finally(() => {
+              setLoading(false);
+            });
+            if (success && data) {
+              return data.map((i) => {
+                return { label: i.name, value: i.id };
+              });
+            }
+            return [];
+          }}
         />
         <ProFormTextArea
           name="remark"
@@ -232,22 +251,20 @@ const AppCreate = () => {
             );
           }}
         />
-        {createAppTemplate && (
-          <CreateApp
-            code={createAppTemplate?.code}
-            name={createAppTemplate?.name}
-            protocol={createAppTemplate.protocol}
-            open={createAppOpen}
-            onCancel={() => {
-              setCreateAppOpen(false);
-              setCreateAppTemplate(undefined);
-            }}
-          />
-        )}
       </PageContainer>
+      {createAppTemplate && (
+        <CreateApp
+          code={createAppTemplate?.code}
+          name={createAppTemplate?.name}
+          protocol={createAppTemplate.protocol}
+          open={createAppOpen}
+          onCancel={() => {
+            setCreateAppOpen(false);
+            setCreateAppTemplate(undefined);
+          }}
+        />
+      )}
     </div>
   );
 };
-export default () => {
-  return <AppCreate />;
-};
+export default AppCreate;

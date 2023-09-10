@@ -81,7 +81,7 @@ export default () => {
       history.push(`/account/identity-source`);
       return;
     }
-    if (!type) {
+    if (!type || !IdentitySourceDetailTabs[type]) {
       setTabActiveKey(IdentitySourceDetailTabs.config);
       history.push({
         pathname: location.pathname,

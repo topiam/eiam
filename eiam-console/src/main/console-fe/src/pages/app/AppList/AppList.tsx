@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { getAppList } from '@/services/app';
+import { getAllAppGroupList, getAppList } from '@/services/app';
 import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import type { ActionType } from '@ant-design/pro-components';
 import { PageContainer, ProList } from '@ant-design/pro-components';
@@ -86,7 +86,7 @@ export default () => {
               key={'create'}
               type="primary"
               onClick={() => {
-                history.push('/app/create');
+                history.push('/app/list/create');
               }}
             >
               <PlusOutlined />
@@ -102,7 +102,7 @@ export default () => {
                   <span
                     onClick={() => {
                       history.push(
-                        `/app/config?id=${row.id}&protocol=${row.protocol}&name=${row.name}`,
+                        `/app/list/config?id=${row.id}&protocol=${row.protocol}&name=${row.name}`,
                       );
                     }}
                   >
@@ -177,7 +177,7 @@ export default () => {
                   key="config"
                   onClick={() => {
                     history.push(
-                      `/app/config?id=${row.id}&protocol=${row.protocol}&name=${row.name}`,
+                      `/app/list/config?id=${row.id}&protocol=${row.protocol}&name=${row.name}`,
                     );
                   }}
                 >
@@ -212,6 +212,25 @@ export default () => {
                   </a>
                 </Popconfirm>,
               ],
+            },
+            status: {
+              // 自己扩展的字段，主要用于筛选，不在列表中显示
+              title: intl.formatMessage({
+                id: 'pages.app.list.metas.group',
+              }),
+              valueType: 'select',
+              fieldProps: {
+                mode: 'multiple',
+              },
+              request: async () => {
+                const { success, data } = await getAllAppGroupList({}, {}, {});
+                if (success && data) {
+                  return data.map((i) => {
+                    return { label: i.name, value: i.id };
+                  });
+                }
+                return [];
+              },
             },
           }}
         />
