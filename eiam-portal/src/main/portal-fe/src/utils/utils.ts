@@ -94,7 +94,7 @@ export const sortParamConverter = (value: Record<string, SortOrder> | undefined)
  *
  * @param value
  */
-export const filterParamConverter = (value: Record<string, ReactText[] | null> | undefined) => {
+export const filterParamConverter = (value: Record<string, Record<string, string | number[] | null>[] | null> | undefined) => {
   const param: Record<string, any> = {};
   if (value)
     Object.entries(value).forEach(([key], index) => {
