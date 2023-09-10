@@ -24,6 +24,7 @@ export default {
   'pages.app.config.basic.icon.desc.2': '建议使用 256 * 256 像素方形图标',
   'pages.app.config.basic.enabled': '应用状态',
   'pages.app.config.basic.type': '应用类型',
+  'pages.app.config.basic.group': '应用分组',
   'pages.app.config.basic.type.value_enum.custom_made': '定制应用',
   'pages.app.config.basic.type.value_enum.standard': '标准应用',
   'pages.app.config.basic.type.value_enum.self_developed': '自研应用',
@@ -591,6 +592,10 @@ export default {
     '授权组织',
   'pages.app.config.items.login_access.access_policy.create_policy.modal_form.subject_type.auth_organization.rule.0.message':
     '请选择组织节点',
+  'pages.app.config.items.app_permission': '权限管理',
+  'pages.app.config.items.app_permission.permission_resource': '资源管理',
+  'pages.app.config.items.app_permission.permission_role': '角色管理',
+  'pages.app.config.items.app_permission.permission_audit': '权限审计',
   'pages.app.config.items.account_sync': '账户同步',
   'pages.app.config.error': '未指定应用',
 };

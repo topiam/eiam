@@ -24,7 +24,7 @@ import { EmailTemplateList, GetEmailTemplate, SmsTemplateList } from './data.d';
  * @param params
  */
 export async function getMailTemplateList(
-  params?: Record<string, any>,
+  params: Record<string, any>,
 ): Promise<API.ApiResult<EmailTemplateList>> {
   return request('/api/v1/setting/mail_template/list', { params });
 }
