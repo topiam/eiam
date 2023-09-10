@@ -17,8 +17,9 @@
  */
 package cn.topiam.employee.application;
 
-import cn.topiam.employee.common.entity.app.AppGroupAssociationEntity;
-import cn.topiam.employee.common.repository.app.AppGroupAssociationRepository;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.util.AlternativeJdkIdGenerator;
 import org.springframework.util.IdGenerator;
@@ -27,16 +28,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.topiam.employee.common.entity.app.AppAccountEntity;
 import cn.topiam.employee.common.entity.app.AppEntity;
+import cn.topiam.employee.common.entity.app.AppGroupAssociationEntity;
 import cn.topiam.employee.common.enums.app.AuthorizationType;
 import cn.topiam.employee.common.enums.app.InitLoginType;
 import cn.topiam.employee.common.exception.app.AppAccountNotExistException;
 import cn.topiam.employee.common.repository.app.AppAccountRepository;
+import cn.topiam.employee.common.repository.app.AppGroupAssociationRepository;
 import cn.topiam.employee.common.repository.app.AppRepository;
 
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * AbstractApplicationService

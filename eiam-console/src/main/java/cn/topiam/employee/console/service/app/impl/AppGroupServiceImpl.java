@@ -18,7 +18,6 @@
 package cn.topiam.employee.console.service.app.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,17 +25,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Lists;
-
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.common.entity.app.AppEntity;
-import cn.topiam.employee.common.entity.app.AppGroupAssociationEntity;
 import cn.topiam.employee.common.entity.app.AppGroupEntity;
 import cn.topiam.employee.common.entity.app.po.AppGroupPO;
 import cn.topiam.employee.common.entity.app.query.AppGroupAssociationListQuery;
 import cn.topiam.employee.common.entity.app.query.AppGroupQuery;
+import cn.topiam.employee.common.enums.app.AppGroupType;
 import cn.topiam.employee.common.repository.app.AppGroupAssociationRepository;
 import cn.topiam.employee.common.repository.app.AppGroupRepository;
 import cn.topiam.employee.console.converter.app.AppConverter;
@@ -93,6 +90,7 @@ public class AppGroupServiceImpl implements AppGroupService {
     @Transactional(rollbackFor = Exception.class)
     public Boolean createAppGroup(AppGroupCreateParam param) {
         AppGroupEntity entity = appGroupConverter.appGroupCreateParamConvertToEntity(param);
+        entity.setType(AppGroupType.CUSTOM);
         appGroupRepository.save(entity);
         AuditContext.setTarget(
             Target.builder().id(String.valueOf(entity.getId())).type(TargetType.APP_GROUP).build());
@@ -150,34 +148,6 @@ public class AppGroupServiceImpl implements AppGroupService {
     }
 
     /**
-     * 启用应用分组
-     *
-     * @param id {@link String}
-     * @return {@link Boolean}
-     */
-    @Override
-    public Boolean enableAppGroup(String id) {
-        appGroupRequireNonNull(Long.valueOf(id));
-        Integer count = appGroupRepository.updateAppGroupStatus(Long.valueOf(id), Boolean.TRUE);
-        AuditContext.setTarget(Target.builder().id(id).type(TargetType.APP_GROUP).build());
-        return count > 0;
-    }
-
-    /**
-     * 禁用应用分组
-     *
-     * @param id {@link String}
-     * @return {@link Boolean}
-     */
-    @Override
-    public Boolean disableAppGroup(String id) {
-        appGroupRequireNonNull(Long.valueOf(id));
-        Integer count = appGroupRepository.updateAppGroupStatus(Long.valueOf(id), Boolean.FALSE);
-        AuditContext.setTarget(Target.builder().id(id).type(TargetType.APP_GROUP).build());
-        return count > 0;
-    }
-
-    /**
      * 查询并检查分组是否为空，非空返回
      *
      * @param id {@link Long}
@@ -191,38 +161,6 @@ public class AppGroupServiceImpl implements AppGroupService {
             throw new TopIamException(AuditContext.getContent());
         }
         return optional.get();
-    }
-
-    /**
-     * 添加应用
-     *
-     * @param appIds  {@link String}
-     * @param groupId {@link String}
-     * @return {@link Boolean}
-     */
-    @Override
-    public Boolean addAssociation(String groupId, String[] appIds) {
-        Optional<AppGroupEntity> optional = appGroupRepository.findById(Long.valueOf(groupId));
-        //用户组不存在
-        if (optional.isEmpty()) {
-            AuditContext.setContent("操作失败，应用组不存在");
-            log.warn(AuditContext.getContent());
-            throw new TopIamException(AuditContext.getContent());
-        }
-        List<AppGroupAssociationEntity> list = new ArrayList<>();
-        Lists.newArrayList(appIds).forEach(id -> {
-            AppGroupAssociationEntity member = new AppGroupAssociationEntity();
-            member.setGroupId(Long.valueOf(groupId));
-            member.setAppId(Long.valueOf(id));
-            list.add(member);
-        });
-        //添加
-        appGroupAssociationRepository.saveAll(list);
-        List<Target> targets = new ArrayList<>(Arrays.stream(appIds)
-            .map(i -> Target.builder().id(i).type(TargetType.APPLICATION).build()).toList());
-        targets.add(Target.builder().id(groupId).type(TargetType.APP_GROUP).build());
-        AuditContext.setTarget(targets);
-        return true;
     }
 
     /**

@@ -81,31 +81,6 @@ public interface AppGroupService {
     AppGroupGetResult getAppGroup(Long id);
 
     /**
-     * 启用应用分组
-     *
-     * @param id {@link String}
-     * @return {@link Boolean}
-     */
-    Boolean enableAppGroup(String id);
-
-    /**
-     * 禁用应用分组
-     *
-     * @param id {@link String}
-     * @return {@link Boolean}
-     */
-    Boolean disableAppGroup(String id);
-
-    /**
-     * 添加应用
-     *
-     * @param appIds {@link String}
-     * @param groupId {@link String}
-     * @return {@link Boolean}
-     */
-    Boolean addAssociation(String groupId, String[] appIds);
-
-    /**
      * 批量移除应用
      *
      * @param id      {@link String}

@@ -35,6 +35,9 @@
             <column name="code_" remarks="分组编码" type="VARCHAR(64)">
                 <constraints nullable="false"/>
             </column>
+            <column name="type_" type="VARCHAR(20)" remarks="类型（默认、自定义）">
+                <constraints nullable="false"/>
+            </column>
             <column name="create_by" remarks="创建者" type="VARCHAR(64)">
                 <constraints nullable="false"/>
             </column>

@@ -20,6 +20,8 @@ package cn.topiam.employee.console.pojo.result.app;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import cn.topiam.employee.common.enums.app.AppGroupType;
+
 import lombok.Data;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -52,6 +54,12 @@ public class AppGroupListResult implements Serializable {
      */
     @Parameter(description = "分组编码")
     private String        code;
+
+    /**
+     * 分组类型
+     */
+    @Parameter(description = "分组类型")
+    private AppGroupType  type;
 
     /**
      * 创建时间

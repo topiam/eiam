@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import cn.topiam.employee.common.repository.app.AppGroupAssociationRepository;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,6 +35,7 @@ import cn.topiam.employee.common.entity.app.po.AppFormConfigPO;
 import cn.topiam.employee.common.enums.app.*;
 import cn.topiam.employee.common.repository.app.AppAccountRepository;
 import cn.topiam.employee.common.repository.app.AppFormConfigRepository;
+import cn.topiam.employee.common.repository.app.AppGroupAssociationRepository;
 import cn.topiam.employee.common.repository.app.AppRepository;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.validation.ValidationUtils;
