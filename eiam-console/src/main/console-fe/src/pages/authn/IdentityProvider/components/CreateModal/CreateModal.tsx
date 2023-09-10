@@ -83,9 +83,9 @@ export default (props: CreateDrawerProps) => {
       {...DRAWER_FORM_ITEM_LAYOUT}
       onFinish={async (values: Record<string, string>) => {
         setLoading(true);
-        const result = await onFinish(values);
-        setLoading(false);
-        return !!result;
+        await onFinish(values).finally(() => {
+          setLoading(false);
+        });
       }}
     >
       <Spin spinning={loading}>

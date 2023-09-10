@@ -42,9 +42,9 @@ export default (props: CreateModelProps) => {
         wrapperCol={{ span: 19 }}
         onFinish={async (values: Record<string, string>) => {
           setLoading(true);
-          const result = await onFinish(values);
-          setLoading(false);
-          return !!result;
+          await onFinish(values).finally(() => {
+            setLoading(false);
+          });
         }}
         modalProps={{
           destroyOnClose: true,
