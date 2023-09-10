@@ -33,7 +33,6 @@ import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.common.entity.setting.AdministratorEntity;
 import cn.topiam.employee.common.repository.setting.AdministratorRepository;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
-import cn.topiam.employee.support.security.userdetails.UserDetails;
 import cn.topiam.employee.support.security.userdetails.UserType;
 import static cn.topiam.employee.core.security.util.SecurityUtils.getFailureMessage;
 import static cn.topiam.employee.support.security.util.SecurityUtils.getPrincipal;

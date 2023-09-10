@@ -38,7 +38,6 @@ import cn.topiam.employee.common.enums.UserStatus;
 import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.core.help.SettingHelp;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
-import cn.topiam.employee.support.security.userdetails.UserDetails;
 import cn.topiam.employee.support.util.PhoneNumberUtils;
 import static cn.topiam.employee.core.help.SettingHelp.getLoginFailureDuration;
 import static cn.topiam.employee.core.security.util.SecurityUtils.getFailureMessage;
