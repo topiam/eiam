@@ -18,6 +18,7 @@
 package cn.topiam.employee.console.pojo.save.app;
 
 import java.io.Serializable;
+import java.util.List;
 
 import lombok.Data;
 
@@ -40,30 +41,30 @@ public class AppCreateParam implements Serializable {
      */
     @NotBlank(message = "应用名称不能为空")
     @Schema(description = "应用名称")
-    private String name;
+    private String       name;
 
     /**
      * 应用模版
      */
     @NotNull(message = "应用模版不能为空")
     @Schema(description = "应用模版")
-    private String template;
+    private String       template;
 
     /**
      * 应用图标
      */
     @Schema(description = "应用图标")
-    private String icon;
+    private String       icon;
 
     /**
      * 备注
      */
     @Schema(description = "备注")
-    private String remark;
+    private String       remark;
 
     /**
      * 应用分组id
      */
-    @Schema(description = "应用分组ID")
-    private Long[] groupId;
+    @Schema(description = "应用分组")
+    private List<String> groupIds;
 }

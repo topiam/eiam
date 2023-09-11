@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.console.listener;
+package cn.topiam.employee.console.initialize;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -47,18 +47,17 @@ import static cn.topiam.employee.support.lock.LockAspect.getTopiamLockKeyPrefix;
 import static cn.topiam.employee.support.util.CreateFileUtil.createFile;
 
 /**
- * ConsoleAdminPasswordInitializeListener
+ * DefaultAdministratorInitialize
  *
  * @author TopIAM
  * Created by support@topiam.cn on  2022/11/26 21:44
  */
 @Order(2)
 @Component
-public class ConsoleAdminPasswordInitializeListener implements
-                                                    ApplicationListener<ContextRefreshedEvent> {
+public class DefaultAdministratorInitialize implements ApplicationListener<ContextRefreshedEvent> {
 
     private final Logger        logger    = LoggerFactory
-        .getLogger(ConsoleAdminPasswordInitializeListener.class);
+        .getLogger(DefaultAdministratorInitialize.class);
     private static final String DIR_NAME  = ".topiam";
     private static final String USER_HOME = "user.home";
 
@@ -159,9 +158,9 @@ public class ConsoleAdminPasswordInitializeListener implements
 
     private final RedissonClient            redissonClient;
 
-    public ConsoleAdminPasswordInitializeListener(AdministratorRepository administratorRepository,
-                                                  PasswordEncoder passwordEncoder,
-                                                  RedissonClient redissonClient) {
+    public DefaultAdministratorInitialize(AdministratorRepository administratorRepository,
+                                          PasswordEncoder passwordEncoder,
+                                          RedissonClient redissonClient) {
         this.administratorRepository = administratorRepository;
         this.passwordEncoder = passwordEncoder;
         this.redissonClient = redissonClient;

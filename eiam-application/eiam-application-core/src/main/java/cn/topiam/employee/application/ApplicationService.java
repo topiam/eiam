@@ -92,11 +92,11 @@ public interface ApplicationService {
      * @param name {@link String} 名称
      * @param icon {@link String} 图标
      * @param remark {@link String} 备注
-     * @param groupId {@link String} 分组id
+     * @param groupIds {@link String} 分组id
      * @return {@link Long} 应用ID
      */
     @Transactional(rollbackFor = Exception.class)
-    String create(String name, String icon, String remark, Long[] groupId);
+    String create(String name, String icon, String remark, List<String> groupIds);
 
     /**
      * 删除应用
@@ -137,11 +137,24 @@ public interface ApplicationService {
      * @param name {@link String}
      * @param icon  {@link String}
      * @param remark  {@link String}
-     * @param groupId {@link Long} 分组id
      * @param initLoginType  {@link InitLoginType}
      * @param authorizationType {@link AuthorizationType}
      * @return {@link AppEntity}
      */
-    AppEntity createApp(String name, String icon, String remark, Long[] groupId,
+    AppEntity createApp(String name, String icon, String remark, InitLoginType initLoginType,
+                        AuthorizationType authorizationType);
+
+    /**
+     * 创建应用
+     *
+     * @param name {@link String}
+     * @param icon  {@link String}
+     * @param remark  {@link String}
+     * @param groupIds {@link Long} 分组id
+     * @param initLoginType  {@link InitLoginType}
+     * @param authorizationType {@link AuthorizationType}
+     * @return {@link AppEntity}
+     */
+    AppEntity createApp(String name, String icon, String remark, List<String> groupIds,
                         InitLoginType initLoginType, AuthorizationType authorizationType);
 }

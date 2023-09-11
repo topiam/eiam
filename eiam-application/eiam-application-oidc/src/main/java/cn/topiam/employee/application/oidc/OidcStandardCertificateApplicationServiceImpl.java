@@ -75,12 +75,12 @@ public class OidcStandardCertificateApplicationServiceImpl extends
      * @param name   {@link String} 名称
      * @param icon   {@link String} 图标
      * @param remark {@link String} 备注
-     * @param groupId {@link Long} 分组id
+     * @param groupIds {@link Long} 分组id
      */
     @Override
-    public String create(String name, String icon, String remark, Long[] groupId) {
+    public String create(String name, String icon, String remark, List<String> groupIds) {
         //1、创建应用
-        AppEntity appEntity = createApp(name, icon, remark, groupId, InitLoginType.APP,
+        AppEntity appEntity = createApp(name, icon, remark, groupIds, InitLoginType.APP,
             AuthorizationType.AUTHORIZATION);
         //2、创建证书
         createCertificate(appEntity.getId(), appEntity.getCode(), AppCertUsingType.OIDC_JWK);
