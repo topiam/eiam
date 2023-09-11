@@ -59,9 +59,19 @@ public abstract class AbstractApplicationService implements ApplicationService {
         return account;
     }
 
+    /**
+     * 创建应用
+     *
+     * @param name              {@link String}
+     * @param icon              {@link String}
+     * @param remark            {@link String}
+     * @param initLoginType     {@link InitLoginType}
+     * @param authorizationType {@link AuthorizationType}
+     * @return {@link AppEntity}
+     */
     @Override
-    public AppEntity createApp(String name, String icon, String remark, Long[] groupId,
-                               InitLoginType initLoginType, AuthorizationType authorizationType) {
+    public AppEntity createApp(String name, String icon, String remark, InitLoginType initLoginType,
+                               AuthorizationType authorizationType) {
         AppEntity appEntity = new AppEntity();
         appEntity.setName(name);
         appEntity.setIcon(icon);
@@ -75,11 +85,18 @@ public abstract class AbstractApplicationService implements ApplicationService {
         appEntity.setInitLoginType(initLoginType);
         appEntity.setAuthorizationType(authorizationType);
         appEntity.setRemark(remark);
-        appRepository.save(appEntity);
+        return appRepository.save(appEntity);
+    }
+
+    @Override
+    public AppEntity createApp(String name, String icon, String remark, List<String> groupIds,
+                               InitLoginType initLoginType, AuthorizationType authorizationType) {
+
+        AppEntity appEntity = createApp(name, icon, remark, initLoginType, authorizationType);
         List<AppGroupAssociationEntity> list = new ArrayList<>();
-        for (Long id : groupId) {
+        for (String id : groupIds) {
             AppGroupAssociationEntity appGroupAssociationEntity = new AppGroupAssociationEntity();
-            appGroupAssociationEntity.setGroupId(id);
+            appGroupAssociationEntity.setGroupId(Long.valueOf(id));
             appGroupAssociationEntity.setAppId(appEntity.getId());
             list.add(appGroupAssociationEntity);
         }

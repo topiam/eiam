@@ -17,6 +17,7 @@
  */
 package cn.topiam.employee.common.repository.app;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,10 +82,30 @@ public interface AppGroupRepository extends LogicDeleteRepository<AppGroupEntity
      */
     @NotNull
     @Cacheable
-    @Query(value = "SELECT * FROM app_group WHERE id_ = :id", nativeQuery = true)
+    @Query(value = "FROM AppGroupEntity WHERE id = :id")
     Optional<AppGroupEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") Long id);
 
-    @Query(value = "SELECT * FROM app_group WHERE is_deleted = 0", nativeQuery = true)
+    /**
+     * 获取所有分组列表
+     *
+     * @return {@link List}
+     */
+    @Query(value = "FROM AppGroupEntity WHERE deleted = false ")
     List<AppGroupEntity> getAppGroupList();
 
+    /**
+     * 根据code列表查询
+     *
+     * @param codes {@link List}
+     * @return {@link List}
+     */
+    List<AppGroupEntity> findAllByCodeIn(@Param("codes") Collection<String> codes);
+
+    /**
+     * 根据code查询
+     *
+     * @param code {@link String}
+     * @return {@link AppGroupEntity}
+     */
+    Optional<AppGroupEntity> findByCode(@Param("code") String code);
 }

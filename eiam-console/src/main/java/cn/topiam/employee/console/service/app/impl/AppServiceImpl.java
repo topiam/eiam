@@ -97,11 +97,10 @@ public class AppServiceImpl implements AppService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public AppCreateResult createApp(AppCreateParam param) {
-        // TODO 创建后没有数据权限
         ApplicationService applicationService = applicationServiceLoader
             .getApplicationService(param.getTemplate());
         String appId = applicationService.create(param.getName(), param.getIcon(),
-            param.getRemark(), param.getGroupId());
+            param.getRemark(), param.getGroupIds());
         AuditContext.setTarget(Target.builder().id(appId).type(TargetType.APPLICATION).build());
         return new AppCreateResult(appId);
     }
