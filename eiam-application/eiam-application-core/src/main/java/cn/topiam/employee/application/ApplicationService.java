@@ -17,6 +17,7 @@
  */
 package cn.topiam.employee.application;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -85,6 +86,19 @@ public interface ApplicationService {
      * @return {@link String}
      */
     String getBase64Icon();
+
+    /**
+     * 创建应用
+     *
+     * @param name {@link String} 名称
+     * @param icon {@link String} 图标
+     * @param remark {@link String} 备注
+     * @return {@link Long} 应用ID
+     */
+    @Transactional(rollbackFor = Exception.class)
+    default String create(String name, String icon, String remark) {
+        return create(name, icon, remark, new ArrayList<>());
+    }
 
     /**
      * 创建应用
