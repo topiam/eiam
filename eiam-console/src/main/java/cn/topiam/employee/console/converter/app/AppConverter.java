@@ -32,7 +32,7 @@ import cn.topiam.employee.application.ApplicationService;
 import cn.topiam.employee.application.ApplicationServiceLoader;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.QAppEntity;
-import cn.topiam.employee.console.pojo.query.app.AppQuery;
+import cn.topiam.employee.common.entity.app.query.AppQuery;
 import cn.topiam.employee.console.pojo.result.app.AppGetResult;
 import cn.topiam.employee.console.pojo.result.app.AppListResult;
 import cn.topiam.employee.console.pojo.update.app.AppUpdateParam;

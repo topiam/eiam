@@ -20,11 +20,13 @@ package cn.topiam.employee.common.repository.app.impl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -33,6 +35,7 @@ import com.google.common.collect.Lists;
 import cn.topiam.employee.common.entity.account.OrganizationMemberEntity;
 import cn.topiam.employee.common.entity.account.UserGroupMemberEntity;
 import cn.topiam.employee.common.entity.app.AppEntity;
+import cn.topiam.employee.common.entity.app.query.AppQuery;
 import cn.topiam.employee.common.repository.account.OrganizationMemberRepository;
 import cn.topiam.employee.common.repository.account.UserGroupMemberRepository;
 import cn.topiam.employee.common.repository.app.AppRepositoryCustomized;
@@ -106,6 +109,54 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
             Integer.class);
         return new PageImpl<>(list, pageable, count);
     }
+
+    /**
+     * 获取应用列表
+     *
+     * @param appQuery {@link  AppQuery}
+     * @param pageable {@link  Pageable}
+     * @return {@link List}
+     */
+    public Page<AppEntity> getAppList(AppQuery appQuery, Pageable pageable) {
+        //@formatter:off
+        StringBuilder builder = new StringBuilder("""
+                SELECT DISTINCT
+                	app.*
+                FROM
+                	app
+                	INNER JOIN app_group_association `group` ON app.id_ = `group`.app_id
+                """);
+
+        //应用名称
+        if (StringUtils.isNoneBlank(appQuery.getName())) {
+            builder.append(" AND app.name_ like '%").append(appQuery.getName()).append("%'");
+        }
+        //协议类型
+        if (Objects.nonNull(appQuery.getProtocol())) {
+            builder.append(" AND app.protocol_ = ").append(appQuery.getProtocol().getCode());
+        }
+        //应用组ID
+        if(Objects.nonNull(appQuery.getGroupId())){
+            builder.append(" AND group.group_id = ").append(appQuery.getGroupId());
+        }
+
+        //@formatter:on
+        String sql = builder.toString();
+        List<AppEntity> list = jdbcTemplate.query(
+            builder.append(" LIMIT ").append(pageable.getPageNumber() * pageable.getPageSize())
+                .append(",").append(pageable.getPageSize()).toString(),
+            new AppEntityMapper());
+        //@formatter:off
+        String countSql = "SELECT count(*) FROM (" + sql + ") app_account_";
+        //@formatter:on
+        Integer count = jdbcTemplate.queryForObject(countSql, Integer.class);
+        return new PageImpl<>(list, pageable, count);
+    }
+
+    /**
+     * JdbcTemplate
+     */
+    private final JdbcTemplate                 jdbcTemplate;
 
     /**
      * NamedParameterJdbcTemplate

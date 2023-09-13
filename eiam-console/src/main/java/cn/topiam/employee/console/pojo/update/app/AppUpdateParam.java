@@ -18,6 +18,7 @@
 package cn.topiam.employee.console.pojo.update.app;
 
 import java.io.Serializable;
+import java.util.List;
 
 import lombok.Data;
 
@@ -58,4 +59,10 @@ public class AppUpdateParam implements Serializable {
      */
     @Schema(description = "备注")
     private String remark;
+
+    /**
+     * 应用分组id
+     */
+    @Schema(description = "应用分组")
+    private List<String> groupIds;
 }

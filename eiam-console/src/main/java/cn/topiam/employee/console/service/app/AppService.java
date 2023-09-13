@@ -19,7 +19,7 @@ package cn.topiam.employee.console.service.app;
 
 import java.util.Map;
 
-import cn.topiam.employee.console.pojo.query.app.AppQuery;
+import cn.topiam.employee.common.entity.app.query.AppQuery;
 import cn.topiam.employee.console.pojo.result.app.AppCreateResult;
 import cn.topiam.employee.console.pojo.result.app.AppGetResult;
 import cn.topiam.employee.console.pojo.result.app.AppListResult;
