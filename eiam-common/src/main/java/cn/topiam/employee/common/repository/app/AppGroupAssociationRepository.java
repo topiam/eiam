@@ -26,6 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.app.AppGroupAssociationEntity;
 import cn.topiam.employee.support.repository.LogicDeleteRepository;
+
+import java.util.List;
+
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 
 /**
@@ -73,4 +76,14 @@ public interface AppGroupAssociationRepository extends
      * @param appId {@link Long}
      */
     void deleteByAppId(Long appId);
+
+
+    /**
+     * 根据应用ID 查询关联信息
+     *
+     * @param appId {@link Long}
+     * @return {@link List}
+     */
+    @Query(value = "SELECT group_id FROM `app_group_association` WHERE  app_id  = :appId AND is_deleted = '0'", nativeQuery = true)
+    List<Long> findGroupIdByAppId(Long appId);
 }

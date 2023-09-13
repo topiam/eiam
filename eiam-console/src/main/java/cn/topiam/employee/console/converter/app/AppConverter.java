@@ -135,9 +135,10 @@ public interface AppConverter {
      * 实体转应用返回
      *
      * @param entity {@link AppEntity}
+     * @param groupIds {@link List}
      * @return {@link AppGetResult}
      */
-    default AppGetResult entityConvertToAppResult(AppEntity entity) {
+    default AppGetResult entityConvertToAppResult(AppEntity entity,List<Long> groupIds) {
         if (entity == null) {
             return null;
         }
@@ -150,6 +151,7 @@ public interface AppConverter {
         appGetResult.setClientId(entity.getClientId());
         appGetResult.setClientSecret(entity.getClientSecret());
         appGetResult.setType(entity.getType());
+        appGetResult.setGroupIds(groupIds);
         //图标未配置，所以先从模版中拿
         if (StringUtils.isBlank(entity.getIcon())) {
             ApplicationService applicationService = getApplicationServiceLoader()

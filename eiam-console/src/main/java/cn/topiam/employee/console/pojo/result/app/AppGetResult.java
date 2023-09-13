@@ -19,6 +19,7 @@ package cn.topiam.employee.console.pojo.result.app;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import cn.topiam.employee.common.enums.app.AppProtocol;
 import cn.topiam.employee.common.enums.app.AppType;
@@ -104,4 +105,11 @@ public class AppGetResult implements Serializable {
      */
     @Parameter(description = "备注")
     private String        remark;
+
+
+    /**
+     * 应用组ID集合
+     */
+    @Parameter(description = "应用组ID集合")
+    private List<Long> groupIds;
 }
