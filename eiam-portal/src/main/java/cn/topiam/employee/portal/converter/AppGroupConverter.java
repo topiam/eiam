@@ -46,11 +46,9 @@ public interface AppGroupConverter {
      *
      * @return {@link Predicate}
      */
-    default Predicate queryPredicate() {
+    default Predicate getQueryPredicate() {
         QAppGroupEntity appGroup = QAppGroupEntity.appGroupEntity;
-        Predicate predicate = ExpressionUtils.and(appGroup.isNotNull(), appGroup.deleted.eq(Boolean.FALSE));
-        //@formatter:on
-        return predicate;
+        return ExpressionUtils.and(appGroup.isNotNull(), appGroup.deleted.eq(Boolean.FALSE));
     }
 
     /**

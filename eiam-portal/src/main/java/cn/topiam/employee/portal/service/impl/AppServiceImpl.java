@@ -71,7 +71,7 @@ public class AppServiceImpl implements AppService {
      */
     @Override
     public List<AppGroupListResult> getAppGroupList() {
-        Predicate predicate = appGroupConverter.queryPredicate();
+        Predicate predicate = appGroupConverter.getQueryPredicate();
         Predicate appGroupAssociationPredicate = appGroupConverter
             .queryAppGroupAssociationPredicate();
         List<AppGroupAssociationEntity> appGroupAssociationList = (List<AppGroupAssociationEntity>) appGroupAssociationRepository
