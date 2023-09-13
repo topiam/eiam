@@ -98,6 +98,7 @@ export default {
   'custom.selected.item': '项',
   'custom.unchecked': '暂未选中',
   'custom.search_button': '搜索',
+  'custom.upload': '上传',
   ...menu,
   ...component,
   ...pages,

@@ -108,6 +108,9 @@ export default () => {
               label={intl.formatMessage({
                 id: 'pages.account.user_group_detail.pro_descriptions.name',
               })}
+              fieldProps={{
+                maxLength: 8,
+              }}
               copyable
             />
             <ProDescriptions.Item

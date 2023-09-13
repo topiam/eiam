@@ -108,7 +108,7 @@ const CreateApp = (props: {
               onOk: () => {
                 successModal.destroy();
                 history.push(
-                  `/app/list/config?id=${result.id}&name=${values.name}&protocol=${protocol}`,
+                  `/app/config?id=${result.id}&name=${values.name}&protocol=${protocol}`,
                 );
               },
             });
@@ -131,9 +131,12 @@ const CreateApp = (props: {
           ]}
         />
         <ProFormSelect
-          name="groups"
+          name="groupIds"
           mode="multiple"
-          label={'归属分组'}
+          fieldProps={{
+            maxTagCount: 'responsive',
+          }}
+          label={intl.formatMessage({ id: 'pages.app.create.modal_form.group' })}
           request={async () => {
             setLoading(true);
             const { success, data } = await getAllAppGroupList({}, {}, {}).finally(() => {

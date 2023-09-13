@@ -48,7 +48,7 @@ export default (props: { visible: boolean }) => {
   async function getList() {
     setLoading(true);
     // 加载列表
-    const { success, result } = await getMailTemplateList();
+    const { success, result } = await getMailTemplateList({});
     if (success) {
       setDataSource(result);
     }
@@ -76,6 +76,7 @@ export default (props: { visible: boolean }) => {
    * 浏览
    *
    * @param browseTitle
+   * @param browseContent
    */
   const browseOnClick = (browseTitle: string, browseContent: string) => {
     setTitle(<span>{`${browseTitle}`}</span>);

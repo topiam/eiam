@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { updateApp } from '@/services/app';
+import { getAllAppGroupList, updateApp } from '@/services/app';
 
 import { ProCard, ProDescriptions } from '@ant-design/pro-components';
 import { useAsyncEffect } from 'ahooks';
@@ -67,10 +67,11 @@ const AppBasic = (props: { appId: string }) => {
    */
   const onSave = async (key: React.Key | React.Key[], record: GetApp): Promise<any | void> => {
     //调用接口修改
-    let params: Record<string, string> = {
+    let params: Record<string, any> = {
       id: record.id,
       name: record.name,
       remark: record.remark,
+      groupIds: record.groupIds,
     };
     if (uploadIconUrl) {
       params = { ...params, icon: uploadIconUrl };
@@ -209,6 +210,22 @@ const AppBasic = (props: { appId: string }) => {
               }}
             />
             <ProDescriptions.Item
+              dataIndex="groupIds"
+              label={intl.formatMessage({ id: 'pages.app.config.basic.group' })}
+              valueType={'select'}
+              request={async () => {
+                const { success, data } = await getAllAppGroupList({}, {}, {});
+                if (success && data) {
+                  return data.map((i) => {
+                    return { label: i.name, value: i.id };
+                  });
+                }
+                return [];
+              }}
+              fieldProps={{ rows: 2, maxLength: 20, maxTagCount: 'responsive', mode: 'multiple' }}
+              copyable={false}
+            />
+            <ProDescriptions.Item
               dataIndex="enabled"
               label={intl.formatMessage({ id: 'pages.app.config.basic.enabled' })}
               editable={false}
@@ -240,28 +257,20 @@ const AppBasic = (props: { appId: string }) => {
               }}
             />
             <ProDescriptions.Item
-              dataIndex="protocolName"
-              label={intl.formatMessage({ id: 'pages.app.config.basic.protocol_name' })}
+              dataIndex="clientId"
+              ellipsis
+              label={intl.formatMessage({ id: 'pages.app.config.basic.client_id' })}
+              valueType={'text'}
               editable={false}
+              copyable={true}
             />
-            {app?.clientId && (
-              <>
-                <ProDescriptions.Item
-                  dataIndex="clientId"
-                  label={intl.formatMessage({ id: 'pages.app.config.basic.client_id' })}
-                  valueType={'text'}
-                  editable={false}
-                  copyable={true}
-                />
-                <ProDescriptions.Item
-                  dataIndex="clientSecret"
-                  label={intl.formatMessage({ id: 'pages.app.config.basic.client_secret' })}
-                  valueType={'password'}
-                  editable={false}
-                  copyable={true}
-                />
-              </>
-            )}
+            <ProDescriptions.Item
+              dataIndex="clientSecret"
+              label={intl.formatMessage({ id: 'pages.app.config.basic.client_secret' })}
+              valueType={'password'}
+              editable={false}
+              copyable={true}
+            />
             <ProDescriptions.Item
               dataIndex="createTime"
               label={intl.formatMessage({ id: 'pages.app.config.basic.create_time' })}
@@ -273,7 +282,7 @@ const AppBasic = (props: { appId: string }) => {
               dataIndex="remark"
               label={intl.formatMessage({ id: 'pages.app.config.basic.remark' })}
               valueType={'textarea'}
-              fieldProps={{ rows: 2, maxLength: 20 }}
+              fieldProps={{ rows: 2, maxLength: 200 }}
               copyable={false}
             />
           </ProDescriptions>
