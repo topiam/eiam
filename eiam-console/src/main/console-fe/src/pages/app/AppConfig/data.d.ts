@@ -37,6 +37,7 @@ export type GetApp = {
   authorizationType: string;
   enabled: boolean;
   remark: string;
+  groupIds: string[];
 };
 
 /**

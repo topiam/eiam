@@ -16,10 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 export default {
-  'pages.app.config.basic': '基本配置',
+  'pages.app.config.basic': '基本信息',
   'pages.app.config.basic.name': '应用名称',
   'pages.app.config.basic.name.rule.0.message': '应用名称为必填项',
   'pages.app.config.basic.icon': '应用图标',
+  'pages.app.config.basic.icon.rule.0.message': '应用图标为必填项',
+  'pages.app.config.basic.icon.rule.1.message': '应用图标上传失败',
   'pages.app.config.basic.icon.desc.1': '必须为 PNG/JPG 格式',
   'pages.app.config.basic.icon.desc.2': '建议使用 256 * 256 像素方形图标',
   'pages.app.config.basic.enabled': '应用状态',

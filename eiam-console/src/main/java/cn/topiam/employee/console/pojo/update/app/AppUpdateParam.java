@@ -40,25 +40,25 @@ public class AppUpdateParam implements Serializable {
      */
     @Schema(description = "应用id")
     @NotNull(message = "ID不能为空")
-    private Long   id;
+    private Long         id;
 
     /**
      * 应用名称
      */
     @Schema(description = "应用名称")
-    private String name;
+    private String       name;
 
     /**
      * 应用图标
      */
     @Schema(description = "应用图标")
-    private String icon;
+    private String       icon;
 
     /**
      * 备注
      */
     @Schema(description = "备注")
-    private String remark;
+    private String       remark;
 
     /**
      * 应用分组id

@@ -24,6 +24,7 @@ export default {
   'pages.app.create.header_title': '标准协议',
   'pages.app.create.modal_form.title': '添加应用',
   'pages.app.create.modal_form.name': '应用名称',
+  'pages.app.create.modal_form.group': '应用分组',
   'pages.app.create.modal_form.name.placeholder': '请输入应用名称',
   'pages.app.create.modal_form.name.message': '应用名称为必填项',
   'pages.app.create.modal_form.name.rule.0': '应用名称为必填项',

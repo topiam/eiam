@@ -19,11 +19,10 @@ package cn.topiam.employee.console.service.app.impl;
 
 import java.util.*;
 
-import cn.topiam.employee.common.entity.app.AppGroupAssociationEntity;
-import cn.topiam.employee.common.repository.app.AppGroupAssociationRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import cn.topiam.employee.application.ApplicationService;
 import cn.topiam.employee.application.ApplicationServiceLoader;
@@ -32,7 +31,9 @@ import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.common.entity.app.AppEntity;
+import cn.topiam.employee.common.entity.app.AppGroupAssociationEntity;
 import cn.topiam.employee.common.entity.app.query.AppQuery;
+import cn.topiam.employee.common.repository.app.AppGroupAssociationRepository;
 import cn.topiam.employee.common.repository.app.AppRepository;
 import cn.topiam.employee.console.converter.app.AppConverter;
 import cn.topiam.employee.console.pojo.result.app.AppCreateResult;
@@ -49,8 +50,6 @@ import cn.topiam.employee.support.util.BeanUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.CollectionUtils;
-
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
 

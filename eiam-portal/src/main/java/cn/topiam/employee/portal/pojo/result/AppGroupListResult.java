@@ -41,7 +41,7 @@ public class AppGroupListResult implements Serializable {
      * 应用分组ID
      */
     @Schema(description = "应用分组ID")
-    private String              id;
+    private String            id;
 
     /**
      * 应用分组名称

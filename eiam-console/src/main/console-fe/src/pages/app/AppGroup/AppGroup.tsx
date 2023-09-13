@@ -23,7 +23,7 @@ import { useRef, useState } from 'react';
 import CreateModal from './components/CreateModal';
 import UpdateModal from './components/UpdateModal';
 import { createAppGroup, removeAppGroup, updateAppGroup } from './service';
-import { useIntl } from '@@/exports';
+import { history, useIntl } from '@@/exports';
 import { getAppGroupList } from '@/services/app';
 
 export default () => {
@@ -73,7 +73,7 @@ export default () => {
             </Tag>
           )}
           {record.type === 'default' && (
-            <Tag color={'#2db7f5'} key={'default'}>
+            <Tag color={'#4fc2fa'} key={'default'}>
               {intl.formatMessage({
                 id: 'pages.app_group.list.column.type.default',
               })}
@@ -108,10 +108,15 @@ export default () => {
             setId(record.id);
             setUpdateModalOpen(true);
           }}
+          style={{
+            pointerEvents: record.type === 'default' ? 'none' : 'auto',
+            ...(record.type === 'default' ? { opacity: 0.2 } : {}),
+          }}
         >
           {intl.formatMessage({ id: 'app.update' })}
         </a>,
         <Popconfirm
+          disabled={record.type === 'default'}
           title={intl.formatMessage({
             id: 'pages.app_group.list.actions.popconfirm.delete',
           })}
@@ -135,7 +140,15 @@ export default () => {
           cancelText={intl.formatMessage({ id: 'app.no' })}
           key="delete"
         >
-          <a target="_blank" key="remove" style={{ color: 'red' }}>
+          <a
+            target="_blank"
+            key="remove"
+            style={{
+              color: 'red',
+              pointerEvents: record.type === 'default' ? 'none' : 'auto',
+              ...(record.type === 'default' ? { opacity: 0.2 } : {}),
+            }}
+          >
             {intl.formatMessage({ id: 'app.delete' })}
           </a>
         </Popconfirm>,
@@ -144,7 +157,12 @@ export default () => {
   ];
 
   return (
-    <PageContainer>
+    <PageContainer
+      content={intl.formatMessage({ id: 'pages.app_group.list.desc' })}
+      onBack={() => {
+        history.push('/app');
+      }}
+    >
       <ProTable<AppAPI.AppGroupList>
         columns={columns}
         actionRef={actionRef}

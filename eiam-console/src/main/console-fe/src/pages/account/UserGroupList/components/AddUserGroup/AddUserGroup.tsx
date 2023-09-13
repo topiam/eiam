@@ -72,6 +72,9 @@ export default (props: {
           placeholder={intl.formatMessage({
             id: 'pages.account.user_group_list.form.name.placeholder',
           })}
+          fieldProps={{
+            maxLength: 8,
+          }}
           rules={[
             {
               required: true,
