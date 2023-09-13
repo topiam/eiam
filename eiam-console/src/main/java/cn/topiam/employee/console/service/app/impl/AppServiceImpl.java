@@ -17,10 +17,7 @@
  */
 package cn.topiam.employee.console.service.app.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import cn.topiam.employee.common.entity.app.AppGroupAssociationEntity;
 import cn.topiam.employee.common.repository.app.AppGroupAssociationRepository;
@@ -52,6 +49,7 @@ import cn.topiam.employee.support.util.BeanUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
@@ -78,7 +76,7 @@ public class AppServiceImpl implements AppService {
     public Page<AppListResult> getAppList(PageModel pageModel, AppQuery query) {
         //查询映射
         org.springframework.data.domain.Page<AppEntity> list = appRepository.getAppList(query,
-                PageRequest.of(pageModel.getCurrent(), pageModel.getPageSize()));
+            PageRequest.of(pageModel.getCurrent(), pageModel.getPageSize()));
         return appConverter.entityConvertToAppListResult(list);
     }
 
@@ -92,9 +90,14 @@ public class AppServiceImpl implements AppService {
     @Transactional(rollbackFor = Exception.class)
     public AppCreateResult createApp(AppCreateParam param) {
         ApplicationService applicationService = applicationServiceLoader
-                .getApplicationService(param.getTemplate());
-        String appId = applicationService.create(param.getName(), param.getIcon(),
-                param.getRemark(), param.getGroupIds());
+            .getApplicationService(param.getTemplate());
+        String appId;
+        if (!CollectionUtils.isEmpty(param.getGroupIds())) {
+            appId = applicationService.create(param.getName(), param.getIcon(), param.getRemark(),
+                param.getGroupIds());
+        } else {
+            appId = applicationService.create(param.getName(), param.getIcon(), param.getRemark());
+        }
         AuditContext.setTarget(Target.builder().id(appId).type(TargetType.APPLICATION).build());
         return new AppCreateResult(appId);
     }
@@ -122,7 +125,7 @@ public class AppServiceImpl implements AppService {
         }
         appGroupAssociationRepository.saveAll(list);
         AuditContext.setTarget(
-                Target.builder().id(param.getId().toString()).type(TargetType.APPLICATION).build());
+            Target.builder().id(param.getId().toString()).type(TargetType.APPLICATION).build());
         return true;
     }
 
@@ -139,7 +142,7 @@ public class AppServiceImpl implements AppService {
         applicationServiceLoader.getApplicationService(app.getTemplate()).delete(id.toString());
         appGroupAssociationRepository.deleteAllByAppId(id);
         AuditContext
-                .setTarget(Target.builder().id(id.toString()).type(TargetType.APPLICATION).build());
+            .setTarget(Target.builder().id(id.toString()).type(TargetType.APPLICATION).build());
         return true;
     }
 
@@ -198,10 +201,10 @@ public class AppServiceImpl implements AppService {
     @Override
     public Boolean saveAppConfig(AppSaveConfigParam param) {
         ApplicationService applicationService = applicationServiceLoader
-                .getApplicationService(param.getTemplate());
+            .getApplicationService(param.getTemplate());
         applicationService.saveConfig(param.getId(), param.getConfig());
         AuditContext
-                .setTarget(Target.builder().id(param.getId()).type(TargetType.APPLICATION).build());
+            .setTarget(Target.builder().id(param.getId()).type(TargetType.APPLICATION).build());
         return true;
     }
 
@@ -216,7 +219,7 @@ public class AppServiceImpl implements AppService {
         Optional<AppEntity> optional = appRepository.findById(Long.valueOf(appId));
         if (optional.isPresent()) {
             ApplicationService applicationService = applicationServiceLoader
-                    .getApplicationService(optional.get().getTemplate());
+                .getApplicationService(optional.get().getTemplate());
             return applicationService.getConfig(appId);
         }
         throw new AppNotExistException();
@@ -241,17 +244,17 @@ public class AppServiceImpl implements AppService {
     /**
      * ApplicationTemplateLoader
      */
-    private final ApplicationServiceLoader applicationServiceLoader;
+    private final ApplicationServiceLoader      applicationServiceLoader;
 
     /**
      * ApplicationRepository
      */
-    private final AppRepository appRepository;
+    private final AppRepository                 appRepository;
 
     /**
      * ApplicationConverter
      */
-    private final AppConverter appConverter;
+    private final AppConverter                  appConverter;
 
     /**
      * AppGroupAssociationRepositorys

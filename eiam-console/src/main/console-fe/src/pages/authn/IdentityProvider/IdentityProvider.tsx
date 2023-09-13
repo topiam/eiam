@@ -361,7 +361,7 @@ const IdentityProvider = () => {
   const { styles } = useStyle(prefixCls);
 
   useMount(async () => {
-    if (!type || !(type.toUpperCase() in IdentityProviderCategory)) {
+    if (!type || !IdentityProviderCategory[type]) {
       setTabActiveKey(IdentityProviderCategory.social);
       history.push({
         pathname: location.pathname,

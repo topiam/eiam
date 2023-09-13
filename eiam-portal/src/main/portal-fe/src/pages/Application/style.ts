@@ -24,7 +24,6 @@ const useStyles = createStyles(({ token, css, prefixCls }, prop) => {
       border: none;
       border-radius: ${token.borderRadius};
       .${prefixCls}-pro-table-list-toolbar-container {
-        margin-bottom: 10px;
       }
 
       &-item-card {
