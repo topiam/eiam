@@ -52,7 +52,6 @@ public interface AppGroupAssociationRepository extends
                    + " WHERE app_id = :appId and group_id = :groupId", nativeQuery = true)
     void deleteByGroupIdAndAppId(@Param("groupId") Long groupId, @Param("appId") Long appId);
 
-
     /**
      * 根据应用ID删除关联信息
      *
