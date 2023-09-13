@@ -119,7 +119,7 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
      */
     public Page<AppEntity> getAppList(AppQuery appQuery, Pageable pageable) {
         //@formatter:off
-        StringBuilder builder = new StringBuilder("SELECT app.* FROM app LEFT JOIN app_group_association `group` ON app.id_ = `group`.app_id WHERE app.is_deleted=0");
+        StringBuilder builder = new StringBuilder("SELECT DISTINCT app.* FROM app LEFT JOIN app_group_association `group` ON app.id_ = `group`.app_id WHERE app.is_deleted =0");
 
         //应用名称
         if (StringUtils.isNoneBlank(appQuery.getName())) {
