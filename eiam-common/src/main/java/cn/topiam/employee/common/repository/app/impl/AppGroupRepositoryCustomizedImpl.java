@@ -81,5 +81,32 @@ public class AppGroupRepositoryCustomizedImpl implements AppGroupRepositoryCusto
         return new PageImpl<>(list, pageable, count);
     }
 
+    /**
+     * 查询应用组列表
+     *
+     * @return {@link List}
+     */
+    @Override
+    public List<AppGroupPO> getAppGroupList(AppGroupQuery query) {
+        //@formatter:off
+        StringBuilder builder = new StringBuilder("SELECT `group`.id_, `group`.name_, `group`.code_, `group`.type_, `group`.create_time, `group`.remark_, IFNULL( ass.app_count, 0) AS app_count FROM app_group `group` LEFT JOIN(SELECT aga.group_id, COUNT(*) AS `app_count` FROM app_group_association aga WHERE aga.is_deleted = '0' GROUP BY aga.group_id ) ass ON `group`.id_ = ass.group_id WHERE is_deleted = '0'");
+        //分组名称
+        if (StringUtils.isNoneBlank(query.getName())) {
+            builder.append(" AND `group`.name_ like '%").append(query.getName()).append("%'");
+        }
+        //分组编码
+        if (StringUtils.isNoneBlank(query.getCode())) {
+            builder.append(" AND `group`.code_ like '%").append(query.getCode()).append("%'");
+        }
+        //分组类型
+        if (ObjectUtils.isNotEmpty(query.getType())) {
+            builder.append(" AND `group`.type_ like '%").append(query.getType().getCode()).append("%'");
+        }
+        builder.append(" ORDER BY `group`.create_time DESC");
+        //@formatter:on
+        List<AppGroupPO> list = jdbcTemplate.query(builder.toString(), new AppGroupPoMapper());
+        return list;
+    }
+
     private final JdbcTemplate jdbcTemplate;
 }

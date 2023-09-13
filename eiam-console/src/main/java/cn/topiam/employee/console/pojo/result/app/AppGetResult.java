@@ -106,10 +106,9 @@ public class AppGetResult implements Serializable {
     @Parameter(description = "备注")
     private String        remark;
 
-
     /**
      * 应用组ID集合
      */
     @Parameter(description = "应用组ID集合")
-    private List<Long> groupIds;
+    private List<Long>    groupIds;
 }

@@ -17,6 +17,8 @@
  */
 package cn.topiam.employee.common.repository.app;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -26,9 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.app.AppGroupAssociationEntity;
 import cn.topiam.employee.support.repository.LogicDeleteRepository;
-
-import java.util.List;
-
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 
 /**
@@ -55,7 +54,6 @@ public interface AppGroupAssociationRepository extends
                    + " WHERE app_id = :appId and group_id = :groupId", nativeQuery = true)
     void deleteByGroupIdAndAppId(@Param("groupId") Long groupId, @Param("appId") Long appId);
 
-
     /**
      * 删除关联
      *
@@ -65,10 +63,8 @@ public interface AppGroupAssociationRepository extends
     @Modifying
     @Transactional(rollbackFor = Exception.class)
     @Query(value = "UPDATE app_group_association SET " + SOFT_DELETE_SET
-            + " WHERE app_id = :appId", nativeQuery = true)
+                   + " WHERE app_id = :appId", nativeQuery = true)
     void deleteAllByAppId(@Param(value = "appId") Long appId);
-
-
 
     /**
      * 根据应用ID删除关联信息
@@ -76,7 +72,6 @@ public interface AppGroupAssociationRepository extends
      * @param appId {@link Long}
      */
     void deleteByAppId(Long appId);
-
 
     /**
      * 根据应用ID 查询关联信息

@@ -157,7 +157,7 @@ public class AppServiceImpl implements AppService {
         if (optional.isPresent()) {
             AppEntity entity = optional.get();
             List<Long> groupIds = appGroupAssociationRepository.findGroupIdByAppId(id);
-            return appConverter.entityConvertToAppResult(entity,groupIds);
+            return appConverter.entityConvertToAppResult(entity, groupIds);
         }
         return null;
 
