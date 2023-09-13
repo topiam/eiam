@@ -20,6 +20,7 @@ package cn.topiam.employee.portal.converter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.querydsl.core.types.ExpressionUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -47,7 +48,7 @@ public interface AppGroupConverter {
      */
     default Predicate queryPredicate() {
         QAppGroupEntity appGroup = QAppGroupEntity.appGroupEntity;
-        Predicate predicate = appGroup.deleted.eq(Boolean.FALSE);
+        Predicate predicate = ExpressionUtils.and(appGroup.isNotNull(), appGroup.deleted.eq(Boolean.FALSE));
         //@formatter:on
         return predicate;
     }
@@ -59,7 +60,7 @@ public interface AppGroupConverter {
      */
     default Predicate queryAppGroupAssociationPredicate() {
         QAppGroupAssociationEntity appGroupAssociation = QAppGroupAssociationEntity.appGroupAssociationEntity;
-        return appGroupAssociation.deleted.eq(Boolean.FALSE);
+        return ExpressionUtils.and(appGroupAssociation.isNotNull(), appGroupAssociation.deleted.eq(Boolean.FALSE));
     }
 
     /**
