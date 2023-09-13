@@ -16,40 +16,50 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import type { ActionType } from '@ant-design/pro-components';
-import { PageContainer, ProCard, ProList } from '@ant-design/pro-components';
-import { Alert, App, Avatar, Badge, Card, Input, Typography } from 'antd';
+import {
+  PageContainer,
+  ProCard,
+  ProFormText,
+  ProList,
+  QueryFilter,
+} from '@ant-design/pro-components';
+import { App, Avatar, Badge, Card, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
-import type { AppList } from './data.d';
-import { InitLoginType } from './data.d';
-import { queryAppList } from './service';
+import { AppList, InitLoginType } from './data.d';
+import { getAppGroupList, queryAppList } from './service';
 import { useIntl } from '@@/exports';
 import useStyle from './style';
 import classnames from 'classnames';
+import { useAsyncEffect } from 'ahooks';
+import { SpinProps } from 'antd/es/spin';
+
 const { Paragraph } = Typography;
 const prefixCls = 'topiam-app-list';
+const renderBadge = (count: number, active = false) => {
+  return (
+    <Badge
+      count={count}
+      style={{
+        marginBlockStart: -2,
+        marginInlineStart: 4,
+        color: active ? '#1890FF' : '#999',
+        backgroundColor: active ? '#E6F7FF' : '#eee',
+      }}
+    />
+  );
+};
 
 const CardList = () => {
   const intl = useIntl();
   const { styles } = useStyle(prefixCls);
-  const [activeKey, setActiveKey] = useState<React.Key | undefined>('tab1');
-
+  // 当前组
+  const [currentGroup, setCurrentGroup] = useState<React.Key>();
   const { message } = App.useApp();
   const actionRef = useRef<ActionType>();
-  const [searchParams, setSearchParams] = useState<{ name: string }>();
-  const content = (
-    <div style={{ textAlign: 'center' }}>
-      <Input.Search
-        placeholder={intl.formatMessage({ id: 'pages.application.search' })}
-        enterButton={intl.formatMessage({ id: 'pages.application.search.enter_button' })}
-        size="large"
-        style={{ maxWidth: 522, width: '100%' }}
-        onSearch={(value) => {
-          setSearchParams({ name: value });
-          actionRef.current?.reload();
-        }}
-      />
-    </div>
-  );
+  const [searchParams, setSearchParams] = useState<Record<string, any>>();
+  const [loading, setLoading] = useState<boolean | SpinProps | undefined>(false);
+  const [items, setItems] = useState<{ key: string; label: React.JSX.Element }[]>([]);
+
   const initSso = (idpInitUrl: string) => {
     const div = window.document.createElement('div');
     div.innerHTML =
@@ -64,42 +74,40 @@ const CardList = () => {
     document.body.removeChild(div);
   };
 
-  const renderBadge = (count: number, active = false) => {
-    return (
-      <Badge
-        count={count}
-        style={{
-          marginBlockStart: -2,
-          marginInlineStart: 4,
-          color: active ? '#1890FF' : '#999',
-          backgroundColor: active ? '#E6F7FF' : '#eee',
-        }}
-      />
-    );
-  };
+  useAsyncEffect(async () => {
+    setLoading(true);
+    const { result, success } = await getAppGroupList().finally(() => {
+      setLoading(false);
+    });
+    if (success && result) {
+      let data: { key: string; label: React.JSX.Element }[] = [];
+      result.forEach((item) => {
+        data.push({
+          key: item.id,
+          label: (
+            <span>
+              {item.name}
+              {renderBadge(item.appCount, currentGroup === item.id)}
+            </span>
+          ),
+        });
+      });
+      setItems(data);
+      // 如果有分组，取第一个分组
+      if (data.length > 0) {
+        setSearchParams({ groupId: data[0].key });
+        actionRef.current?.reload();
+      }
+      // 手动请求
+      else {
+        actionRef.current?.reload();
+      }
+    }
+  }, []);
 
   return (
     <div className={styles}>
-      <PageContainer
-        className={classnames(`${prefixCls}`)}
-        tabList={[
-          {
-            tab: '应用列表',
-            key: 'list',
-          },
-          {
-            tab: '应用账号',
-            key: 'account',
-          },
-        ]}
-      >
-        <Alert
-          banner
-          type={'info'}
-          message={intl.formatMessage({ id: 'pages.application.alert' })}
-          showIcon
-        />
-        <br />
+      <PageContainer className={classnames(`${prefixCls}`)}>
         <ProList<AppList>
           rowKey="id"
           split
@@ -111,32 +119,34 @@ const CardList = () => {
             xl: 4,
             xxl: 5,
           }}
-          request={queryAppList}
-          pagination={{}}
-          toolbar={{
-            menu: {
-              type: 'tab',
-              activeKey,
-              items: [
-                {
-                  key: 'tab1',
-                  label: <span>开发分组{renderBadge(99, activeKey === 'tab1')}</span>,
-                },
-                {
-                  key: 'tab2',
-                  label: <span>运维分组{renderBadge(32, activeKey === 'tab2')}</span>,
-                },
-              ],
-              onChange(key) {
-                setActiveKey(key);
-              },
-            },
+          loading={loading}
+          onLoadingChange={(loading) => {
+            setLoading(loading);
           }}
+          manualRequest
+          request={queryAppList}
+          toolbar={
+            items.length > 0
+              ? {
+                  menu: {
+                    type: 'tab',
+                    activeKey: currentGroup,
+                    items: items,
+                    onChange(key) {
+                      if (key) {
+                        setCurrentGroup(key);
+                        setSearchParams((values) => {
+                          return { ...values, groupId: key };
+                        });
+                        actionRef.current?.reload();
+                      }
+                    },
+                  },
+                }
+              : {}
+          }
           params={searchParams}
           actionRef={actionRef}
-          tableExtraRender={() => {
-            return <ProCard>{content}</ProCard>;
-          }}
           renderItem={(item: AppList) => {
             return (
               item &&
@@ -147,8 +157,11 @@ const CardList = () => {
                   hoverable
                   bordered={false}
                   onClick={async () => {
-                    if (item.initLoginType === InitLoginType.PORTAL_OR_APP_INIT_SSO) {
-                      initSso(item.initLoginUrl);
+                    if (
+                      item.initLoginType === InitLoginType.portal_or_app_init_sso &&
+                      item?.initLoginUrl
+                    ) {
+                      initSso(item?.initLoginUrl);
                       return;
                     }
                     message.warning(
@@ -173,6 +186,33 @@ const CardList = () => {
                   </div>
                 </Card>
               )
+            );
+          }}
+          tableExtraRender={() => {
+            return (
+              <ProCard bodyStyle={{ padding: 0 }}>
+                <QueryFilter
+                  layout="horizontal"
+                  onFinish={(values) => {
+                    setSearchParams({ ...searchParams, ...values });
+                    actionRef.current?.reload();
+                    return Promise.resolve();
+                  }}
+                  onReset={() => {
+                    if (items.length > 0) {
+                      setSearchParams({ groupId: currentGroup });
+                    } else {
+                      setSearchParams({});
+                    }
+                    actionRef.current?.reload();
+                  }}
+                >
+                  <ProFormText
+                    name="name"
+                    label={intl.formatMessage({ id: 'pages.application.search.name' })}
+                  />
+                </QueryFilter>
+              </ProCard>
             );
           }}
         />

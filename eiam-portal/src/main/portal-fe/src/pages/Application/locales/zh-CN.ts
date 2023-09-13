@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 export default {
-  'pages.application.search': '请输入',
-  'pages.application.search.enter_button': '搜索',
-  'pages.application.alert': '请点击下方的应用进行单点登录。若希望修改应用内容，请联系管理员。',
+  'pages.application.search.name': '应用名称',
+  'pages.application.tab.list': '应用列表',
+  'pages.application.tab.account': '应用账号',
   'pages.application.init.warning': '仅允许应用发起',
 };

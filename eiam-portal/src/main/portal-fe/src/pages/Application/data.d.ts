@@ -22,8 +22,8 @@ export type AppList = {
   template: string;
   icon?: string;
   name: string;
-  initLoginType: InitLoginType;
-  initLoginUrl: string;
+  initLoginType: InitLoginType | string;
+  initLoginUrl?: string;
   description: string;
 };
 
