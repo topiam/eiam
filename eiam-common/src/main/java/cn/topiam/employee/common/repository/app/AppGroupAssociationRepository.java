@@ -51,4 +51,12 @@ public interface AppGroupAssociationRepository extends
     @Query(value = "UPDATE app_group_association SET " + SOFT_DELETE_SET
                    + " WHERE app_id = :appId and group_id = :groupId", nativeQuery = true)
     void deleteByGroupIdAndAppId(@Param("groupId") Long groupId, @Param("appId") Long appId);
+
+
+    /**
+     * 根据应用ID删除关联信息
+     *
+     * @param appId {@link Long}
+     */
+    void deleteByAppId(Long appId);
 }
