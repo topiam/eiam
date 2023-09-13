@@ -137,6 +137,7 @@ public class AppServiceImpl implements AppService {
     public boolean deleteApp(Long id) {
         AppEntity app = appRequireNonNull(id);
         applicationServiceLoader.getApplicationService(app.getTemplate()).delete(id.toString());
+        appGroupAssociationRepository.deleteAllByAppId(id);
         AuditContext
                 .setTarget(Target.builder().id(id.toString()).type(TargetType.APPLICATION).build());
         return true;

@@ -54,6 +54,20 @@ public interface AppGroupAssociationRepository extends
 
 
     /**
+     * 删除关联
+     *
+     * @param appId {@link  Long}
+     * @return {@link  Boolean}
+     */
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE app_group_association SET " + SOFT_DELETE_SET
+            + " WHERE app_id = :appId", nativeQuery = true)
+    void deleteAllByAppId(@Param(value = "appId") Long appId);
+
+
+
+    /**
      * 根据应用ID删除关联信息
      *
      * @param appId {@link Long}
