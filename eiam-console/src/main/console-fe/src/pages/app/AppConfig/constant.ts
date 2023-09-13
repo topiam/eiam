@@ -29,14 +29,12 @@ export enum ConfigTabs {
   access_policy = 'access_policy',
   //登录访问
   login_access = 'login_access',
+  //应用权限
+  app_permission = 'app_permission',
   //资源管理
   permission_resource = 'permission_resource',
   //角色管理
   permission_role = 'permission_role',
-  //授权管理
-  permission_policy = 'permission_policy',
-  //应用权限
-  app_permission = 'app_permission',
   //应用账户
   app_account = 'app_account',
 }
