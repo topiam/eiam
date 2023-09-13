@@ -25,14 +25,11 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.google.common.collect.Lists;
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
+
 
 import cn.topiam.employee.application.ApplicationService;
 import cn.topiam.employee.application.ApplicationServiceLoader;
 import cn.topiam.employee.common.entity.app.AppEntity;
-import cn.topiam.employee.common.entity.app.QAppEntity;
-import cn.topiam.employee.common.entity.app.query.AppQuery;
 import cn.topiam.employee.console.pojo.result.app.AppGetResult;
 import cn.topiam.employee.console.pojo.result.app.AppListResult;
 import cn.topiam.employee.console.pojo.update.app.AppUpdateParam;
@@ -47,24 +44,6 @@ import cn.topiam.employee.support.repository.page.domain.Page;
  */
 @Mapper(componentModel = "spring")
 public interface AppConverter {
-
-    /**
-     * 查询应用列表参数转换为  Querydsl  Predicate
-     *
-     * @param query {@link AppQuery} query
-     * @return {@link Predicate}
-     */
-    default Predicate queryAppListParamConvertToPredicate(AppQuery query) {
-        QAppEntity application = QAppEntity.appEntity;
-        Predicate predicate = ExpressionUtils.and(application.isNotNull(),
-            application.deleted.eq(Boolean.FALSE));
-        //查询条件
-        //@formatter:off
-        predicate = StringUtils.isBlank(query.getName()) ? predicate : ExpressionUtils.and(predicate, application.name.like("%" + query.getName() + "%"));
-        predicate = Objects.isNull(query.getProtocol()) ? predicate : ExpressionUtils.and(predicate, application.protocol.eq(query.getProtocol()));
-        //@formatter:on
-        return predicate;
-    }
 
     /**
      * 实体转换为应用列表结果
@@ -135,9 +114,10 @@ public interface AppConverter {
      * 实体转应用返回
      *
      * @param entity {@link AppEntity}
+     * @param groupIds {@link List}
      * @return {@link AppGetResult}
      */
-    default AppGetResult entityConvertToAppResult(AppEntity entity) {
+    default AppGetResult entityConvertToAppResult(AppEntity entity, List<Long> groupIds) {
         if (entity == null) {
             return null;
         }
@@ -150,6 +130,7 @@ public interface AppConverter {
         appGetResult.setClientId(entity.getClientId());
         appGetResult.setClientSecret(entity.getClientSecret());
         appGetResult.setType(entity.getType());
+        appGetResult.setGroupIds(groupIds);
         //图标未配置，所以先从模版中拿
         if (StringUtils.isBlank(entity.getIcon())) {
             ApplicationService applicationService = getApplicationServiceLoader()

@@ -17,6 +17,8 @@
  */
 package cn.topiam.employee.common.repository.app;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -53,9 +55,30 @@ public interface AppGroupAssociationRepository extends
     void deleteByGroupIdAndAppId(@Param("groupId") Long groupId, @Param("appId") Long appId);
 
     /**
+     * 删除关联
+     *
+     * @param appId {@link  Long}
+     * @return {@link  Boolean}
+     */
+    @Modifying
+    @Transactional(rollbackFor = Exception.class)
+    @Query(value = "UPDATE app_group_association SET " + SOFT_DELETE_SET
+                   + " WHERE app_id = :appId", nativeQuery = true)
+    void deleteAllByAppId(@Param(value = "appId") Long appId);
+
+    /**
      * 根据应用ID删除关联信息
      *
      * @param appId {@link Long}
      */
     void deleteByAppId(Long appId);
+
+    /**
+     * 根据应用ID 查询关联信息
+     *
+     * @param appId {@link Long}
+     * @return {@link List}
+     */
+    @Query(value = "SELECT group_id FROM `app_group_association` WHERE  app_id  = :appId AND is_deleted = '0'", nativeQuery = true)
+    List<Long> findGroupIdByAppId(Long appId);
 }

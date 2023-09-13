@@ -17,6 +17,8 @@
  */
 package cn.topiam.employee.common.repository.app;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -38,4 +40,11 @@ public interface AppGroupRepositoryCustomized {
      * @return {@link Page}
      */
     Page<AppGroupPO> getAppGroupList(AppGroupQuery query, Pageable pageable);
+
+    /**
+     * 查询应用组列表
+     *
+     * @return {@link List}
+     */
+    List<AppGroupPO> getAppGroupList(AppGroupQuery query);
 }

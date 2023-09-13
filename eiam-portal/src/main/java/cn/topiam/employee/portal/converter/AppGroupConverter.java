@@ -17,19 +17,13 @@
  */
 package cn.topiam.employee.portal.converter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
+import com.google.common.collect.Lists;
 
-import cn.topiam.employee.common.entity.app.AppGroupAssociationEntity;
-import cn.topiam.employee.common.entity.app.AppGroupEntity;
-import cn.topiam.employee.common.entity.app.QAppGroupAssociationEntity;
-import cn.topiam.employee.common.entity.app.QAppGroupEntity;
+import cn.topiam.employee.common.entity.app.po.AppGroupPO;
 import cn.topiam.employee.portal.pojo.result.AppGroupListResult;
 
 /**
@@ -42,53 +36,26 @@ import cn.topiam.employee.portal.pojo.result.AppGroupListResult;
 public interface AppGroupConverter {
 
     /**
-     * queryPredicate
+     * 实体转换为分组列表结果
      *
-     * @return {@link Predicate}
+     * @param appGroupPoList {@link List}
+     * @return {@link List}
      */
-    default Predicate getQueryPredicate() {
-        QAppGroupEntity appGroup = QAppGroupEntity.appGroupEntity;
-        return ExpressionUtils.and(appGroup.isNotNull(), appGroup.deleted.eq(Boolean.FALSE));
-    }
-
-    /**
-     * 应用组与应用关联 Predicate
-     *
-     * @return {@link Predicate}
-     */
-    default Predicate queryAppGroupAssociationPredicate() {
-        QAppGroupAssociationEntity appGroupAssociation = QAppGroupAssociationEntity.appGroupAssociationEntity;
-        return ExpressionUtils.and(appGroupAssociation.isNotNull(),
-            appGroupAssociation.deleted.eq(Boolean.FALSE));
+    default List<AppGroupListResult> entityConvertToAppGroupListResult(List<AppGroupPO> appGroupPoList) {
+        List<AppGroupListResult> list = Lists.newArrayList();
+        for (AppGroupPO po : appGroupPoList) {
+            AppGroupListResult result = entityConvertToAppGroupListResult(po);
+            list.add(result);
+        }
+        return list;
     }
 
     /**
      * 实体转分组管理列表
      *
-     * @param list                    {@link AppGroupEntity}
-     * @param appGroupAssociationList {@link AppGroupAssociationEntity}
+     * @param appGroupPo {@link AppGroupPO}
      * @return {@link AppGroupListResult}
      */
-    default List<AppGroupListResult> entityConvertToAppGroupListResult(List<AppGroupEntity> list,
-                                                                       List<AppGroupAssociationEntity> appGroupAssociationList) {
-        List<AppGroupListResult> results = new ArrayList<>();
-        for (AppGroupEntity entity : list) {
-            AppGroupListResult result = appGroupEntityConverterToResult(entity);
-            long count = appGroupAssociationList.stream()
-                .filter(t -> t.getGroupId().equals(entity.getId())).count();
-            result.setAppCount(Integer.valueOf(Long.toString(count)));
-            results.add(result);
-        }
-        return results;
-    }
-
-    /**
-     * 将分组实体对象转换为Result
-     *
-     * @param entity {@link AppGroupEntity}
-     * @return {@link AppGroupEntity}
-     */
-    @Mapping(target = "appCount", ignore = true)
-    AppGroupListResult appGroupEntityConverterToResult(AppGroupEntity entity);
+    AppGroupListResult entityConvertToAppGroupListResult(AppGroupPO appGroupPo);
 
 }
