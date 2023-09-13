@@ -80,6 +80,9 @@ export default (props: {
               }),
             },
           ]}
+          fieldProps={{
+            maxLength: 8,
+          }}
         />
         <ProFormText
           label={intl.formatMessage({ id: 'pages.app_group.modal_form.name' })}
