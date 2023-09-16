@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { getAllAppGroupList, getAppList } from '@/services/app';
+import { getAllAppGroupList, getAppList, removeApp } from '@/services/app';
 import { PlusOutlined, QuestionCircleOutlined, GroupOutlined } from '@ant-design/icons';
 import type { ActionType } from '@ant-design/pro-components';
 import { PageContainer, ProList } from '@ant-design/pro-components';
@@ -25,7 +25,7 @@ import { history, useIntl } from '@umijs/max';
 import useStyle from './style';
 import classnames from 'classnames';
 import { AppList } from './data.d';
-import { disableApp, enableApp, removeApp } from './service';
+import { disableApp, enableApp } from './service';
 
 const prefixCls = 'app-list';
 
@@ -111,7 +111,7 @@ export default () => {
                   <span
                     onClick={() => {
                       history.push(
-                        `/app/config?id=${row.id}&protocol=${row.protocol}&name=${row.name}`,
+                        `/app/detail?id=${row.id}&protocol=${row.protocol}&name=${row.name}`,
                       );
                     }}
                   >
@@ -183,14 +183,12 @@ export default () => {
                   </Popconfirm>
                 ),
                 <a
-                  key="config"
+                  key="details"
                   onClick={() => {
-                    history.push(
-                      `/app/config?id=${row.id}&protocol=${row.protocol}&name=${row.name}`,
-                    );
+                    history.push(`/app/detail?id=${row.id}`);
                   }}
                 >
-                  {intl.formatMessage({ id: 'app.manage' })}
+                  {intl.formatMessage({ id: 'pages.app.list.actions.detail' })}
                 </a>,
                 <Popconfirm
                   title={intl.formatMessage({

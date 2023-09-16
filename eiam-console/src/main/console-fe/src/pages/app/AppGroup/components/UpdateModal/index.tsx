@@ -15,20 +15,5 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { request } from '@umijs/max';
-
-/**
- * 启用应用
- */
-export async function enableApp(id: string): Promise<API.ApiResult<boolean>> {
-  return request(`/api/v1/app/enable/${id}`, { method: 'PUT' });
-}
-
-/**
- * 禁用应用
- */
-export async function disableApp(id: string): Promise<API.ApiResult<boolean>> {
-  return request(`/api/v1/app/disable/${id}`, { method: 'PUT' });
-}
-
-
+import UpdateModal from './UpdateModal';
+export default UpdateModal;
