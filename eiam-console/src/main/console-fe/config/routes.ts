@@ -148,12 +148,12 @@ export default [
     hideInMenu: true,
     component: './app/AppCreate',
   },
-  //应用配置
+  //应用详情
   {
-    name: 'app.config',
-    path: '/app/config',
+    name: 'app.detail',
+    path: '/app/detail',
     hideInMenu: true,
-    component: './app/AppConfig',
+    component: './app/AppDetail',
   },
   //应用分组
   {

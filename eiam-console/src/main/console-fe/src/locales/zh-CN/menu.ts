@@ -42,7 +42,7 @@ export default {
   'menu.app.list': '应用列表',
   'menu.app.group': '应用分组',
   'menu.app.create': '创建应用',
-  'menu.app.config': '应用配置',
+  'menu.app.detail': '应用详情',
   'menu.account': '账户管理',
   'menu.account.user': '组织与用户',
   'menu.account.user.detail': '用户详情',
