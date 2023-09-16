@@ -16,6 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 export default {
+  'pages.account.user_group_detail.extra.delete': '删除用户组',
+  'pages.account.user_group_detail.extra.delete.confirm_title': '您确定要删除此用户组？',
+  'pages.account.user_group_detail.extra.delete.confirm_content': '此操作不可恢复，请谨慎操作！',
   'pages.account.user_group_detail.common.username': '用户名称',
   'pages.account.user_group_detail.common.phone': '手机号',
   'pages.account.user_group_detail.common.org_display_path': '所属组织',

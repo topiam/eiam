@@ -15,19 +15,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { getUserGroup, updateUserGroup } from '@/services/account';
+import { getUserGroup, removeUser, updateUserGroup } from '@/services/account';
 import { history } from '@@/core/history';
 
 import { PageContainer, ProDescriptions, RouteContext } from '@ant-design/pro-components';
 import { useAsyncEffect, useMount } from 'ahooks';
-import { App, Skeleton } from 'antd';
-import { useState } from 'react';
+import { App, Button, Skeleton } from 'antd';
+import React, { useState } from 'react';
 import MemberList from './components/MemberList';
 import { UserGroupDetailTabs } from './constant';
 import queryString from 'query-string';
 import { useIntl, useLocation } from '@umijs/max';
 import useStyles from './style';
 import AppAccess from './components/AppAccess';
+import { ExclamationCircleFilled } from '@ant-design/icons';
 
 /**
  * 用户组详情
@@ -35,7 +36,7 @@ import AppAccess from './components/AppAccess';
 export default () => {
   const intl = useIntl();
   const { styles } = useStyles();
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   const location = useLocation();
   const query = queryString.parse(location.search);
   const { id } = query as { id: string };
@@ -156,6 +157,38 @@ export default () => {
             id: 'pages.account.user_group_detail.tab_list.app_access',
           }),
         },
+      ]}
+      extra={[
+        <Button
+          key="delete"
+          type="primary"
+          danger
+          onClick={() => {
+            const confirmed = modal.error({
+              centered: true,
+              title: intl.formatMessage({
+                id: 'pages.account.user_group_detail.extra.delete.confirm_title',
+              }),
+              icon: <ExclamationCircleFilled />,
+              content: intl.formatMessage({
+                id: 'pages.account.user_group_detail.extra.delete.confirm_content',
+              }),
+              okText: intl.formatMessage({ id: 'app.confirm' }),
+              okType: 'danger',
+              okCancel: true,
+              cancelText: intl.formatMessage({ id: 'app.cancel' }),
+              onOk: async () => {
+                const { success } = await removeUser(id);
+                if (success) {
+                  message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                  confirmed.destroy();
+                }
+              },
+            });
+          }}
+        >
+          {intl.formatMessage({ id: 'pages.account.user_group_detail.extra.delete' })}
+        </Button>,
       ]}
       tabActiveKey={tabActiveKey}
       onTabChange={(key: string) => {
