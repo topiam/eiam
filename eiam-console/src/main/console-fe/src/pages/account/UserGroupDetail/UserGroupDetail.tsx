@@ -27,7 +27,7 @@ import { UserGroupDetailTabs } from './constant';
 import queryString from 'query-string';
 import { useIntl, useLocation } from '@umijs/max';
 import useStyles from './style';
-import AccessStrategy from '@/pages/account/UserGroupDetail/components/AccessStrategy';
+import AppAccess from './components/AppAccess';
 
 /**
  * 用户组详情
@@ -106,7 +106,7 @@ export default () => {
             <ProDescriptions.Item
               dataIndex="name"
               label={intl.formatMessage({
-                id: 'pages.account.user_group_detail.pro_descriptions.name',
+                id: 'pages.account.user_group_detail.descriptions.name',
               })}
               fieldProps={{
                 maxLength: 8,
@@ -116,14 +116,14 @@ export default () => {
             <ProDescriptions.Item
               dataIndex="code"
               label={intl.formatMessage({
-                id: 'pages.account.user_group_detail.pro_descriptions.code',
+                id: 'pages.account.user_group_detail.descriptions.code',
               })}
               copyable
               editable={false}
             />
             <ProDescriptions.Item
               label={intl.formatMessage({
-                id: 'pages.account.user_group_detail.pro_descriptions.remark',
+                id: 'pages.account.user_group_detail.descriptions.remark',
               })}
               className={styles.descriptionRemark}
               dataIndex="remark"
@@ -151,9 +151,9 @@ export default () => {
           tab: intl.formatMessage({ id: 'pages.account.user_group_detail.tab_list.member' }),
         },
         {
-          key: UserGroupDetailTabs.access_policy,
+          key: UserGroupDetailTabs.app_access,
           tab: intl.formatMessage({
-            id: 'pages.account.user_group_detail.tab_list.access_policy',
+            id: 'pages.account.user_group_detail.tab_list.app_access',
           }),
         },
       ]}
@@ -169,7 +169,7 @@ export default () => {
       {/*成员信息*/}
       {type === UserGroupDetailTabs.member && <MemberList id={id} />}
       {/*授权应用*/}
-      {type === UserGroupDetailTabs.access_policy && <AccessStrategy userGroupId={id} />}
+      {type === UserGroupDetailTabs.app_access && <AppAccess userGroupId={id} />}
     </PageContainer>
   );
 };
