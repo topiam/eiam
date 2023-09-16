@@ -29,7 +29,7 @@ import { useLocation } from '@umijs/max';
 import { useIntl } from '@@/exports';
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import { removeUser } from '@/services/account';
-import AppAccess from '@/pages/account/UserDetail/components/AppAccess';
+import AppAccess from './components/AppAccess';
 
 export default () => {
   const location = useLocation();
