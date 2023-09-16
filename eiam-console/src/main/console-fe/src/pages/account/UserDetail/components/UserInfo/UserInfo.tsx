@@ -31,7 +31,7 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 import { omit } from 'lodash';
 import classNames from 'classnames';
 import { ParamCheckType } from '@/constant';
-import AccessStrategy from '../AccessStrategy';
+import AppAccess from '../AppAccess';
 import { useIntl } from '@umijs/max';
 
 const prefixCls = 'user-detail-info';
@@ -480,8 +480,6 @@ export default (props: { userId: string }) => {
           toolbar={{ settings: [] }}
         />
       </ProCard>
-      <br />
-      <AccessStrategy userId={userId} />
     </div>
   );
 };

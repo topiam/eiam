@@ -24,8 +24,8 @@ import { EventStatus } from '@/pages/audit/data.d';
 import { getLoginAuditList } from '@/services/account';
 import { useIntl } from '@umijs/max';
 
-export default (props: { id: string }) => {
-  const { id } = props;
+export default (props: { userId: string }) => {
+  const { userId } = props;
   useEffect(() => {}, []);
   const intl = useIntl();
 
@@ -97,7 +97,7 @@ export default (props: { id: string }) => {
         columns={columns}
         search={false}
         request={getLoginAuditList}
-        params={{ id }}
+        params={{ userId: userId }}
         pagination={{ pageSize: 10 }}
       />
     </>

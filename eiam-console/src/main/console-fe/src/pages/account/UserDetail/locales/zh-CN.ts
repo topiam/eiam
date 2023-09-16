@@ -16,6 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 export default {
+  'pages.account.user_detail.tabs.user_info': '用户信息',
+  'pages.account.user_detail.tabs.login_audit': '登录日志',
+  'pages.account.user_detail.tabs.app_access': '应用授权',
+  'pages.account.user_detail.extra.delete': '删除用户',
+  'pages.account.user_detail.extra.delete.confirm_title': '您确定要删除此用户？',
+  'pages.account.user_detail.extra.delete.confirm_content': '此操作不可恢复，请谨慎操作！',
   'pages.account.user_detail.user_info': '账户信息',
   'pages.account.user_detail.user_info.not_selected': '未选择用户',
   'pages.account.user_detail.user_info.columns.open_id': '显示名',
