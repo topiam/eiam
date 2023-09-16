@@ -15,6 +15,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import AppBasic from './AppBasic';
+/**
+ * 应用信息
+ */
+export type GetApp = {
+  id: string;
+  type: string;
+  name: string;
+  icon: string;
+  template: string;
+  protocol: string;
+  protocolName: string;
+  clientId: string;
+  clientSecret: string;
+  //sso发起方
+  initLoginType: string;
+  //sso登录链接
+  initLoginUrl: string;
+  nameIdValueType: string;
+  //授权范围
+  authorizationType: string;
+  enabled: boolean;
+  remark: string;
+  groupIds: string[];
+};
 
-export default AppBasic;

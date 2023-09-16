@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { SsoScope } from '@/pages/app/AppConfig/constant';
+import { SsoScope } from '@/pages/app/AppDetail/constant';
 import { ProFormSelect } from '@ant-design/pro-components';
 import { useIntl } from '@@/exports';
 
@@ -31,18 +31,18 @@ export default () => {
   return (
     <ProFormSelect
       label={intl.formatMessage({
-        id: 'pages.app.config.items.login_access.protocol_config.common.authorization_type',
+        id: 'pages.app.config.detail.items.login_access.protocol_config.common.authorization_type',
       })}
       name={'authorizationType'}
       allowClear={false}
       extra={intl.formatMessage({
-        id: 'pages.app.config.items.login_access.protocol_config.common.authorization_type.extra',
+        id: 'pages.app.config.detail.items.login_access.protocol_config.common.authorization_type.extra',
       })}
       rules={[
         {
           required: true,
           message: intl.formatMessage({
-            id: 'pages.app.config.items.login_access.protocol_config.common.authorization_type.rule.0.message',
+            id: 'pages.app.config.detail.items.login_access.protocol_config.common.authorization_type.rule.0.message',
           }),
         },
       ]}
@@ -50,13 +50,13 @@ export default () => {
         {
           value: SsoScope.AUTHORIZATION,
           label: intl.formatMessage({
-            id: 'pages.app.config.items.login_access.protocol_config.common.authorization_type.option.0',
+            id: 'pages.app.config.detail.items.login_access.protocol_config.common.authorization_type.option.0',
           }),
         },
         {
           value: SsoScope.ALL_ACCESS,
           label: intl.formatMessage({
-            id: 'pages.app.config.items.login_access.protocol_config.common.authorization_type.option.1',
+            id: 'pages.app.config.detail.items.login_access.protocol_config.common.authorization_type.option.1',
           }),
         },
       ]}

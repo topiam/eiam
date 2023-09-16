@@ -19,22 +19,14 @@
  * ConfigTabs
  */
 export enum ConfigTabs {
-  //基本信息
-  basic = 'basic',
+  //应用配置
+  app_config = 'app_config',
   //协议
   protocol_config = 'protocol_config',
-  //账户同步
-  account_sync = 'account_sync',
   //访问授权
   access_policy = 'access_policy',
   //登录访问
   login_access = 'login_access',
-  //应用权限
-  app_permission = 'app_permission',
-  //资源管理
-  permission_resource = 'permission_resource',
-  //角色管理
-  permission_role = 'permission_role',
   //应用账户
   app_account = 'app_account',
 }
@@ -63,7 +55,6 @@ export enum SsoScope {
  * 证书使用类型
  */
 export enum CertUsingType {
-  SAML_SIGN = 'saml_sign',
   JWT_ENCRYPT = 'jwt_encrypt',
 }
 

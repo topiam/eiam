@@ -21,13 +21,13 @@ import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ModalForm, ProFormText, ProTable } from '@ant-design/pro-components';
 
-import { Alert, App, Button, Form, Popconfirm, Table } from 'antd';
+import { App, Button, Form, Popconfirm, Table } from 'antd';
 import { useRef } from 'react';
 import { AppProtocolType } from '@/constant';
 import { Base64 } from 'js-base64';
 import { useIntl } from '@umijs/max';
 
-export default (props: { appId: string; protocol: AppProtocolType }) => {
+export default (props: { appId: string; protocol: AppProtocolType | string }) => {
   const actionRef = useRef<ActionType>();
   const intl = useIntl();
   const { message } = App.useApp();
@@ -35,7 +35,7 @@ export default (props: { appId: string; protocol: AppProtocolType }) => {
   const columns: ProColumns<AppAPI.AppAccountList>[] = [
     {
       title: intl.formatMessage({
-        id: 'pages.app.config.items.login_access.app_account.columns.username',
+        id: 'pages.app.config.detail.items.login_access.app_account.columns.username',
       }),
       dataIndex: 'username',
       ellipsis: true,
@@ -43,14 +43,14 @@ export default (props: { appId: string; protocol: AppProtocolType }) => {
     },
     {
       title: intl.formatMessage({
-        id: 'pages.app.config.items.login_access.app_account.columns.account',
+        id: 'pages.app.config.detail.items.login_access.app_account.columns.account',
       }),
       dataIndex: 'account',
       ellipsis: true,
     },
     {
       title: intl.formatMessage({
-        id: 'pages.app.config.items.login_access.app_account.columns.create_time',
+        id: 'pages.app.config.detail.items.login_access.app_account.columns.create_time',
       }),
       dataIndex: 'createTime',
       valueType: 'dateTime',
@@ -59,7 +59,7 @@ export default (props: { appId: string; protocol: AppProtocolType }) => {
     },
     {
       title: intl.formatMessage({
-        id: 'pages.app.config.items.login_access.app_account.columns.option',
+        id: 'pages.app.config.detail.items.login_access.app_account.columns.option',
       }),
       valueType: 'option',
       key: 'option',
@@ -69,7 +69,7 @@ export default (props: { appId: string; protocol: AppProtocolType }) => {
       render: (text, record) => [
         <Popconfirm
           title={intl.formatMessage({
-            id: 'pages.app.config.items.login_access.app_account.columns.option.popconfirm.title',
+            id: 'pages.app.config.detail.items.login_access.app_account.columns.option.popconfirm.title',
           })}
           placement="bottomRight"
           icon={
@@ -117,7 +117,7 @@ export default (props: { appId: string; protocol: AppProtocolType }) => {
       <>
         <ModalForm
           title={intl.formatMessage({
-            id: 'pages.app.config.items.login_access.app_account.create_app_account',
+            id: 'pages.app.config.detail.items.login_access.app_account.create_app_account',
           })}
           width={500}
           form={form}
@@ -125,7 +125,7 @@ export default (props: { appId: string; protocol: AppProtocolType }) => {
           trigger={
             <Button key="button" icon={<PlusOutlined />} type="primary">
               {intl.formatMessage({
-                id: 'pages.app.config.items.login_access.app_account.create_app_account',
+                id: 'pages.app.config.detail.items.login_access.app_account.create_app_account',
               })}
             </Button>
           }
@@ -155,21 +155,21 @@ export default (props: { appId: string; protocol: AppProtocolType }) => {
         >
           <Form.Item
             label={intl.formatMessage({
-              id: 'pages.app.config.items.login_access.app_account.columns.username',
+              id: 'pages.app.config.detail.items.login_access.app_account.columns.username',
             })}
             name={'userId'}
             rules={[
               {
                 required: true,
                 message: intl.formatMessage({
-                  id: 'pages.app.config.items.login_access.app_account.create_app_account.modal_form.user_id.rule.0.message',
+                  id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.user_id.rule.0.message',
                 }),
               },
             ]}
           >
             <UserSelect
               placeholder={intl.formatMessage({
-                id: 'pages.app.config.items.login_access.app_account.create_app_account.modal_form.user_id.placeholder',
+                id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.user_id.placeholder',
               })}
             />
           </Form.Item>
@@ -178,34 +178,34 @@ export default (props: { appId: string; protocol: AppProtocolType }) => {
             <>
               <ProFormText
                 label={intl.formatMessage({
-                  id: 'pages.app.config.items.login_access.app_account.create_app_account.modal_form.account',
+                  id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.account',
                 })}
                 name={'account'}
                 placeholder={intl.formatMessage({
-                  id: 'pages.app.config.items.login_access.app_account.create_app_account.modal_form.account.rule.0.message',
+                  id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.account.rule.0.message',
                 })}
                 rules={[
                   {
                     required: true,
                     message: intl.formatMessage({
-                      id: 'pages.app.config.items.login_access.app_account.create_app_account.modal_form.account.rule.0.message',
+                      id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.account.rule.0.message',
                     }),
                   },
                 ]}
               />
               <ProFormText.Password
                 label={intl.formatMessage({
-                  id: 'pages.app.config.items.login_access.app_account.create_app_account.modal_form.password',
+                  id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.password',
                 })}
                 name={'password'}
                 placeholder={intl.formatMessage({
-                  id: 'pages.app.config.items.login_access.app_account.create_app_account.modal_form.password.rule.0.message',
+                  id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.password.rule.0.message',
                 })}
                 rules={[
                   {
                     required: true,
                     message: intl.formatMessage({
-                      id: 'pages.app.config.items.login_access.app_account.create_app_account.modal_form.password.rule.0.message',
+                      id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.password.rule.0.message',
                     }),
                   },
                 ]}
@@ -215,17 +215,17 @@ export default (props: { appId: string; protocol: AppProtocolType }) => {
             //非Form协议
             <ProFormText
               label={intl.formatMessage({
-                id: 'pages.app.config.items.login_access.app_account.create_app_account.modal_form.app_identity',
+                id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.app_identity',
               })}
               name={'account'}
               placeholder={intl.formatMessage({
-                id: 'pages.app.config.items.login_access.app_account.create_app_account.modal_form.app_identity.rule.0.message',
+                id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.app_identity.rule.0.message',
               })}
               rules={[
                 {
                   required: true,
                   message: intl.formatMessage({
-                    id: 'pages.app.config.items.login_access.app_account.create_app_account.modal_form.app_identity.rule.0.message',
+                    id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.app_identity.rule.0.message',
                   }),
                 },
               ]}
@@ -237,14 +237,6 @@ export default (props: { appId: string; protocol: AppProtocolType }) => {
   };
   return (
     <>
-      <Alert
-        banner
-        type={'info'}
-        message={intl.formatMessage({
-          id: 'pages.app.config.items.login_access.app_account.alert.message',
-        })}
-        style={{ marginBottom: 16 }}
-      />
       <ProTable<AppAPI.AppAccountList>
         columns={columns}
         actionRef={actionRef}
@@ -258,11 +250,6 @@ export default (props: { appId: string; protocol: AppProtocolType }) => {
         params={{ appId: appId }}
         rowKey="id"
         search={{}}
-        style={{
-          height: 'calc(100vh - 244px)',
-          overflow: 'auto',
-        }}
-        cardProps={{ style: { minHeight: '100%' } }}
         options={false}
         pagination={{
           defaultPageSize: 5,

@@ -20,6 +20,17 @@ import { useAsyncEffect } from 'ahooks';
 import { Collapse, Form, Typography } from 'antd';
 import { useIntl } from '@umijs/max';
 import Alert from '@/components/Alert';
+import { createStyles } from 'antd-style';
+import { ColProps } from 'antd/es/grid/col';
+
+const useStyles = createStyles(({ prefixCls }) => ({
+  alert: {
+    [`.${prefixCls}-alert-content .${prefixCls}-alert-description .${prefixCls}-form-item:last-child`]:
+      {
+        marginBottom: '0 !important',
+      },
+  },
+}));
 
 /**
  * 配置信息
@@ -30,10 +41,23 @@ export default (props: {
   appId: string;
   protocolEndpoint: Record<string, string>;
   collapsed?: boolean;
+  labelCol?: ColProps;
+  wrapperCol?: ColProps;
 }) => {
   const [configForm] = Form.useForm();
-  const { protocolEndpoint, appId, collapsed = true } = props;
+  const {
+    protocolEndpoint,
+    appId,
+    collapsed = true,
+    labelCol = {
+      span: 6,
+    },
+    wrapperCol = {
+      span: 12,
+    },
+  } = props;
   const intl = useIntl();
+  const { styles } = useStyles();
 
   useAsyncEffect(async () => {
     configForm.setFieldsValue(protocolEndpoint);
@@ -42,8 +66,8 @@ export default (props: {
   return (
     <ProForm
       layout={'horizontal'}
-      labelCol={{ xs: { span: 24 }, sm: { span: 6 } }}
-      wrapperCol={{ xs: { span: 24 }, sm: { span: 12 } }}
+      labelCol={labelCol}
+      wrapperCol={wrapperCol}
       labelAlign={'right'}
       submitter={false}
       labelWrap
@@ -59,22 +83,23 @@ export default (props: {
             label: (
               <a>
                 {intl.formatMessage({
-                  id: 'pages.app.config.items.login_access.protocol_config.form.config_about',
+                  id: 'pages.app.config.detail.items.login_access.protocol_config.form.config_about',
                 })}
               </a>
             ),
             children: (
               <Alert
                 type={'grey'}
+                className={styles.alert}
                 description={
                   <>
                     <ProFormText
                       label={intl.formatMessage({
-                        id: 'pages.app.config.items.login_access.protocol_config.form.config_about.idp_sso_endpoint',
+                        id: 'pages.app.config.detail.items.login_access.protocol_config.form.config_about.idp_sso_endpoint',
                       })}
                       name={'idpSsoEndpoint'}
                       extra={intl.formatMessage({
-                        id: 'pages.app.config.items.login_access.protocol_config.form.config_about.idp_sso_endpoint.extra',
+                        id: 'pages.app.config.detail.items.login_access.protocol_config.form.config_about.idp_sso_endpoint.extra',
                       })}
                       readonly
                       proFieldProps={{

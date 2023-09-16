@@ -57,7 +57,7 @@ const CreateAppAccessPolicy = (props: {
     <>
       <ModalForm
         title={intl.formatMessage({
-          id: 'pages.app.config.items.login_access.access_policy.create_policy',
+          id: 'pages.app.config.detail.items.login_access.access_policy.create_policy',
         })}
         width={600}
         open={open}
@@ -81,7 +81,7 @@ const CreateAppAccessPolicy = (props: {
         <ProFormRadio.Group
           name="subjectType"
           label={intl.formatMessage({
-            id: 'pages.app.config.items.login_access.access_policy.create_policy.modal_form.subject_type',
+            id: 'pages.app.config.detail.items.login_access.access_policy.create_policy.modal_form.subject_type',
           })}
           initialValue={AccessPolicyType.USER}
           fieldProps={{
@@ -94,19 +94,19 @@ const CreateAppAccessPolicy = (props: {
             {
               value: AccessPolicyType.USER,
               label: intl.formatMessage({
-                id: 'pages.app.config.items.login_access.access_policy.columns.subject_type.value_enum.user',
+                id: 'pages.app.config.detail.items.login_access.access_policy.columns.subject_type.value_enum.user',
               }),
             },
             {
               value: AccessPolicyType.USER_GROUP,
               label: intl.formatMessage({
-                id: 'pages.app.config.items.login_access.access_policy.columns.subject_type.value_enum.user_group',
+                id: 'pages.app.config.detail.items.login_access.access_policy.columns.subject_type.value_enum.user_group',
               }),
             },
             {
               value: AccessPolicyType.ORGANIZATION,
               label: intl.formatMessage({
-                id: 'pages.app.config.items.login_access.access_policy.columns.subject_type.value_enum.organization',
+                id: 'pages.app.config.detail.items.login_access.access_policy.columns.subject_type.value_enum.organization',
               }),
             },
           ]}
@@ -114,7 +114,7 @@ const CreateAppAccessPolicy = (props: {
             {
               required: true,
               message: intl.formatMessage({
-                id: 'pages.app.config.items.login_access.access_policy.create_policy.modal_form.subject_type.rule.0.message',
+                id: 'pages.app.config.detail.items.login_access.access_policy.create_policy.modal_form.subject_type.rule.0.message',
               }),
             },
           ]}
@@ -127,21 +127,21 @@ const CreateAppAccessPolicy = (props: {
                 <>
                   <Form.Item
                     label={intl.formatMessage({
-                      id: 'pages.app.config.items.login_access.access_policy.create_policy.modal_form.subject_type.auth_user',
+                      id: 'pages.app.config.detail.items.login_access.access_policy.create_policy.modal_form.subject_type.auth_user',
                     })}
                     name={'subjectIds'}
                     rules={[
                       {
                         required: true,
                         message: intl.formatMessage({
-                          id: 'pages.app.config.items.login_access.access_policy.create_policy.modal_form.subject_type.auth_user.rule.0.message',
+                          id: 'pages.app.config.detail.items.login_access.access_policy.create_policy.modal_form.subject_type.auth_user.rule.0.message',
                         }),
                       },
                     ]}
                   >
                     <UserSelect
                       placeholder={intl.formatMessage({
-                        id: 'pages.app.config.items.login_access.access_policy.create_policy.modal_form.subject_type.auth_user.placeholder',
+                        id: 'pages.app.config.detail.items.login_access.access_policy.create_policy.modal_form.subject_type.auth_user.placeholder',
                       })}
                       mode={'multiple'}
                     />
@@ -153,21 +153,21 @@ const CreateAppAccessPolicy = (props: {
               return (
                 <Form.Item
                   label={intl.formatMessage({
-                    id: 'pages.app.config.items.login_access.access_policy.create_policy.modal_form.subject_type.auth_user_group',
+                    id: 'pages.app.config.detail.items.login_access.access_policy.create_policy.modal_form.subject_type.auth_user_group',
                   })}
                   name={'subjectIds'}
                   rules={[
                     {
                       required: true,
                       message: intl.formatMessage({
-                        id: 'pages.app.config.items.login_access.access_policy.create_policy.modal_form.subject_type.auth_user_group.rule.0.message',
+                        id: 'pages.app.config.detail.items.login_access.access_policy.create_policy.modal_form.subject_type.auth_user_group.rule.0.message',
                       }),
                     },
                   ]}
                 >
                   <UserGroupSelect
                     placeholder={intl.formatMessage({
-                      id: 'pages.app.config.items.login_access.access_policy.create_policy.modal_form.subject_type.auth_user_group.rule.0.message',
+                      id: 'pages.app.config.detail.items.login_access.access_policy.create_policy.modal_form.subject_type.auth_user_group.rule.0.message',
                     })}
                     mode={'multiple'}
                   />
@@ -179,21 +179,21 @@ const CreateAppAccessPolicy = (props: {
                 <>
                   <Form.Item
                     label={intl.formatMessage({
-                      id: 'pages.app.config.items.login_access.access_policy.create_policy.modal_form.subject_type.auth_organization',
+                      id: 'pages.app.config.detail.items.login_access.access_policy.create_policy.modal_form.subject_type.auth_organization',
                     })}
                     name={'subjectIds'}
                     rules={[
                       {
                         required: true,
                         message: intl.formatMessage({
-                          id: 'pages.app.config.items.login_access.access_policy.create_policy.modal_form.subject_type.auth_organization.rule.0.message',
+                          id: 'pages.app.config.detail.items.login_access.access_policy.create_policy.modal_form.subject_type.auth_organization.rule.0.message',
                         }),
                       },
                     ]}
                   >
                     <OrgCascader
                       placeholder={intl.formatMessage({
-                        id: 'pages.app.config.items.login_access.access_policy.create_policy.modal_form.subject_type.auth_organization.rule.0.message',
+                        id: 'pages.app.config.detail.items.login_access.access_policy.create_policy.modal_form.subject_type.auth_organization.rule.0.message',
                       })}
                     />
                   </Form.Item>
@@ -216,7 +216,7 @@ export default (props: { appId: string }) => {
   const columns: ProColumns<AppAPI.AppAccessPolicyList>[] = [
     {
       title: intl.formatMessage({
-        id: 'pages.app.config.items.login_access.access_policy.columns.subject_name',
+        id: 'pages.app.config.detail.items.login_access.access_policy.columns.subject_name',
       }),
       dataIndex: 'subjectName',
       ellipsis: true,
@@ -224,7 +224,7 @@ export default (props: { appId: string }) => {
     },
     {
       title: intl.formatMessage({
-        id: 'pages.app.config.items.login_access.access_policy.columns.subject_type',
+        id: 'pages.app.config.detail.items.login_access.access_policy.columns.subject_type',
       }),
       dataIndex: 'subjectType',
       valueType: 'select',
@@ -232,24 +232,24 @@ export default (props: { appId: string }) => {
       valueEnum: {
         USER: {
           text: intl.formatMessage({
-            id: 'pages.app.config.items.login_access.access_policy.columns.subject_type.value_enum.user',
+            id: 'pages.app.config.detail.items.login_access.access_policy.columns.subject_type.value_enum.user',
           }),
         },
         USER_GROUP: {
           text: intl.formatMessage({
-            id: 'pages.app.config.items.login_access.access_policy.columns.subject_type.value_enum.user_group',
+            id: 'pages.app.config.detail.items.login_access.access_policy.columns.subject_type.value_enum.user_group',
           }),
         },
         ORGANIZATION: {
           text: intl.formatMessage({
-            id: 'pages.app.config.items.login_access.access_policy.columns.subject_type.value_enum.organization',
+            id: 'pages.app.config.detail.items.login_access.access_policy.columns.subject_type.value_enum.organization',
           }),
         },
       },
     },
     {
       title: intl.formatMessage({
-        id: 'pages.app.config.items.login_access.access_policy.columns.create_time',
+        id: 'pages.app.config.detail.items.login_access.access_policy.columns.create_time',
       }),
       align: 'center',
       ellipsis: true,
@@ -259,7 +259,7 @@ export default (props: { appId: string }) => {
     },
     {
       title: intl.formatMessage({
-        id: 'pages.app.config.items.login_access.access_policy.columns.option',
+        id: 'pages.app.config.detail.items.login_access.access_policy.columns.option',
       }),
       valueType: 'option',
       key: 'option',
@@ -269,7 +269,7 @@ export default (props: { appId: string }) => {
       render: (text, record) => [
         <Popconfirm
           title={intl.formatMessage({
-            id: 'pages.app.config.items.login_access.access_policy.columns.option.popconfirm.title',
+            id: 'pages.app.config.detail.items.login_access.access_policy.columns.option.popconfirm.title',
           })}
           placement="bottomRight"
           icon={
@@ -299,7 +299,7 @@ export default (props: { appId: string }) => {
             }}
           >
             {intl.formatMessage({
-              id: 'pages.app.config.items.login_access.access_policy.cancel_policy',
+              id: 'pages.app.config.detail.items.login_access.access_policy.cancel_policy',
             })}
           </a>
         </Popconfirm>,
@@ -326,11 +326,6 @@ export default (props: { appId: string }) => {
         pagination={{
           defaultPageSize: 5,
         }}
-        style={{
-          height: 'calc(100vh - 178px)',
-          overflow: 'auto',
-        }}
-        cardProps={{ style: { minHeight: '100%' } }}
         dateFormatter="string"
         toolBarRender={() => [
           <Button
@@ -342,7 +337,7 @@ export default (props: { appId: string }) => {
             }}
           >
             {intl.formatMessage({
-              id: 'pages.app.config.items.login_access.access_policy.create_policy',
+              id: 'pages.app.config.detail.items.login_access.access_policy.create_policy',
             })}
           </Button>,
         ]}

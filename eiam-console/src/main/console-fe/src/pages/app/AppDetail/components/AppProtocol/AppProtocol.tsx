@@ -26,11 +26,9 @@ import FromConfig from './FromProtocolConfig';
 import JwtConfig from './JwtProtocolConfig';
 import OidcConfig from './OidcProtocolConfig';
 import { GetApp } from '../../data.d';
-import { useIntl } from '@@/exports';
 
 export default (props: { appId: string }) => {
   const { appId } = props;
-  const intl = useIntl();
   const [loading, setLoading] = useState<boolean>(true);
   const [app, setApp] = useState<GetApp>();
   useAsyncEffect(async () => {
@@ -52,12 +50,7 @@ export default (props: { appId: string }) => {
     return <Component app={app} />;
   };
   return (
-    <ProCard
-      title={intl.formatMessage({ id: 'pages.app.config.items.login_access.protocol_config' })}
-      style={{ height: 'calc(100vh - 178px)', overflow: 'auto' }}
-      bodyStyle={{ height: '100%' }}
-      headerBordered
-    >
+    <ProCard>
       <Skeleton loading={loading} active={true} paragraph={{ rows: 5 }}>
         {app && ComponentByKey({ key: app?.protocol, app: app })}
       </Skeleton>
