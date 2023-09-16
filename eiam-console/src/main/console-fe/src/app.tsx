@@ -113,7 +113,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, loading }) => {
         heightLayoutHeader: showBanner ? 78 : 56,
       },
       pageContainer: {
-        paddingBlockPageContainerContent: 12,
+        paddingBlockPageContainerContent: 6,
         paddingInlinePageContainerContent: 24,
       },
     },

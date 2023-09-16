@@ -22,6 +22,7 @@ export default {
   'pages.app.list.tool_bar_render.add_app': '添加应用',
   'pages.app.list.metas.title': '应用名称',
   'pages.app.list.metas.group': '应用分组',
+  'pages.app.list.actions.detail': '详情',
   'pages.app.list.actions.popconfirm.disable_app': '确定禁用该应用吗？',
   'pages.app.list.actions.popconfirm.enable_app': '确定启用该应用吗？',
   'pages.app.list.actions.popconfirm.delete_app': '您确定要删除此应用？',

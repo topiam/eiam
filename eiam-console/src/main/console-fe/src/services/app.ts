@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { download, filterParamConverter, sortParamConverter } from '@/utils/utils';
+import { filterParamConverter, sortParamConverter } from '@/utils/utils';
 import type { RequestData } from '@ant-design/pro-components';
 import type { SortOrder } from 'antd/es/table/interface';
 import { request } from '@umijs/max';
@@ -62,27 +62,16 @@ export async function getAppConfig(id: string): Promise<API.ApiResult<Record<str
 }
 
 /**
- * 下载 IDP SAML2 元数据
+ * Remove Application
  */
-export async function downloadIdpSaml2AppMetadata(id: string): Promise<void> {
-  let fileName = '';
-  request(`/api/v1/app/saml2/download/idp_metadata_file`, {
-    method: 'GET',
-    params: { appId: id },
-    responseType: 'blob',
-    getResponse: true,
-  })
-    .then((res) => {
-      fileName = res.headers['content-disposition'] || res.headers['Content-Disposition'];
-      return res.data;
-    })
-    .then((res) => {
-      download(new Blob([res]), fileName);
-    });
+export async function removeApp(id: string): Promise<API.ApiResult<boolean>> {
+  return request<API.ApiResult<boolean>>(`/api/v1/app/delete/${id}`, {
+    method: 'DELETE',
+  });
 }
 
 /**
- * Save Saml2 Config
+ * Save App Config
  */
 export async function saveAppConfig(
   values: Record<string, any>,

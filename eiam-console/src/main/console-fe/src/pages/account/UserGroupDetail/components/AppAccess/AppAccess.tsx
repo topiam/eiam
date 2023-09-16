@@ -52,7 +52,7 @@ export default (props: { userGroupId: string }) => {
           xxl: 5,
         }}
         headerTitle={intl.formatMessage({
-          id: 'pages.account.user_group_detail.access_strategy',
+          id: 'pages.account.user_group_detail.app_access_title',
         })}
         request={getAppAccessPolicyList}
         params={{ subjectId: userGroupId, subjectType: AccessPolicyType.USER_GROUP }}

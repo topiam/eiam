@@ -56,7 +56,7 @@ export default (props: { userId: string }) => {
             padding: 0,
           },
         }}
-        headerTitle={intl.formatMessage({ id: 'pages.account.user_detail.access_strategy' })}
+        headerTitle={intl.formatMessage({ id: 'pages.account.user_detail.app_access_title' })}
         request={getAppAccessPolicyList}
         params={{ subjectId: userId, subjectType: AccessPolicyType.USER }}
         rowKey={'id'}

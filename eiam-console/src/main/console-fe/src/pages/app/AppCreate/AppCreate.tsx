@@ -64,7 +64,7 @@ const CreateApp = (props: {
 
   useAsyncEffect(async () => {
     if (open) {
-      form?.setFieldsValue({ name: `${name} 应用` });
+      form?.setFieldsValue({ name: `${name}` });
     }
   }, [open]);
 
@@ -108,7 +108,7 @@ const CreateApp = (props: {
               onOk: () => {
                 successModal.destroy();
                 history.push(
-                  `/app/config?id=${result.id}&name=${values.name}&protocol=${protocol}`,
+                  `/app/detail?id=${result.id}&name=${values.name}&protocol=${protocol}`,
                 );
               },
             });

@@ -15,19 +15,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { getUserGroup, updateUserGroup } from '@/services/account';
+import { getUserGroup, removeUserGroup, updateUserGroup } from '@/services/account';
 import { history } from '@@/core/history';
 
 import { PageContainer, ProDescriptions, RouteContext } from '@ant-design/pro-components';
 import { useAsyncEffect, useMount } from 'ahooks';
-import { App, Skeleton } from 'antd';
-import { useState } from 'react';
+import { App, Button, Skeleton } from 'antd';
+import React, { useState } from 'react';
 import MemberList from './components/MemberList';
 import { UserGroupDetailTabs } from './constant';
 import queryString from 'query-string';
 import { useIntl, useLocation } from '@umijs/max';
 import useStyles from './style';
-import AccessStrategy from '@/pages/account/UserGroupDetail/components/AccessStrategy';
+import AppAccess from './components/AppAccess';
+import { ExclamationCircleFilled } from '@ant-design/icons';
 
 /**
  * 用户组详情
@@ -35,7 +36,7 @@ import AccessStrategy from '@/pages/account/UserGroupDetail/components/AccessStr
 export default () => {
   const intl = useIntl();
   const { styles } = useStyles();
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   const location = useLocation();
   const query = queryString.parse(location.search);
   const { id } = query as { id: string };
@@ -106,7 +107,7 @@ export default () => {
             <ProDescriptions.Item
               dataIndex="name"
               label={intl.formatMessage({
-                id: 'pages.account.user_group_detail.pro_descriptions.name',
+                id: 'pages.account.user_group_detail.descriptions.name',
               })}
               fieldProps={{
                 maxLength: 8,
@@ -116,14 +117,14 @@ export default () => {
             <ProDescriptions.Item
               dataIndex="code"
               label={intl.formatMessage({
-                id: 'pages.account.user_group_detail.pro_descriptions.code',
+                id: 'pages.account.user_group_detail.descriptions.code',
               })}
               copyable
               editable={false}
             />
             <ProDescriptions.Item
               label={intl.formatMessage({
-                id: 'pages.account.user_group_detail.pro_descriptions.remark',
+                id: 'pages.account.user_group_detail.descriptions.remark',
               })}
               className={styles.descriptionRemark}
               dataIndex="remark"
@@ -151,11 +152,43 @@ export default () => {
           tab: intl.formatMessage({ id: 'pages.account.user_group_detail.tab_list.member' }),
         },
         {
-          key: UserGroupDetailTabs.access_policy,
+          key: UserGroupDetailTabs.app_access,
           tab: intl.formatMessage({
-            id: 'pages.account.user_group_detail.tab_list.access_policy',
+            id: 'pages.account.user_group_detail.tab_list.app_access',
           }),
         },
+      ]}
+      extra={[
+        <Button
+          key="delete"
+          type="primary"
+          danger
+          onClick={() => {
+            const confirmed = modal.error({
+              centered: true,
+              title: intl.formatMessage({
+                id: 'pages.account.user_group_detail.extra.delete.confirm_title',
+              }),
+              icon: <ExclamationCircleFilled />,
+              content: intl.formatMessage({
+                id: 'pages.account.user_group_detail.extra.delete.confirm_content',
+              }),
+              okText: intl.formatMessage({ id: 'app.confirm' }),
+              okType: 'danger',
+              okCancel: true,
+              cancelText: intl.formatMessage({ id: 'app.cancel' }),
+              onOk: async () => {
+                const { success } = await removeUserGroup(id);
+                if (success) {
+                  message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                  confirmed.destroy();
+                }
+              },
+            });
+          }}
+        >
+          {intl.formatMessage({ id: 'pages.account.user_group_detail.extra.delete' })}
+        </Button>,
       ]}
       tabActiveKey={tabActiveKey}
       onTabChange={(key: string) => {
@@ -169,7 +202,7 @@ export default () => {
       {/*成员信息*/}
       {type === UserGroupDetailTabs.member && <MemberList id={id} />}
       {/*授权应用*/}
-      {type === UserGroupDetailTabs.access_policy && <AccessStrategy userGroupId={id} />}
+      {type === UserGroupDetailTabs.app_access && <AppAccess userGroupId={id} />}
     </PageContainer>
   );
 };
