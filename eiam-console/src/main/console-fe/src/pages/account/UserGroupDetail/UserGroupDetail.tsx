@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { getUserGroup, removeUser, updateUserGroup } from '@/services/account';
+import { getUserGroup, removeUserGroup, updateUserGroup } from '@/services/account';
 import { history } from '@@/core/history';
 
 import { PageContainer, ProDescriptions, RouteContext } from '@ant-design/pro-components';
@@ -178,7 +178,7 @@ export default () => {
               okCancel: true,
               cancelText: intl.formatMessage({ id: 'app.cancel' }),
               onOk: async () => {
-                const { success } = await removeUser(id);
+                const { success } = await removeUserGroup(id);
                 if (success) {
                   message.success(intl.formatMessage({ id: 'app.operation_success' }));
                   confirmed.destroy();
