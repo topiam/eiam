@@ -24,7 +24,7 @@ const Settings: LayoutSettings & {
   navTheme: 'light',
   colorPrimary: '#1677FF',
   layout: 'mix',
-  contentWidth: 'Fluid',
+  contentWidth: 'Fixed',
   fixedHeader: true,
   fixSiderbar: true,
   splitMenus: false,
