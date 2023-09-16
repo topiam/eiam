@@ -125,6 +125,7 @@ public class AppGroupServiceImpl implements AppGroupService {
     public boolean deleteAppGroup(Long id) {
         appGroupRequireNonNull(id);
         appGroupRepository.deleteById(id);
+        appGroupAssociationRepository.deleteAllByGroupId(id);
         AuditContext
             .setTarget(Target.builder().id(id.toString()).type(TargetType.APP_GROUP).build());
         return true;

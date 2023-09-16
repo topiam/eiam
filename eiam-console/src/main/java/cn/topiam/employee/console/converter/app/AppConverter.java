@@ -26,7 +26,6 @@ import org.mapstruct.Mapping;
 
 import com.google.common.collect.Lists;
 
-
 import cn.topiam.employee.application.ApplicationService;
 import cn.topiam.employee.application.ApplicationServiceLoader;
 import cn.topiam.employee.common.entity.app.AppEntity;
