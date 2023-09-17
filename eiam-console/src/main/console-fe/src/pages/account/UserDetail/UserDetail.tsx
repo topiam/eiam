@@ -42,12 +42,16 @@ export default () => {
   };
   const [tabActiveKey, setTabActiveKey] = useState<string>();
 
+  const goUserList = () => {
+    history.push(`/account/user`);
+  };
+
   useMount(() => {
     if (!id) {
       useApp.message
         .warning(intl.formatMessage({ id: 'pages.account.user_detail.user_info.not_selected' }))
         .then();
-      history.push(`/account/user`);
+      goUserList();
       return;
     }
     if (!type || !UserDetailTabs[type]) {
@@ -64,7 +68,7 @@ export default () => {
   return (
     <PageContainer
       onBack={() => {
-        history.push('/account/user');
+        goUserList();
       }}
       tabList={[
         {
@@ -104,6 +108,7 @@ export default () => {
                 if (success) {
                   useApp.message.success(intl.formatMessage({ id: 'app.operation_success' }));
                   confirmed.destroy();
+                  goUserList();
                 }
               },
             });

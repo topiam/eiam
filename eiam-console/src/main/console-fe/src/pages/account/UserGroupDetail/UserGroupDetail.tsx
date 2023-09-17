@@ -48,12 +48,16 @@ export default () => {
   const [tabActiveKey, setTabActiveKey] = useState<string>();
   const [loading, setLoading] = useState<boolean>(false);
 
+  const goUserGroupList = () => {
+    history.push('/account/user-group');
+  };
+
   useMount(() => {
     if (!id) {
       message
         .warning(intl.formatMessage({ id: 'pages.account.user_group_detail.use_mount.message' }))
         .then();
-      history.push(`/account/user-group`);
+      goUserGroupList();
       return;
     }
     if (!type || !UserGroupDetailTabs[type]) {
@@ -140,7 +144,7 @@ export default () => {
   return (
     <PageContainer
       onBack={() => {
-        history.push('/account/user-group');
+        goUserGroupList();
       }}
       title={
         loading ? <Skeleton.Input style={{ width: 50 }} active size={'small'} /> : detail?.name
@@ -182,6 +186,7 @@ export default () => {
                 if (success) {
                   message.success(intl.formatMessage({ id: 'app.operation_success' }));
                   confirmed.destroy();
+                  goUserGroupList();
                 }
               },
             });

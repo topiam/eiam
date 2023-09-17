@@ -50,10 +50,14 @@ export default () => {
     type: ConfigTabs;
   };
 
+  const goAppList = () => {
+    history.push('/app');
+  };
+
   useAsyncEffect(async () => {
     if (!id) {
       message.error(intl.formatMessage({ id: 'pages.app.config.detail.error' }));
-      history.push('/app');
+      goAppList();
       return;
     }
     if (!type || !ConfigTabs[type]) {
@@ -155,7 +159,7 @@ export default () => {
       title={loading ? <Skeleton.Input style={{ width: 50 }} active size={'small'} /> : app?.name}
       style={{ overflow: 'hidden' }}
       onBack={() => {
-        history.push('/app');
+        goAppList();
       }}
       loading={loading}
       extra={[
@@ -182,6 +186,7 @@ export default () => {
                 if (success) {
                   message.success(intl.formatMessage({ id: 'app.operation_success' }));
                   confirmed.destroy();
+                  goAppList();
                 }
               },
             });
