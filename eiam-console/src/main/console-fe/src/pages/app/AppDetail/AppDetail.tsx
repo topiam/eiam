@@ -93,7 +93,6 @@ export default () => {
             size="small"
             column={isMobile ? 1 : 2}
             dataSource={{ ...app }}
-            style={{ marginBlockEnd: -16 }}
           >
             <ProDescriptions.Item
               dataIndex="type"
