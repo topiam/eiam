@@ -38,7 +38,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Data
 @Accessors(chain = true)
 @Schema(description = "分页查询策略响应")
-public class AppPermissionPolicyPO implements Serializable {
+public class PermissionPolicyPO implements Serializable {
 
     @Serial
     private static final long    serialVersionUID = 3320953184046791392L;

@@ -24,8 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.app.query.AppPolicyQuery;
-import cn.topiam.employee.common.entity.permission.AppPermissionPolicyEntity;
-import cn.topiam.employee.common.entity.permission.po.AppPermissionPolicyPO;
+import cn.topiam.employee.common.entity.permission.PermissionPolicyEntity;
+import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
 import cn.topiam.employee.common.exception.app.AppPolicyNotExistException;
 import cn.topiam.employee.common.repository.permission.AppPermissionPolicyRepository;
 import cn.topiam.employee.console.converter.permission.PermissionPolicyConverter;
@@ -59,7 +59,7 @@ public class PermissionPolicyServiceImpl implements PermissionPolicyService {
     @Override
     public Page<PermissionPolicyListResult> getPermissionPolicyList(PageModel page,
                                                                     AppPolicyQuery query) {
-        org.springframework.data.domain.Page<AppPermissionPolicyPO> data;
+        org.springframework.data.domain.Page<PermissionPolicyPO> data;
         QPageRequest request = QPageRequest.of(page.getCurrent(), page.getPageSize());
         data = appPermissionPolicyRepository.findPage(query, request);
         return permissionPolicyConverter.entityConvertToPolicyListResult(data);
@@ -100,7 +100,7 @@ public class PermissionPolicyServiceImpl implements PermissionPolicyService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean createPermissionPolicy(PermissionPolicyCreateParam param) {
-        AppPermissionPolicyEntity resource = permissionPolicyConverter
+        PermissionPolicyEntity resource = permissionPolicyConverter
             .policyCreateParamConvertToEntity(param);
         // 新增策略
         appPermissionPolicyRepository.save(resource);
@@ -115,7 +115,7 @@ public class PermissionPolicyServiceImpl implements PermissionPolicyService {
      */
     @Override
     public Boolean updatePermissionPolicy(PermissionPolicyUpdateParam param) {
-        AppPermissionPolicyEntity resource = permissionPolicyConverter
+        PermissionPolicyEntity resource = permissionPolicyConverter
             .policyUpdateParamConvertToEntity(param);
         // 更新策略
         appPermissionPolicyRepository.save(resource);

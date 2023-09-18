@@ -22,6 +22,7 @@ import java.io.Serial;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import cn.topiam.employee.common.enums.PermissionActionType;
 import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
 
 import lombok.Getter;
@@ -29,54 +30,50 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
 /**
- * <p>
- * 应用角色表
- * </p>
+ * 应用权限
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-08-10
+ * Created by support@topiam.cn on  2021/11/2 21:05
  */
 @Getter
 @Setter
 @ToString
 @Entity
 @Accessors(chain = true)
-@Table(name = "app_permission_role")
-@SQLDelete(sql = "update app_permission_role set " + SOFT_DELETE_SET + " where id_ = ?")
+@Table(name = "app_permission_action")
+@SQLDelete(sql = "update app_permission_action set " + SOFT_DELETE_SET + " where id_ = ?")
 @Where(clause = SOFT_DELETE_WHERE)
-public class AppPermissionRoleEntity extends LogicDeleteEntity<Long> {
+public class PermissionActionEntity extends LogicDeleteEntity<Long> {
 
     @Serial
-    private static final long serialVersionUID = -7761332532995424593L;
+    private static final long           serialVersionUID = -3954680915360748087L;
 
     /**
-     * 角色名称
+     * 权限值
+     */
+    @Column(name = "value_")
+    private String                      value;
+    /**
+     * 描述
      */
     @Column(name = "name_")
-    private String            name;
+    private String                      name;
 
     /**
-     * 角色编码
+     * 权限类型
      */
-    @Column(name = "code_")
-    private String            code;
+    @Column(name = "type_")
+    private PermissionActionType        type;
 
     /**
-     * 应用ID
+     * 资源
      */
-    @Column(name = "app_id")
-    private Long              appId;
-
-    /**
-     * 是否启用
-     */
-    @Column(name = "is_enabled")
-    private Boolean           enabled;
+    @ManyToOne
+    @JoinColumn(name = "resource_id")
+    private PermissionResourceEntity resource;
 }

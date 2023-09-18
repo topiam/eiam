@@ -17,12 +17,12 @@
  */
 package cn.topiam.employee.openapi.endpoint.permission;
 
+import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cn.topiam.employee.common.entity.permission.po.AppPermissionPolicyPO;
 import cn.topiam.employee.openapi.pojo.request.app.query.OpenApiPolicyQuery;
 import cn.topiam.employee.openapi.service.AppPermissionPolicyService;
 import cn.topiam.employee.support.repository.page.domain.Page;
@@ -48,15 +48,15 @@ public class AppPermissionPolicyEndpoint {
      * 获取所有策略（分页）
      *
      * @param page {@link PageModel}
-     * @return {@link AppPermissionPolicyPO}
+     * @return {@link PermissionPolicyPO}
      */
     @Operation(summary = "获取策略列表")
     @GetMapping(value = "/list")
-    public ApiRestResult<Page<AppPermissionPolicyPO>> getPermissionPolicyList(PageModel page,
-                                                                              @Validated OpenApiPolicyQuery query) {
-        Page<AppPermissionPolicyPO> result = permissionPolicyService.getPermissionPolicyList(page,
+    public ApiRestResult<Page<PermissionPolicyPO>> getPermissionPolicyList(PageModel page,
+                                                                           @Validated OpenApiPolicyQuery query) {
+        Page<PermissionPolicyPO> result = permissionPolicyService.getPermissionPolicyList(page,
             query);
-        return ApiRestResult.<Page<AppPermissionPolicyPO>> builder().result(result).build();
+        return ApiRestResult.<Page<PermissionPolicyPO>> builder().result(result).build();
     }
 
     private final AppPermissionPolicyService permissionPolicyService;

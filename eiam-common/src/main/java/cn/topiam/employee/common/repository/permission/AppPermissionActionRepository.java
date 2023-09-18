@@ -19,11 +19,11 @@ package cn.topiam.employee.common.repository.permission;
 
 import java.util.List;
 
+import cn.topiam.employee.common.entity.permission.PermissionActionEntity;
+import cn.topiam.employee.common.entity.permission.PermissionResourceEntity;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
-import cn.topiam.employee.common.entity.permission.AppPermissionActionEntity;
-import cn.topiam.employee.common.entity.permission.AppPermissionResourceEntity;
 import cn.topiam.employee.support.repository.LogicDeleteRepository;
 
 /**
@@ -32,13 +32,13 @@ import cn.topiam.employee.support.repository.LogicDeleteRepository;
  */
 @Repository
 public interface AppPermissionActionRepository extends
-                                               LogicDeleteRepository<AppPermissionActionEntity, Long>,
-                                               QuerydslPredicateExecutor<AppPermissionActionEntity> {
+                                               LogicDeleteRepository<PermissionActionEntity, Long>,
+                                               QuerydslPredicateExecutor<PermissionActionEntity> {
     /**
      * findAllByResource
      *
-     * @param resource {@link AppPermissionResourceEntity}
+     * @param resource {@link PermissionResourceEntity}
      * @return {@link List}
      */
-    List<AppPermissionActionEntity> findAllByResource(AppPermissionResourceEntity resource);
+    List<PermissionActionEntity> findAllByResource(PermissionResourceEntity resource);
 }

@@ -17,16 +17,16 @@
  */
 package cn.topiam.employee.openapi.service.impl;
 
+import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.app.query.AppPolicyQuery;
-import cn.topiam.employee.common.entity.permission.AppPermissionPolicyEntity;
-import cn.topiam.employee.common.entity.permission.po.AppPermissionPolicyPO;
+import cn.topiam.employee.common.entity.permission.PermissionPolicyEntity;
 import cn.topiam.employee.common.exception.app.AppPolicyNotExistException;
 import cn.topiam.employee.common.repository.permission.AppPermissionPolicyRepository;
-import cn.topiam.employee.openapi.converter.app.AppPermissionPolicyConverter;
+import cn.topiam.employee.openapi.converter.app.PermissionPolicyConverter;
 import cn.topiam.employee.openapi.pojo.request.app.query.OpenApiPolicyQuery;
 import cn.topiam.employee.openapi.pojo.request.app.save.AppPermissionPolicyCreateParam;
 import cn.topiam.employee.openapi.pojo.request.app.update.AppPermissionPolicyUpdateParam;
@@ -54,11 +54,11 @@ public class AppPermissionPolicyServiceImpl implements AppPermissionPolicyServic
      *
      * @param page  {@link PageModel}
      * @param query {@link OpenApiPolicyQuery}
-     * @return {@link AppPermissionPolicyPO}
+     * @return {@link PermissionPolicyPO}
      */
     @Override
-    public Page<AppPermissionPolicyPO> getPermissionPolicyList(PageModel page,
-                                                               OpenApiPolicyQuery query) {
+    public Page<PermissionPolicyPO> getPermissionPolicyList(PageModel page,
+                                                            OpenApiPolicyQuery query) {
         AppPolicyQuery appPolicyQuery = new AppPolicyQuery();
         // TODO token获取所属应用
         //        appPolicyQuery.setAppId(0L);
@@ -68,9 +68,9 @@ public class AppPermissionPolicyServiceImpl implements AppPermissionPolicyServic
         appPolicyQuery.setSubjectType(query.getSubjectType());
         appPolicyQuery.setObjectType(query.getObjectType());
         QPageRequest request = QPageRequest.of(page.getCurrent(), page.getPageSize());
-        org.springframework.data.domain.Page<AppPermissionPolicyPO> data = appPermissionPolicyRepository
+        org.springframework.data.domain.Page<PermissionPolicyPO> data = appPermissionPolicyRepository
             .findPage(appPolicyQuery, request);
-        return appPermissionPolicyConverter.entityConvertToPolicyListResult(data);
+        return permissionPolicyConverter.entityConvertToPolicyListResult(data);
     }
 
     /**
@@ -108,7 +108,7 @@ public class AppPermissionPolicyServiceImpl implements AppPermissionPolicyServic
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean createPermissionPolicy(AppPermissionPolicyCreateParam param) {
-        AppPermissionPolicyEntity resource = appPermissionPolicyConverter
+        PermissionPolicyEntity resource = permissionPolicyConverter
             .policyCreateParamConvertToEntity(param);
         // 新增策略
         appPermissionPolicyRepository.save(resource);
@@ -123,14 +123,14 @@ public class AppPermissionPolicyServiceImpl implements AppPermissionPolicyServic
      */
     @Override
     public Boolean updatePermissionPolicy(AppPermissionPolicyUpdateParam param) {
-        AppPermissionPolicyEntity resource = appPermissionPolicyConverter
+        PermissionPolicyEntity resource = permissionPolicyConverter
             .policyUpdateParamConvertToEntity(param);
         // 更新策略
         appPermissionPolicyRepository.save(resource);
         return null;
     }
 
-    private final AppPermissionPolicyConverter  appPermissionPolicyConverter;
+    private final PermissionPolicyConverter permissionPolicyConverter;
 
     private final AppPermissionPolicyRepository appPermissionPolicyRepository;
 }

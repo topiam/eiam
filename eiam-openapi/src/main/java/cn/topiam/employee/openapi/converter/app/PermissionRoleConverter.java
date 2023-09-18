@@ -30,7 +30,7 @@ import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 
 import cn.topiam.employee.common.entity.app.QAppPermissionRoleEntity;
-import cn.topiam.employee.common.entity.permission.AppPermissionRoleEntity;
+import cn.topiam.employee.common.entity.permission.PermissionRoleEntity;
 import cn.topiam.employee.openapi.pojo.request.app.query.AppPermissionRoleListQuery;
 import cn.topiam.employee.openapi.pojo.request.app.save.AppPermissionRoleCreateParam;
 import cn.topiam.employee.openapi.pojo.request.app.update.PermissionRoleUpdateParam;
@@ -45,7 +45,7 @@ import cn.topiam.employee.support.repository.page.domain.Page;
  * Created by support@topiam.cn on 2020/8/14 22:45
  */
 @Mapper(componentModel = "spring")
-public interface AppPermissionRoleConverter {
+public interface PermissionRoleConverter {
 
     /**
      * 角色实体转换为角色分页结果
@@ -53,11 +53,11 @@ public interface AppPermissionRoleConverter {
      * @param page {@link Page}
      * @return {@link Page}
      */
-    default Page<AppPermissionRoleListResult> entityConvertToRolePaginationResult(org.springframework.data.domain.Page<AppPermissionRoleEntity> page) {
+    default Page<AppPermissionRoleListResult> entityConvertToRolePaginationResult(org.springframework.data.domain.Page<PermissionRoleEntity> page) {
         Page<AppPermissionRoleListResult> result = new Page<>();
         if (!CollectionUtils.isEmpty(page.getContent())) {
             List<AppPermissionRoleListResult> list = new ArrayList<>();
-            for (AppPermissionRoleEntity user : page.getContent()) {
+            for (PermissionRoleEntity user : page.getContent()) {
                 list.add(entityConvertToRolePaginationResult(user));
             }
             //@formatter:off
@@ -75,16 +75,16 @@ public interface AppPermissionRoleConverter {
     /**
      * 角色实体转换为角色分页结果
      *
-     * @param page {@link AppPermissionRoleEntity}
+     * @param page {@link PermissionRoleEntity}
      * @return {@link AppPermissionRoleListResult}
      */
-    AppPermissionRoleListResult entityConvertToRolePaginationResult(AppPermissionRoleEntity page);
+    AppPermissionRoleListResult entityConvertToRolePaginationResult(PermissionRoleEntity page);
 
     /**
      * 角色创建参数转换为角色实体
      *
      * @param param {@link AppPermissionRoleCreateParam}
-     * @return {@link AppPermissionRoleEntity}
+     * @return {@link PermissionRoleEntity}
      */
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "id", ignore = true)
@@ -93,13 +93,13 @@ public interface AppPermissionRoleConverter {
     @Mapping(target = "updateBy", ignore = true)
     @Mapping(target = "createTime", ignore = true)
     @Mapping(target = "createBy", ignore = true)
-    AppPermissionRoleEntity roleCreateParamConvertToEntity(AppPermissionRoleCreateParam param);
+    PermissionRoleEntity roleCreateParamConvertToEntity(AppPermissionRoleCreateParam param);
 
     /**
      * 角色更新参数转换为角色实体类
      *
      * @param param {@link PermissionRoleUpdateParam} 更新参数
-     * @return {@link AppPermissionRoleEntity} 角色实体
+     * @return {@link PermissionRoleEntity} 角色实体
      */
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "appId", ignore = true)
@@ -108,21 +108,21 @@ public interface AppPermissionRoleConverter {
     @Mapping(target = "updateBy", ignore = true)
     @Mapping(target = "createTime", ignore = true)
     @Mapping(target = "createBy", ignore = true)
-    AppPermissionRoleEntity roleUpdateParamConvertToEntity(PermissionRoleUpdateParam param);
+    PermissionRoleEntity roleUpdateParamConvertToEntity(PermissionRoleUpdateParam param);
 
     /**
      * 实体转系统详情结果
      *
-     * @param role {@link AppPermissionRoleEntity}
+     * @param role {@link PermissionRoleEntity}
      * @return {@link AppPermissionRoleResult}
      */
-    AppPermissionRoleResult entityConvertToRoleDetailResult(AppPermissionRoleEntity role);
+    AppPermissionRoleResult entityConvertToRoleDetailResult(PermissionRoleEntity role);
 
     /**
      * 角色分页查询参数转实体
      *
      * @param query {@link AppPermissionRoleListQuery}
-     * @return {@link AppPermissionRoleEntity}
+     * @return {@link PermissionRoleEntity}
      */
     default Predicate rolePaginationParamConvertToPredicate(AppPermissionRoleListQuery query) {
         QAppPermissionRoleEntity role = QAppPermissionRoleEntity.appPermissionRoleEntity;

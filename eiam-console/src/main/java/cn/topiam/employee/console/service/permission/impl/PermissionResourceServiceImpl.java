@@ -23,6 +23,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import cn.topiam.employee.common.entity.permission.PermissionActionEntity;
+import cn.topiam.employee.common.entity.permission.PermissionResourceEntity;
 import cn.topiam.employee.console.pojo.result.permission.PermissionResourceGetResult;
 import cn.topiam.employee.console.pojo.result.permission.PermissionResourceListResult;
 import cn.topiam.employee.console.pojo.save.permission.PermissionResourceCreateParam;
@@ -39,8 +41,6 @@ import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.common.entity.app.QAppPermissionResourceEntity;
-import cn.topiam.employee.common.entity.permission.AppPermissionActionEntity;
-import cn.topiam.employee.common.entity.permission.AppPermissionResourceEntity;
 import cn.topiam.employee.common.enums.CheckValidityType;
 import cn.topiam.employee.common.exception.app.AppResourceNotExistException;
 import cn.topiam.employee.common.repository.permission.AppPermissionActionRepository;
@@ -81,7 +81,7 @@ public class PermissionResourceServiceImpl implements PermissionResourceService 
     @Override
     public Page<PermissionResourceListResult> getPermissionResourceList(PageModel page,
                                                                         PermissionResourceListQuery query) {
-        org.springframework.data.domain.Page<AppPermissionResourceEntity> data;
+        org.springframework.data.domain.Page<PermissionResourceEntity> data;
         Predicate predicate = permissionResourceConverter
             .resourcePaginationParamConvertToPredicate(query);
         QPageRequest request = QPageRequest.of(page.getCurrent(), page.getPageSize());
@@ -97,7 +97,7 @@ public class PermissionResourceServiceImpl implements PermissionResourceService 
      */
     @Override
     public PermissionResourceGetResult getPermissionResource(String id) {
-        AppPermissionResourceEntity resource = appResourceRepository.findById(Long.valueOf(id))
+        PermissionResourceEntity resource = appResourceRepository.findById(Long.valueOf(id))
             .orElseThrow(AppResourceNotExistException::new);
         return permissionResourceConverter.entityConvertToResourceGetResult(resource);
     }
@@ -112,12 +112,12 @@ public class PermissionResourceServiceImpl implements PermissionResourceService 
     @Transactional(rollbackFor = Exception.class)
     public Boolean deletePermissionResource(String id) {
         Long resourceId = Long.valueOf(id);
-        AppPermissionResourceEntity resource = appResourceRepository.findById(resourceId)
+        PermissionResourceEntity resource = appResourceRepository.findById(resourceId)
             .orElseThrow(AppResourceNotExistException::new);
-        List<AppPermissionActionEntity> actionList = appPermissionActionRepository
+        List<PermissionActionEntity> actionList = appPermissionActionRepository
             .findAllByResource(resource);
         List<Long> objectIdList = new ArrayList<>(
-            actionList.stream().map(AppPermissionActionEntity::getId).toList());
+            actionList.stream().map(PermissionActionEntity::getId).toList());
         objectIdList.add(resourceId);
         appPermissionPolicyRepository.deleteAllByObjectIdIn(objectIdList);
         appResourceRepository.deleteById(resourceId);
@@ -135,7 +135,7 @@ public class PermissionResourceServiceImpl implements PermissionResourceService 
      */
     @Override
     public Boolean updateStatus(Long id, boolean enabled) {
-        AppPermissionResourceEntity resource = appResourceRepository.findById(Long.valueOf(id))
+        PermissionResourceEntity resource = appResourceRepository.findById(Long.valueOf(id))
             .orElseThrow(AppResourceNotExistException::new);
         AuditContext.setTarget(
             Target.builder().id(id.toString()).type(TargetType.APP_PERMISSION_RESOURCE).build());
@@ -151,7 +151,7 @@ public class PermissionResourceServiceImpl implements PermissionResourceService 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean createPermissionResource(PermissionResourceCreateParam param) {
-        AppPermissionResourceEntity resource = permissionResourceConverter
+        PermissionResourceEntity resource = permissionResourceConverter
             .resourceCreateParamConvertToEntity(param);
         buildActions(param.getActions(), resource);
         // 新增资源
@@ -170,22 +170,22 @@ public class PermissionResourceServiceImpl implements PermissionResourceService 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean updatePermissionResource(PermissionResourceUpdateParam param) {
-        AppPermissionResourceEntity resource = permissionResourceConverter
+        PermissionResourceEntity resource = permissionResourceConverter
             .resourceUpdateParamConvertToEntity(param);
-        AppPermissionResourceEntity entity = getAppPermissionResourceEntity(
+        PermissionResourceEntity entity = getAppPermissionResourceEntity(
             Long.valueOf(param.getId()));
         buildActions(param.getActions(), resource);
         BeanUtils.merge(resource, entity, LAST_MODIFIED_BY, LAST_MODIFIED_TIME);
         // 查询资源下所有权限
-        List<AppPermissionActionEntity> actionList = appPermissionActionRepository
+        List<PermissionActionEntity> actionList = appPermissionActionRepository
             .findAllByResource(resource);
         // 取出未删除的权限id
-        Set<Long> reservedSet = resource.getActions().stream().map(AppPermissionActionEntity::getId)
+        Set<Long> reservedSet = resource.getActions().stream().map(PermissionActionEntity::getId)
             .collect(Collectors.toSet());
         // 过滤要删除的权限id
         List<Long> removeActions = actionList.stream()
             .filter(item -> !reservedSet.contains(item.getId()))
-            .map(AppPermissionActionEntity::getId).toList();
+            .map(PermissionActionEntity::getId).toList();
         appPermissionActionRepository.deleteAllById(removeActions);
         // 更新资源
         appResourceRepository.save(entity);
@@ -198,9 +198,9 @@ public class PermissionResourceServiceImpl implements PermissionResourceService 
      * 获取应用权限资源
      *
      * @param id {@link Long}
-     * @return {@link AppPermissionResourceEntity}
+     * @return {@link PermissionResourceEntity}
      */
-    private AppPermissionResourceEntity getAppPermissionResourceEntity(Long id) {
+    private PermissionResourceEntity getAppPermissionResourceEntity(Long id) {
         return appResourceRepository.findById(id)
             .orElseThrow(() -> new BadParamsException("应用权限资源不存在"));
     }
@@ -219,7 +219,7 @@ public class PermissionResourceServiceImpl implements PermissionResourceService 
     public Boolean permissionResourceParamCheck(CheckValidityType type, String value, Long appId,
                                                 Long id) {
         QAppPermissionResourceEntity role = QAppPermissionResourceEntity.appPermissionResourceEntity;
-        AppPermissionResourceEntity entity = new AppPermissionResourceEntity();
+        PermissionResourceEntity entity = new PermissionResourceEntity();
         boolean result = false;
         // ID存在说明是修改操作，查询一下当前数据
         if (Objects.nonNull(id)) {
@@ -249,14 +249,14 @@ public class PermissionResourceServiceImpl implements PermissionResourceService 
      * 批量处理actions
      *
      * @param permissions {@link List< PermissionsActionParam >}
-     * @param resource {@link AppPermissionResourceEntity>}
+     * @param resource {@link PermissionResourceEntity >}
      */
     private void buildActions(List<PermissionsActionParam> permissions,
-                              AppPermissionResourceEntity resource) {
+                              PermissionResourceEntity resource) {
         // 权限
-        List<AppPermissionActionEntity> list = new ArrayList<>();
+        List<PermissionActionEntity> list = new ArrayList<>();
         for (PermissionsActionParam p : permissions) {
-            AppPermissionActionEntity entity = new AppPermissionActionEntity();
+            PermissionActionEntity entity = new PermissionActionEntity();
             entity.setResource(resource);
             entity.setType(p.getType());
             entity.setName(p.getName());

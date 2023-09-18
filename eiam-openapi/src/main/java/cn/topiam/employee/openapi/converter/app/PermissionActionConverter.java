@@ -17,10 +17,10 @@
  */
 package cn.topiam.employee.openapi.converter.app;
 
+import cn.topiam.employee.common.entity.permission.PermissionActionEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import cn.topiam.employee.common.entity.permission.AppPermissionActionEntity;
 import cn.topiam.employee.openapi.pojo.request.app.AppPermissionsActionParam;
 
 /**
@@ -31,7 +31,7 @@ import cn.topiam.employee.openapi.pojo.request.app.AppPermissionsActionParam;
  */
 @SuppressWarnings("AlibabaAbstractMethodOrInterfaceMethodMustUseJavadoc")
 @Mapper(componentModel = "spring")
-public interface AppPermissionActionConverter {
+public interface PermissionActionConverter {
     @Mapping(target = "updateTime", ignore = true)
     @Mapping(target = "updateBy", ignore = true)
     @Mapping(target = "resource", ignore = true)
@@ -40,7 +40,7 @@ public interface AppPermissionActionConverter {
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "createTime", ignore = true)
     @Mapping(target = "createBy", ignore = true)
-    AppPermissionActionEntity toEntity(AppPermissionsActionParam dto);
+    PermissionActionEntity toEntity(AppPermissionsActionParam dto);
 
-    AppPermissionsActionParam toDTO(AppPermissionActionEntity entities);
+    AppPermissionsActionParam toDTO(PermissionActionEntity entities);
 }

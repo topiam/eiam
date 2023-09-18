@@ -20,6 +20,7 @@ package cn.topiam.employee.console.converter.permission;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.topiam.employee.common.entity.permission.PermissionResourceEntity;
 import cn.topiam.employee.console.pojo.result.permission.PermissionResourceGetResult;
 import cn.topiam.employee.console.pojo.result.permission.PermissionResourceListResult;
 import cn.topiam.employee.console.pojo.update.permission.PermissionResourceUpdateParam;
@@ -33,7 +34,6 @@ import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 
 import cn.topiam.employee.common.entity.app.QAppPermissionResourceEntity;
-import cn.topiam.employee.common.entity.permission.AppPermissionResourceEntity;
 import cn.topiam.employee.console.pojo.query.permission.PermissionResourceListQuery;
 import cn.topiam.employee.console.pojo.save.permission.PermissionResourceCreateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
@@ -71,7 +71,7 @@ public interface PermissionResourceConverter {
      * 资源创建参数转实体类
      *
      * @param param {@link PermissionResourceCreateParam}
-     * @return {@link AppPermissionResourceEntity}
+     * @return {@link PermissionResourceEntity}
      */
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "actions", ignore = true)
@@ -81,13 +81,13 @@ public interface PermissionResourceConverter {
     @Mapping(target = "remark", ignore = true)
     @Mapping(target = "createTime", ignore = true)
     @Mapping(target = "createBy", ignore = true)
-    AppPermissionResourceEntity resourceCreateParamConvertToEntity(PermissionResourceCreateParam param);
+    PermissionResourceEntity resourceCreateParamConvertToEntity(PermissionResourceCreateParam param);
 
     /**
      * 资源修改参数转实体类
      *
      * @param param {@link PermissionResourceCreateParam}
-     * @return {@link AppPermissionResourceEntity}
+     * @return {@link PermissionResourceEntity}
      */
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "actions", ignore = true)
@@ -96,7 +96,7 @@ public interface PermissionResourceConverter {
     @Mapping(target = "remark", ignore = true)
     @Mapping(target = "createTime", ignore = true)
     @Mapping(target = "createBy", ignore = true)
-    AppPermissionResourceEntity resourceUpdateParamConvertToEntity(PermissionResourceUpdateParam param);
+    PermissionResourceEntity resourceUpdateParamConvertToEntity(PermissionResourceUpdateParam param);
 
     /**
      * 资源转换为资源列表结果
@@ -104,12 +104,12 @@ public interface PermissionResourceConverter {
      * @param page {@link Page}
      * @return {@link Page}
      */
-    default Page<PermissionResourceListResult> entityConvertToResourceListResult(org.springframework.data.domain.Page<AppPermissionResourceEntity> page) {
+    default Page<PermissionResourceListResult> entityConvertToResourceListResult(org.springframework.data.domain.Page<PermissionResourceEntity> page) {
         Page<PermissionResourceListResult> result = new Page<>();
-        List<AppPermissionResourceEntity> pageList = page.getContent();
+        List<PermissionResourceEntity> pageList = page.getContent();
         if (!CollectionUtils.isEmpty(pageList)) {
             List<PermissionResourceListResult> list = new ArrayList<>();
-            for (AppPermissionResourceEntity resource : pageList) {
+            for (PermissionResourceEntity resource : pageList) {
                 list.add(entityConvertToResourceListResult(resource));
             }
             //@formatter:off
@@ -127,17 +127,17 @@ public interface PermissionResourceConverter {
     /**
      * 实体转换为资源列表结果
      *
-     * @param data {@link AppPermissionResourceEntity}
+     * @param data {@link PermissionResourceEntity}
      * @return {@link PermissionResourceListResult}
      */
-    PermissionResourceListResult entityConvertToResourceListResult(AppPermissionResourceEntity data);
+    PermissionResourceListResult entityConvertToResourceListResult(PermissionResourceEntity data);
 
     /**
      * 实体转获取详情返回
      *
-     * @param resource {@link AppPermissionResourceEntity}
+     * @param resource {@link PermissionResourceEntity}
      * @return {@link PermissionResourceGetResult}
      */
     @Mapping(target = "actions", source = "actions")
-    PermissionResourceGetResult entityConvertToResourceGetResult(AppPermissionResourceEntity resource);
+    PermissionResourceGetResult entityConvertToResourceGetResult(PermissionResourceEntity resource);
 }

@@ -52,7 +52,7 @@ import static jakarta.persistence.FetchType.LAZY;
 @Table(name = "app_permission_resource")
 @SQLDelete(sql = "update app_permission_resource set " + SOFT_DELETE_SET + " where id_ = ?")
 @Where(clause = SOFT_DELETE_WHERE)
-public class AppPermissionResourceEntity extends LogicDeleteEntity<Long> {
+public class PermissionResourceEntity extends LogicDeleteEntity<Long> {
 
     @Serial
     private static final long               serialVersionUID = 7342074686605139968L;
@@ -93,5 +93,5 @@ public class AppPermissionResourceEntity extends LogicDeleteEntity<Long> {
     @ToString.Exclude
     @OneToMany(mappedBy = "resource", fetch = LAZY, cascade = { CascadeType.PERSIST,
                                                                 CascadeType.REMOVE })
-    private List<AppPermissionActionEntity> actions;
+    private List<PermissionActionEntity> actions;
 }

@@ -17,12 +17,12 @@
  */
 package cn.topiam.employee.common.entity.permission;
 
-import java.io.Serial;
-
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
-import cn.topiam.employee.common.enums.PermissionActionType;
+import cn.topiam.employee.common.enums.app.AppPolicyEffect;
+import cn.topiam.employee.common.enums.app.AppPolicyObjectType;
+import cn.topiam.employee.common.enums.app.AppPolicySubjectType;
 import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
 
 import lombok.Getter;
@@ -30,50 +30,57 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
 /**
- * 应用权限
+ * 应用策略
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/2 21:05
+ * Created by support@topiam.cn on  2021/11/4 19:41
  */
 @Getter
 @Setter
 @ToString
 @Entity
 @Accessors(chain = true)
-@Table(name = "app_permission_action")
-@SQLDelete(sql = "update app_permission_action set " + SOFT_DELETE_SET + " where id_ = ?")
+@Table(name = "app_permission_policy")
+@SQLDelete(sql = "update app_permission_policy set " + SOFT_DELETE_SET + " where id_ = ?")
 @Where(clause = SOFT_DELETE_WHERE)
-public class AppPermissionActionEntity extends LogicDeleteEntity<Long> {
-
-    @Serial
-    private static final long           serialVersionUID = -3954680915360748087L;
+public class PermissionPolicyEntity extends LogicDeleteEntity<Long> {
 
     /**
-     * 权限值
+     * 应用id
      */
-    @Column(name = "value_")
-    private String                      value;
-    /**
-     * 描述
-     */
-    @Column(name = "name_")
-    private String                      name;
+    @Column(name = "app_id")
+    private Long                 appId;
 
     /**
-     * 权限类型
+     * 权限主体ID（用户、角色、分组、组织机构）
      */
-    @Column(name = "type_")
-    private PermissionActionType        type;
-
+    @Column(name = "subject_id")
+    private String               subjectId;
     /**
-     * 资源
+     * 权限主体类型（用户、角色、分组、组织机构）
      */
-    @ManyToOne
-    @JoinColumn(name = "resource_id")
-    private AppPermissionResourceEntity resource;
+    @Column(name = "subject_type")
+    private AppPolicySubjectType subjectType;
+    /**
+     * 权限客体ID（权限、角色）
+     */
+    @Column(name = "object_id")
+    private Long                 objectId;
+    /**
+     * 权限客体类型（权限、角色）
+     */
+    @Column(name = "object_type")
+    private AppPolicyObjectType  objectType;
+    /**
+     * Effect
+     */
+    @Column(name = "effect_")
+    private AppPolicyEffect      effect;
 }

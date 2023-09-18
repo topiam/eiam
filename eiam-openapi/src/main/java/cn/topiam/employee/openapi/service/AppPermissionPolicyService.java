@@ -17,7 +17,7 @@
  */
 package cn.topiam.employee.openapi.service;
 
-import cn.topiam.employee.common.entity.permission.po.AppPermissionPolicyPO;
+import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
 import cn.topiam.employee.openapi.pojo.request.app.query.OpenApiPolicyQuery;
 import cn.topiam.employee.openapi.pojo.request.app.save.AppPermissionPolicyCreateParam;
 import cn.topiam.employee.openapi.pojo.request.app.update.AppPermissionPolicyUpdateParam;
@@ -39,9 +39,9 @@ public interface AppPermissionPolicyService {
      *
      * @param page  {@link PageModel}
      * @param query {@link OpenApiPolicyQuery}
-     * @return {@link AppPermissionPolicyPO}
+     * @return {@link PermissionPolicyPO}
      */
-    Page<AppPermissionPolicyPO> getPermissionPolicyList(PageModel page, OpenApiPolicyQuery query);
+    Page<PermissionPolicyPO> getPermissionPolicyList(PageModel page, OpenApiPolicyQuery query);
 
     /**
      * 获取资源

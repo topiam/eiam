@@ -19,12 +19,12 @@ package cn.topiam.employee.console.service.permission.impl;
 
 import java.util.List;
 
+import cn.topiam.employee.common.entity.permission.PermissionResourceEntity;
 import cn.topiam.employee.console.converter.permission.PermissionActionConverter;
 import org.springframework.stereotype.Service;
 
 import com.querydsl.core.types.Predicate;
 
-import cn.topiam.employee.common.entity.permission.AppPermissionResourceEntity;
 import cn.topiam.employee.common.repository.permission.AppPermissionResourceRepository;
 import cn.topiam.employee.console.pojo.query.permission.PermissionActionListQuery;
 import cn.topiam.employee.console.pojo.result.permission.PermissionActionListResult;
@@ -54,7 +54,7 @@ public class PermissionActionServiceImpl implements PermissionActionService {
     public List<PermissionActionListResult> getPermissionActionList(PermissionActionListQuery query) {
         Predicate predicate = permissionActionConverter
             .appPermissionActionListQueryConvertToPredicate(query);
-        List<AppPermissionResourceEntity> list = (List<AppPermissionResourceEntity>) appPermissionResourceRepository
+        List<PermissionResourceEntity> list = (List<PermissionResourceEntity>) appPermissionResourceRepository
             .findAll(predicate);
         return permissionActionConverter.entityConvertToResourceActionListResult(list);
     }

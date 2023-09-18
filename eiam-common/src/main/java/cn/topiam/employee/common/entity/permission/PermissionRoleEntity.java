@@ -17,12 +17,11 @@
  */
 package cn.topiam.employee.common.entity.permission;
 
+import java.io.Serial;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
-import cn.topiam.employee.common.enums.app.AppPolicyEffect;
-import cn.topiam.employee.common.enums.app.AppPolicyObjectType;
-import cn.topiam.employee.common.enums.app.AppPolicySubjectType;
 import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
 
 import lombok.Getter;
@@ -37,50 +36,47 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
 
 /**
- * 应用策略
+ * <p>
+ * 应用角色表
+ * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/4 19:41
+ * Created by support@topiam.cn on  2020-08-10
  */
 @Getter
 @Setter
 @ToString
 @Entity
 @Accessors(chain = true)
-@Table(name = "app_permission_policy")
-@SQLDelete(sql = "update app_permission_policy set " + SOFT_DELETE_SET + " where id_ = ?")
+@Table(name = "app_permission_role")
+@SQLDelete(sql = "update app_permission_role set " + SOFT_DELETE_SET + " where id_ = ?")
 @Where(clause = SOFT_DELETE_WHERE)
-public class AppPermissionPolicyEntity extends LogicDeleteEntity<Long> {
+public class PermissionRoleEntity extends LogicDeleteEntity<Long> {
+
+    @Serial
+    private static final long serialVersionUID = -7761332532995424593L;
 
     /**
-     * 应用id
+     * 角色名称
+     */
+    @Column(name = "name_")
+    private String            name;
+
+    /**
+     * 角色编码
+     */
+    @Column(name = "code_")
+    private String            code;
+
+    /**
+     * 应用ID
      */
     @Column(name = "app_id")
-    private Long                 appId;
+    private Long              appId;
 
     /**
-     * 权限主体ID（用户、角色、分组、组织机构）
+     * 是否启用
      */
-    @Column(name = "subject_id")
-    private String               subjectId;
-    /**
-     * 权限主体类型（用户、角色、分组、组织机构）
-     */
-    @Column(name = "subject_type")
-    private AppPolicySubjectType subjectType;
-    /**
-     * 权限客体ID（权限、角色）
-     */
-    @Column(name = "object_id")
-    private Long                 objectId;
-    /**
-     * 权限客体类型（权限、角色）
-     */
-    @Column(name = "object_type")
-    private AppPolicyObjectType  objectType;
-    /**
-     * Effect
-     */
-    @Column(name = "effect_")
-    private AppPolicyEffect      effect;
+    @Column(name = "is_enabled")
+    private Boolean           enabled;
 }

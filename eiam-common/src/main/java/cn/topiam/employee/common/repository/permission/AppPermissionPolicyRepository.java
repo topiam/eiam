@@ -20,6 +20,7 @@ package cn.topiam.employee.common.repository.permission;
 import java.io.Serializable;
 import java.util.Collection;
 
+import cn.topiam.employee.common.entity.permission.PermissionPolicyEntity;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -27,7 +28,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import cn.topiam.employee.common.entity.permission.AppPermissionPolicyEntity;
 import cn.topiam.employee.support.repository.LogicDeleteRepository;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 
@@ -37,8 +37,8 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
  */
 @Repository
 public interface AppPermissionPolicyRepository extends AppPermissionPolicyRepositoryCustomized,
-                                               LogicDeleteRepository<AppPermissionPolicyEntity, Long>,
-                                               QuerydslPredicateExecutor<AppPermissionPolicyEntity> {
+                                               LogicDeleteRepository<PermissionPolicyEntity, Long>,
+                                               QuerydslPredicateExecutor<PermissionPolicyEntity> {
     /**
      * 按主体 ID 删除所有
      *
@@ -81,6 +81,6 @@ public interface AppPermissionPolicyRepository extends AppPermissionPolicyReposi
      */
     @Transactional(rollbackFor = Exception.class)
     @Modifying
-    @Query(value = "UPDATE AppPermissionResourceEntity set enabled =:status WHERE id =:id")
+    @Query(value = "UPDATE PermissionResourceEntity set enabled =:status WHERE id =:id")
     Integer updateStatus(@Param(value = "id") Long id, @Param(value = "status") Boolean status);
 }

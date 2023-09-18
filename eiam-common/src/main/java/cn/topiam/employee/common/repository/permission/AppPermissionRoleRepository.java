@@ -19,6 +19,7 @@ package cn.topiam.employee.common.repository.permission;
 
 import java.util.Optional;
 
+import cn.topiam.employee.common.entity.permission.PermissionRoleEntity;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Modifying;
@@ -28,7 +29,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import cn.topiam.employee.common.entity.permission.AppPermissionRoleEntity;
 import cn.topiam.employee.support.repository.LogicDeleteRepository;
 
 /**
@@ -41,8 +41,8 @@ import cn.topiam.employee.support.repository.LogicDeleteRepository;
  */
 @Repository
 public interface AppPermissionRoleRepository extends
-                                             LogicDeleteRepository<AppPermissionRoleEntity, Long>,
-                                             QuerydslPredicateExecutor<AppPermissionRoleEntity> {
+                                             LogicDeleteRepository<PermissionRoleEntity, Long>,
+                                             QuerydslPredicateExecutor<PermissionRoleEntity> {
     /**
      * 更新角色状态
      *
@@ -58,10 +58,10 @@ public interface AppPermissionRoleRepository extends
      * findByIdContainsDeleted
      *
      * @param id must not be {@literal null}.
-     * @return {@link AppPermissionRoleEntity}
+     * @return {@link PermissionRoleEntity}
      */
     @NotNull
     @Cacheable
     @Query(value = "SELECT * FROM app_permission_role WHERE id_ = :id", nativeQuery = true)
-    Optional<AppPermissionRoleEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") Long id);
+    Optional<PermissionRoleEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") Long id);
 }

@@ -23,6 +23,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import cn.topiam.employee.common.entity.permission.PermissionActionEntity;
+import cn.topiam.employee.common.entity.permission.PermissionResourceEntity;
+import cn.topiam.employee.openapi.converter.app.PermissionResourceConverter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
@@ -32,14 +35,11 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 
 import cn.topiam.employee.common.entity.app.QAppPermissionResourceEntity;
-import cn.topiam.employee.common.entity.permission.AppPermissionActionEntity;
-import cn.topiam.employee.common.entity.permission.AppPermissionResourceEntity;
 import cn.topiam.employee.common.enums.CheckValidityType;
 import cn.topiam.employee.common.exception.app.AppResourceNotExistException;
 import cn.topiam.employee.common.repository.permission.AppPermissionActionRepository;
 import cn.topiam.employee.common.repository.permission.AppPermissionPolicyRepository;
 import cn.topiam.employee.common.repository.permission.AppPermissionResourceRepository;
-import cn.topiam.employee.openapi.converter.app.AppPermissionResourceConverter;
 import cn.topiam.employee.openapi.pojo.request.app.AppPermissionsActionParam;
 import cn.topiam.employee.openapi.pojo.request.app.query.AppResourceListQuery;
 import cn.topiam.employee.openapi.pojo.request.app.query.OpenApiPolicyQuery;
@@ -75,12 +75,12 @@ public class AppPermissionResourceServiceImpl implements AppPermissionResourceSe
     @Override
     public Page<AppPermissionResourceListResult> getPermissionResourceList(PageModel page,
                                                                            AppResourceListQuery query) {
-        org.springframework.data.domain.Page<AppPermissionResourceEntity> data;
-        Predicate predicate = appPermissionResourceConverter
+        org.springframework.data.domain.Page<PermissionResourceEntity> data;
+        Predicate predicate = permissionResourceConverter
             .resourcePaginationParamConvertToPredicate(query);
         QPageRequest request = QPageRequest.of(page.getCurrent(), page.getPageSize());
         data = appResourceRepository.findAll(predicate, request);
-        return appPermissionResourceConverter.entityConvertToResourceListResult(data);
+        return permissionResourceConverter.entityConvertToResourceListResult(data);
     }
 
     /**
@@ -91,9 +91,9 @@ public class AppPermissionResourceServiceImpl implements AppPermissionResourceSe
      */
     @Override
     public AppPermissionResourceGetResult getPermissionResource(String id) {
-        AppPermissionResourceEntity resource = appResourceRepository.findById(Long.valueOf(id))
+        PermissionResourceEntity resource = appResourceRepository.findById(Long.valueOf(id))
             .orElseThrow(AppResourceNotExistException::new);
-        return appPermissionResourceConverter.entityConvertToResourceGetResult(resource);
+        return permissionResourceConverter.entityConvertToResourceGetResult(resource);
     }
 
     /**
@@ -106,12 +106,12 @@ public class AppPermissionResourceServiceImpl implements AppPermissionResourceSe
     @Transactional(rollbackFor = Exception.class)
     public Boolean deletePermissionResource(String id) {
         Long resourceId = Long.valueOf(id);
-        AppPermissionResourceEntity resource = appResourceRepository.findById(resourceId)
+        PermissionResourceEntity resource = appResourceRepository.findById(resourceId)
             .orElseThrow(AppResourceNotExistException::new);
-        List<AppPermissionActionEntity> actionList = appPermissionActionRepository
+        List<PermissionActionEntity> actionList = appPermissionActionRepository
             .findAllByResource(resource);
         List<Long> objectIdList = new ArrayList<>(
-            actionList.stream().map(AppPermissionActionEntity::getId).toList());
+            actionList.stream().map(PermissionActionEntity::getId).toList());
         objectIdList.add(resourceId);
         appPermissionPolicyRepository.deleteAllByObjectIdIn(objectIdList);
         appResourceRepository.deleteById(resourceId);
@@ -127,7 +127,7 @@ public class AppPermissionResourceServiceImpl implements AppPermissionResourceSe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean createPermissionResource(AppPermissionResourceCreateParam param) {
-        AppPermissionResourceEntity resource = appPermissionResourceConverter
+        PermissionResourceEntity resource = permissionResourceConverter
             .resourceCreateParamConvertToEntity(param);
         buildActions(param.getActions(), resource);
         // 新增资源
@@ -144,19 +144,19 @@ public class AppPermissionResourceServiceImpl implements AppPermissionResourceSe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean updatePermissionResource(AppPermissionResourceUpdateParam param) {
-        AppPermissionResourceEntity resource = appPermissionResourceConverter
+        PermissionResourceEntity resource = permissionResourceConverter
             .resourceUpdateParamConvertToEntity(param);
         buildActions(param.getActions(), resource);
         // 查询资源下所有权限
-        List<AppPermissionActionEntity> actionList = appPermissionActionRepository
+        List<PermissionActionEntity> actionList = appPermissionActionRepository
             .findAllByResource(resource);
         // 取出未删除的权限id
-        Set<Long> reservedSet = resource.getActions().stream().map(AppPermissionActionEntity::getId)
+        Set<Long> reservedSet = resource.getActions().stream().map(PermissionActionEntity::getId)
             .collect(Collectors.toSet());
         // 过滤要删除的权限id
         List<Long> removeActions = actionList.stream()
             .filter(item -> reservedSet.contains(item.getId()))
-            .map(AppPermissionActionEntity::getId).toList();
+            .map(PermissionActionEntity::getId).toList();
         appPermissionPolicyRepository.deleteAllByObjectIdIn(removeActions);
         // 更新资源
         appResourceRepository.save(resource);
@@ -177,7 +177,7 @@ public class AppPermissionResourceServiceImpl implements AppPermissionResourceSe
     public Boolean permissionResourceParamCheck(CheckValidityType type, String value, Long appId,
                                                 Long id) {
         QAppPermissionResourceEntity role = QAppPermissionResourceEntity.appPermissionResourceEntity;
-        AppPermissionResourceEntity entity = new AppPermissionResourceEntity();
+        PermissionResourceEntity entity = new PermissionResourceEntity();
         boolean result = false;
         // ID存在说明是修改操作，查询一下当前数据
         if (Objects.nonNull(id)) {
@@ -209,14 +209,14 @@ public class AppPermissionResourceServiceImpl implements AppPermissionResourceSe
      * 批量处理actions
      *
      * @param permissions {@link List<AppPermissionsActionParam>}
-     * @param resource {@link AppPermissionResourceEntity>}
+     * @param resource {@link PermissionResourceEntity >}
      */
     private void buildActions(List<AppPermissionsActionParam> permissions,
-                              AppPermissionResourceEntity resource) {
+                              PermissionResourceEntity resource) {
         // 权限
-        List<AppPermissionActionEntity> list = new ArrayList<>();
+        List<PermissionActionEntity> list = new ArrayList<>();
         for (AppPermissionsActionParam p : permissions) {
-            AppPermissionActionEntity entity = new AppPermissionActionEntity();
+            PermissionActionEntity entity = new PermissionActionEntity();
             entity.setResource(resource);
             entity.setType(p.getType());
             entity.setName(p.getName());
@@ -227,7 +227,7 @@ public class AppPermissionResourceServiceImpl implements AppPermissionResourceSe
         resource.setActions(list);
     }
 
-    private final AppPermissionResourceConverter  appPermissionResourceConverter;
+    private final PermissionResourceConverter permissionResourceConverter;
 
     private final AppPermissionResourceRepository appResourceRepository;
     /**

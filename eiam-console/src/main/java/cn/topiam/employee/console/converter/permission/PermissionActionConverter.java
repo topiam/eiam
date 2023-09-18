@@ -20,6 +20,8 @@ package cn.topiam.employee.console.converter.permission;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.topiam.employee.common.entity.permission.PermissionActionEntity;
+import cn.topiam.employee.common.entity.permission.PermissionResourceEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -29,8 +31,6 @@ import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 
 import cn.topiam.employee.common.entity.app.QAppPermissionResourceEntity;
-import cn.topiam.employee.common.entity.permission.AppPermissionActionEntity;
-import cn.topiam.employee.common.entity.permission.AppPermissionResourceEntity;
 import cn.topiam.employee.common.enums.PermissionActionType;
 import cn.topiam.employee.console.pojo.query.permission.PermissionActionListQuery;
 import cn.topiam.employee.console.pojo.result.permission.PermissionActionListResult;
@@ -68,18 +68,18 @@ public interface PermissionActionConverter {
     /**
      * 实体转资源权限结果返回
      *
-     * @param list {@link AppPermissionResourceEntity}
+     * @param list {@link PermissionResourceEntity}
      * @return {@link PermissionActionListResult}
      */
-    default List<PermissionActionListResult> entityConvertToResourceActionListResult(List<AppPermissionResourceEntity> list) {
+    default List<PermissionActionListResult> entityConvertToResourceActionListResult(List<PermissionResourceEntity> list) {
         List<PermissionActionListResult> results = new ArrayList<>();
         List<PermissionActionListResult.Action> menus = new ArrayList<>();
         List<PermissionActionListResult.Action> apis = new ArrayList<>();
         List<PermissionActionListResult.Action> buttons = new ArrayList<>();
         List<PermissionActionListResult.Action> others = new ArrayList<>();
         List<PermissionActionListResult.Action> datas = new ArrayList<>();
-        for (AppPermissionResourceEntity resource : list) {
-            for (AppPermissionActionEntity action : resource.getActions()) {
+        for (PermissionResourceEntity resource : list) {
+            for (PermissionActionEntity action : resource.getActions()) {
                 if (PermissionActionType.MENU.equals(action.getType())) {
                     menus.add(actionConvertToResourceActionResult(action));
                 }
@@ -117,10 +117,10 @@ public interface PermissionActionConverter {
     /**
      * actionConvertToResourceActionResult
      *
-     * @param action {@link AppPermissionActionEntity}
+     * @param action {@link PermissionActionEntity}
      * @return {@link PermissionActionListResult.Action}
      */
     @Mapping(target = "access", source = "value")
-    PermissionActionListResult.Action actionConvertToResourceActionResult(AppPermissionActionEntity action);
+    PermissionActionListResult.Action actionConvertToResourceActionResult(PermissionActionEntity action);
 
 }

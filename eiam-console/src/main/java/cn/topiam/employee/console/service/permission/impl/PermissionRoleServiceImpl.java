@@ -38,7 +38,7 @@ import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.common.entity.app.QAppPermissionRoleEntity;
-import cn.topiam.employee.common.entity.permission.AppPermissionRoleEntity;
+import cn.topiam.employee.common.entity.permission.PermissionRoleEntity;
 import cn.topiam.employee.common.enums.CheckValidityType;
 import cn.topiam.employee.common.exception.app.AppRoleNotExistException;
 import cn.topiam.employee.common.repository.permission.AppPermissionPolicyRepository;
@@ -75,7 +75,7 @@ public class PermissionRoleServiceImpl implements PermissionRoleService {
     @Override
     public Page<PermissionRoleListResult> getPermissionRoleList(PageModel page,
                                                                 PermissionRoleListQuery query) {
-        org.springframework.data.domain.Page<AppPermissionRoleEntity> data;
+        org.springframework.data.domain.Page<PermissionRoleEntity> data;
         Predicate predicate = permissionRoleConverter
             .rolePaginationParamConvertToPredicate(query);
         QPageRequest request = QPageRequest.of(page.getCurrent(), page.getPageSize());
@@ -91,7 +91,7 @@ public class PermissionRoleServiceImpl implements PermissionRoleService {
      */
     @Override
     public boolean createPermissionRole(PermissionRoleCreateParam param) {
-        AppPermissionRoleEntity entity = permissionRoleConverter
+        PermissionRoleEntity entity = permissionRoleConverter
             .roleCreateParamConvertToEntity(param);
         appPermissionRoleRepository.save(entity);
         AuditContext.setTarget(Target.builder().id(entity.getId().toString())
@@ -105,9 +105,9 @@ public class PermissionRoleServiceImpl implements PermissionRoleService {
      */
     @Override
     public boolean updatePermissionRole(PermissionRoleUpdateParam param) {
-        AppPermissionRoleEntity source = permissionRoleConverter
+        PermissionRoleEntity source = permissionRoleConverter
             .roleUpdateParamConvertToEntity(param);
-        AppPermissionRoleEntity target = appPermissionRoleRepository
+        PermissionRoleEntity target = appPermissionRoleRepository
             .findById(Long.valueOf(param.getId())).orElseThrow(AppRoleNotExistException::new);
         BeanUtils.merge(source, target, LAST_MODIFIED_TIME, LAST_MODIFIED_BY);
         appPermissionRoleRepository.save(target);
@@ -145,7 +145,7 @@ public class PermissionRoleServiceImpl implements PermissionRoleService {
     @Override
     public PermissionRoleResult getPermissionRole(Long id) {
         //查询
-        Optional<AppPermissionRoleEntity> entity = appPermissionRoleRepository.findById(id);
+        Optional<PermissionRoleEntity> entity = appPermissionRoleRepository.findById(id);
         //映射
         return permissionRoleConverter.entityConvertToRoleDetailResult(entity.orElse(null));
     }
@@ -164,7 +164,7 @@ public class PermissionRoleServiceImpl implements PermissionRoleService {
     public Boolean permissionRoleParamCheck(CheckValidityType type, String value, Long appId,
                                             Long id) {
         QAppPermissionRoleEntity role = QAppPermissionRoleEntity.appPermissionRoleEntity;
-        AppPermissionRoleEntity entity = new AppPermissionRoleEntity();
+        PermissionRoleEntity entity = new PermissionRoleEntity();
         boolean result = false;
         // ID存在说明是修改操作，查询一下当前数据
         if (Objects.nonNull(id)) {

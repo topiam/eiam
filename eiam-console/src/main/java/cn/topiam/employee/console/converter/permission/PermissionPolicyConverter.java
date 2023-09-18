@@ -20,14 +20,14 @@ package cn.topiam.employee.console.converter.permission;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.topiam.employee.common.entity.permission.PermissionPolicyEntity;
+import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
 import cn.topiam.employee.console.pojo.result.permission.PermissionPolicyListResult;
 import cn.topiam.employee.console.pojo.save.permission.PermissionPolicyCreateParam;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.util.CollectionUtils;
 
-import cn.topiam.employee.common.entity.permission.AppPermissionPolicyEntity;
-import cn.topiam.employee.common.entity.permission.po.AppPermissionPolicyPO;
 import cn.topiam.employee.console.pojo.update.permission.PermissionPolicyUpdateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
 
@@ -44,7 +44,7 @@ public interface PermissionPolicyConverter {
      * 资源创建参数转实体类
      *
      * @param param {@link PermissionPolicyCreateParam}
-     * @return {@link AppPermissionPolicyEntity}
+     * @return {@link PermissionPolicyEntity}
      */
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "id", ignore = true)
@@ -53,13 +53,13 @@ public interface PermissionPolicyConverter {
     @Mapping(target = "remark", ignore = true)
     @Mapping(target = "createTime", ignore = true)
     @Mapping(target = "createBy", ignore = true)
-    AppPermissionPolicyEntity policyCreateParamConvertToEntity(PermissionPolicyCreateParam param);
+    PermissionPolicyEntity policyCreateParamConvertToEntity(PermissionPolicyCreateParam param);
 
     /**
      * 资源修改参数转实体类
      *
      * @param param {@link PermissionPolicyCreateParam}
-     * @return {@link AppPermissionPolicyEntity}
+     * @return {@link PermissionPolicyEntity}
      */
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "updateTime", ignore = true)
@@ -67,7 +67,7 @@ public interface PermissionPolicyConverter {
     @Mapping(target = "remark", ignore = true)
     @Mapping(target = "createTime", ignore = true)
     @Mapping(target = "createBy", ignore = true)
-    AppPermissionPolicyEntity policyUpdateParamConvertToEntity(PermissionPolicyUpdateParam param);
+    PermissionPolicyEntity policyUpdateParamConvertToEntity(PermissionPolicyUpdateParam param);
 
     /**
      * 资源转换为资源列表结果
@@ -75,9 +75,9 @@ public interface PermissionPolicyConverter {
      * @param page {@link Page}
      * @return {@link Page}
      */
-    default Page<PermissionPolicyListResult> entityConvertToPolicyListResult(org.springframework.data.domain.Page<AppPermissionPolicyPO> page) {
+    default Page<PermissionPolicyListResult> entityConvertToPolicyListResult(org.springframework.data.domain.Page<PermissionPolicyPO> page) {
         Page<PermissionPolicyListResult> result = new Page<>();
-        List<AppPermissionPolicyPO> pageList = page.getContent();
+        List<PermissionPolicyPO> pageList = page.getContent();
         if (!CollectionUtils.isEmpty(pageList)) {
             //@formatter:off
             result.setPagination(Page.Pagination.builder()
@@ -87,7 +87,7 @@ public interface PermissionPolicyConverter {
                     .build());
             //@formatter:on
             List<PermissionPolicyListResult> list = new ArrayList<>();
-            for (AppPermissionPolicyPO po : pageList) {
+            for (PermissionPolicyPO po : pageList) {
                 list.add(entityConvertToPolicyListResult(po));
             }
             result.setList(list);
@@ -99,7 +99,7 @@ public interface PermissionPolicyConverter {
      * entityConvertToPolicyListResult
      *
      * @param entity {@link PermissionPolicyListResult}
-     * @return {@link AppPermissionPolicyPO}
+     * @return {@link PermissionPolicyPO}
      */
-    PermissionPolicyListResult entityConvertToPolicyListResult(AppPermissionPolicyPO entity);
+    PermissionPolicyListResult entityConvertToPolicyListResult(PermissionPolicyPO entity);
 }
