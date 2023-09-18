@@ -114,7 +114,7 @@ public class AppServiceImpl implements AppService {
         AppEntity entity = appConverter.appUpdateParamConverterToEntity(param);
         BeanUtils.merge(entity, app, LAST_MODIFIED_TIME, LAST_MODIFIED_BY);
         appRepository.save(app);
-        appGroupAssociationRepository.deleteByAppId(app.getId());
+        appGroupAssociationRepository.deleteAllByAppId(app.getId());
         List<AppGroupAssociationEntity> list = new ArrayList<>();
         for (String id : param.getGroupIds()) {
             AppGroupAssociationEntity appGroupAssociationEntity = new AppGroupAssociationEntity();
@@ -139,7 +139,7 @@ public class AppServiceImpl implements AppService {
     public boolean deleteApp(Long id) {
         AppEntity app = appRequireNonNull(id);
         applicationServiceLoader.getApplicationService(app.getTemplate()).delete(id.toString());
-        appGroupAssociationRepository.deleteAllByAppId(id);
+        appGroupAssociationRepository.deleteByAppId(id);
         AuditContext
             .setTarget(Target.builder().id(id.toString()).type(TargetType.APPLICATION).build());
         return true;
