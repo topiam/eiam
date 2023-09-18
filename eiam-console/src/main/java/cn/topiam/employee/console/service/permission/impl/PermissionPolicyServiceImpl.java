@@ -1,5 +1,5 @@
 /*
- * eiam-openapi - Employee Identity and Access Management
+ * eiam-console - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,8 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.openapi.service.impl;
+package cn.topiam.employee.console.service.permission.impl;
 
+import cn.topiam.employee.console.pojo.result.permission.PermissionPolicyListResult;
+import cn.topiam.employee.console.pojo.save.permission.PermissionPolicyCreateParam;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,12 +28,10 @@ import cn.topiam.employee.common.entity.permission.AppPermissionPolicyEntity;
 import cn.topiam.employee.common.entity.permission.po.AppPermissionPolicyPO;
 import cn.topiam.employee.common.exception.app.AppPolicyNotExistException;
 import cn.topiam.employee.common.repository.permission.AppPermissionPolicyRepository;
-import cn.topiam.employee.openapi.converter.app.AppPermissionPolicyConverter;
-import cn.topiam.employee.openapi.pojo.request.app.query.OpenApiPolicyQuery;
-import cn.topiam.employee.openapi.pojo.request.app.save.AppPermissionPolicyCreateParam;
-import cn.topiam.employee.openapi.pojo.request.app.update.AppPermissionPolicyUpdateParam;
-import cn.topiam.employee.openapi.pojo.response.app.AppPermissionPolicyGetResult;
-import cn.topiam.employee.openapi.service.AppPermissionPolicyService;
+import cn.topiam.employee.console.converter.permission.PermissionPolicyConverter;
+import cn.topiam.employee.console.pojo.result.permission.PermissionPolicyGetResult;
+import cn.topiam.employee.console.pojo.update.permission.PermissionPolicyUpdateParam;
+import cn.topiam.employee.console.service.permission.PermissionPolicyService;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 
@@ -47,40 +47,32 @@ import lombok.RequiredArgsConstructor;
  */
 @Service
 @RequiredArgsConstructor
-public class AppPermissionPolicyServiceImpl implements AppPermissionPolicyService {
+public class PermissionPolicyServiceImpl implements PermissionPolicyService {
 
     /**
      * 获取策略列表
      *
      * @param page  {@link PageModel}
-     * @param query {@link OpenApiPolicyQuery}
-     * @return {@link AppPermissionPolicyPO}
+     * @param query {@link AppPolicyQuery}
+     * @return {@link PermissionPolicyListResult}
      */
     @Override
-    public Page<AppPermissionPolicyPO> getPermissionPolicyList(PageModel page,
-                                                               OpenApiPolicyQuery query) {
-        AppPolicyQuery appPolicyQuery = new AppPolicyQuery();
-        // TODO token获取所属应用
-        //        appPolicyQuery.setAppId(0L);
-        appPolicyQuery.setEffect(query.getEffect());
-        appPolicyQuery.setSubjectId(query.getSubjectId());
-        appPolicyQuery.setObjectId(query.getObjectId());
-        appPolicyQuery.setSubjectType(query.getSubjectType());
-        appPolicyQuery.setObjectType(query.getObjectType());
+    public Page<PermissionPolicyListResult> getPermissionPolicyList(PageModel page,
+                                                                    AppPolicyQuery query) {
+        org.springframework.data.domain.Page<AppPermissionPolicyPO> data;
         QPageRequest request = QPageRequest.of(page.getCurrent(), page.getPageSize());
-        org.springframework.data.domain.Page<AppPermissionPolicyPO> data = appPermissionPolicyRepository
-            .findPage(appPolicyQuery, request);
-        return appPermissionPolicyConverter.entityConvertToPolicyListResult(data);
+        data = appPermissionPolicyRepository.findPage(query, request);
+        return permissionPolicyConverter.entityConvertToPolicyListResult(data);
     }
 
     /**
      * 获取策略
      *
      * @param id {@link String}
-     * @return {@link AppPermissionPolicyGetResult}
+     * @return {@link PermissionPolicyGetResult}
      */
     @Override
-    public AppPermissionPolicyGetResult getPermissionPolicy(String id) {
+    public PermissionPolicyGetResult getPermissionPolicy(String id) {
         return null;
     }
 
@@ -102,13 +94,13 @@ public class AppPermissionPolicyServiceImpl implements AppPermissionPolicyServic
     /**
      * 创建策略
      *
-     * @param param {@link AppPermissionPolicyCreateParam}
+     * @param param {@link PermissionPolicyCreateParam}
      * @return {@link Boolean}
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean createPermissionPolicy(AppPermissionPolicyCreateParam param) {
-        AppPermissionPolicyEntity resource = appPermissionPolicyConverter
+    public Boolean createPermissionPolicy(PermissionPolicyCreateParam param) {
+        AppPermissionPolicyEntity resource = permissionPolicyConverter
             .policyCreateParamConvertToEntity(param);
         // 新增策略
         appPermissionPolicyRepository.save(resource);
@@ -118,19 +110,19 @@ public class AppPermissionPolicyServiceImpl implements AppPermissionPolicyServic
     /**
      * 更新策略
      *
-     * @param param {@link AppPermissionPolicyUpdateParam}
+     * @param param {@link PermissionPolicyUpdateParam}
      * @return {@link Boolean}
      */
     @Override
-    public Boolean updatePermissionPolicy(AppPermissionPolicyUpdateParam param) {
-        AppPermissionPolicyEntity resource = appPermissionPolicyConverter
+    public Boolean updatePermissionPolicy(PermissionPolicyUpdateParam param) {
+        AppPermissionPolicyEntity resource = permissionPolicyConverter
             .policyUpdateParamConvertToEntity(param);
         // 更新策略
         appPermissionPolicyRepository.save(resource);
         return null;
     }
 
-    private final AppPermissionPolicyConverter  appPermissionPolicyConverter;
+    private final PermissionPolicyConverter permissionPolicyConverter;
 
     private final AppPermissionPolicyRepository appPermissionPolicyRepository;
 }

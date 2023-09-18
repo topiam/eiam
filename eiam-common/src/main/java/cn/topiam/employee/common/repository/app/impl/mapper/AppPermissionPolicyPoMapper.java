@@ -22,7 +22,7 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
 
-import cn.topiam.employee.common.entity.app.po.AppPermissionPolicyPO;
+import cn.topiam.employee.common.entity.permission.po.AppPermissionPolicyPO;
 import cn.topiam.employee.common.enums.app.AppPolicyEffect;
 import cn.topiam.employee.common.enums.app.AppPolicyObjectType;
 import cn.topiam.employee.common.enums.app.AppPolicySubjectType;

@@ -1,5 +1,5 @@
 /*
- * eiam-openapi - Employee Identity and Access Management
+ * eiam-console - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,13 +15,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.openapi.service.impl;
+package cn.topiam.employee.console.service.permission.impl;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import cn.topiam.employee.console.converter.permission.PermissionRoleConverter;
+import cn.topiam.employee.console.pojo.result.permission.PermissionRoleListResult;
+import cn.topiam.employee.console.pojo.result.permission.PermissionRoleResult;
+import cn.topiam.employee.console.pojo.save.permission.PermissionRoleCreateParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
@@ -30,19 +34,18 @@ import org.springframework.transaction.annotation.Transactional;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 
+import cn.topiam.employee.audit.context.AuditContext;
+import cn.topiam.employee.audit.entity.Target;
+import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.common.entity.app.QAppPermissionRoleEntity;
 import cn.topiam.employee.common.entity.permission.AppPermissionRoleEntity;
 import cn.topiam.employee.common.enums.CheckValidityType;
 import cn.topiam.employee.common.exception.app.AppRoleNotExistException;
 import cn.topiam.employee.common.repository.permission.AppPermissionPolicyRepository;
 import cn.topiam.employee.common.repository.permission.AppPermissionRoleRepository;
-import cn.topiam.employee.openapi.converter.app.AppPermissionRoleConverter;
-import cn.topiam.employee.openapi.pojo.request.app.query.AppPermissionRoleListQuery;
-import cn.topiam.employee.openapi.pojo.request.app.save.AppPermissionRoleCreateParam;
-import cn.topiam.employee.openapi.pojo.request.app.update.PermissionRoleUpdateParam;
-import cn.topiam.employee.openapi.pojo.response.app.AppPermissionRoleListResult;
-import cn.topiam.employee.openapi.pojo.response.app.AppPermissionRoleResult;
-import cn.topiam.employee.openapi.service.AppPermissionRoleService;
+import cn.topiam.employee.console.pojo.query.permission.PermissionRoleListQuery;
+import cn.topiam.employee.console.pojo.update.permission.PermissionRoleUpdateParam;
+import cn.topiam.employee.console.service.permission.PermissionRoleService;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.util.BeanUtils;
@@ -61,36 +64,38 @@ import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIF
  */
 @Service
 @RequiredArgsConstructor
-public class AppPermissionRoleServiceImpl implements AppPermissionRoleService {
+public class PermissionRoleServiceImpl implements PermissionRoleService {
 
     /**
      * 获取所有角色（分页）
      *
      * @param page {@link PageModel}
-     * @return {@link AppPermissionRoleListResult}
+     * @return {@link PermissionRoleListResult}
      */
     @Override
-    public Page<AppPermissionRoleListResult> getPermissionRoleList(PageModel page,
-                                                                   AppPermissionRoleListQuery query) {
+    public Page<PermissionRoleListResult> getPermissionRoleList(PageModel page,
+                                                                PermissionRoleListQuery query) {
         org.springframework.data.domain.Page<AppPermissionRoleEntity> data;
-        Predicate predicate = appPermissionRoleConverter
+        Predicate predicate = permissionRoleConverter
             .rolePaginationParamConvertToPredicate(query);
         QPageRequest request = QPageRequest.of(page.getCurrent(), page.getPageSize());
         data = appPermissionRoleRepository.findAll(predicate, request);
-        return appPermissionRoleConverter.entityConvertToRolePaginationResult(data);
+        return permissionRoleConverter.entityConvertToRolePaginationResult(data);
     }
 
     /**
      * 创建系统
      *
-     * @param param {@link AppPermissionRoleCreateParam}
+     * @param param {@link PermissionRoleCreateParam}
      * @return {@link Boolean}
      */
     @Override
-    public boolean createPermissionRole(AppPermissionRoleCreateParam param) {
-        AppPermissionRoleEntity entity = appPermissionRoleConverter
+    public boolean createPermissionRole(PermissionRoleCreateParam param) {
+        AppPermissionRoleEntity entity = permissionRoleConverter
             .roleCreateParamConvertToEntity(param);
         appPermissionRoleRepository.save(entity);
+        AuditContext.setTarget(Target.builder().id(entity.getId().toString())
+            .type(TargetType.APP_PERMISSION_ROLE).build());
         return true;
     }
 
@@ -100,12 +105,14 @@ public class AppPermissionRoleServiceImpl implements AppPermissionRoleService {
      */
     @Override
     public boolean updatePermissionRole(PermissionRoleUpdateParam param) {
-        AppPermissionRoleEntity source = appPermissionRoleConverter
+        AppPermissionRoleEntity source = permissionRoleConverter
             .roleUpdateParamConvertToEntity(param);
         AppPermissionRoleEntity target = appPermissionRoleRepository
             .findById(Long.valueOf(param.getId())).orElseThrow(AppRoleNotExistException::new);
         BeanUtils.merge(source, target, LAST_MODIFIED_TIME, LAST_MODIFIED_BY);
         appPermissionRoleRepository.save(target);
+        AuditContext.setTarget(Target.builder().id(target.getId().toString())
+            .type(TargetType.APP_PERMISSION_ROLE).build());
         return true;
     }
 
@@ -124,6 +131,8 @@ public class AppPermissionRoleServiceImpl implements AppPermissionRoleService {
         // 删除对应策略
         appPermissionPolicyRepository.deleteAllBySubjectIdIn(idList);
         appPermissionPolicyRepository.deleteAllByObjectIdIn(longIds);
+        AuditContext
+            .setTarget(Target.builder().id(ids).type(TargetType.APP_PERMISSION_ROLE).build());
         return true;
     }
 
@@ -131,14 +140,14 @@ public class AppPermissionRoleServiceImpl implements AppPermissionRoleService {
      * 角色详情
      *
      * @param id {@link Long}
-     * @return {@link AppPermissionRoleResult}
+     * @return {@link PermissionRoleResult}
      */
     @Override
-    public AppPermissionRoleResult getPermissionRole(Long id) {
+    public PermissionRoleResult getPermissionRole(Long id) {
         //查询
         Optional<AppPermissionRoleEntity> entity = appPermissionRoleRepository.findById(id);
         //映射
-        return appPermissionRoleConverter.entityConvertToRoleDetailResult(entity.orElse(null));
+        return permissionRoleConverter.entityConvertToRoleDetailResult(entity.orElse(null));
     }
 
     /**
@@ -199,7 +208,7 @@ public class AppPermissionRoleServiceImpl implements AppPermissionRoleService {
     /**
      * 用户数据映射器
      */
-    private final AppPermissionRoleConverter    appPermissionRoleConverter;
+    private final PermissionRoleConverter permissionRoleConverter;
     /**
      * RoleRepository
      */

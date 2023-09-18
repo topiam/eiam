@@ -1,5 +1,5 @@
 /*
- * eiam-openapi - Employee Identity and Access Management
+ * eiam-console - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.openapi.service;
+package cn.topiam.employee.console.service.permission;
 
-import cn.topiam.employee.common.entity.permission.po.AppPermissionPolicyPO;
-import cn.topiam.employee.openapi.pojo.request.app.query.OpenApiPolicyQuery;
-import cn.topiam.employee.openapi.pojo.request.app.save.AppPermissionPolicyCreateParam;
-import cn.topiam.employee.openapi.pojo.request.app.update.AppPermissionPolicyUpdateParam;
-import cn.topiam.employee.openapi.pojo.response.app.AppPermissionPolicyGetResult;
+import cn.topiam.employee.common.entity.app.query.AppPolicyQuery;
+import cn.topiam.employee.console.pojo.result.permission.PermissionPolicyGetResult;
+import cn.topiam.employee.console.pojo.result.permission.PermissionPolicyListResult;
+import cn.topiam.employee.console.pojo.save.permission.PermissionPolicyCreateParam;
+import cn.topiam.employee.console.pojo.update.permission.PermissionPolicyUpdateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 
@@ -33,23 +33,24 @@ import cn.topiam.employee.support.repository.page.domain.PageModel;
  * @author TopIAM
  * Created by support@topiam.cn on  2020-08-10
  */
-public interface AppPermissionPolicyService {
+public interface PermissionPolicyService {
     /**
      * 获取资源列表
      *
      * @param page  {@link PageModel}
-     * @param query {@link OpenApiPolicyQuery}
-     * @return {@link AppPermissionPolicyPO}
+     * @param query {@link AppPolicyQuery}
+     * @return {@link PermissionPolicyListResult}
      */
-    Page<AppPermissionPolicyPO> getPermissionPolicyList(PageModel page, OpenApiPolicyQuery query);
+    Page<PermissionPolicyListResult> getPermissionPolicyList(PageModel page,
+                                                             AppPolicyQuery query);
 
     /**
      * 获取资源
      *
      * @param id {@link String}
-     * @return {@link AppPermissionPolicyGetResult}
+     * @return {@link PermissionPolicyGetResult}
      */
-    AppPermissionPolicyGetResult getPermissionPolicy(String id);
+    PermissionPolicyGetResult getPermissionPolicy(String id);
 
     /**
      * 删除资源
@@ -62,16 +63,16 @@ public interface AppPermissionPolicyService {
     /**
      * 创建资源
      *
-     * @param param {@link AppPermissionPolicyCreateParam}
+     * @param param {@link PermissionPolicyCreateParam}
      * @return {@link Boolean}
      */
-    Boolean createPermissionPolicy(AppPermissionPolicyCreateParam param);
+    Boolean createPermissionPolicy(PermissionPolicyCreateParam param);
 
     /**
      * 更新资源
      *
-     * @param param {@link AppPermissionPolicyUpdateParam}
+     * @param param {@link PermissionPolicyUpdateParam}
      * @return {@link Boolean}
      */
-    Boolean updatePermissionPolicy(AppPermissionPolicyUpdateParam param);
+    Boolean updatePermissionPolicy(PermissionPolicyUpdateParam param);
 }

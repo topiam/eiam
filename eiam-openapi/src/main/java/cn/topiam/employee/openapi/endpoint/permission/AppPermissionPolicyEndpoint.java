@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cn.topiam.employee.common.entity.app.po.AppPermissionPolicyPO;
+import cn.topiam.employee.common.entity.permission.po.AppPermissionPolicyPO;
 import cn.topiam.employee.openapi.pojo.request.app.query.OpenApiPolicyQuery;
 import cn.topiam.employee.openapi.service.AppPermissionPolicyService;
 import cn.topiam.employee.support.repository.page.domain.Page;

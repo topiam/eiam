@@ -28,10 +28,10 @@ import org.springframework.util.ObjectUtils;
 
 import com.google.common.collect.Lists;
 
-import cn.topiam.employee.common.entity.app.po.AppPermissionPolicyPO;
 import cn.topiam.employee.common.entity.app.query.AppPolicyQuery;
-import cn.topiam.employee.common.repository.app.AppPermissionPolicyRepositoryCustomized;
+import cn.topiam.employee.common.entity.permission.po.AppPermissionPolicyPO;
 import cn.topiam.employee.common.repository.app.impl.mapper.AppPermissionPolicyPoMapper;
+import cn.topiam.employee.common.repository.permission.AppPermissionPolicyRepositoryCustomized;
 
 import lombok.RequiredArgsConstructor;
 

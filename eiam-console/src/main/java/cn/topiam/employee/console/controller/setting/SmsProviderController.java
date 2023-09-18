@@ -29,7 +29,7 @@ import cn.topiam.employee.common.enums.MailType;
 import cn.topiam.employee.common.enums.MessageCategory;
 import cn.topiam.employee.common.enums.SmsType;
 import cn.topiam.employee.console.pojo.save.setting.SmsProviderSaveParam;
-import cn.topiam.employee.console.pojo.setting.SmsProviderConfigResult;
+import cn.topiam.employee.console.pojo.result.setting.SmsProviderConfigResult;
 import cn.topiam.employee.console.service.setting.MessageSettingService;
 import cn.topiam.employee.core.message.MsgVariable;
 import cn.topiam.employee.core.message.sms.SmsMsgEventPublish;

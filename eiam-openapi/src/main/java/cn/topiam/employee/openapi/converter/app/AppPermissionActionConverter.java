@@ -20,7 +20,7 @@ package cn.topiam.employee.openapi.converter.app;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import cn.topiam.employee.common.entity.app.AppPermissionActionEntity;
+import cn.topiam.employee.common.entity.permission.AppPermissionActionEntity;
 import cn.topiam.employee.openapi.pojo.request.app.AppPermissionsActionParam;
 
 /**

@@ -1,5 +1,5 @@
 /*
- * eiam-openapi - Employee Identity and Access Management
+ * eiam-console - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,18 +15,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.openapi.converter.app;
+package cn.topiam.employee.console.converter.permission;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import cn.topiam.employee.console.pojo.result.permission.PermissionPolicyListResult;
+import cn.topiam.employee.console.pojo.save.permission.PermissionPolicyCreateParam;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.util.CollectionUtils;
 
 import cn.topiam.employee.common.entity.permission.AppPermissionPolicyEntity;
 import cn.topiam.employee.common.entity.permission.po.AppPermissionPolicyPO;
-import cn.topiam.employee.openapi.pojo.request.app.save.AppPermissionPolicyCreateParam;
-import cn.topiam.employee.openapi.pojo.request.app.update.AppPermissionPolicyUpdateParam;
+import cn.topiam.employee.console.pojo.update.permission.PermissionPolicyUpdateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
 
 /**
@@ -35,13 +37,13 @@ import cn.topiam.employee.support.repository.page.domain.Page;
  * @author TopIAM
  * Created by support@topiam.cn on 2020/8/14 22:45
  */
-@Mapper(componentModel = "spring", uses = AppPermissionActionConverter.class)
-public interface AppPermissionPolicyConverter {
+@Mapper(componentModel = "spring", uses = PermissionActionConverter.class)
+public interface PermissionPolicyConverter {
 
     /**
      * 资源创建参数转实体类
      *
-     * @param param {@link AppPermissionPolicyCreateParam}
+     * @param param {@link PermissionPolicyCreateParam}
      * @return {@link AppPermissionPolicyEntity}
      */
     @Mapping(target = "deleted", ignore = true)
@@ -51,12 +53,12 @@ public interface AppPermissionPolicyConverter {
     @Mapping(target = "remark", ignore = true)
     @Mapping(target = "createTime", ignore = true)
     @Mapping(target = "createBy", ignore = true)
-    AppPermissionPolicyEntity policyCreateParamConvertToEntity(AppPermissionPolicyCreateParam param);
+    AppPermissionPolicyEntity policyCreateParamConvertToEntity(PermissionPolicyCreateParam param);
 
     /**
      * 资源修改参数转实体类
      *
-     * @param param {@link AppPermissionPolicyCreateParam}
+     * @param param {@link PermissionPolicyCreateParam}
      * @return {@link AppPermissionPolicyEntity}
      */
     @Mapping(target = "deleted", ignore = true)
@@ -65,7 +67,7 @@ public interface AppPermissionPolicyConverter {
     @Mapping(target = "remark", ignore = true)
     @Mapping(target = "createTime", ignore = true)
     @Mapping(target = "createBy", ignore = true)
-    AppPermissionPolicyEntity policyUpdateParamConvertToEntity(AppPermissionPolicyUpdateParam param);
+    AppPermissionPolicyEntity policyUpdateParamConvertToEntity(PermissionPolicyUpdateParam param);
 
     /**
      * 资源转换为资源列表结果
@@ -73,8 +75,8 @@ public interface AppPermissionPolicyConverter {
      * @param page {@link Page}
      * @return {@link Page}
      */
-    default Page<AppPermissionPolicyPO> entityConvertToPolicyListResult(org.springframework.data.domain.Page<AppPermissionPolicyPO> page) {
-        Page<AppPermissionPolicyPO> result = new Page<>();
+    default Page<PermissionPolicyListResult> entityConvertToPolicyListResult(org.springframework.data.domain.Page<AppPermissionPolicyPO> page) {
+        Page<PermissionPolicyListResult> result = new Page<>();
         List<AppPermissionPolicyPO> pageList = page.getContent();
         if (!CollectionUtils.isEmpty(pageList)) {
             //@formatter:off
@@ -84,8 +86,20 @@ public interface AppPermissionPolicyConverter {
                     .current(page.getPageable().getPageNumber() + 1)
                     .build());
             //@formatter:on
-            result.setList(pageList);
+            List<PermissionPolicyListResult> list = new ArrayList<>();
+            for (AppPermissionPolicyPO po : pageList) {
+                list.add(entityConvertToPolicyListResult(po));
+            }
+            result.setList(list);
         }
         return result;
     }
+
+    /**
+     * entityConvertToPolicyListResult
+     *
+     * @param entity {@link PermissionPolicyListResult}
+     * @return {@link AppPermissionPolicyPO}
+     */
+    PermissionPolicyListResult entityConvertToPolicyListResult(AppPermissionPolicyPO entity);
 }

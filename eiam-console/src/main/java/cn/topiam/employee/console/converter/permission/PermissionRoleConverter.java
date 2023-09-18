@@ -1,5 +1,5 @@
 /*
- * eiam-openapi - Employee Identity and Access Management
+ * eiam-console - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,11 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.openapi.converter.app;
+package cn.topiam.employee.console.converter.permission;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.topiam.employee.console.pojo.save.permission.PermissionRoleCreateParam;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -31,11 +32,10 @@ import com.querydsl.core.types.Predicate;
 
 import cn.topiam.employee.common.entity.app.QAppPermissionRoleEntity;
 import cn.topiam.employee.common.entity.permission.AppPermissionRoleEntity;
-import cn.topiam.employee.openapi.pojo.request.app.query.AppPermissionRoleListQuery;
-import cn.topiam.employee.openapi.pojo.request.app.save.AppPermissionRoleCreateParam;
-import cn.topiam.employee.openapi.pojo.request.app.update.PermissionRoleUpdateParam;
-import cn.topiam.employee.openapi.pojo.response.app.AppPermissionRoleListResult;
-import cn.topiam.employee.openapi.pojo.response.app.AppPermissionRoleResult;
+import cn.topiam.employee.console.pojo.query.permission.PermissionRoleListQuery;
+import cn.topiam.employee.console.pojo.result.permission.PermissionRoleListResult;
+import cn.topiam.employee.console.pojo.result.permission.PermissionRoleResult;
+import cn.topiam.employee.console.pojo.update.permission.PermissionRoleUpdateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
 
 /**
@@ -45,7 +45,7 @@ import cn.topiam.employee.support.repository.page.domain.Page;
  * Created by support@topiam.cn on 2020/8/14 22:45
  */
 @Mapper(componentModel = "spring")
-public interface AppPermissionRoleConverter {
+public interface PermissionRoleConverter {
 
     /**
      * 角色实体转换为角色分页结果
@@ -53,10 +53,10 @@ public interface AppPermissionRoleConverter {
      * @param page {@link Page}
      * @return {@link Page}
      */
-    default Page<AppPermissionRoleListResult> entityConvertToRolePaginationResult(org.springframework.data.domain.Page<AppPermissionRoleEntity> page) {
-        Page<AppPermissionRoleListResult> result = new Page<>();
+    default Page<PermissionRoleListResult> entityConvertToRolePaginationResult(org.springframework.data.domain.Page<AppPermissionRoleEntity> page) {
+        Page<PermissionRoleListResult> result = new Page<>();
         if (!CollectionUtils.isEmpty(page.getContent())) {
-            List<AppPermissionRoleListResult> list = new ArrayList<>();
+            List<PermissionRoleListResult> list = new ArrayList<>();
             for (AppPermissionRoleEntity user : page.getContent()) {
                 list.add(entityConvertToRolePaginationResult(user));
             }
@@ -76,14 +76,14 @@ public interface AppPermissionRoleConverter {
      * 角色实体转换为角色分页结果
      *
      * @param page {@link AppPermissionRoleEntity}
-     * @return {@link AppPermissionRoleListResult}
+     * @return {@link PermissionRoleListResult}
      */
-    AppPermissionRoleListResult entityConvertToRolePaginationResult(AppPermissionRoleEntity page);
+    PermissionRoleListResult entityConvertToRolePaginationResult(AppPermissionRoleEntity page);
 
     /**
      * 角色创建参数转换为角色实体
      *
-     * @param param {@link AppPermissionRoleCreateParam}
+     * @param param {@link PermissionRoleCreateParam}
      * @return {@link AppPermissionRoleEntity}
      */
     @Mapping(target = "deleted", ignore = true)
@@ -93,7 +93,7 @@ public interface AppPermissionRoleConverter {
     @Mapping(target = "updateBy", ignore = true)
     @Mapping(target = "createTime", ignore = true)
     @Mapping(target = "createBy", ignore = true)
-    AppPermissionRoleEntity roleCreateParamConvertToEntity(AppPermissionRoleCreateParam param);
+    AppPermissionRoleEntity roleCreateParamConvertToEntity(PermissionRoleCreateParam param);
 
     /**
      * 角色更新参数转换为角色实体类
@@ -114,17 +114,17 @@ public interface AppPermissionRoleConverter {
      * 实体转系统详情结果
      *
      * @param role {@link AppPermissionRoleEntity}
-     * @return {@link AppPermissionRoleResult}
+     * @return {@link PermissionRoleResult}
      */
-    AppPermissionRoleResult entityConvertToRoleDetailResult(AppPermissionRoleEntity role);
+    PermissionRoleResult entityConvertToRoleDetailResult(AppPermissionRoleEntity role);
 
     /**
      * 角色分页查询参数转实体
      *
-     * @param query {@link AppPermissionRoleListQuery}
+     * @param query {@link PermissionRoleListQuery}
      * @return {@link AppPermissionRoleEntity}
      */
-    default Predicate rolePaginationParamConvertToPredicate(AppPermissionRoleListQuery query) {
+    default Predicate rolePaginationParamConvertToPredicate(PermissionRoleListQuery query) {
         QAppPermissionRoleEntity role = QAppPermissionRoleEntity.appPermissionRoleEntity;
         Predicate predicate = ExpressionUtils.and(role.isNotNull(), role.deleted.eq(Boolean.FALSE));
         //查询条件
@@ -135,8 +135,8 @@ public interface AppPermissionRoleConverter {
         predicate = ObjectUtils.isEmpty(query.getEnabled()) ? predicate : ExpressionUtils.and(predicate, role.enabled.eq(query.getEnabled()));
         // 角色编码
         predicate = StringUtils.isBlank(query.getCode()) ? predicate : ExpressionUtils.and(predicate, role.code.eq(query.getCode()));
-        // TODO 从token中获取 所属应用
-        predicate = ExpressionUtils.and(predicate, role.appId.eq(0L));
+        // 所属应用
+        predicate = ObjectUtils.isEmpty(query.getAppId()) ? predicate : ExpressionUtils.and(predicate, role.appId.eq(query.getAppId()));
         //@formatter:on
         return predicate;
     }
