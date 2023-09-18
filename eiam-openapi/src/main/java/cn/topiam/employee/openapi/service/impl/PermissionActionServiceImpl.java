@@ -15,32 +15,43 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.openapi.service;
+package cn.topiam.employee.openapi.service.impl;
 
 import java.util.List;
+
+import org.springframework.stereotype.Service;
 
 import cn.topiam.employee.openapi.pojo.request.app.query.AppPermissionListQuery;
 import cn.topiam.employee.openapi.pojo.request.app.save.AppPermissionActionCreateParam;
 import cn.topiam.employee.openapi.pojo.request.app.update.ResourceActionUpdateParam;
 import cn.topiam.employee.openapi.pojo.response.app.AppPermissionActionGetResult;
 import cn.topiam.employee.openapi.pojo.response.app.AppPermissionActionListResult;
+import cn.topiam.employee.openapi.service.PermissionActionService;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * <p>
- * 权限 服务类
+ * 资源权限 服务类
  * </p>
  *
  * @author TopIAM
  * Created by support@topiam.cn on  2020-08-10
  */
-public interface AppPermissionActionService {
+@Service
+@RequiredArgsConstructor
+public class PermissionActionServiceImpl implements PermissionActionService {
+
     /**
      * 获取权限列表
      *
      * @param query {@link AppPermissionListQuery}
      * @return {@link AppPermissionActionListResult}
      */
-    List<AppPermissionActionListResult> getPermissionActionList(AppPermissionListQuery query);
+    @Override
+    public List<AppPermissionActionListResult> getPermissionActionList(AppPermissionListQuery query) {
+        return null;
+    }
 
     /**
      * 获取权限详情
@@ -48,7 +59,10 @@ public interface AppPermissionActionService {
      * @param id {@link String}
      * @return {@link AppPermissionActionGetResult}
      */
-    AppPermissionActionGetResult getPermissionAction(String id);
+    @Override
+    public AppPermissionActionGetResult getPermissionAction(String id) {
+        return null;
+    }
 
     /**
      * 删除权限
@@ -56,7 +70,10 @@ public interface AppPermissionActionService {
      * @param id {@link String}
      * @return {@link Boolean}
      */
-    Boolean deletePermissionAction(String id);
+    @Override
+    public Boolean deletePermissionAction(String id) {
+        return null;
+    }
 
     /**
      * 创建权限
@@ -64,7 +81,10 @@ public interface AppPermissionActionService {
      * @param param {@link AppPermissionActionCreateParam}
      * @return {@link Boolean}
      */
-    Boolean createPermissionAction(AppPermissionActionCreateParam param);
+    @Override
+    public Boolean createPermissionAction(AppPermissionActionCreateParam param) {
+        return null;
+    }
 
     /**
      * 更新权限
@@ -72,5 +92,8 @@ public interface AppPermissionActionService {
      * @param param {@link ResourceActionUpdateParam}
      * @return {@link Boolean}
      */
-    Boolean updatePermissionAction(ResourceActionUpdateParam param);
+    @Override
+    public Boolean updatePermissionAction(ResourceActionUpdateParam param) {
+        return null;
+    }
 }

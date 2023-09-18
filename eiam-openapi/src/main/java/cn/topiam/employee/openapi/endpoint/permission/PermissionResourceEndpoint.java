@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cn.topiam.employee.openapi.pojo.request.app.query.AppResourceListQuery;
 import cn.topiam.employee.openapi.pojo.response.app.AppPermissionResourceListResult;
-import cn.topiam.employee.openapi.service.AppPermissionResourceService;
+import cn.topiam.employee.openapi.service.PermissionResourceService;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.result.ApiRestResult;
@@ -43,7 +43,7 @@ import static cn.topiam.employee.openapi.constants.OpenApiV1Constants.OPEN_API_P
 @RestController
 @RequestMapping(value = OPEN_API_PERMISSION_PATH + "/resource")
 @RequiredArgsConstructor
-public class AppPermissionResourceEndpoint {
+public class PermissionResourceEndpoint {
     /**
      * 获取应用的所有资源（分页）
      *
@@ -54,7 +54,7 @@ public class AppPermissionResourceEndpoint {
     @GetMapping(value = "/list")
     public ApiRestResult<Page<AppPermissionResourceListResult>> getPermissionResourceList(PageModel page,
                                                                                           @Validated AppResourceListQuery query) {
-        Page<AppPermissionResourceListResult> result = appPermissionResourceService
+        Page<AppPermissionResourceListResult> result = permissionResourceService
             .getPermissionResourceList(page, query);
         return ApiRestResult.<Page<AppPermissionResourceListResult>> builder().result(result)
             .build();
@@ -68,5 +68,5 @@ public class AppPermissionResourceEndpoint {
     /**
      * 资源服务类
      */
-    private final AppPermissionResourceService appPermissionResourceService;
+    private final PermissionResourceService permissionResourceService;
 }

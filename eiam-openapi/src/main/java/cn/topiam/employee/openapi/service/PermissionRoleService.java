@@ -34,7 +34,7 @@ import cn.topiam.employee.support.repository.page.domain.PageModel;
  * @author TopIAM
  * Created by support@topiam.cn on  2020-08-10
  */
-public interface AppPermissionRoleService {
+public interface PermissionRoleService {
 
     /**
      * 获取所有角色（分页）

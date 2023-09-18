@@ -36,13 +36,13 @@ import cn.topiam.employee.common.enums.CheckValidityType;
 import cn.topiam.employee.common.exception.app.AppRoleNotExistException;
 import cn.topiam.employee.common.repository.permission.AppPermissionPolicyRepository;
 import cn.topiam.employee.common.repository.permission.AppPermissionRoleRepository;
-import cn.topiam.employee.openapi.converter.app.PermissionRoleConverter;
+import cn.topiam.employee.openapi.converter.permission.PermissionRoleConverter;
 import cn.topiam.employee.openapi.pojo.request.app.query.AppPermissionRoleListQuery;
 import cn.topiam.employee.openapi.pojo.request.app.save.AppPermissionRoleCreateParam;
 import cn.topiam.employee.openapi.pojo.request.app.update.PermissionRoleUpdateParam;
 import cn.topiam.employee.openapi.pojo.response.app.AppPermissionRoleListResult;
 import cn.topiam.employee.openapi.pojo.response.app.AppPermissionRoleResult;
-import cn.topiam.employee.openapi.service.AppPermissionRoleService;
+import cn.topiam.employee.openapi.service.PermissionRoleService;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.util.BeanUtils;
@@ -61,7 +61,7 @@ import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIF
  */
 @Service
 @RequiredArgsConstructor
-public class AppPermissionRoleServiceImpl implements AppPermissionRoleService {
+public class PermissionRoleServiceImpl implements PermissionRoleService {
 
     /**
      * 获取所有角色（分页）

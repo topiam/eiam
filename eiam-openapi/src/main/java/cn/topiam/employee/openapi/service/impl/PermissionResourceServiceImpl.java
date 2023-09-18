@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 import cn.topiam.employee.common.entity.permission.PermissionActionEntity;
 import cn.topiam.employee.common.entity.permission.PermissionResourceEntity;
-import cn.topiam.employee.openapi.converter.app.PermissionResourceConverter;
+import cn.topiam.employee.openapi.converter.permission.PermissionResourceConverter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
@@ -47,7 +47,7 @@ import cn.topiam.employee.openapi.pojo.request.app.save.AppPermissionResourceCre
 import cn.topiam.employee.openapi.pojo.request.app.update.AppPermissionResourceUpdateParam;
 import cn.topiam.employee.openapi.pojo.response.app.AppPermissionResourceGetResult;
 import cn.topiam.employee.openapi.pojo.response.app.AppPermissionResourceListResult;
-import cn.topiam.employee.openapi.service.AppPermissionResourceService;
+import cn.topiam.employee.openapi.service.PermissionResourceService;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 
@@ -63,7 +63,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Service
 @RequiredArgsConstructor
-public class AppPermissionResourceServiceImpl implements AppPermissionResourceService {
+public class PermissionResourceServiceImpl implements PermissionResourceService {
 
     /**
      * 获取资源列表

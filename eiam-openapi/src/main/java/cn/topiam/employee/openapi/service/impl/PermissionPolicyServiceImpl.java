@@ -26,12 +26,12 @@ import cn.topiam.employee.common.entity.app.query.AppPolicyQuery;
 import cn.topiam.employee.common.entity.permission.PermissionPolicyEntity;
 import cn.topiam.employee.common.exception.app.AppPolicyNotExistException;
 import cn.topiam.employee.common.repository.permission.AppPermissionPolicyRepository;
-import cn.topiam.employee.openapi.converter.app.PermissionPolicyConverter;
+import cn.topiam.employee.openapi.converter.permission.PermissionPolicyConverter;
 import cn.topiam.employee.openapi.pojo.request.app.query.OpenApiPolicyQuery;
 import cn.topiam.employee.openapi.pojo.request.app.save.AppPermissionPolicyCreateParam;
 import cn.topiam.employee.openapi.pojo.request.app.update.AppPermissionPolicyUpdateParam;
 import cn.topiam.employee.openapi.pojo.response.app.AppPermissionPolicyGetResult;
-import cn.topiam.employee.openapi.service.AppPermissionPolicyService;
+import cn.topiam.employee.openapi.service.PermissionPolicyService;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 
@@ -47,7 +47,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Service
 @RequiredArgsConstructor
-public class AppPermissionPolicyServiceImpl implements AppPermissionPolicyService {
+public class PermissionPolicyServiceImpl implements PermissionPolicyService {
 
     /**
      * 获取策略列表

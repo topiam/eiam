@@ -33,7 +33,7 @@ import cn.topiam.employee.support.repository.page.domain.PageModel;
  * @author TopIAM
  * Created by support@topiam.cn on  2020-08-10
  */
-public interface AppPermissionPolicyService {
+public interface PermissionPolicyService {
     /**
      * 获取资源列表
      *

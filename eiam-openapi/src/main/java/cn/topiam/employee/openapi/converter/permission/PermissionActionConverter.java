@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.openapi.converter.app;
+package cn.topiam.employee.openapi.converter.permission;
 
 import cn.topiam.employee.common.entity.permission.PermissionActionEntity;
 import org.mapstruct.Mapper;

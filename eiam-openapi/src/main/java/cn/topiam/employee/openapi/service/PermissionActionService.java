@@ -15,43 +15,32 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.openapi.service.impl;
+package cn.topiam.employee.openapi.service;
 
 import java.util.List;
-
-import org.springframework.stereotype.Service;
 
 import cn.topiam.employee.openapi.pojo.request.app.query.AppPermissionListQuery;
 import cn.topiam.employee.openapi.pojo.request.app.save.AppPermissionActionCreateParam;
 import cn.topiam.employee.openapi.pojo.request.app.update.ResourceActionUpdateParam;
 import cn.topiam.employee.openapi.pojo.response.app.AppPermissionActionGetResult;
 import cn.topiam.employee.openapi.pojo.response.app.AppPermissionActionListResult;
-import cn.topiam.employee.openapi.service.AppPermissionActionService;
-
-import lombok.RequiredArgsConstructor;
 
 /**
  * <p>
- * 资源权限 服务类
+ * 权限 服务类
  * </p>
  *
  * @author TopIAM
  * Created by support@topiam.cn on  2020-08-10
  */
-@Service
-@RequiredArgsConstructor
-public class AppPermissionActionServiceImpl implements AppPermissionActionService {
-
+public interface PermissionActionService {
     /**
      * 获取权限列表
      *
      * @param query {@link AppPermissionListQuery}
      * @return {@link AppPermissionActionListResult}
      */
-    @Override
-    public List<AppPermissionActionListResult> getPermissionActionList(AppPermissionListQuery query) {
-        return null;
-    }
+    List<AppPermissionActionListResult> getPermissionActionList(AppPermissionListQuery query);
 
     /**
      * 获取权限详情
@@ -59,10 +48,7 @@ public class AppPermissionActionServiceImpl implements AppPermissionActionServic
      * @param id {@link String}
      * @return {@link AppPermissionActionGetResult}
      */
-    @Override
-    public AppPermissionActionGetResult getPermissionAction(String id) {
-        return null;
-    }
+    AppPermissionActionGetResult getPermissionAction(String id);
 
     /**
      * 删除权限
@@ -70,10 +56,7 @@ public class AppPermissionActionServiceImpl implements AppPermissionActionServic
      * @param id {@link String}
      * @return {@link Boolean}
      */
-    @Override
-    public Boolean deletePermissionAction(String id) {
-        return null;
-    }
+    Boolean deletePermissionAction(String id);
 
     /**
      * 创建权限
@@ -81,10 +64,7 @@ public class AppPermissionActionServiceImpl implements AppPermissionActionServic
      * @param param {@link AppPermissionActionCreateParam}
      * @return {@link Boolean}
      */
-    @Override
-    public Boolean createPermissionAction(AppPermissionActionCreateParam param) {
-        return null;
-    }
+    Boolean createPermissionAction(AppPermissionActionCreateParam param);
 
     /**
      * 更新权限
@@ -92,8 +72,5 @@ public class AppPermissionActionServiceImpl implements AppPermissionActionServic
      * @param param {@link ResourceActionUpdateParam}
      * @return {@link Boolean}
      */
-    @Override
-    public Boolean updatePermissionAction(ResourceActionUpdateParam param) {
-        return null;
-    }
+    Boolean updatePermissionAction(ResourceActionUpdateParam param);
 }

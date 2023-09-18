@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.topiam.employee.openapi.pojo.request.app.query.OpenApiPolicyQuery;
-import cn.topiam.employee.openapi.service.AppPermissionPolicyService;
+import cn.topiam.employee.openapi.service.PermissionPolicyService;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.result.ApiRestResult;
@@ -43,7 +43,7 @@ import static cn.topiam.employee.openapi.constants.OpenApiV1Constants.OPEN_API_P
 @RestController
 @RequestMapping(value = OPEN_API_PERMISSION_PATH + "/policy")
 @RequiredArgsConstructor
-public class AppPermissionPolicyEndpoint {
+public class PermissionPolicyEndpoint {
     /**
      * 获取所有策略（分页）
      *
@@ -59,5 +59,5 @@ public class AppPermissionPolicyEndpoint {
         return ApiRestResult.<Page<PermissionPolicyPO>> builder().result(result).build();
     }
 
-    private final AppPermissionPolicyService permissionPolicyService;
+    private final PermissionPolicyService permissionPolicyService;
 }

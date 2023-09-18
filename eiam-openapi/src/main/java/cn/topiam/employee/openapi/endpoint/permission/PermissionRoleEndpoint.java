@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cn.topiam.employee.openapi.pojo.request.app.query.AppPermissionRoleListQuery;
 import cn.topiam.employee.openapi.pojo.response.app.AppPermissionRoleListResult;
-import cn.topiam.employee.openapi.service.AppPermissionRoleService;
+import cn.topiam.employee.openapi.service.PermissionRoleService;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.result.ApiRestResult;
@@ -43,7 +43,7 @@ import static cn.topiam.employee.openapi.constants.OpenApiV1Constants.OPEN_API_P
 @RestController
 @RequestMapping(value = OPEN_API_PERMISSION_PATH + "/role")
 @RequiredArgsConstructor
-public class AppPermissionRoleEndpoint {
+public class PermissionRoleEndpoint {
     //1、获取应用的所有角色（分页）
     /**
      * 获取所有角色（分页）
@@ -55,7 +55,7 @@ public class AppPermissionRoleEndpoint {
     @GetMapping(value = "/list")
     public ApiRestResult<Page<AppPermissionRoleListResult>> getPermissionRoleList(PageModel page,
                                                                                   @Validated AppPermissionRoleListQuery query) {
-        Page<AppPermissionRoleListResult> result = appPermissionRoleService
+        Page<AppPermissionRoleListResult> result = permissionRoleService
             .getPermissionRoleList(page, query);
         return ApiRestResult.<Page<AppPermissionRoleListResult>> builder().result(result).build();
     }
@@ -68,5 +68,5 @@ public class AppPermissionRoleEndpoint {
     /**
      * 角色服务类
      */
-    private final AppPermissionRoleService appPermissionRoleService;
+    private final PermissionRoleService permissionRoleService;
 }
