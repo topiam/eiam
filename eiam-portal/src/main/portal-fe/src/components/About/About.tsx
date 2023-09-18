@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react';
-import { Image, Modal, Space, Typography } from 'antd';
-import { InfoCircleFilled } from '@ant-design/icons';
+import { Col, Image, Modal, Row, Space, Typography } from 'antd';
+import { CopyrightOutlined, InfoCircleFilled } from '@ant-design/icons';
 import { FormattedMessage } from '@umijs/max';
 import { useSafeState } from 'ahooks';
 import { createStyles } from 'antd-style';
@@ -26,14 +26,12 @@ const { Text, Link } = Typography;
 
 const useStyle = createStyles({
   main: {
-    display: 'flex',
-    gap: '40px',
-    padding: '20px 0',
+    padding: '10px 0',
   },
 });
 const About: React.FC = () => {
   const { styles } = useStyle();
-
+  const currentYear = new Date().getFullYear();
   const [aboutOpen, setAboutOpen] = useSafeState(false);
 
   return (
@@ -53,14 +51,27 @@ const About: React.FC = () => {
         onCancel={() => setAboutOpen(false)}
       >
         <div className={styles.main}>
-          <Image width={200} src={'/full-logo.svg'} preview={false} />
-          <Space direction="vertical">
-            <Text>产品：TopIAM 企业数字身份管控平台</Text>
-            <Text>版本：社区版 1.0.1 </Text>
-            <Link href="https://eiam.topiam.cn" target="_blank">
-              https://eiam.topiam.cn
-            </Link>
-          </Space>
+          <Row gutter={16}>
+            <Col span={6} style={{ borderRight: '3px solid #f0f2f5' }}>
+              <Image src={'/full-logo.svg'} preview={false} />
+            </Col>
+            <Col span={18}>
+              <Space direction="vertical" size={'middle'}>
+                <Text>产品：TOPIAM 企业数字身份管控平台</Text>
+                <Text>版本：社区版 1.1.0</Text>
+                <Text>
+                  版权所有 <CopyrightOutlined /> {'济南源创网络科技有限公司'} 2022-{currentYear}
+                  。保留一切权利。
+                </Text>
+                <Text>
+                  警告：本软件受著作权法和国际版权条约的保护，未经授权擅自复制、修改、分发本程序的全部或任何部分，将要承担一切由此导致的民事或刑事责任。
+                </Text>
+                <Link href="https://eiam.topiam.cn" target="_blank">
+                  https://eiam.topiam.cn
+                </Link>
+              </Space>
+            </Col>
+          </Row>
         </div>
       </Modal>
     </>

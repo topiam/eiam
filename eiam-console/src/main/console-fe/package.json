@@ -50,7 +50,7 @@
     "@ant-design/pro-components": "^2.6.19",
     "ahooks": "^3.7.8",
     "antd": "^5.9.1",
-    "antd-img-crop": "^4.12.2",
+    "antd-img-crop": "^4.13.0",
     "antd-style": "^3.4.6",
     "classnames": "^2.3.2",
     "codemirror": "^5.65.5",
