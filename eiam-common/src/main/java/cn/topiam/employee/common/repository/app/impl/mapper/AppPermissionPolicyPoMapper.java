@@ -20,9 +20,9 @@ package cn.topiam.employee.common.repository.app.impl.mapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
 import org.springframework.jdbc.core.RowMapper;
 
-import cn.topiam.employee.common.entity.app.po.AppPermissionPolicyPO;
 import cn.topiam.employee.common.enums.app.AppPolicyEffect;
 import cn.topiam.employee.common.enums.app.AppPolicyObjectType;
 import cn.topiam.employee.common.enums.app.AppPolicySubjectType;
@@ -31,7 +31,7 @@ import cn.topiam.employee.common.enums.app.AppPolicySubjectType;
  * @author TopIAM
  * Created by support@topiam.cn on  2022/2/13 23:25
  */
-public class AppPermissionPolicyPoMapper implements RowMapper<AppPermissionPolicyPO> {
+public class AppPermissionPolicyPoMapper implements RowMapper<PermissionPolicyPO> {
 
     /**
      * Implementations must implement this method to map each row of data
@@ -46,18 +46,18 @@ public class AppPermissionPolicyPoMapper implements RowMapper<AppPermissionPolic
      */
     @SuppressWarnings("DuplicatedCode")
     @Override
-    public AppPermissionPolicyPO mapRow(ResultSet rs, int rowNum) throws SQLException {
-        AppPermissionPolicyPO appPermissionPolicyPo = new AppPermissionPolicyPO();
-        appPermissionPolicyPo.setId(rs.getLong("id_"));
-        appPermissionPolicyPo.setEffect(AppPolicyEffect.getType(rs.getString("effect")));
-        appPermissionPolicyPo.setSubjectId(rs.getString("subject_id"));
-        appPermissionPolicyPo
+    public PermissionPolicyPO mapRow(ResultSet rs, int rowNum) throws SQLException {
+        PermissionPolicyPO permissionPolicyPo = new PermissionPolicyPO();
+        permissionPolicyPo.setId(rs.getLong("id_"));
+        permissionPolicyPo.setEffect(AppPolicyEffect.getType(rs.getString("effect")));
+        permissionPolicyPo.setSubjectId(rs.getString("subject_id"));
+        permissionPolicyPo
             .setSubjectType(AppPolicySubjectType.getType(rs.getString("subject_type")));
-        appPermissionPolicyPo.setSubjectName(rs.getString("subject_name"));
-        appPermissionPolicyPo.setObjectId(rs.getLong("object_id"));
-        appPermissionPolicyPo
+        permissionPolicyPo.setSubjectName(rs.getString("subject_name"));
+        permissionPolicyPo.setObjectId(rs.getLong("object_id"));
+        permissionPolicyPo
             .setObjectType(AppPolicyObjectType.getType(rs.getString("object_type")));
-        appPermissionPolicyPo.setObjectName(rs.getString("object_name"));
-        return appPermissionPolicyPo;
+        permissionPolicyPo.setObjectName(rs.getString("object_name"));
+        return permissionPolicyPo;
     }
 }

@@ -19,6 +19,7 @@ package cn.topiam.employee.common.repository.app.impl;
 
 import java.util.List;
 
+import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -28,10 +29,9 @@ import org.springframework.util.ObjectUtils;
 
 import com.google.common.collect.Lists;
 
-import cn.topiam.employee.common.entity.app.po.AppPermissionPolicyPO;
 import cn.topiam.employee.common.entity.app.query.AppPolicyQuery;
-import cn.topiam.employee.common.repository.app.AppPermissionPolicyRepositoryCustomized;
 import cn.topiam.employee.common.repository.app.impl.mapper.AppPermissionPolicyPoMapper;
+import cn.topiam.employee.common.repository.permission.AppPermissionPolicyRepositoryCustomized;
 
 import lombok.RequiredArgsConstructor;
 
@@ -49,7 +49,7 @@ public class AppPermissionPolicyRepositoryCustomizedImpl implements
     }
 
     @Override
-    public Page<AppPermissionPolicyPO> findPage(AppPolicyQuery query, Pageable pageable) {
+    public Page<PermissionPolicyPO> findPage(AppPolicyQuery query, Pageable pageable) {
         //查询条件
         //@formatter:off
         // 所属应用
@@ -111,7 +111,7 @@ public class AppPermissionPolicyRepositoryCustomizedImpl implements
                 .append(" FROM app_permission_policy policy ").append(subjectJoin).append(objectJoin);
 
         // @formatter:off
-        List<AppPermissionPolicyPO> list = jdbcTemplate
+        List<PermissionPolicyPO> list = jdbcTemplate
                 .query(
                         selectSql.append(" LIMIT ").append(pageable.getPageNumber() * pageable.getPageSize())
                                 .append(",").append(pageable.getPageSize()).toString(),
