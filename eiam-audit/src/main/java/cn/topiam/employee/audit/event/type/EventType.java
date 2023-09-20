@@ -489,14 +489,6 @@ public enum EventType {
                         */
                        ADD_APP_GROUP(AppEventType.ADD_APP_GROUP),
                        /**
-                        * 启用应用分组
-                        */
-                       ENABLE_APP_GROUP(AppEventType.ENABLE_APP_GROUP),
-                       /**
-                        * 禁用应用分组
-                        */
-                       DISABLE_APP_GROUP(AppEventType.DISABLE_APP_GROUP),
-                       /**
                         * 修改应用分组
                         */
                        UPDATE_APP_GROUP(AppEventType.UPDATE_APP_GROUP),

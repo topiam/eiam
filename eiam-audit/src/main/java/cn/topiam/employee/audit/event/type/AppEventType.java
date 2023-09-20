@@ -161,16 +161,6 @@ public class AppEventType {
     public static Type ADD_APP_GROUP                   = new Type("eiam:event:app_group:create",
         "添加应用分组", APP_GROUP_RESOURCE, List.of(UserType.ADMIN));
     /**
-     * 启用应用分组
-     */
-    public static Type ENABLE_APP_GROUP                = new Type("eiam:event:app_group:enabled",
-        "启用应用分组", APP_GROUP_RESOURCE, List.of(UserType.ADMIN));
-    /**
-     * 禁用应用分组
-     */
-    public static Type DISABLE_APP_GROUP               = new Type("eiam:event:app_group:disabled",
-        "禁用应用分组", APP_GROUP_RESOURCE, List.of(UserType.ADMIN));
-    /**
      * 编辑应用分组
      */
     public static Type UPDATE_APP_GROUP                = new Type("eiam:event:app_group:update",
