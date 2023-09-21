@@ -26,8 +26,8 @@ import org.springframework.util.CollectionUtils;
 
 import cn.topiam.employee.common.entity.app.AppAccountEntity;
 import cn.topiam.employee.common.entity.app.po.AppAccountPO;
-import cn.topiam.employee.openapi.pojo.request.app.save.AppAccountCreateParam;
-import cn.topiam.employee.openapi.pojo.response.app.AppAccountListResult;
+import cn.topiam.employee.openapi.pojo.result.app.AppAccountListResult;
+import cn.topiam.employee.openapi.pojo.save.app.AppAccountCreateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
 
 /**

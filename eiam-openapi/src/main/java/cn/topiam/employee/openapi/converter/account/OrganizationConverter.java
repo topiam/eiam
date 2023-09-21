@@ -25,10 +25,10 @@ import org.mapstruct.Mapping;
 import org.springframework.util.CollectionUtils;
 
 import cn.topiam.employee.common.entity.account.OrganizationEntity;
-import cn.topiam.employee.openapi.pojo.request.account.save.account.OrganizationCreateParam;
-import cn.topiam.employee.openapi.pojo.request.account.update.account.OrganizationUpdateParam;
-import cn.topiam.employee.openapi.pojo.response.account.OrganizationChildResult;
-import cn.topiam.employee.openapi.pojo.response.account.OrganizationResult;
+import cn.topiam.employee.openapi.pojo.result.account.OrganizationChildResult;
+import cn.topiam.employee.openapi.pojo.result.account.OrganizationResult;
+import cn.topiam.employee.openapi.pojo.save.account.OrganizationCreateParam;
+import cn.topiam.employee.openapi.pojo.update.account.OrganizationUpdateParam;
 
 /**
  * 组织架构数据映射
