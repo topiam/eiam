@@ -36,9 +36,9 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
  * Created by support@topiam.cn on  2021/11/4 22:44
  */
 @Repository
-public interface AppPermissionPolicyRepository extends AppPermissionPolicyRepositoryCustomized,
-                                               LogicDeleteRepository<PermissionPolicyEntity, Long>,
-                                               QuerydslPredicateExecutor<PermissionPolicyEntity> {
+public interface PermissionPolicyRepository extends PermissionPolicyRepositoryCustomized,
+                                            LogicDeleteRepository<PermissionPolicyEntity, Long>,
+                                            QuerydslPredicateExecutor<PermissionPolicyEntity> {
     /**
      * 按主体 ID 删除所有
      *

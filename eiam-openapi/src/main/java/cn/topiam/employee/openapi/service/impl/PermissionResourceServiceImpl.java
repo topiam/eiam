@@ -36,9 +36,9 @@ import cn.topiam.employee.common.entity.permission.PermissionResourceEntity;
 import cn.topiam.employee.common.entity.permission.QPermissionResourceEntity;
 import cn.topiam.employee.common.enums.CheckValidityType;
 import cn.topiam.employee.common.exception.app.AppResourceNotExistException;
-import cn.topiam.employee.common.repository.permission.AppPermissionActionRepository;
-import cn.topiam.employee.common.repository.permission.AppPermissionPolicyRepository;
-import cn.topiam.employee.common.repository.permission.AppPermissionResourceRepository;
+import cn.topiam.employee.common.repository.permission.PermissionActionRepository;
+import cn.topiam.employee.common.repository.permission.PermissionPolicyRepository;
+import cn.topiam.employee.common.repository.permission.PermissionResourceRepository;
 import cn.topiam.employee.openapi.converter.permission.PermissionResourceConverter;
 import cn.topiam.employee.openapi.pojo.request.app.AppPermissionsActionParam;
 import cn.topiam.employee.openapi.pojo.request.app.query.AppResourceListQuery;
@@ -227,15 +227,15 @@ public class PermissionResourceServiceImpl implements PermissionResourceService 
         resource.setActions(list);
     }
 
-    private final PermissionResourceConverter     permissionResourceConverter;
+    private final PermissionResourceConverter  permissionResourceConverter;
 
-    private final AppPermissionResourceRepository appResourceRepository;
+    private final PermissionResourceRepository appResourceRepository;
     /**
      * PolicyRepository
      */
-    private final AppPermissionPolicyRepository   permissionPolicyRepository;
+    private final PermissionPolicyRepository   permissionPolicyRepository;
     /**
      * ActionRepository
      */
-    private final AppPermissionActionRepository   permissionActionRepository;
+    private final PermissionActionRepository   permissionActionRepository;
 }

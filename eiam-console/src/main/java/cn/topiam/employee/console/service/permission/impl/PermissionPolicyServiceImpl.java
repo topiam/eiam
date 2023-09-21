@@ -25,7 +25,7 @@ import cn.topiam.employee.common.entity.app.query.AppPolicyQuery;
 import cn.topiam.employee.common.entity.permission.PermissionPolicyEntity;
 import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
 import cn.topiam.employee.common.exception.app.AppPolicyNotExistException;
-import cn.topiam.employee.common.repository.permission.AppPermissionPolicyRepository;
+import cn.topiam.employee.common.repository.permission.PermissionPolicyRepository;
 import cn.topiam.employee.console.converter.permission.PermissionPolicyConverter;
 import cn.topiam.employee.console.pojo.result.permission.PermissionPolicyGetResult;
 import cn.topiam.employee.console.pojo.result.permission.PermissionPolicyListResult;
@@ -121,7 +121,7 @@ public class PermissionPolicyServiceImpl implements PermissionPolicyService {
         return null;
     }
 
-    private final PermissionPolicyConverter     permissionPolicyConverter;
+    private final PermissionPolicyConverter  permissionPolicyConverter;
 
-    private final AppPermissionPolicyRepository permissionPolicyRepository;
+    private final PermissionPolicyRepository permissionPolicyRepository;
 }

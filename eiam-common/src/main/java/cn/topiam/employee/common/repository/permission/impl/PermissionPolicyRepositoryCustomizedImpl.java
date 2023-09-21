@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.common.repository.app.impl;
+package cn.topiam.employee.common.repository.permission.impl;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ import com.google.common.collect.Lists;
 import cn.topiam.employee.common.entity.app.query.AppPolicyQuery;
 import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
 import cn.topiam.employee.common.repository.app.impl.mapper.AppPermissionPolicyPoMapper;
-import cn.topiam.employee.common.repository.permission.AppPermissionPolicyRepositoryCustomized;
+import cn.topiam.employee.common.repository.permission.PermissionPolicyRepositoryCustomized;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,8 +41,8 @@ import lombok.RequiredArgsConstructor;
  */
 @Repository
 @RequiredArgsConstructor
-public class AppPermissionPolicyRepositoryCustomizedImpl implements
-                                                         AppPermissionPolicyRepositoryCustomized {
+public class PermissionPolicyRepositoryCustomizedImpl implements
+                                                      PermissionPolicyRepositoryCustomized {
 
     private String leftJoin(String table, String condition) {
         return " LEFT JOIN " + table + " ON " + condition + " AND " + table + ".is_deleted = '0' ";

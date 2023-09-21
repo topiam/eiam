@@ -34,8 +34,8 @@ import cn.topiam.employee.common.entity.permission.PermissionRoleEntity;
 import cn.topiam.employee.common.entity.permission.QPermissionRoleEntity;
 import cn.topiam.employee.common.enums.CheckValidityType;
 import cn.topiam.employee.common.exception.app.AppRoleNotExistException;
-import cn.topiam.employee.common.repository.permission.AppPermissionPolicyRepository;
-import cn.topiam.employee.common.repository.permission.AppPermissionRoleRepository;
+import cn.topiam.employee.common.repository.permission.PermissionPolicyRepository;
+import cn.topiam.employee.common.repository.permission.PermissionRoleRepository;
 import cn.topiam.employee.openapi.converter.permission.PermissionRoleConverter;
 import cn.topiam.employee.openapi.pojo.request.app.query.AppPermissionRoleListQuery;
 import cn.topiam.employee.openapi.pojo.request.app.save.AppPermissionRoleCreateParam;
@@ -196,13 +196,13 @@ public class PermissionRoleServiceImpl implements PermissionRoleService {
     /**
      * 用户数据映射器
      */
-    private final PermissionRoleConverter       permissionRoleConverter;
+    private final PermissionRoleConverter    permissionRoleConverter;
     /**
      * RoleRepository
      */
-    private final AppPermissionRoleRepository   permissionRoleRepository;
+    private final PermissionRoleRepository   permissionRoleRepository;
     /**
      * PolicyRepository
      */
-    private final AppPermissionPolicyRepository permissionPolicyRepository;
+    private final PermissionPolicyRepository permissionPolicyRepository;
 }

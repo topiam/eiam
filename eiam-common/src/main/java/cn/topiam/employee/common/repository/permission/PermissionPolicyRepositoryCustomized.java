@@ -17,28 +17,23 @@
  */
 package cn.topiam.employee.common.repository.permission;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.stereotype.Repository;
-
-import cn.topiam.employee.common.entity.permission.PermissionActionEntity;
-import cn.topiam.employee.common.entity.permission.PermissionResourceEntity;
-import cn.topiam.employee.support.repository.LogicDeleteRepository;
+import cn.topiam.employee.common.entity.app.query.AppPolicyQuery;
+import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/22 23:06
+ * Created by support@topiam.cn on  2021/11/4 22:44
  */
-@Repository
-public interface AppPermissionActionRepository extends
-                                               LogicDeleteRepository<PermissionActionEntity, Long>,
-                                               QuerydslPredicateExecutor<PermissionActionEntity> {
+public interface PermissionPolicyRepositoryCustomized {
     /**
-     * findAllByResource
+     * 分页查询权限策略
      *
-     * @param resource {@link PermissionResourceEntity}
-     * @return {@link List}
+     * @param query {@link AppPolicyQuery}
+     * @param request {@link Pageable}
+     * @return {@link PermissionPolicyPO}
      */
-    List<PermissionActionEntity> findAllByResource(PermissionResourceEntity resource);
+    Page<PermissionPolicyPO> findPage(AppPolicyQuery query, Pageable request);
 }

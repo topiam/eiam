@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 import com.querydsl.core.types.Predicate;
 
 import cn.topiam.employee.common.entity.permission.PermissionResourceEntity;
-import cn.topiam.employee.common.repository.permission.AppPermissionResourceRepository;
+import cn.topiam.employee.common.repository.permission.PermissionResourceRepository;
 import cn.topiam.employee.console.converter.permission.PermissionActionConverter;
 import cn.topiam.employee.console.pojo.query.permission.PermissionActionListQuery;
 import cn.topiam.employee.console.pojo.result.permission.PermissionActionListResult;
@@ -59,7 +59,7 @@ public class PermissionActionServiceImpl implements PermissionActionService {
         return permissionActionConverter.entityConvertToResourceActionListResult(list);
     }
 
-    private final AppPermissionResourceRepository permissionResourceRepository;
+    private final PermissionResourceRepository permissionResourceRepository;
 
-    private final PermissionActionConverter       permissionActionConverter;
+    private final PermissionActionConverter    permissionActionConverter;
 }
