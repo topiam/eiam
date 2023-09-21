@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import cn.topiam.employee.common.entity.permission.PermissionRoleEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
@@ -31,7 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 
-import cn.topiam.employee.common.entity.app.QAppPermissionRoleEntity;
+import cn.topiam.employee.common.entity.permission.PermissionRoleEntity;
+import cn.topiam.employee.common.entity.permission.QPermissionRoleEntity;
 import cn.topiam.employee.common.enums.CheckValidityType;
 import cn.topiam.employee.common.exception.app.AppRoleNotExistException;
 import cn.topiam.employee.common.repository.permission.AppPermissionPolicyRepository;
@@ -73,10 +73,9 @@ public class PermissionRoleServiceImpl implements PermissionRoleService {
     public Page<AppPermissionRoleListResult> getPermissionRoleList(PageModel page,
                                                                    AppPermissionRoleListQuery query) {
         org.springframework.data.domain.Page<PermissionRoleEntity> data;
-        Predicate predicate = permissionRoleConverter
-            .rolePaginationParamConvertToPredicate(query);
+        Predicate predicate = permissionRoleConverter.rolePaginationParamConvertToPredicate(query);
         QPageRequest request = QPageRequest.of(page.getCurrent(), page.getPageSize());
-        data = appPermissionRoleRepository.findAll(predicate, request);
+        data = permissionRoleRepository.findAll(predicate, request);
         return permissionRoleConverter.entityConvertToRolePaginationResult(data);
     }
 
@@ -88,9 +87,8 @@ public class PermissionRoleServiceImpl implements PermissionRoleService {
      */
     @Override
     public boolean createPermissionRole(AppPermissionRoleCreateParam param) {
-        PermissionRoleEntity entity = permissionRoleConverter
-            .roleCreateParamConvertToEntity(param);
-        appPermissionRoleRepository.save(entity);
+        PermissionRoleEntity entity = permissionRoleConverter.roleCreateParamConvertToEntity(param);
+        permissionRoleRepository.save(entity);
         return true;
     }
 
@@ -100,12 +98,11 @@ public class PermissionRoleServiceImpl implements PermissionRoleService {
      */
     @Override
     public boolean updatePermissionRole(PermissionRoleUpdateParam param) {
-        PermissionRoleEntity source = permissionRoleConverter
-            .roleUpdateParamConvertToEntity(param);
-        PermissionRoleEntity target = appPermissionRoleRepository
-            .findById(Long.valueOf(param.getId())).orElseThrow(AppRoleNotExistException::new);
+        PermissionRoleEntity source = permissionRoleConverter.roleUpdateParamConvertToEntity(param);
+        PermissionRoleEntity target = permissionRoleRepository.findById(Long.valueOf(param.getId()))
+            .orElseThrow(AppRoleNotExistException::new);
         BeanUtils.merge(source, target, LAST_MODIFIED_TIME, LAST_MODIFIED_BY);
-        appPermissionRoleRepository.save(target);
+        permissionRoleRepository.save(target);
         return true;
     }
 
@@ -120,10 +117,10 @@ public class PermissionRoleServiceImpl implements PermissionRoleService {
     public boolean deletePermissionRole(String ids) {
         List<String> idList = Arrays.stream(ids.split(",")).toList();
         List<Long> longIds = idList.stream().map(Long::parseLong).toList();
-        appPermissionRoleRepository.deleteAllById(longIds);
+        permissionRoleRepository.deleteAllById(longIds);
         // 删除对应策略
-        appPermissionPolicyRepository.deleteAllBySubjectIdIn(idList);
-        appPermissionPolicyRepository.deleteAllByObjectIdIn(longIds);
+        permissionPolicyRepository.deleteAllBySubjectIdIn(idList);
+        permissionPolicyRepository.deleteAllByObjectIdIn(longIds);
         return true;
     }
 
@@ -136,7 +133,7 @@ public class PermissionRoleServiceImpl implements PermissionRoleService {
     @Override
     public AppPermissionRoleResult getPermissionRole(Long id) {
         //查询
-        Optional<PermissionRoleEntity> entity = appPermissionRoleRepository.findById(id);
+        Optional<PermissionRoleEntity> entity = permissionRoleRepository.findById(id);
         //映射
         return permissionRoleConverter.entityConvertToRoleDetailResult(entity.orElse(null));
     }
@@ -154,12 +151,12 @@ public class PermissionRoleServiceImpl implements PermissionRoleService {
     @Override
     public Boolean permissionRoleParamCheck(CheckValidityType type, String value, Long appId,
                                             Long id) {
-        QAppPermissionRoleEntity role = QAppPermissionRoleEntity.appPermissionRoleEntity;
+        QPermissionRoleEntity role = QPermissionRoleEntity.permissionRoleEntity;
         PermissionRoleEntity entity = new PermissionRoleEntity();
         boolean result = false;
         // ID存在说明是修改操作，查询一下当前数据
         if (Objects.nonNull(id)) {
-            entity = appPermissionRoleRepository.findById(id)
+            entity = permissionRoleRepository.findById(id)
                 .orElseThrow(AppRoleNotExistException::new);
         }
         //角色编码
@@ -169,7 +166,7 @@ public class PermissionRoleServiceImpl implements PermissionRoleService {
             }
             BooleanExpression eq = role.code.eq(value);
             eq.and(role.appId.eq(appId));
-            result = !appPermissionRoleRepository.exists(eq);
+            result = !permissionRoleRepository.exists(eq);
         }
         //角色名称
         if (CheckValidityType.NAME.equals(type)) {
@@ -178,7 +175,7 @@ public class PermissionRoleServiceImpl implements PermissionRoleService {
             }
             BooleanExpression eq = role.name.eq(value);
             eq.and(role.appId.eq(appId));
-            result = !appPermissionRoleRepository.exists(eq);
+            result = !permissionRoleRepository.exists(eq);
         }
         return result;
     }
@@ -192,20 +189,20 @@ public class PermissionRoleServiceImpl implements PermissionRoleService {
      */
     @Override
     public Boolean updatePermissionRoleStatus(String id, Boolean status) {
-        appPermissionRoleRepository.updateStatus(id, status);
+        permissionRoleRepository.updateStatus(id, status);
         return true;
     }
 
     /**
      * 用户数据映射器
      */
-    private final PermissionRoleConverter permissionRoleConverter;
+    private final PermissionRoleConverter       permissionRoleConverter;
     /**
      * RoleRepository
      */
-    private final AppPermissionRoleRepository   appPermissionRoleRepository;
+    private final AppPermissionRoleRepository   permissionRoleRepository;
     /**
      * PolicyRepository
      */
-    private final AppPermissionPolicyRepository appPermissionPolicyRepository;
+    private final AppPermissionPolicyRepository permissionPolicyRepository;
 }

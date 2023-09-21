@@ -17,9 +17,6 @@
  */
 package cn.topiam.employee.console.controller.permission;
 
-import cn.topiam.employee.console.pojo.result.permission.PermissionResourceGetResult;
-import cn.topiam.employee.console.pojo.result.permission.PermissionResourceListResult;
-import cn.topiam.employee.console.pojo.save.permission.PermissionRoleCreateParam;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -29,8 +26,11 @@ import cn.topiam.employee.audit.annotation.Audit;
 import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.common.enums.CheckValidityType;
 import cn.topiam.employee.console.pojo.query.permission.PermissionResourceListQuery;
+import cn.topiam.employee.console.pojo.result.permission.PermissionResourceGetResult;
+import cn.topiam.employee.console.pojo.result.permission.PermissionResourceListResult;
 import cn.topiam.employee.console.pojo.result.permission.PermissionRoleListResult;
 import cn.topiam.employee.console.pojo.save.permission.PermissionResourceCreateParam;
+import cn.topiam.employee.console.pojo.save.permission.PermissionRoleCreateParam;
 import cn.topiam.employee.console.pojo.update.permission.PermissionResourceUpdateParam;
 import cn.topiam.employee.console.pojo.update.permission.PermissionRoleUpdateParam;
 import cn.topiam.employee.console.service.permission.PermissionResourceService;
@@ -47,7 +47,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-
 import static cn.topiam.employee.common.constant.PermissionConstants.PERMISSION_PATH;
 
 /**
@@ -58,8 +57,7 @@ import static cn.topiam.employee.common.constant.PermissionConstants.PERMISSION_
  */
 @Validated
 @Tag(name = "应用权限-资源")
-@RequestMapping(value = PERMISSION_PATH
-                        + "/resource", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = PERMISSION_PATH + "/resource", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 @RequiredArgsConstructor
 public class PermissionResourceController {
@@ -77,8 +75,7 @@ public class PermissionResourceController {
                                                                                        @Validated PermissionResourceListQuery query) {
         Page<PermissionResourceListResult> result = permissionResourceService
             .getPermissionResourceList(page, query);
-        return ApiRestResult.<Page<PermissionResourceListResult>> builder().result(result)
-            .build();
+        return ApiRestResult.<Page<PermissionResourceListResult>> builder().result(result).build();
     }
 
     /**
@@ -193,8 +190,8 @@ public class PermissionResourceController {
                                                      @Parameter(description = "值") @NotEmpty(message = "验证值不能为空") String value,
                                                      @Parameter(description = "应用ID") @NotNull(message = "应用ID不能为空") Long appId,
                                                      @Parameter(description = "ID") Long id) {
-        Boolean result = permissionResourceService.permissionResourceParamCheck(type, value,
-            appId, id);
+        Boolean result = permissionResourceService.permissionResourceParamCheck(type, value, appId,
+            id);
         //返回
         return ApiRestResult.<Boolean> builder().result(result).build();
     }

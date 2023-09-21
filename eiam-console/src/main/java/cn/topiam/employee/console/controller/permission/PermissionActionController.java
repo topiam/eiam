@@ -19,7 +19,6 @@ package cn.topiam.employee.console.controller.permission;
 
 import java.util.List;
 
-import cn.topiam.employee.console.pojo.result.permission.PermissionActionListResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -30,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.topiam.employee.console.pojo.query.permission.PermissionActionListQuery;
+import cn.topiam.employee.console.pojo.result.permission.PermissionActionListResult;
 import cn.topiam.employee.console.service.permission.PermissionActionService;
 import cn.topiam.employee.support.result.ApiRestResult;
 
@@ -37,7 +37,6 @@ import lombok.RequiredArgsConstructor;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import static cn.topiam.employee.common.constant.PermissionConstants.PERMISSION_PATH;
 
 /**
@@ -49,8 +48,7 @@ import static cn.topiam.employee.common.constant.PermissionConstants.PERMISSION_
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "应用权限-权限项")
-@RequestMapping(value = PERMISSION_PATH
-                        + "/action", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = PERMISSION_PATH + "/action", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 public class PermissionActionController {
 

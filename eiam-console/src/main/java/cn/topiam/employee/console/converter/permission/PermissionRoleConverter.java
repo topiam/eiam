@@ -20,7 +20,6 @@ package cn.topiam.employee.console.converter.permission;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.topiam.employee.console.pojo.save.permission.PermissionRoleCreateParam;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -30,11 +29,12 @@ import org.springframework.util.ObjectUtils;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 
-import cn.topiam.employee.common.entity.app.QAppPermissionRoleEntity;
 import cn.topiam.employee.common.entity.permission.PermissionRoleEntity;
+import cn.topiam.employee.common.entity.permission.QPermissionRoleEntity;
 import cn.topiam.employee.console.pojo.query.permission.PermissionRoleListQuery;
 import cn.topiam.employee.console.pojo.result.permission.PermissionRoleListResult;
 import cn.topiam.employee.console.pojo.result.permission.PermissionRoleResult;
+import cn.topiam.employee.console.pojo.save.permission.PermissionRoleCreateParam;
 import cn.topiam.employee.console.pojo.update.permission.PermissionRoleUpdateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
 
@@ -125,7 +125,7 @@ public interface PermissionRoleConverter {
      * @return {@link PermissionRoleEntity}
      */
     default Predicate rolePaginationParamConvertToPredicate(PermissionRoleListQuery query) {
-        QAppPermissionRoleEntity role = QAppPermissionRoleEntity.appPermissionRoleEntity;
+        QPermissionRoleEntity role = QPermissionRoleEntity.permissionRoleEntity;
         Predicate predicate = ExpressionUtils.and(role.isNotNull(), role.deleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off

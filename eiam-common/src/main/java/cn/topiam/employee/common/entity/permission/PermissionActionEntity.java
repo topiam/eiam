@@ -51,24 +51,24 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
 public class PermissionActionEntity extends LogicDeleteEntity<Long> {
 
     @Serial
-    private static final long           serialVersionUID = -3954680915360748087L;
+    private static final long        serialVersionUID = -3954680915360748087L;
 
     /**
      * 权限值
      */
     @Column(name = "value_")
-    private String                      value;
+    private String                   value;
     /**
      * 描述
      */
     @Column(name = "name_")
-    private String                      name;
+    private String                   name;
 
     /**
      * 权限类型
      */
     @Column(name = "type_")
-    private PermissionActionType        type;
+    private PermissionActionType     type;
 
     /**
      * 资源

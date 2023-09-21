@@ -20,9 +20,9 @@ package cn.topiam.employee.common.repository.app.impl.mapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
 import org.springframework.jdbc.core.RowMapper;
 
+import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
 import cn.topiam.employee.common.enums.app.AppPolicyEffect;
 import cn.topiam.employee.common.enums.app.AppPolicyObjectType;
 import cn.topiam.employee.common.enums.app.AppPolicySubjectType;
@@ -55,8 +55,7 @@ public class AppPermissionPolicyPoMapper implements RowMapper<PermissionPolicyPO
             .setSubjectType(AppPolicySubjectType.getType(rs.getString("subject_type")));
         permissionPolicyPo.setSubjectName(rs.getString("subject_name"));
         permissionPolicyPo.setObjectId(rs.getLong("object_id"));
-        permissionPolicyPo
-            .setObjectType(AppPolicyObjectType.getType(rs.getString("object_type")));
+        permissionPolicyPo.setObjectType(AppPolicyObjectType.getType(rs.getString("object_type")));
         permissionPolicyPo.setObjectName(rs.getString("object_name"));
         return permissionPolicyPo;
     }

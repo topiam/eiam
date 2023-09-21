@@ -55,37 +55,37 @@ import static jakarta.persistence.FetchType.LAZY;
 public class PermissionResourceEntity extends LogicDeleteEntity<Long> {
 
     @Serial
-    private static final long               serialVersionUID = 7342074686605139968L;
+    private static final long            serialVersionUID = 7342074686605139968L;
 
     /**
      * 资源编码
      */
     @Column(name = "code_")
-    private String                          code;
+    private String                       code;
 
     /**
      * 资源名称
      */
     @Column(name = "name_")
-    private String                          name;
+    private String                       name;
 
     /**
      * 应用ID
      */
     @Column(name = "app_id")
-    private Long                            appId;
+    private Long                         appId;
 
     /**
      * 描述
      */
     @Column(name = "desc_")
-    private String                          desc;
+    private String                       desc;
 
     /**
      * 是否启用
      */
     @Column(name = "is_enabled")
-    private Boolean                         enabled;
+    private Boolean                      enabled;
 
     /**
      * 权限

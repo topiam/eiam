@@ -17,12 +17,12 @@
  */
 package cn.topiam.employee.openapi.endpoint.permission;
 
-import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
 import cn.topiam.employee.openapi.pojo.request.app.query.OpenApiPolicyQuery;
 import cn.topiam.employee.openapi.service.PermissionPolicyService;
 import cn.topiam.employee.support.repository.page.domain.Page;

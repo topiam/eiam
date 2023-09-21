@@ -17,11 +17,11 @@
  */
 package cn.topiam.employee.common.repository.permission;
 
-import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import cn.topiam.employee.common.entity.app.query.AppPolicyQuery;
+import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
 
 /**
  * @author TopIAM

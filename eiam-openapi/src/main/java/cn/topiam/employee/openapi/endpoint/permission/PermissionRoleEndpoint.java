@@ -55,8 +55,8 @@ public class PermissionRoleEndpoint {
     @GetMapping(value = "/list")
     public ApiRestResult<Page<AppPermissionRoleListResult>> getPermissionRoleList(PageModel page,
                                                                                   @Validated AppPermissionRoleListQuery query) {
-        Page<AppPermissionRoleListResult> result = permissionRoleService
-            .getPermissionRoleList(page, query);
+        Page<AppPermissionRoleListResult> result = permissionRoleService.getPermissionRoleList(page,
+            query);
         return ApiRestResult.<Page<AppPermissionRoleListResult>> builder().result(result).build();
     }
     //2、新增角色

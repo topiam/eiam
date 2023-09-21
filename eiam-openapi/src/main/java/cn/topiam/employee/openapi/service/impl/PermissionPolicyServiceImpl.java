@@ -17,13 +17,13 @@
  */
 package cn.topiam.employee.openapi.service.impl;
 
-import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.app.query.AppPolicyQuery;
 import cn.topiam.employee.common.entity.permission.PermissionPolicyEntity;
+import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
 import cn.topiam.employee.common.exception.app.AppPolicyNotExistException;
 import cn.topiam.employee.common.repository.permission.AppPermissionPolicyRepository;
 import cn.topiam.employee.openapi.converter.permission.PermissionPolicyConverter;
@@ -68,7 +68,7 @@ public class PermissionPolicyServiceImpl implements PermissionPolicyService {
         appPolicyQuery.setSubjectType(query.getSubjectType());
         appPolicyQuery.setObjectType(query.getObjectType());
         QPageRequest request = QPageRequest.of(page.getCurrent(), page.getPageSize());
-        org.springframework.data.domain.Page<PermissionPolicyPO> data = appPermissionPolicyRepository
+        org.springframework.data.domain.Page<PermissionPolicyPO> data = permissionPolicyRepository
             .findPage(appPolicyQuery, request);
         return permissionPolicyConverter.entityConvertToPolicyListResult(data);
     }
@@ -93,9 +93,8 @@ public class PermissionPolicyServiceImpl implements PermissionPolicyService {
     @Override
     public Boolean deletePermissionPolicy(String id) {
         Long policyId = Long.valueOf(id);
-        appPermissionPolicyRepository.findById(policyId)
-            .orElseThrow(AppPolicyNotExistException::new);
-        appPermissionPolicyRepository.deleteById(policyId);
+        permissionPolicyRepository.findById(policyId).orElseThrow(AppPolicyNotExistException::new);
+        permissionPolicyRepository.deleteById(policyId);
         return true;
     }
 
@@ -111,7 +110,7 @@ public class PermissionPolicyServiceImpl implements PermissionPolicyService {
         PermissionPolicyEntity resource = permissionPolicyConverter
             .policyCreateParamConvertToEntity(param);
         // 新增策略
-        appPermissionPolicyRepository.save(resource);
+        permissionPolicyRepository.save(resource);
         return true;
     }
 
@@ -126,11 +125,11 @@ public class PermissionPolicyServiceImpl implements PermissionPolicyService {
         PermissionPolicyEntity resource = permissionPolicyConverter
             .policyUpdateParamConvertToEntity(param);
         // 更新策略
-        appPermissionPolicyRepository.save(resource);
+        permissionPolicyRepository.save(resource);
         return null;
     }
 
-    private final PermissionPolicyConverter permissionPolicyConverter;
+    private final PermissionPolicyConverter     permissionPolicyConverter;
 
-    private final AppPermissionPolicyRepository appPermissionPolicyRepository;
+    private final AppPermissionPolicyRepository permissionPolicyRepository;
 }

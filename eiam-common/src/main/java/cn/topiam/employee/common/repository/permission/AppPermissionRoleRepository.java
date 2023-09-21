@@ -19,7 +19,6 @@ package cn.topiam.employee.common.repository.permission;
 
 import java.util.Optional;
 
-import cn.topiam.employee.common.entity.permission.PermissionRoleEntity;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Modifying;
@@ -29,6 +28,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import cn.topiam.employee.common.entity.permission.PermissionRoleEntity;
 import cn.topiam.employee.support.repository.LogicDeleteRepository;
 
 /**

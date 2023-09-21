@@ -17,8 +17,6 @@
  */
 package cn.topiam.employee.console.service.permission.impl;
 
-import cn.topiam.employee.console.pojo.result.permission.PermissionPolicyListResult;
-import cn.topiam.employee.console.pojo.save.permission.PermissionPolicyCreateParam;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +28,8 @@ import cn.topiam.employee.common.exception.app.AppPolicyNotExistException;
 import cn.topiam.employee.common.repository.permission.AppPermissionPolicyRepository;
 import cn.topiam.employee.console.converter.permission.PermissionPolicyConverter;
 import cn.topiam.employee.console.pojo.result.permission.PermissionPolicyGetResult;
+import cn.topiam.employee.console.pojo.result.permission.PermissionPolicyListResult;
+import cn.topiam.employee.console.pojo.save.permission.PermissionPolicyCreateParam;
 import cn.topiam.employee.console.pojo.update.permission.PermissionPolicyUpdateParam;
 import cn.topiam.employee.console.service.permission.PermissionPolicyService;
 import cn.topiam.employee.support.repository.page.domain.Page;
@@ -61,7 +61,7 @@ public class PermissionPolicyServiceImpl implements PermissionPolicyService {
                                                                     AppPolicyQuery query) {
         org.springframework.data.domain.Page<PermissionPolicyPO> data;
         QPageRequest request = QPageRequest.of(page.getCurrent(), page.getPageSize());
-        data = appPermissionPolicyRepository.findPage(query, request);
+        data = permissionPolicyRepository.findPage(query, request);
         return permissionPolicyConverter.entityConvertToPolicyListResult(data);
     }
 
@@ -85,9 +85,8 @@ public class PermissionPolicyServiceImpl implements PermissionPolicyService {
     @Override
     public Boolean deletePermissionPolicy(String id) {
         Long policyId = Long.valueOf(id);
-        appPermissionPolicyRepository.findById(policyId)
-            .orElseThrow(AppPolicyNotExistException::new);
-        appPermissionPolicyRepository.deleteById(policyId);
+        permissionPolicyRepository.findById(policyId).orElseThrow(AppPolicyNotExistException::new);
+        permissionPolicyRepository.deleteById(policyId);
         return true;
     }
 
@@ -103,7 +102,7 @@ public class PermissionPolicyServiceImpl implements PermissionPolicyService {
         PermissionPolicyEntity resource = permissionPolicyConverter
             .policyCreateParamConvertToEntity(param);
         // 新增策略
-        appPermissionPolicyRepository.save(resource);
+        permissionPolicyRepository.save(resource);
         return true;
     }
 
@@ -118,11 +117,11 @@ public class PermissionPolicyServiceImpl implements PermissionPolicyService {
         PermissionPolicyEntity resource = permissionPolicyConverter
             .policyUpdateParamConvertToEntity(param);
         // 更新策略
-        appPermissionPolicyRepository.save(resource);
+        permissionPolicyRepository.save(resource);
         return null;
     }
 
-    private final PermissionPolicyConverter permissionPolicyConverter;
+    private final PermissionPolicyConverter     permissionPolicyConverter;
 
-    private final AppPermissionPolicyRepository appPermissionPolicyRepository;
+    private final AppPermissionPolicyRepository permissionPolicyRepository;
 }

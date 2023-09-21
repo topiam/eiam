@@ -17,9 +17,6 @@
  */
 package cn.topiam.employee.console.controller.permission;
 
-import cn.topiam.employee.console.pojo.result.permission.PermissionPolicyListResult;
-import cn.topiam.employee.console.pojo.result.permission.PermissionRoleListResult;
-import cn.topiam.employee.console.pojo.update.permission.PermissionPolicyUpdateParam;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -27,8 +24,11 @@ import org.springframework.web.bind.annotation.*;
 
 import cn.topiam.employee.common.entity.app.query.AppPolicyQuery;
 import cn.topiam.employee.console.pojo.result.permission.PermissionPolicyGetResult;
+import cn.topiam.employee.console.pojo.result.permission.PermissionPolicyListResult;
+import cn.topiam.employee.console.pojo.result.permission.PermissionRoleListResult;
 import cn.topiam.employee.console.pojo.save.permission.PermissionPolicyCreateParam;
 import cn.topiam.employee.console.pojo.save.permission.PermissionRoleCreateParam;
+import cn.topiam.employee.console.pojo.update.permission.PermissionPolicyUpdateParam;
 import cn.topiam.employee.console.pojo.update.permission.PermissionRoleUpdateParam;
 import cn.topiam.employee.console.service.permission.PermissionPolicyService;
 import cn.topiam.employee.support.lock.Lock;
@@ -41,7 +41,6 @@ import lombok.RequiredArgsConstructor;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import static cn.topiam.employee.common.constant.PermissionConstants.PERMISSION_PATH;
 
 /**
@@ -52,8 +51,7 @@ import static cn.topiam.employee.common.constant.PermissionConstants.PERMISSION_
  */
 @Validated
 @Tag(name = "应用权限-授权策略")
-@RequestMapping(value = PERMISSION_PATH
-                        + "/policy", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = PERMISSION_PATH + "/policy", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 @RequiredArgsConstructor
 public class PermissionPolicyController {

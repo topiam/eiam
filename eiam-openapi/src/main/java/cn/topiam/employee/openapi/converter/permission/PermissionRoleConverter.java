@@ -29,8 +29,8 @@ import org.springframework.util.ObjectUtils;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 
-import cn.topiam.employee.common.entity.app.QAppPermissionRoleEntity;
 import cn.topiam.employee.common.entity.permission.PermissionRoleEntity;
+import cn.topiam.employee.common.entity.permission.QPermissionRoleEntity;
 import cn.topiam.employee.openapi.pojo.request.app.query.AppPermissionRoleListQuery;
 import cn.topiam.employee.openapi.pojo.request.app.save.AppPermissionRoleCreateParam;
 import cn.topiam.employee.openapi.pojo.request.app.update.PermissionRoleUpdateParam;
@@ -125,7 +125,7 @@ public interface PermissionRoleConverter {
      * @return {@link PermissionRoleEntity}
      */
     default Predicate rolePaginationParamConvertToPredicate(AppPermissionRoleListQuery query) {
-        QAppPermissionRoleEntity role = QAppPermissionRoleEntity.appPermissionRoleEntity;
+        QPermissionRoleEntity role = QPermissionRoleEntity.permissionRoleEntity;
         Predicate predicate = ExpressionUtils.and(role.isNotNull(), role.deleted.eq(Boolean.FALSE));
         //查询条件
         //@formatter:off

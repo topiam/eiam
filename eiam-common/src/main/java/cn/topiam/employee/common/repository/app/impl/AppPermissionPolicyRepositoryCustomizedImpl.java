@@ -19,7 +19,6 @@ package cn.topiam.employee.common.repository.app.impl;
 
 import java.util.List;
 
-import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +29,7 @@ import org.springframework.util.ObjectUtils;
 import com.google.common.collect.Lists;
 
 import cn.topiam.employee.common.entity.app.query.AppPolicyQuery;
+import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
 import cn.topiam.employee.common.repository.app.impl.mapper.AppPermissionPolicyPoMapper;
 import cn.topiam.employee.common.repository.permission.AppPermissionPolicyRepositoryCustomized;
 

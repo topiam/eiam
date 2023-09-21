@@ -40,31 +40,31 @@ public class PermissionResourceCreateParam implements Serializable {
      */
     @Schema(description = "资源编码")
     @NotBlank(message = "资源编码不能为空")
-    private String                          code;
+    private String                       code;
     /**
      * 名称
      */
     @Schema(description = "资源名称")
     @NotBlank(message = "资源名称不能为空")
-    private String                          name;
+    private String                       name;
     /**
      * 描述
      */
     @Schema(description = "资源描述")
     @NotBlank(message = "资源描述不能为空")
-    private String                          desc;
+    private String                       desc;
 
     /**
      * 是否启用
      */
-    private Boolean                         enabled = true;
+    private Boolean                      enabled = true;
 
     /**
      * 所属应用
      */
     @Schema(description = "所属应用")
     @NotNull(message = "所属应用不能为空")
-    private Long                            appId;
+    private Long                         appId;
 
     /**
      * 资源权限

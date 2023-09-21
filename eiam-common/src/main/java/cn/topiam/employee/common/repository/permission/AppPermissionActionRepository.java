@@ -19,11 +19,11 @@ package cn.topiam.employee.common.repository.permission;
 
 import java.util.List;
 
-import cn.topiam.employee.common.entity.permission.PermissionActionEntity;
-import cn.topiam.employee.common.entity.permission.PermissionResourceEntity;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
+import cn.topiam.employee.common.entity.permission.PermissionActionEntity;
+import cn.topiam.employee.common.entity.permission.PermissionResourceEntity;
 import cn.topiam.employee.support.repository.LogicDeleteRepository;
 
 /**

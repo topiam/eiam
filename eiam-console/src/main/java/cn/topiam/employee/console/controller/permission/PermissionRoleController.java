@@ -17,9 +17,6 @@
  */
 package cn.topiam.employee.console.controller.permission;
 
-import cn.topiam.employee.console.pojo.result.permission.PermissionRoleListResult;
-import cn.topiam.employee.console.pojo.result.permission.PermissionRoleResult;
-import cn.topiam.employee.console.pojo.save.permission.PermissionRoleCreateParam;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -29,6 +26,9 @@ import cn.topiam.employee.audit.annotation.Audit;
 import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.common.enums.CheckValidityType;
 import cn.topiam.employee.console.pojo.query.permission.PermissionRoleListQuery;
+import cn.topiam.employee.console.pojo.result.permission.PermissionRoleListResult;
+import cn.topiam.employee.console.pojo.result.permission.PermissionRoleResult;
+import cn.topiam.employee.console.pojo.save.permission.PermissionRoleCreateParam;
 import cn.topiam.employee.console.pojo.update.permission.PermissionRoleUpdateParam;
 import cn.topiam.employee.console.service.permission.PermissionRoleService;
 import cn.topiam.employee.support.lock.Lock;
@@ -44,7 +44,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-
 import static cn.topiam.employee.common.constant.PermissionConstants.PERMISSION_PATH;
 
 /**
@@ -71,8 +70,8 @@ public class PermissionRoleController {
     @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Page<PermissionRoleListResult>> getPermissionRoleList(PageModel page,
                                                                                @Validated PermissionRoleListQuery query) {
-        Page<PermissionRoleListResult> result = permissionRoleService
-            .getPermissionRoleList(page, query);
+        Page<PermissionRoleListResult> result = permissionRoleService.getPermissionRoleList(page,
+            query);
         return ApiRestResult.<Page<PermissionRoleListResult>> builder().result(result).build();
     }
 

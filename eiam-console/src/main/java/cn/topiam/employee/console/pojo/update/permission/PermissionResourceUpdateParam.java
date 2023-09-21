@@ -40,47 +40,47 @@ import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
 @Schema(description = "修改资源入参")
 public class PermissionResourceUpdateParam implements Serializable {
     @Serial
-    private static final long               serialVersionUID = 6021548372386059064L;
+    private static final long            serialVersionUID = 6021548372386059064L;
     /**
      * ID
      */
     @Schema(accessMode = READ_ONLY)
     @NotBlank(message = "ID不能为空")
-    private String                          id;
+    private String                       id;
 
     /**
      * 名称
      */
     @Schema(description = "资源名称")
     @NotBlank(message = "资源名称不能为空")
-    private String                          name;
+    private String                       name;
 
     /**
      * 编码
      */
     @Schema(description = "资源编码")
     @NotBlank(message = "资源编码不能为空")
-    private String                          code;
+    private String                       code;
 
     /**
      * 描述
      */
     @Schema(description = "资源描述")
     @NotBlank(message = "资源描述不能为空")
-    private String                          desc;
+    private String                       desc;
 
     /**
      * 所属应用
      */
     @Schema(description = "所属应用")
     @NotNull(message = "所属应用不能为空")
-    private Long                            appId;
+    private Long                         appId;
 
     /**
      * 是否启用
      */
     @Schema(description = "是否启用")
-    private Boolean                         enabled;
+    private Boolean                      enabled;
 
     /**
      * 资源权限

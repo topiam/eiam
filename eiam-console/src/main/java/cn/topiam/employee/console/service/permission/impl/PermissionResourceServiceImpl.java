@@ -23,12 +23,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import cn.topiam.employee.common.entity.permission.PermissionActionEntity;
-import cn.topiam.employee.common.entity.permission.PermissionResourceEntity;
-import cn.topiam.employee.console.pojo.result.permission.PermissionResourceGetResult;
-import cn.topiam.employee.console.pojo.result.permission.PermissionResourceListResult;
-import cn.topiam.employee.console.pojo.save.permission.PermissionResourceCreateParam;
-import cn.topiam.employee.console.pojo.update.permission.PermissionResourceUpdateParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
@@ -40,7 +34,9 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
-import cn.topiam.employee.common.entity.app.QAppPermissionResourceEntity;
+import cn.topiam.employee.common.entity.permission.PermissionActionEntity;
+import cn.topiam.employee.common.entity.permission.PermissionResourceEntity;
+import cn.topiam.employee.common.entity.permission.QPermissionResourceEntity;
 import cn.topiam.employee.common.enums.CheckValidityType;
 import cn.topiam.employee.common.exception.app.AppResourceNotExistException;
 import cn.topiam.employee.common.repository.permission.AppPermissionActionRepository;
@@ -48,7 +44,11 @@ import cn.topiam.employee.common.repository.permission.AppPermissionPolicyReposi
 import cn.topiam.employee.common.repository.permission.AppPermissionResourceRepository;
 import cn.topiam.employee.console.converter.permission.PermissionResourceConverter;
 import cn.topiam.employee.console.pojo.query.permission.PermissionResourceListQuery;
+import cn.topiam.employee.console.pojo.result.permission.PermissionResourceGetResult;
+import cn.topiam.employee.console.pojo.result.permission.PermissionResourceListResult;
+import cn.topiam.employee.console.pojo.save.permission.PermissionResourceCreateParam;
 import cn.topiam.employee.console.pojo.save.permission.PermissionsActionParam;
+import cn.topiam.employee.console.pojo.update.permission.PermissionResourceUpdateParam;
 import cn.topiam.employee.console.service.permission.PermissionResourceService;
 import cn.topiam.employee.support.exception.BadParamsException;
 import cn.topiam.employee.support.repository.page.domain.Page;
@@ -114,12 +114,12 @@ public class PermissionResourceServiceImpl implements PermissionResourceService 
         Long resourceId = Long.valueOf(id);
         PermissionResourceEntity resource = appResourceRepository.findById(resourceId)
             .orElseThrow(AppResourceNotExistException::new);
-        List<PermissionActionEntity> actionList = appPermissionActionRepository
+        List<PermissionActionEntity> actionList = permissionActionRepository
             .findAllByResource(resource);
         List<Long> objectIdList = new ArrayList<>(
             actionList.stream().map(PermissionActionEntity::getId).toList());
         objectIdList.add(resourceId);
-        appPermissionPolicyRepository.deleteAllByObjectIdIn(objectIdList);
+        permissionPolicyRepository.deleteAllByObjectIdIn(objectIdList);
         appResourceRepository.deleteById(resourceId);
         AuditContext
             .setTarget(Target.builder().id(id).type(TargetType.APP_PERMISSION_RESOURCE).build());
@@ -139,7 +139,7 @@ public class PermissionResourceServiceImpl implements PermissionResourceService 
             .orElseThrow(AppResourceNotExistException::new);
         AuditContext.setTarget(
             Target.builder().id(id.toString()).type(TargetType.APP_PERMISSION_RESOURCE).build());
-        return appPermissionPolicyRepository.updateStatus(id, enabled) > 0;
+        return permissionPolicyRepository.updateStatus(id, enabled) > 0;
     }
 
     /**
@@ -177,16 +177,16 @@ public class PermissionResourceServiceImpl implements PermissionResourceService 
         buildActions(param.getActions(), resource);
         BeanUtils.merge(resource, entity, LAST_MODIFIED_BY, LAST_MODIFIED_TIME);
         // 查询资源下所有权限
-        List<PermissionActionEntity> actionList = appPermissionActionRepository
+        List<PermissionActionEntity> actionList = permissionActionRepository
             .findAllByResource(resource);
         // 取出未删除的权限id
         Set<Long> reservedSet = resource.getActions().stream().map(PermissionActionEntity::getId)
             .collect(Collectors.toSet());
         // 过滤要删除的权限id
         List<Long> removeActions = actionList.stream()
-            .filter(item -> !reservedSet.contains(item.getId()))
-            .map(PermissionActionEntity::getId).toList();
-        appPermissionActionRepository.deleteAllById(removeActions);
+            .filter(item -> !reservedSet.contains(item.getId())).map(PermissionActionEntity::getId)
+            .toList();
+        permissionActionRepository.deleteAllById(removeActions);
         // 更新资源
         appResourceRepository.save(entity);
         AuditContext.setTarget(
@@ -218,7 +218,7 @@ public class PermissionResourceServiceImpl implements PermissionResourceService 
     @Override
     public Boolean permissionResourceParamCheck(CheckValidityType type, String value, Long appId,
                                                 Long id) {
-        QAppPermissionResourceEntity role = QAppPermissionResourceEntity.appPermissionResourceEntity;
+        QPermissionResourceEntity role = QPermissionResourceEntity.permissionResourceEntity;
         PermissionResourceEntity entity = new PermissionResourceEntity();
         boolean result = false;
         // ID存在说明是修改操作，查询一下当前数据
@@ -267,15 +267,15 @@ public class PermissionResourceServiceImpl implements PermissionResourceService 
         resource.setActions(list);
     }
 
-    private final PermissionResourceConverter permissionResourceConverter;
+    private final PermissionResourceConverter     permissionResourceConverter;
 
     private final AppPermissionResourceRepository appResourceRepository;
     /**
      * PolicyRepository
      */
-    private final AppPermissionPolicyRepository   appPermissionPolicyRepository;
+    private final AppPermissionPolicyRepository   permissionPolicyRepository;
     /**
      * ActionRepository
      */
-    private final AppPermissionActionRepository   appPermissionActionRepository;
+    private final AppPermissionActionRepository   permissionActionRepository;
 }

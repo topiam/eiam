@@ -41,8 +41,7 @@ public interface PermissionPolicyService {
      * @param query {@link AppPolicyQuery}
      * @return {@link PermissionPolicyListResult}
      */
-    Page<PermissionPolicyListResult> getPermissionPolicyList(PageModel page,
-                                                             AppPolicyQuery query);
+    Page<PermissionPolicyListResult> getPermissionPolicyList(PageModel page, AppPolicyQuery query);
 
     /**
      * 获取资源

@@ -20,14 +20,14 @@ package cn.topiam.employee.console.converter.permission;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.topiam.employee.common.entity.permission.PermissionPolicyEntity;
-import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
-import cn.topiam.employee.console.pojo.result.permission.PermissionPolicyListResult;
-import cn.topiam.employee.console.pojo.save.permission.PermissionPolicyCreateParam;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.util.CollectionUtils;
 
+import cn.topiam.employee.common.entity.permission.PermissionPolicyEntity;
+import cn.topiam.employee.common.entity.permission.po.PermissionPolicyPO;
+import cn.topiam.employee.console.pojo.result.permission.PermissionPolicyListResult;
+import cn.topiam.employee.console.pojo.save.permission.PermissionPolicyCreateParam;
 import cn.topiam.employee.console.pojo.update.permission.PermissionPolicyUpdateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
 

@@ -20,7 +20,6 @@ package cn.topiam.employee.openapi.converter.permission;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.topiam.employee.common.entity.permission.PermissionResourceEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -29,7 +28,8 @@ import org.springframework.util.CollectionUtils;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 
-import cn.topiam.employee.common.entity.app.QAppPermissionResourceEntity;
+import cn.topiam.employee.common.entity.permission.PermissionResourceEntity;
+import cn.topiam.employee.common.entity.permission.QPermissionResourceEntity;
 import cn.topiam.employee.openapi.pojo.request.app.query.AppResourceListQuery;
 import cn.topiam.employee.openapi.pojo.request.app.save.AppPermissionResourceCreateParam;
 import cn.topiam.employee.openapi.pojo.request.app.update.AppPermissionResourceUpdateParam;
@@ -53,7 +53,7 @@ public interface PermissionResourceConverter {
      * @return {@link Predicate}
      */
     default Predicate resourcePaginationParamConvertToPredicate(AppResourceListQuery query) {
-        QAppPermissionResourceEntity resource = QAppPermissionResourceEntity.appPermissionResourceEntity;
+        QPermissionResourceEntity resource = QPermissionResourceEntity.permissionResourceEntity;
         Predicate predicate = ExpressionUtils.and(resource.isNotNull(),
             resource.deleted.eq(Boolean.FALSE));
         //查询条件
