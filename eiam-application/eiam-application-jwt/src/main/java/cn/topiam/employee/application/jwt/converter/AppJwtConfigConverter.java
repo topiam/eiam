@@ -31,6 +31,7 @@ import cn.topiam.employee.common.entity.app.AppJwtConfigEntity;
 import cn.topiam.employee.common.entity.app.po.AppJwtConfigPO;
 import cn.topiam.employee.core.help.ServerHelp;
 import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CODE;
+import static cn.topiam.employee.common.constant.ProtocolConstants.JwtEndpointConstants.JWT_SLO_PATH;
 import static cn.topiam.employee.common.constant.ProtocolConstants.JwtEndpointConstants.JWT_SSO_PATH;
 
 /**
@@ -98,6 +99,8 @@ public interface AppJwtConfigConverter {
         StringSubstitutor sub = new StringSubstitutor(variables, "{", "}");
         //IDP SSO 端点
         domain.setIdpSsoEndpoint(sub.replace(ServerHelp.getPortalPublicBaseUrl()+JWT_SSO_PATH));
+        //IDP SLO 端点
+        domain.setIdpSloEndpoint(sub.replace(ServerHelp.getPortalPublicBaseUrl()+JWT_SLO_PATH));
         return domain;
         //@formatter:on
     }
