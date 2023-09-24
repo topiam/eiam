@@ -141,6 +141,22 @@ export default (props: {
                       }}
                       fieldProps={{ autoComplete: 'off' }}
                     />
+                    <ProFormText
+                      label={intl.formatMessage({
+                        id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.config_about.idp_slo_endpoint',
+                      })}
+                      name={'idpSloEndpoint'}
+                      extra={intl.formatMessage({
+                        id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.config_about.idp_slo_endpoint.extra',
+                      })}
+                      readonly
+                      proFieldProps={{
+                        render: (value: string) => {
+                          return value && <Typography.Text copyable>{value}</Typography.Text>;
+                        },
+                      }}
+                      fieldProps={{ autoComplete: 'off' }}
+                    />
                     <ProFormTextArea
                       label={intl.formatMessage({
                         id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.config_about.idp_encrypt_cert',

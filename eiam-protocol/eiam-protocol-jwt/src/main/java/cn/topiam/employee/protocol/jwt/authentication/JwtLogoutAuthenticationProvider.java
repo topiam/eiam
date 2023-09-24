@@ -28,7 +28,7 @@ import org.springframework.security.core.session.SessionRegistry;
  * @author SanLi
  * Created by qinggang.zuo@gmail.com / 2689170096@qq.com on  2023/9/4 16:11
  */
-public final class OidcLogoutAuthenticationProvider implements AuthenticationProvider {
+public final class JwtLogoutAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -48,7 +48,7 @@ public final class OidcLogoutAuthenticationProvider implements AuthenticationPro
 
     private final SessionRegistry sessionRegistry;
 
-    public OidcLogoutAuthenticationProvider(SessionRegistry sessionRegistry) {
+    public JwtLogoutAuthenticationProvider(SessionRegistry sessionRegistry) {
         this.sessionRegistry = sessionRegistry;
     }
 }

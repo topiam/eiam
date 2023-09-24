@@ -43,4 +43,10 @@ public class AppJwtProtocolEndpoint implements Serializable {
      */
     @Parameter(description = "IDP SSO 端点")
     private String            idpSsoEndpoint;
+
+    /**
+     * IDP SLO 端点
+     */
+    @Parameter(description = "IDP SLO 端点")
+    private String            idpSloEndpoint;
 }

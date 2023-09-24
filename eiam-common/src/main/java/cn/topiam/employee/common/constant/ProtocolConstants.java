@@ -238,6 +238,11 @@ public final class ProtocolConstants {
         public static final String JWT_SSO_PATH            = JWT_AUTHORIZE_BASE_PATH + "/sso";
 
         /**
+         * JWT_SLO
+         */
+        public static final String JWT_SLO_PATH            = JWT_AUTHORIZE_BASE_PATH + "/slo";
+
+        /**
          * JWT IDP SSO 发起
          */
         public static final String IDP_JWT_SSO_INITIATOR   = JWT_AUTHORIZE_BASE_PATH + "/initiator";
