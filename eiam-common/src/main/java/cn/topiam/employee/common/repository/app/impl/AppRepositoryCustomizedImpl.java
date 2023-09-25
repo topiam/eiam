@@ -58,7 +58,7 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
      * 获取我的应用列表
      *
      * @param userId   {@link  Long}
-     * @param query {@link query}
+     * @param query {@link GetAppListQuery}
      * @param pageable {@link  String}
      * @return {@link List}
      */
