@@ -20,6 +20,7 @@ package cn.topiam.employee.common.entity.app.query;
 import java.io.Serial;
 import java.io.Serializable;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springdoc.core.annotations.ParameterObject;
 
 import lombok.Data;
@@ -39,14 +40,17 @@ public class GetAppListQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -4981513177967939516L;
+
     /**
-     * name
+     * 应用名称
      */
+    @Parameter(description = "应用名称")
     private String            name;
 
     /**
-     * groupId
+     * 应用分组ID
      */
+    @Parameter(description = "应用分组ID")
     private Long              groupId;
 
 }
