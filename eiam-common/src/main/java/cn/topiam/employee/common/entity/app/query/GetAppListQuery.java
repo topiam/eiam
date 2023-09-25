@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.portal.pojo.query;
+package cn.topiam.employee.common.entity.app.query;
 
 import java.io.Serial;
 import java.io.Serializable;

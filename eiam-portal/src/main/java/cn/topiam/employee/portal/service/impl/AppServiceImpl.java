@@ -29,7 +29,7 @@ import cn.topiam.employee.common.repository.app.AppGroupRepository;
 import cn.topiam.employee.common.repository.app.AppRepository;
 import cn.topiam.employee.portal.converter.AppConverter;
 import cn.topiam.employee.portal.converter.AppGroupConverter;
-import cn.topiam.employee.portal.pojo.query.GetAppListQuery;
+import cn.topiam.employee.common.entity.app.query.GetAppListQuery;
 import cn.topiam.employee.portal.pojo.result.AppGroupListResult;
 import cn.topiam.employee.portal.pojo.result.GetAppListResult;
 import cn.topiam.employee.portal.service.AppService;
@@ -56,8 +56,7 @@ public class AppServiceImpl implements AppService {
     public Page<GetAppListResult> getAppList(GetAppListQuery query, PageModel pageModel) {
         Long userId = Long.valueOf(SecurityUtils.getCurrentUserId());
         org.springframework.data.domain.Page<AppEntity> list = appRepository.getAppList(userId,
-            query.getName(), query.getGroupId(),
-            QPageRequest.of(pageModel.getCurrent(), pageModel.getPageSize()));
+            query, QPageRequest.of(pageModel.getCurrent(), pageModel.getPageSize()));
         return appConverter.entityConvertToAppListResult(list);
     }
 

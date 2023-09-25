@@ -19,6 +19,7 @@ package cn.topiam.employee.common.repository.app;
 
 import java.util.List;
 
+import cn.topiam.employee.common.entity.app.query.GetAppListQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -37,12 +38,12 @@ public interface AppRepositoryCustomized {
      *
      * 获取我的应用列表
      *
-     * @param name {@link  String}
      * @param userId {@link  Long}
+     * @param query {@link GetAppListQuery}
      * @param pageable    {@link  Pageable}
      * @return {@link List}
      */
-    Page<AppEntity> getAppList(Long userId, String name, Long groupId, Pageable pageable);
+    Page<AppEntity> getAppList(Long userId, GetAppListQuery query, Pageable pageable);
 
     /**
      *
