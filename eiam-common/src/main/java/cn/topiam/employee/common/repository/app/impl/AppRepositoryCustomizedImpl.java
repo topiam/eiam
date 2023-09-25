@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import cn.topiam.employee.common.entity.app.query.GetAppListQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -56,13 +57,13 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
     /**
      * 获取我的应用列表
      *
-     * @param name     {@link  String}
      * @param userId   {@link  Long}
+     * @param query {@link query}
      * @param pageable {@link  String}
      * @return {@link List}
      */
     @Override
-    public Page<AppEntity> getAppList(Long userId, String name, Long groupId, Pageable pageable) {
+    public Page<AppEntity> getAppList(Long userId, GetAppListQuery query, Pageable pageable) {
         List<Object> paramList = Lists.newArrayList();
         //当前用户加入的用户组Id
         List<Long> groupIdList = userGroupMemberRepository.findByUserId(userId).stream()
@@ -89,12 +90,12 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
                 	AND (app_acce.subject_id IN (:subjectIds) OR app.authorization_type = 'all_access')
                 """);
         //用户名
-        if (StringUtils.isNoneBlank(name)) {
-            builder.append(" AND app.name_ like '%").append(name).append("%'");
+        if (StringUtils.isNoneBlank(query.getName())) {
+            builder.append(" AND app.name_ like '%").append(query.getName()).append("%'");
         }
         //分组id
-        if (null!=groupId) {
-            builder.append(" AND ass.group_id = ").append(groupId);
+        if (Objects.nonNull(query.getGroupId())) {
+            builder.append(" AND ass.group_id = ").append(query.getGroupId());
         }
         //@formatter:on
         String sql = builder.toString();
