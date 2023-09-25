@@ -68,7 +68,7 @@ const CardList = () => {
         label: (
           <span>
             {intl.formatMessage({ id: 'pages.application.group_all' })}
-            {renderBadge(0, currentGroup === 'all')}
+            {renderBadge(0, currentGroup === all)}
           </span>
         ),
       },
