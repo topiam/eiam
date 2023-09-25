@@ -27,14 +27,15 @@ import { App, Avatar, Badge, Card, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 import { AppList, InitLoginType } from './data.d';
 import { getAppGroupList, queryAppList } from './service';
-import { useIntl } from '@@/exports';
 import useStyle from './style';
 import classnames from 'classnames';
 import { useAsyncEffect } from 'ahooks';
 import { SpinProps } from 'antd/es/spin';
+import { useIntl } from '@umijs/max';
 
 const { Paragraph } = Typography;
 const prefixCls = 'topiam-app-list';
+const all = 'all';
 const renderBadge = (count: number, active = false) => {
   return (
     <Badge
@@ -60,7 +61,7 @@ const CardList = () => {
   const [loading, setLoading] = useState<boolean | SpinProps | undefined>(false);
   const [items, setItems] = useState<{ key: string; label: React.JSX.Element }[]>([
     {
-      key: 'all',
+      key: all,
       label: (
         <span>
           {intl.formatMessage({ id: 'pages.application.group_all' })}
@@ -130,6 +131,7 @@ const CardList = () => {
           }}
           manualRequest
           request={queryAppList}
+          pagination={{}}
           toolbar={
             items.length > 0
               ? {
@@ -140,9 +142,9 @@ const CardList = () => {
                     onChange(key) {
                       if (key) {
                         setCurrentGroup(key);
-                        if (key === 'all') {
+                        if (key === all) {
                           setSearchParams((values) => {
-                            return { ...values };
+                            return { ...values, groupId: undefined };
                           });
                         } else {
                           setSearchParams((values) => {
