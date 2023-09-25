@@ -58,7 +58,17 @@ const CardList = () => {
   const actionRef = useRef<ActionType>();
   const [searchParams, setSearchParams] = useState<Record<string, any>>();
   const [loading, setLoading] = useState<boolean | SpinProps | undefined>(false);
-  const [items, setItems] = useState<{ key: string; label: React.JSX.Element }[]>([]);
+  const [items, setItems] = useState<{ key: string; label: React.JSX.Element }[]>([
+    {
+      key: 'all',
+      label: (
+        <span>
+          {intl.formatMessage({ id: 'pages.application.group_all' })}
+          {renderBadge(0, currentGroup === 'all')}
+        </span>
+      ),
+    },
+  ]);
 
   const initSso = (idpInitUrl: string) => {
     const div = window.document.createElement('div');
@@ -92,16 +102,11 @@ const CardList = () => {
           ),
         });
       });
-      setItems(data);
-      // 如果有分组，取第一个分组
-      if (data.length > 0) {
-        setSearchParams({ groupId: data[0].key });
-        actionRef.current?.reload();
-      }
+      setItems((values) => {
+        return values.concat(data);
+      });
       // 手动请求
-      else {
-        actionRef.current?.reload();
-      }
+      actionRef.current?.reload();
     }
   }, []);
 
@@ -135,9 +140,15 @@ const CardList = () => {
                     onChange(key) {
                       if (key) {
                         setCurrentGroup(key);
-                        setSearchParams((values) => {
-                          return { ...values, groupId: key };
-                        });
+                        if (key === 'all') {
+                          setSearchParams((values) => {
+                            return { ...values };
+                          });
+                        } else {
+                          setSearchParams((values) => {
+                            return { ...values, groupId: key };
+                          });
+                        }
                         actionRef.current?.reload();
                       }
                     },
