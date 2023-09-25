@@ -25,7 +25,7 @@ import {
 } from '@ant-design/pro-components';
 import { App, Avatar, Badge, Card, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
-import { AppList, InitLoginType } from './data.d';
+import { AppGroupList, AppList, InitLoginType } from './data.d';
 import { getAppGroupList, queryAppList } from './service';
 import useStyle from './style';
 import classnames from 'classnames';
@@ -58,18 +58,34 @@ const CardList = () => {
   const { message } = App.useApp();
   const actionRef = useRef<ActionType>();
   const [searchParams, setSearchParams] = useState<Record<string, any>>();
+  const [appGroupList, setAppGroupList] = useState<AppGroupList[]>([]);
   const [loading, setLoading] = useState<boolean | SpinProps | undefined>(false);
-  const [items, setItems] = useState<{ key: string; label: React.JSX.Element }[]>([
-    {
-      key: all,
-      label: (
-        <span>
-          {intl.formatMessage({ id: 'pages.application.group_all' })}
-          {renderBadge(0, currentGroup === 'all')}
-        </span>
-      ),
-    },
-  ]);
+
+  const getItems = () => {
+    let data: { key: string; label: React.JSX.Element }[] = [
+      {
+        key: all,
+        label: (
+          <span>
+            {intl.formatMessage({ id: 'pages.application.group_all' })}
+            {renderBadge(0, currentGroup === 'all')}
+          </span>
+        ),
+      },
+    ];
+    appGroupList.forEach((item) => {
+      data.push({
+        key: item.id,
+        label: (
+          <span>
+            {item.name}
+            {renderBadge(item.appCount, currentGroup === item.id)}
+          </span>
+        ),
+      });
+    });
+    return data;
+  };
 
   const initSso = (idpInitUrl: string) => {
     const div = window.document.createElement('div');
@@ -91,21 +107,8 @@ const CardList = () => {
       setLoading(false);
     });
     if (success && result) {
-      let data: { key: string; label: React.JSX.Element }[] = [];
-      result.forEach((item) => {
-        data.push({
-          key: item.id,
-          label: (
-            <span>
-              {item.name}
-              {renderBadge(item.appCount, currentGroup === item.id)}
-            </span>
-          ),
-        });
-      });
-      setItems((values) => {
-        return values.concat(data);
-      });
+      setAppGroupList(result);
+      setCurrentGroup(all);
       // 手动请求
       actionRef.current?.reload();
     }
@@ -133,12 +136,12 @@ const CardList = () => {
           request={queryAppList}
           pagination={{}}
           toolbar={
-            items.length > 0
+            appGroupList?.length > 0
               ? {
                   menu: {
                     type: 'tab',
                     activeKey: currentGroup,
-                    items: items,
+                    items: getItems(),
                     onChange(key) {
                       if (key) {
                         setCurrentGroup(key);
@@ -212,7 +215,7 @@ const CardList = () => {
                     return Promise.resolve();
                   }}
                   onReset={() => {
-                    if (items.length > 0) {
+                    if (currentGroup && currentGroup !== all) {
                       setSearchParams({ groupId: currentGroup });
                     } else {
                       setSearchParams({});
