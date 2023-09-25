@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import cn.topiam.employee.common.entity.app.query.GetAppListQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -37,12 +36,14 @@ import cn.topiam.employee.common.entity.account.OrganizationMemberEntity;
 import cn.topiam.employee.common.entity.account.UserGroupMemberEntity;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.query.AppQuery;
+import cn.topiam.employee.common.entity.app.query.GetAppListQuery;
 import cn.topiam.employee.common.repository.account.OrganizationMemberRepository;
 import cn.topiam.employee.common.repository.account.UserGroupMemberRepository;
 import cn.topiam.employee.common.repository.app.AppRepositoryCustomized;
 import cn.topiam.employee.common.repository.app.impl.mapper.AppEntityMapper;
 
 import lombok.AllArgsConstructor;
+import static cn.topiam.employee.common.enums.app.AuthorizationType.ALL_ACCESS;
 
 /**
  * App Repository Customized
@@ -58,8 +59,8 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
      * 获取我的应用列表
      *
      * @param userId   {@link  Long}
-     * @param query {@link query}
-     * @param pageable {@link  String}
+     * @param query {@link GetAppListQuery}
+     * @param pageable {@link  Pageable}
      * @return {@link List}
      */
     @Override
@@ -77,18 +78,7 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
         Map<String, Object> paramMap = new HashMap<>(16);
         paramMap.put("subjectIds", paramList);
         //@formatter:off
-        StringBuilder builder = new StringBuilder("""
-                SELECT DISTINCT
-                	app.*
-                FROM
-                	app
-                	LEFT JOIN app_access_policy app_acce ON app.id_ = app_acce.app_id AND app_acce.is_deleted = '0'
-                	LEFT JOIN app_group_association ass ON app.id_ = ass.app_id AND ass.is_deleted = '0'
-                WHERE
-                	app.is_enabled = 1
-                	AND app.is_deleted = '0'
-                	AND (app_acce.subject_id IN (:subjectIds) OR app.authorization_type = 'all_access')
-                """);
+        StringBuilder builder = new StringBuilder("SELECT DISTINCT app.* FROM app LEFT JOIN app_access_policy app_acce ON app.id_ = app_acce.app_id AND app_acce.is_deleted = '0' LEFT JOIN app_group_association ass ON app.id_ = ass.app_id AND ass.is_deleted = '0' WHERE app.is_enabled = 1 AND app.is_deleted = '0' AND (app_acce.subject_id IN (:subjectIds) OR app.authorization_type = '"+ALL_ACCESS.getCode()+"')");
         //用户名
         if (StringUtils.isNoneBlank(query.getName())) {
             builder.append(" AND app.name_ like '%").append(query.getName()).append("%'");
@@ -108,7 +98,7 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
         //@formatter:on
         Integer count = namedParameterJdbcTemplate.queryForObject(countSql, paramMap,
             Integer.class);
-        return new PageImpl<>(list, pageable, count);
+        return new PageImpl<>(list, pageable, Objects.requireNonNull(count).longValue());
     }
 
     /**
@@ -118,6 +108,7 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
      * @param pageable {@link  Pageable}
      * @return {@link List}
      */
+    @Override
     public Page<AppEntity> getAppList(AppQuery appQuery, Pageable pageable) {
         //@formatter:off
         StringBuilder builder = new StringBuilder("SELECT DISTINCT app.* FROM app LEFT JOIN app_group_association `group` ON app.id_ = `group`.app_id WHERE app.is_deleted =0");
@@ -145,7 +136,7 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
         String countSql = "SELECT count(*) FROM (" + sql + ") app_account_";
         //@formatter:on
         Integer count = jdbcTemplate.queryForObject(countSql, Integer.class);
-        return new PageImpl<>(list, pageable, count);
+        return new PageImpl<>(list, pageable, Objects.requireNonNull(count).longValue());
     }
 
     /**

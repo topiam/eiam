@@ -18,6 +18,7 @@
 package cn.topiam.employee.common.repository.account.impl;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -105,7 +106,7 @@ public class UserGroupMemberRepositoryCustomizedImpl implements
         String countSql = "SELECT count(*) FROM (" + sql + ") user_";
         //@formatter:on
         Integer count = jdbcTemplate.queryForObject(countSql, Integer.class);
-        return new PageImpl<>(list, pageable, count);
+        return new PageImpl<>(list, pageable, Objects.requireNonNull(count).longValue());
     }
 
     private final JdbcTemplate jdbcTemplate;

@@ -133,7 +133,7 @@ public class AppAccessPolicyRepositoryCustomizedImpl implements
         String countSql = "SELECT count(*) FROM (" + sql + ") app_access_policy_";
         //@formatter:on
         Integer count = jdbcTemplate.queryForObject(countSql, Integer.class);
-        return new PageImpl<>(list, pageable, count);
+        return new PageImpl<>(list, pageable, Objects.requireNonNull(count).longValue());
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * eiam-portal - Employee Identity and Access Management
+ * eiam-common - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,11 +20,11 @@ package cn.topiam.employee.common.entity.app.query;
 import java.io.Serial;
 import java.io.Serializable;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import org.springdoc.core.annotations.ParameterObject;
 
 import lombok.Data;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
