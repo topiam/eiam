@@ -60,7 +60,6 @@ public class AppOidcStandardSaveConfigParam implements Serializable {
     /**
      * 登出重定向URI
      */
-    @NotNull(message = "登出重定向URI不能为空")
     @Schema(description = "登出重定向URI")
     private List<@NotBlank(message = "登出重定向URI不能为空") @URL(message = "登出重定向URI格式不正确") String> postLogoutRedirectUris;
 
