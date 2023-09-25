@@ -39,23 +39,7 @@ import static cn.topiam.employee.common.constant.ProtocolConstants.JWT_CONFIG_CA
 @AllArgsConstructor
 @CacheConfig(cacheNames = { JWT_CONFIG_CACHE_NAME })
 public class AppJwtConfigRepositoryCustomizedImpl implements AppJwtConfigRepositoryCustomized {
-    private static final String SELECT_SQL = """
-            SELECT
-                ajc.*,
-                app.init_login_url,
-                app.init_login_type,
-                app.authorization_type,
-                app.template_,
-                app.code_,
-                app.is_enabled,
-                app.client_id,
-                app.client_secret
-            FROM
-                app
-                INNER JOIN app_jwt_config ajc ON app.id_ = ajc.app_id AND ajc.is_deleted = '0'
-            WHERE
-                app.is_deleted = '0'
-            """;
+    private static final String SELECT_SQL = "SELECT ajc.*, app.init_login_url, app.init_login_type, app.authorization_type, app.template_ , app.code_, app.is_enabled, app.client_id, app.client_secret FROM app INNER JOIN app_jwt_config ajc ON app.id_ = ajc.app_id AND ajc.is_deleted = '0' WHERE app.is_deleted = '0'";
 
     /**
      * 根据应用ID获取

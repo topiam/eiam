@@ -18,9 +18,9 @@
 package cn.topiam.employee.console.service.setting;
 
 import cn.topiam.employee.console.pojo.result.setting.EmailProviderConfigResult;
+import cn.topiam.employee.console.pojo.result.setting.SmsProviderConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.MailProviderSaveParam;
 import cn.topiam.employee.console.pojo.save.setting.SmsProviderSaveParam;
-import cn.topiam.employee.console.pojo.result.setting.SmsProviderConfigResult;
 
 /**
  * 消息设置接口

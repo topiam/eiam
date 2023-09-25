@@ -40,9 +40,9 @@ import cn.topiam.employee.common.message.sms.aliyun.AliyunSmsProviderConfig;
 import cn.topiam.employee.common.message.sms.qiniu.QiNiuSmsProviderConfig;
 import cn.topiam.employee.common.message.sms.tencent.TencentSmsProviderConfig;
 import cn.topiam.employee.console.pojo.result.setting.EmailProviderConfigResult;
+import cn.topiam.employee.console.pojo.result.setting.SmsProviderConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.MailProviderSaveParam;
 import cn.topiam.employee.console.pojo.save.setting.SmsProviderSaveParam;
-import cn.topiam.employee.console.pojo.result.setting.SmsProviderConfigResult;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.validation.ValidationUtils;
 

@@ -1,5 +1,5 @@
 /*
- * eiam-application-jwt - Employee Identity and Access Management
+ * eiam-openapi - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,38 +15,42 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.application.jwt.pojo;
-
-import java.io.Serial;
-import java.io.Serializable;
+package cn.topiam.employee.openapi.pojo.save.app;
 
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 /**
-* 协议端点域
-*
-* @author TopIAM
-* Created by support@topiam.cn on  2023/02/12 23:37
-*/
+ * AppAccountCreateParam 应用账户新增入参
+ *
+ * @author TopIAM
+ * Created by support@topiam.cn on  2022/5/24 22:13
+ */
 @Data
-@Schema(description = "协议端点")
-public class AppJwtProtocolEndpoint implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = -2261602995152894964L;
+@Schema(description = "应用账户新增入参")
+public class AppAccountCreateParam {
 
     /**
-     * IDP SSO 端点
+     * 应用ID
      */
-    @Parameter(description = "IDP SSO 端点")
-    private String            idpSsoEndpoint;
+    @Schema(description = "应用ID")
+    @NotNull(message = "应用ID不能为空")
+    private Long   appId;
 
     /**
-     * IDP SLO 端点
+     * 用户ID
      */
-    @Parameter(description = "IDP SLO 端点")
-    private String            idpSloEndpoint;
+    @Schema(description = "用户ID")
+    @NotNull(message = "用户ID不能为空")
+    private Long   userId;
+
+    /**
+     * 账户名称
+     */
+    @Schema(description = "账户名称")
+    @NotBlank(message = "账户名称不能为空")
+    private String account;
 }

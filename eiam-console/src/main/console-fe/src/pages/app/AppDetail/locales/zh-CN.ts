@@ -160,7 +160,7 @@ export default {
   'pages.app.config.detail.items.login_access.protocol_config.jwt.config_about.idp_sso_endpoint.extra':
     '应用发起单点登录的地址。',
   'pages.app.config.detail.items.login_access.protocol_config.jwt.config_about.idp_slo_endpoint':
-    '登出端点',
+    'IdP SLO 地址',
   'pages.app.config.detail.items.login_access.protocol_config.jwt.config_about.idp_slo_endpoint.extra':
     '应用发起单点登出的地址。',
   'pages.app.config.detail.items.login_access.protocol_config.jwt.config_about.idp_encrypt_cert':

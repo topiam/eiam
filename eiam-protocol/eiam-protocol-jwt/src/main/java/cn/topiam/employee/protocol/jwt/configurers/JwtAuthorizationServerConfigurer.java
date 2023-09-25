@@ -111,6 +111,7 @@ public final class JwtAuthorizationServerConfigurer extends
         //@formatter:off
         Map<Class<? extends AbstractConfigurer>, AbstractConfigurer> configurers = new LinkedHashMap<>();
         configurers.put(JwtAuthorizationEndpointConfigurer.class, new JwtAuthorizationEndpointConfigurer(this::postProcess));
+        configurers.put(JwtLogoutAuthorizationEndpointConfigurer.class, new JwtLogoutAuthorizationEndpointConfigurer(this::postProcess));
         //@formatter:on
         return configurers;
     }
