@@ -93,7 +93,7 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
             builder.append(" AND app.name_ like '%").append(name).append("%'");
         }
         //分组id
-        if (null!=groupId) {
+        if (Objects.nonNull(groupId)) {
             builder.append(" AND ass.group_id = ").append(groupId);
         }
         //@formatter:on
