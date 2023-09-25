@@ -25,11 +25,11 @@ import org.springframework.stereotype.Service;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.po.AppGroupPO;
 import cn.topiam.employee.common.entity.app.query.AppGroupQuery;
+import cn.topiam.employee.common.entity.app.query.GetAppListQuery;
 import cn.topiam.employee.common.repository.app.AppGroupRepository;
 import cn.topiam.employee.common.repository.app.AppRepository;
 import cn.topiam.employee.portal.converter.AppConverter;
 import cn.topiam.employee.portal.converter.AppGroupConverter;
-import cn.topiam.employee.common.entity.app.query.GetAppListQuery;
 import cn.topiam.employee.portal.pojo.result.AppGroupListResult;
 import cn.topiam.employee.portal.pojo.result.GetAppListResult;
 import cn.topiam.employee.portal.service.AppService;
@@ -63,13 +63,12 @@ public class AppServiceImpl implements AppService {
     /**
      * 查询应用分组
      *
-     * @param appGroupQuery {@link AppGroupQuery}
+     * @param query {@link AppGroupQuery}
      * @return {@link AppGroupListResult}
      */
     @Override
-    public List<AppGroupListResult> getAppGroupList(AppGroupQuery appGroupQuery) {
-        //查询映射
-        List<AppGroupPO> list = appGroupRepository.getAppGroupList(appGroupQuery);
+    public List<AppGroupListResult> getAppGroupList(AppGroupQuery query) {
+        List<AppGroupPO> list = appGroupRepository.getAppGroupList(query);
         return appGroupConverter.entityConvertToAppGroupListResult(list);
     }
 

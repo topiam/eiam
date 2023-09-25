@@ -19,12 +19,12 @@ package cn.topiam.employee.common.repository.app;
 
 import java.util.List;
 
-import cn.topiam.employee.common.entity.app.query.GetAppListQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.query.AppQuery;
+import cn.topiam.employee.common.entity.app.query.GetAppListQuery;
 
 /**
  * 应用 Repository Customized

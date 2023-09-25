@@ -129,7 +129,7 @@ public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
         String countSql = "SELECT count(*) FROM (" + sql + ") user_";
         //@formatter:on
         Integer count = jdbcTemplate.queryForObject(countSql, Integer.class);
-        return new PageImpl<>(list, pageable, count);
+        return new PageImpl<>(list, pageable, Objects.requireNonNull(count).longValue());
     }
 
     /**
@@ -203,7 +203,7 @@ public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
         String countSql = "SELECT COUNT(*) FROM(" + sql + ") user_";
         //@formatter:on
         Integer count = jdbcTemplate.queryForObject(countSql, Integer.class);
-        return new PageImpl<>(list, pageable, count);
+        return new PageImpl<>(list, pageable, Objects.requireNonNull(count).longValue());
     }
 
     /**
