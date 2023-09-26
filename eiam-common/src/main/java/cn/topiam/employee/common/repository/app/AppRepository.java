@@ -17,7 +17,6 @@
  */
 package cn.topiam.employee.common.repository.app;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.jetbrains.annotations.NotNull;
