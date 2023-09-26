@@ -45,7 +45,7 @@ export default {
   'pages.app.config.detail.items.login_access.protocol_config.common.authorization_type':
     '授权范围',
   'pages.app.config.detail.items.login_access.protocol_config.common.authorization_type.extra':
-    '若选择手动授权，需要在 访问授权 中进行权限分配。',
+    '若选择手动授权，需要在【访问授权】中进行权限分配。',
   'pages.app.config.detail.items.login_access.protocol_config.common.authorization_type.rule.0.message':
     '请选择授权范围',
   'pages.app.config.detail.items.login_access.protocol_config.common.authorization_type.option.0':
