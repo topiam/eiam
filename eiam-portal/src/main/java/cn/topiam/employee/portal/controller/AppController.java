@@ -58,11 +58,13 @@ public class AppController {
      */
     @Operation(summary = "获取应用数量")
     @GetMapping(value = "/count")
-    public ApiRestResult<String> getAppCount() {
+    public ApiRestResult<String> getAppCount(String groupId) {
         Long count;
-
+        if (StringUtils.isEmpty(groupId)) {
             count = appService.getAppCount();
-
+        } else {
+            count = appService.getAppCount(groupId);
+        }
         return ApiRestResult.ok(count.toString());
     }
 
