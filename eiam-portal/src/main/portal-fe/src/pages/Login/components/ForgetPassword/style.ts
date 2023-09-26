@@ -21,8 +21,7 @@ const useStyle = createStyles((_, props) => {
   const prefixCls = `${props}`;
   return {
     main: {
-      width: '320px',
-      marginTop: '24px',
+      width: '328px',
       [`.${prefixCls}`]: {
         ['&-success-box']: {
           padding: '40px',
@@ -51,7 +50,6 @@ const useStyle = createStyles((_, props) => {
         ['&-back']: {
           width: '100%',
           marginBottom: '24px',
-          marginTop: '24px',
         },
         ['&-back-time']: {
           display: 'flex',

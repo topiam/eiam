@@ -68,7 +68,7 @@ export async function getInitialState(): Promise<{
   /**
    * 控制台打印
    */
-  console.log('%c欢迎使用 TopIAM 企业数字身份管控平台', 'font-size: 24px;');
+  console.log('%c欢迎使用 TOPIAM 企业数字身份管控平台', 'font-size: 24px;');
   return {
     fetchUserInfo,
     currentUser: isLoginPath() ? undefined : await fetchUserInfo(),

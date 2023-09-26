@@ -20,9 +20,9 @@ import { ICON_LIST } from '@/components/IconFont/constant';
 import { IDP_TYPE, RESULT_STATE, SESSION_STATUS } from '@/constants';
 import { getCurrentStatus, getLoginEncryptSecret } from '@/services';
 import { aesEcbEncrypt } from '@/utils/aes';
-import { ProCard, ProForm, ProFormCheckbox, ProFormInstance } from '@ant-design/pro-components';
+import { ProForm, ProFormCheckbox, ProFormInstance } from '@ant-design/pro-components';
 import { useAsyncEffect, useRequest, useSafeState } from 'ahooks';
-import { Alert, App, Avatar, Skeleton, Space, Spin, Tabs, Tooltip } from 'antd';
+import { Alert, App, Avatar, Space, Spin, Tabs, Tooltip } from 'antd';
 import { nanoid } from 'nanoid';
 import { useRef, useState } from 'react';
 import { FormattedMessage, Helmet, history, useIntl } from '@umijs/max';
@@ -36,12 +36,11 @@ import { accountLogin, getLoginConfig, otpLogin } from './service';
 import useStyle from './style';
 import { goto } from './utils';
 import queryString from 'query-string';
-import Banner from '@/components/Banner';
 import { omit } from 'lodash';
 import { emailValidator } from '@/utils/utils';
+import PageLoading from '@/components/PageLoading';
 
 const prefixCls = 'topiam-login';
-const showBanner = process.env.PREVIEW_ENV || process.env.NODE_ENV === 'development';
 
 /**
  * 错误消息
@@ -313,284 +312,273 @@ const Login = () => {
       <Helmet>
         <link rel="icon" href={'/favicon.ico'} />
       </Helmet>
-      {showBanner && (
-        <div className={`${prefixCls}-banner`}>
-          <Banner />
-        </div>
-      )}
-      <div className={`${prefixCls}-container`}>
-        <div className={`${prefixCls}-content`}>
-          <div className={`${prefixCls}-card`}>
-            {statusLoading ? (
-              <ProCard>
-                <Skeleton loading={statusLoading} paragraph={{ rows: 5 }}></Skeleton>
-              </ProCard>
-            ) : (
-              <>
-                {/*登录*/}
-                {!status && !forgetPassword && (
-                  <>
-                    <div className={`${prefixCls}-top`}>
-                      <img alt="logo" className={`${prefixCls}-logo`} src={'/full-logo.svg'} />
-                      <div className={`${prefixCls}-desc`}>
-                        {intl.formatMessage({ id: 'pages.layout.title' })}
-                      </div>
+      {statusLoading || loginConfigLoading ? (
+        <PageLoading />
+      ) : (
+        <div className={`${prefixCls}-container`}>
+          <div className={`${prefixCls}-content`}>
+            <div className={`${prefixCls}-card`}>
+              {/*登录*/}
+              {!status && !forgetPassword && (
+                <>
+                  <div className={`${prefixCls}-top`}>
+                    <img alt="logo" className={`${prefixCls}-logo`} src={'/full-logo.svg'} />
+                    <div className={`${prefixCls}-desc`}>
+                      {intl.formatMessage({ id: 'pages.layout.title' })}
                     </div>
-                    <div className={`${prefixCls}-main`}>
-                      {/*登录错误*/}
-                      {userLoginState?.status !== RESULT_STATE.SUCCESS &&
-                        currentProvider?.type === IDP_TYPE.ACCOUNT &&
-                        userLoginState?.message && (
-                          <LoginMessage content={userLoginState?.message} />
-                        )}
-                      {/*其他登录方式*/}
-                      {loginConfig?.idps?.map((value) => {
-                        if (
-                          value.type === currentProvider?.type &&
-                          value.code === currentProvider?.code
-                        ) {
-                          if (value.type === IDP_TYPE.DINGTALK_OAUTH) {
-                            dingTalkOauthOnClick(value.code);
-                            return <></>;
-                          }
-                          //QQ
-                          if (value.type === IDP_TYPE.QQ_OAUTH) {
-                            qqOauthOnClick(value.code);
-                            return <></>;
-                          }
-                          /* 扫码登录 */
-                          return (
-                            <QrCodeLogin
-                              key={nanoid()}
-                              code={value.code}
-                              name={value.name}
-                              type={currentProvider?.type}
-                            />
-                          );
+                  </div>
+                  <div className={`${prefixCls}-main`}>
+                    {/*登录错误*/}
+                    {userLoginState?.status !== RESULT_STATE.SUCCESS &&
+                      currentProvider?.type === IDP_TYPE.ACCOUNT &&
+                      userLoginState?.message && <LoginMessage content={userLoginState?.message} />}
+                    {/*其他登录方式*/}
+                    {loginConfig?.idps?.map((value) => {
+                      if (
+                        value.type === currentProvider?.type &&
+                        value.code === currentProvider?.code
+                      ) {
+                        if (value.type === IDP_TYPE.DINGTALK_OAUTH) {
+                          dingTalkOauthOnClick(value.code);
+                          return <></>;
                         }
-                        return <div key={value.code} />;
-                      })}
-                      {
-                        // 用户名密码和短信登录
-                        (currentProvider?.type === IDP_TYPE.ACCOUNT ||
-                          currentProvider?.type === IDP_TYPE.CAPTCHA) && (
-                          <ProForm
-                            initialValues={{ 'remember-me': false }}
-                            autoComplete="off"
-                            formRef={formRef}
-                            submitter={{
-                              searchConfig: {
-                                submitText: intl.formatMessage({
-                                  id: 'pages.login.submit',
-                                }),
+                        //QQ
+                        if (value.type === IDP_TYPE.QQ_OAUTH) {
+                          qqOauthOnClick(value.code);
+                          return <></>;
+                        }
+                        /* 扫码登录 */
+                        return (
+                          <QrCodeLogin
+                            key={nanoid()}
+                            code={value.code}
+                            name={value.name}
+                            type={currentProvider?.type}
+                          />
+                        );
+                      }
+                      return <div key={value.code} />;
+                    })}
+                    {
+                      // 用户名密码和短信登录
+                      (currentProvider?.type === IDP_TYPE.ACCOUNT ||
+                        currentProvider?.type === IDP_TYPE.CAPTCHA) && (
+                        <ProForm
+                          initialValues={{ 'remember-me': false }}
+                          autoComplete="off"
+                          formRef={formRef}
+                          submitter={{
+                            searchConfig: {
+                              submitText: intl.formatMessage({
+                                id: 'pages.login.submit',
+                              }),
+                            },
+                            render: (_, dom) => dom.pop(),
+                            submitButtonProps: {
+                              loading,
+                              size: 'large',
+                              htmlType: 'submit',
+                              style: {
+                                width: '100%',
                               },
-                              render: (_, dom) => dom.pop(),
-                              submitButtonProps: {
-                                loading,
-                                size: 'large',
-                                htmlType: 'submit',
-                                style: {
-                                  width: '100%',
-                                },
-                              },
+                            },
+                          }}
+                          onFinish={async (values) => {
+                            run(values);
+                            return data;
+                          }}
+                        >
+                          <Tabs
+                            activeKey={currentProvider?.type}
+                            destroyInactiveTabPane
+                            onChange={(key) => {
+                              setCurrentProvider({ type: key });
                             }}
-                            onFinish={async (values) => {
-                              await run(values);
-                              return data;
+                            items={[
+                              {
+                                label: intl.formatMessage({
+                                  id: 'pages.login.account-login.tab',
+                                }),
+                                key: IDP_TYPE.ACCOUNT,
+                                children: (
+                                  <>
+                                    <UsernamePassword />
+                                  </>
+                                ),
+                              },
+                              {
+                                label: intl.formatMessage({
+                                  id: 'pages.login.phone-login.tab',
+                                }),
+                                key: IDP_TYPE.CAPTCHA,
+                                children: (
+                                  <>
+                                    <Captcha onGetCaptcha={async () => {}} onRef={captchaRef} />
+                                  </>
+                                ),
+                              },
+                            ]}
+                          />
+                          <div
+                            style={{
+                              marginBottom: 24,
                             }}
                           >
-                            <Tabs
-                              activeKey={currentProvider?.type}
-                              destroyInactiveTabPane
-                              onChange={(key) => {
-                                setCurrentProvider({ type: key });
-                              }}
-                              items={[
-                                {
-                                  label: intl.formatMessage({
-                                    id: 'pages.login.account-login.tab',
-                                  }),
-                                  key: IDP_TYPE.ACCOUNT,
-                                  children: (
-                                    <>
-                                      <UsernamePassword />
-                                    </>
-                                  ),
-                                },
-                                {
-                                  label: intl.formatMessage({
-                                    id: 'pages.login.phone-login.tab',
-                                  }),
-                                  key: IDP_TYPE.CAPTCHA,
-                                  children: (
-                                    <>
-                                      <Captcha onGetCaptcha={async () => {}} onRef={captchaRef} />
-                                    </>
-                                  ),
-                                },
-                              ]}
-                            />
-                            <div
+                            <ProFormCheckbox noStyle name="remember-me">
+                              <FormattedMessage id="pages.login.remember-me" />
+                            </ProFormCheckbox>
+                            <a
                               style={{
-                                marginBottom: 24,
+                                float: 'right',
+                              }}
+                              onClick={async () => {
+                                setStatusLoading(true);
+                                setForgetPassword(true);
+                                setTimeout(() => {
+                                  setStatusLoading(false);
+                                }, 85);
                               }}
                             >
-                              <ProFormCheckbox noStyle name="remember-me">
-                                <FormattedMessage id="pages.login.remember-me" />
-                              </ProFormCheckbox>
-                              <a
-                                style={{
-                                  float: 'right',
-                                }}
-                                onClick={async () => {
-                                  setStatusLoading(true);
-                                  setForgetPassword(true);
-                                  setTimeout(() => {
-                                    setStatusLoading(false);
-                                  }, 85);
-                                }}
-                              >
-                                <FormattedMessage id="pages.login.forgot-password" />
-                              </a>
-                            </div>
-                          </ProForm>
-                        )
-                      }
-                      <>
-                        <Spin spinning={loginConfigLoading}>
-                          {!loginConfigLoading && (
-                            <>
-                              {typeof loginConfig?.idps !== 'undefined' &&
-                                loginConfig?.idps?.length > 0 && (
-                                  <div className={`${prefixCls}-other`}>
-                                    <FormattedMessage id="pages.login.login-with" />
-                                  </div>
-                                )}
-                              <Space className={`${prefixCls}-other-content`} align={'center'}>
-                                {
-                                  // 不是短信和用户名密码时
-                                  currentProvider?.type !== IDP_TYPE.CAPTCHA &&
-                                    currentProvider?.type !== IDP_TYPE.ACCOUNT && (
-                                      <Tooltip
-                                        key={'password'}
-                                        title={intl.formatMessage({
-                                          id: 'pages.login.account-login.tab',
-                                        })}
-                                        placement="top"
+                              <FormattedMessage id="pages.login.forgot-password" />
+                            </a>
+                          </div>
+                        </ProForm>
+                      )
+                    }
+                    <>
+                      <Spin spinning={loginConfigLoading}>
+                        {!loginConfigLoading && (
+                          <>
+                            {typeof loginConfig?.idps !== 'undefined' &&
+                              loginConfig?.idps?.length > 0 && (
+                                <div className={`${prefixCls}-other`}>
+                                  <FormattedMessage id="pages.login.login-with" />
+                                </div>
+                              )}
+                            <Space className={`${prefixCls}-other-content`} align={'center'}>
+                              {
+                                // 不是短信和用户名密码时
+                                currentProvider?.type !== IDP_TYPE.CAPTCHA &&
+                                  currentProvider?.type !== IDP_TYPE.ACCOUNT && (
+                                    <Tooltip
+                                      key={'password'}
+                                      title={intl.formatMessage({
+                                        id: 'pages.login.account-login.tab',
+                                      })}
+                                      placement="top"
+                                    >
+                                      <a
+                                        onClick={() => {
+                                          setCurrentProvider({
+                                            type: IDP_TYPE.ACCOUNT,
+                                            code: undefined,
+                                          });
+                                        }}
                                       >
+                                        <Avatar
+                                          className={`${prefixCls}-other-avatar`}
+                                          size={50}
+                                          src={ICON_LIST.password}
+                                        />
+                                      </a>
+                                    </Tooltip>
+                                  )
+                              }
+                              {loginConfig?.idps &&
+                                loginConfig?.idps.map((value) => {
+                                  return (
+                                    value.code !== currentProvider?.code && (
+                                      <Tooltip key={nanoid()} title={value.name} placement="top">
                                         <a
+                                          style={{ display: 'block' }}
                                           onClick={() => {
-                                            setCurrentProvider({
-                                              type: IDP_TYPE.ACCOUNT,
-                                              code: undefined,
-                                            });
+                                            //钉钉OAuth认证，跳转页面
+                                            if (value.type === IDP_TYPE.DINGTALK_OAUTH) {
+                                              dingTalkOauthOnClick(value.code);
+                                              return;
+                                            }
+                                            //飞书，跳转页面
+                                            if (value.type === IDP_TYPE.FEISHU_OAUTH) {
+                                              feiShuOauthOnClick(value.code);
+                                              return;
+                                            }
+                                            //QQ
+                                            if (value.type === IDP_TYPE.QQ_OAUTH) {
+                                              qqOauthOnClick(value.code);
+                                              return;
+                                            }
+                                            //微博
+                                            if (value.type === IDP_TYPE.WEIBO_OAUTH) {
+                                              weiBoOauthOnClick(value.code);
+                                              return;
+                                            }
+                                            //gitee
+                                            if (value.type === IDP_TYPE.GITEE_OAUTH) {
+                                              giteeOauthOnClick(value.code);
+                                              return;
+                                            }
+                                            //GITHUB，跳转页面
+                                            if (value.type === IDP_TYPE.GITHUB_OAUTH) {
+                                              githubOauthOnClick(value.code);
+                                              return;
+                                            }
+                                            //支付宝，跳转页面
+                                            if (value.type === IDP_TYPE.ALIPAY_OAUTH) {
+                                              alipayOauthOnClick(value.code);
+                                              return;
+                                            }
+                                            //其他方式，跳转页面
+                                            else {
+                                              setCurrentProvider({
+                                                type: value.type,
+                                                code: value.code,
+                                              });
+                                            }
                                           }}
                                         >
                                           <Avatar
                                             className={`${prefixCls}-other-avatar`}
                                             size={50}
-                                            src={ICON_LIST.password}
+                                            src={ICON_LIST[value.type]}
+                                            key={value.code}
                                           />
                                         </a>
                                       </Tooltip>
                                     )
-                                }
-                                {loginConfig?.idps &&
-                                  loginConfig?.idps.map((value) => {
-                                    return (
-                                      value.code !== currentProvider?.code && (
-                                        <Tooltip key={nanoid()} title={value.name} placement="top">
-                                          <a
-                                            style={{ display: 'block' }}
-                                            onClick={() => {
-                                              //钉钉OAuth认证，跳转页面
-                                              if (value.type === IDP_TYPE.DINGTALK_OAUTH) {
-                                                dingTalkOauthOnClick(value.code);
-                                                return;
-                                              }
-                                              //飞书，跳转页面
-                                              if (value.type === IDP_TYPE.FEISHU_OAUTH) {
-                                                feiShuOauthOnClick(value.code);
-                                                return;
-                                              }
-                                              //QQ
-                                              if (value.type === IDP_TYPE.QQ_OAUTH) {
-                                                qqOauthOnClick(value.code);
-                                                return;
-                                              }
-                                              //微博
-                                              if (value.type === IDP_TYPE.WEIBO_OAUTH) {
-                                                weiBoOauthOnClick(value.code);
-                                                return;
-                                              }
-                                              //gitee
-                                              if (value.type === IDP_TYPE.GITEE_OAUTH) {
-                                                giteeOauthOnClick(value.code);
-                                                return;
-                                              }
-                                              //GITHUB，跳转页面
-                                              if (value.type === IDP_TYPE.GITHUB_OAUTH) {
-                                                githubOauthOnClick(value.code);
-                                                return;
-                                              }
-                                              //支付宝，跳转页面
-                                              if (value.type === IDP_TYPE.ALIPAY_OAUTH) {
-                                                alipayOauthOnClick(value.code);
-                                                return;
-                                              }
-                                              //其他方式，跳转页面
-                                              else {
-                                                setCurrentProvider({
-                                                  type: value.type,
-                                                  code: value.code,
-                                                });
-                                              }
-                                            }}
-                                          >
-                                            <Avatar
-                                              className={`${prefixCls}-other-avatar`}
-                                              size={50}
-                                              src={ICON_LIST[value.type]}
-                                              key={value.code}
-                                            />
-                                          </a>
-                                        </Tooltip>
-                                      )
-                                    );
-                                  })}
-                              </Space>
-                            </>
-                          )}
-                        </Spin>
-                      </>
-                    </div>
-                  </>
-                )}
-                {/**BIND USER*/}
-                {status === SESSION_STATUS.require_bind_idp && (
-                  <div style={{ padding: '31px 38px 31px' }}>
-                    <BindIdp />
+                                  );
+                                })}
+                            </Space>
+                          </>
+                        )}
+                      </Spin>
+                    </>
                   </div>
-                )}
-                {/*忘记密码*/}
-                {!status && forgetPassword && (
-                  <ForgetPassword
-                    close={() => {
-                      setForgetPassword(false);
-                      setStatusLoading(true);
-                      setTimeout(() => {
-                        setStatusLoading(false);
-                      }, 85);
-                    }}
-                  />
-                )}
-              </>
-            )}
+                </>
+              )}
+              {/**BIND USER*/}
+              {status === SESSION_STATUS.require_bind_idp && (
+                <div style={{ padding: '31px 38px 31px' }}>
+                  <BindIdp />
+                </div>
+              )}
+              {/*忘记密码*/}
+              {!status && forgetPassword && (
+                <ForgetPassword
+                  close={() => {
+                    setForgetPassword(false);
+                    setStatusLoading(true);
+                    setTimeout(() => {
+                      setStatusLoading(false);
+                    }, 85);
+                  }}
+                />
+              )}
+            </div>
           </div>
+          {/**Footer*/}
+          <Footer className={`${prefixCls}-footer`} />
         </div>
-        {/**Footer*/}
-        <Footer className={`${prefixCls}-footer`} />
-      </div>
+      )}
     </div>
   );
 };

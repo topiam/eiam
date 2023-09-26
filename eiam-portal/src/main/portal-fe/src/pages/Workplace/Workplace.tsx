@@ -24,7 +24,7 @@ const Workplace: FC = () => {
   return (
     <PageContainer>
       <Card>
-        <Alert banner description={'欢迎使用 TopIAM 企业数字身份管控平台'} type={'success'} />
+        <Alert banner description={'欢迎使用 TOPIAM 企业数字身份管控平台'} type={'success'} />
       </Card>
     </PageContainer>
   );

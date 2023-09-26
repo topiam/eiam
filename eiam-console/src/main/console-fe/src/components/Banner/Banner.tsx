@@ -22,7 +22,7 @@ import Marquee from 'react-fast-marquee';
 const message = () => {
   return (
     <>
-      <span>⭐️ 如果你喜欢 TopIAM，请给它一个 Star </span>
+      <span>⭐️ 如果你喜欢 TOPIAM，请给它一个 Star </span>
       <a target="_blank" rel="noopener noreferrer" href="https://github.com/topiam/eiam">
         GitHub
       </a>
