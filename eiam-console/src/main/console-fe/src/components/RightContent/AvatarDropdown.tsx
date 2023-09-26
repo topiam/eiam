@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { LogoutOutlined } from '@ant-design/icons';
+import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { history, useIntl, useModel } from '@umijs/max';
 import { Spin } from 'antd';
 import type { MenuInfo } from 'rc-menu/lib/interface';
@@ -26,6 +26,7 @@ import { isLoginPath, LOGIN_PATH } from '@/utils/utils';
 import { outLogin } from '@/services';
 import queryString from 'query-string';
 import { createStyles } from 'antd-style';
+import { ItemType } from 'antd/es/menu/hooks/useItems';
 
 export type GlobalHeaderRightProps = {
   menu?: boolean;
@@ -90,7 +91,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ children }) =
         });
         return;
       }
-      history.push(`/account/${key}`);
+      history.push(`/user/${key}`);
     },
     [initialState, setInitialState],
   );
@@ -117,7 +118,15 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ children }) =
     return loading;
   }
 
-  const menuItems = [
+  const menuItems: ItemType[] = [
+    {
+      key: 'center',
+      icon: <UserOutlined />,
+      label: intl.formatMessage({ id: 'components.right_content.center' }),
+    },
+    {
+      type: 'divider',
+    },
     {
       key: 'logout',
       icon: <LogoutOutlined />,
