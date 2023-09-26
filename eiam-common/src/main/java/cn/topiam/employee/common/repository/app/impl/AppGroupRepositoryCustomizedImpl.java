@@ -22,13 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import cn.topiam.employee.common.entity.account.OrganizationMemberEntity;
-import cn.topiam.employee.common.entity.account.UserGroupMemberEntity;
-import cn.topiam.employee.common.entity.app.AppEntity;
-import cn.topiam.employee.common.repository.account.OrganizationMemberRepository;
-import cn.topiam.employee.common.repository.account.UserGroupMemberRepository;
-import cn.topiam.employee.common.repository.app.impl.mapper.AppEntityMapper;
-import com.google.common.collect.Lists;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -38,14 +31,19 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.google.common.collect.Lists;
+
+import cn.topiam.employee.common.entity.account.OrganizationMemberEntity;
+import cn.topiam.employee.common.entity.account.UserGroupMemberEntity;
 import cn.topiam.employee.common.entity.account.query.UserGroupMemberListQuery;
 import cn.topiam.employee.common.entity.app.po.AppGroupPO;
 import cn.topiam.employee.common.entity.app.query.AppGroupQuery;
+import cn.topiam.employee.common.repository.account.OrganizationMemberRepository;
+import cn.topiam.employee.common.repository.account.UserGroupMemberRepository;
 import cn.topiam.employee.common.repository.app.AppGroupRepositoryCustomized;
 import cn.topiam.employee.common.repository.app.impl.mapper.AppGroupPoMapper;
 
 import lombok.AllArgsConstructor;
-
 import static cn.topiam.employee.common.enums.app.AuthorizationType.ALL_ACCESS;
 
 /**
@@ -143,7 +141,7 @@ public class AppGroupRepositoryCustomizedImpl implements AppGroupRepositoryCusto
         Map<String, Object> paramMap = new HashMap<>(16);
         paramMap.put("subjectIds", paramList);
         //@formatter:off
-        StringBuilder builder = new StringBuilder("SELECT DISTINCT app.* FROM app LEFT JOIN app_access_policy app_acce ON app.id_ = app_acce.app_id AND app_acce.is_deleted = '0' LEFT JOIN app_group_association ass ON app.id_ = ass.app_id AND ass.is_deleted = '0' WHERE app.is_enabled = 1 AND app.is_deleted = '0' AND (app_acce.subject_id IN (:subjectIds) OR app.authorization_type = '"+ALL_ACCESS.getCode()+"')");
+        StringBuilder builder = new StringBuilder("SELECT COUNT(DISTINCT app.id_) FROM app LEFT JOIN app_access_policy app_acce ON app.id_ = app_acce.app_id AND app_acce.is_deleted = '0' LEFT JOIN app_group_association ass ON app.id_ = ass.app_id AND ass.is_deleted = '0' WHERE app.is_enabled = 1 AND app.is_deleted = '0' AND (app_acce.subject_id IN (:subjectIds) OR app.authorization_type = '"+ALL_ACCESS.getCode()+"')");
         builder.append(" AND ass.group_id = ").append(groupId);
         return namedParameterJdbcTemplate.queryForObject(builder.toString(), paramMap,
                 Long.class);

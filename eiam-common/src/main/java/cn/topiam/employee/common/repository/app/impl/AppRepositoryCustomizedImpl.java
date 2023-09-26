@@ -43,7 +43,6 @@ import cn.topiam.employee.common.repository.app.AppRepositoryCustomized;
 import cn.topiam.employee.common.repository.app.impl.mapper.AppEntityMapper;
 
 import lombok.AllArgsConstructor;
-
 import static cn.topiam.employee.common.enums.app.AuthorizationType.ALL_ACCESS;
 
 /**
