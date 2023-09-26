@@ -38,12 +38,11 @@ const useStyle = createStyles(({ prefixCls, token }, props) => {
           display: 'flex',
           flex: 'none !important',
           flexDirection: 'column',
-          width: '430px',
+          padding: '32px',
           maxWidth: '100%',
-          minHeight: '475px',
           backgroundColor: '#fff',
           borderRadius: token.borderRadius,
-          boxShadow: '0 2px 10px 0 rgb(57 106 255 / 5%)',
+          boxShadow: '0px 0px 24px 0px rgba(0,0,0,0.1)',
           [`${antCls}-tabs-nav-list`]: {
             margin: 'auto',
             fontSize: '16px',
@@ -57,7 +56,6 @@ const useStyle = createStyles(({ prefixCls, token }, props) => {
         },
         ['&-top']: {
           textAlign: 'center',
-          padding: '39px 0 0',
         },
         ['&-logo']: {
           width: '200px',
@@ -68,7 +66,7 @@ const useStyle = createStyles(({ prefixCls, token }, props) => {
           verticalAlign: 'top',
         },
         ['&-desc']: {
-          marginTop: '12px',
+          marginTop: '25px',
           marginBottom: '15px',
           color: token.colorTextSecondary,
           fontSize: token.fontSize,

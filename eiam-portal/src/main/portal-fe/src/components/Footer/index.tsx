@@ -24,7 +24,7 @@ const currentYear = new Date().getFullYear();
 export default (props: FooterProps) => (
   <DefaultFooter
     style={{ backgroundColor: 'transparent' }}
-    copyright={`2020-${currentYear} TopIAM 版权所有`}
+    copyright={`2022-${currentYear} TOPIAM 版权所有`}
     links={[
       {
         key: 'website',
