@@ -47,4 +47,22 @@ public interface AppGroupRepositoryCustomized {
      * @return {@link List}
      */
     List<AppGroupPO> getAppGroupList(AppGroupQuery query);
+
+    /**
+     * 查询应用组列表
+     *
+     * @param userId  {@link Long}
+     * @param query {@link AppGroupQuery}
+     * @return {@link List}
+     */
+    List<AppGroupPO> getAppGroupList(Long userId, AppGroupQuery query);
+
+    /**
+     * 根据当前用户和分组获取应用数量
+     *
+     * @param groupId {@link Long}
+     * @param userId {@link Long}
+     * @return {@link Long}
+     */
+    Long getAppCount(String groupId, Long userId);
 }

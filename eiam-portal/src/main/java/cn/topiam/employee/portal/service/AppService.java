@@ -49,4 +49,19 @@ public interface AppService {
      * @return {@link AppGroupListResult}
      */
     List<AppGroupListResult> getAppGroupList(AppGroupQuery appGroupQuery);
+
+    /**
+     * 获取应用数量
+     *
+     * @param groupId {@link String}
+     * @return {@link Long}
+     */
+    Long getAppCount(String groupId);
+
+    /**
+     * 获取所有应用
+     *
+     * @return {@link Long}
+     */
+    Long getAppCount();
 }

@@ -68,8 +68,32 @@ public class AppServiceImpl implements AppService {
      */
     @Override
     public List<AppGroupListResult> getAppGroupList(AppGroupQuery query) {
-        List<AppGroupPO> list = appGroupRepository.getAppGroupList(query);
+        Long userId = Long.valueOf(SecurityUtils.getCurrentUserId());
+        List<AppGroupPO> list = appGroupRepository.getAppGroupList(userId, query);
         return appGroupConverter.entityConvertToAppGroupListResult(list);
+    }
+
+    /**
+     * 获取应用数量
+     *
+     * @param groupId {@link String}
+     * @return {@link Integer}
+     */
+    @Override
+    public Long getAppCount(String groupId) {
+        Long userId = Long.valueOf(SecurityUtils.getCurrentUserId());
+        return appGroupRepository.getAppCount(groupId, userId);
+    }
+
+    /**
+     * 获取应用数量
+     *
+     * @return {@link Long}
+     */
+    @Override
+    public Long getAppCount() {
+        Long userId = Long.valueOf(SecurityUtils.getCurrentUserId());
+        return appRepository.getAppCount(userId);
     }
 
     /**
