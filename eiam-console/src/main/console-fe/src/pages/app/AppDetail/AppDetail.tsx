@@ -89,11 +89,7 @@ export default () => {
         loading ? (
           <Skeleton active paragraph={{ rows: 1 }} />
         ) : (
-          <ProDescriptions
-            size="small"
-            column={isMobile ? 1 : 2}
-            dataSource={{ ...app }}
-          >
+          <ProDescriptions size="small" column={isMobile ? 1 : 2} dataSource={{ ...app }}>
             <ProDescriptions.Item
               dataIndex="type"
               label={intl.formatMessage({ id: 'pages.app.config.detail.config.type' })}
@@ -195,7 +191,16 @@ export default () => {
         </Button>,
       ]}
       tabActiveKey={tabActiveKey}
-      onTabChange={setTabActiveKey}
+      onTabChange={(key) => {
+        setTabActiveKey(key);
+        history.replace({
+          pathname: location.pathname,
+          search: queryString.stringify({
+            type: key,
+            id,
+          }),
+        });
+      }}
       tabList={[
         {
           key: ConfigTabs.app_config,
