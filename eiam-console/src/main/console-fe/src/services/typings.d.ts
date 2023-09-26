@@ -38,6 +38,7 @@ declare namespace API {
     email: string;
     phone: string;
     username: string;
+    fullName: string;
     access: string[];
   };
 
@@ -63,6 +64,14 @@ declare namespace API {
   };
 
   export type EncryptPublicSecret = {
+    secret: string;
+  };
+
+
+  /**
+   * 加密秘钥
+   */
+  export type EncryptSecret = {
     secret: string;
   };
 

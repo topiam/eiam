@@ -38,3 +38,10 @@ export async function outLogin() {
     method: 'POST',
   });
 }
+
+/**
+ * 获取加密公钥
+ */
+export async function getEncryptSecret(): Promise<API.ApiResult<API.EncryptSecret>> {
+  return request(`/api/v1/public_secret?type=encrypt`);
+}

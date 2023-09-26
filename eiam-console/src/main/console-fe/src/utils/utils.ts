@@ -21,6 +21,7 @@ import { parse } from 'querystring';
 import { history, matchPath } from '@umijs/max';
 import YAML from 'yaml';
 import { PhoneNumber } from 'google-libphonenumber';
+import { getEncryptSecret } from '@/services';
 
 export const getPageQuery = () => {
   const { href } = window.location;
@@ -376,3 +377,14 @@ export function generateUUID() {
     return v.toString(16);
   });
 }
+
+/**
+ * 获取加密公钥
+ */
+export const onGetEncryptSecret = async (): Promise<undefined | string> => {
+  const { success, result } = await getEncryptSecret();
+  if (success && result) {
+    return Promise.resolve(result.secret);
+  }
+  return Promise.resolve(undefined);
+};
