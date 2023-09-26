@@ -43,6 +43,7 @@ import cn.topiam.employee.common.repository.app.AppRepositoryCustomized;
 import cn.topiam.employee.common.repository.app.impl.mapper.AppEntityMapper;
 
 import lombok.AllArgsConstructor;
+
 import static cn.topiam.employee.common.enums.app.AuthorizationType.ALL_ACCESS;
 
 /**
@@ -59,7 +60,7 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
      * 获取我的应用列表
      *
      * @param userId   {@link  Long}
-     * @param query {@link GetAppListQuery}
+     * @param query    {@link GetAppListQuery}
      * @param pageable {@link  Pageable}
      * @return {@link List}
      */
@@ -147,23 +148,40 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
      */
     @Override
     public Long getAppCount(Long userId) {
-        return null;
+        //@formatter:on
+        List<Object> paramList = Lists.newArrayList();
+        //当前用户加入的用户组Id
+        List<Long> groupIdList = userGroupMemberRepository.findByUserId(userId).stream()
+            .map(UserGroupMemberEntity::getGroupId).toList();
+        //当前用户加入的组织id
+        List<String> orgId = organizationMemberRepository.findAllByUserId(userId).stream()
+            .map(OrganizationMemberEntity::getOrgId).toList();
+        paramList.addAll(groupIdList);
+        paramList.addAll(orgId);
+        paramList.add(userId);
+        Map<String, Object> paramMap = new HashMap<>(16);
+        paramMap.put("subjectIds", paramList);
+        StringBuilder builder = new StringBuilder(
+            "SELECT count(DISTINCT app.id_) FROM app LEFT JOIN app_access_policy app_acce ON app.id_ = app_acce.app_id AND app_acce.is_deleted = '0' WHERE app.is_enabled = 1 AND app.is_deleted = '0' AND (app_acce.subject_id IN (:subjectIds) OR app.authorization_type = '"
+                                                  + ALL_ACCESS.getCode() + "')");
+        return namedParameterJdbcTemplate.queryForObject(builder.toString(), paramMap, Long.class);
+        //@formatter:off
     }
 
     /**
      * JdbcTemplate
      */
-    private final JdbcTemplate                 jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     /**
      * NamedParameterJdbcTemplate
      */
-    private final NamedParameterJdbcTemplate   namedParameterJdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     /**
      * UserGroupMemberRepository
      */
-    private final UserGroupMemberRepository    userGroupMemberRepository;
+    private final UserGroupMemberRepository userGroupMemberRepository;
 
     /**
      * OrganizationMemberRepository
