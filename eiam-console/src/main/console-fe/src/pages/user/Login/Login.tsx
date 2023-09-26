@@ -28,11 +28,9 @@ import queryString from 'query-string';
 import { flushSync } from 'react-dom';
 import classnames from 'classnames';
 import useStyle from './style';
-import Banner from '@/components/Banner';
 import PageLoading from '@/components/PageLoading';
 
 const prefixCls = 'login';
-const showBanner = process.env.PREVIEW_ENV || process.env.NODE_ENV === 'development';
 
 /**
  * 错误消息
@@ -152,116 +150,107 @@ const Login: React.FC = () => {
             <link rel="icon" href={'/favicon.ico'} />
           </Helmet>
           <div className={classnames(`${prefixCls}`)}>
-            {showBanner && <Banner />}
-            <div
-              style={{
-                backgroundColor: 'white',
-                height: 'calc(100vh - 48px)',
-                border: '1px solid rgb(240, 240, 240)',
+            <LoginFormPage
+              backgroundImageUrl={'/login-background.png'}
+              logo={'/full-logo.svg'}
+              subTitle={intl.formatMessage({
+                id: 'pages.layout.title',
+              })}
+              initialValues={{
+                'remember-me': false,
+              }}
+              form={form}
+              scrollToFirstError
+              submitter={{
+                searchConfig: {
+                  submitText: intl.formatMessage({
+                    id: 'pages.login.submit',
+                  }),
+                },
+                render: (_, dom) => dom.pop(),
+                submitButtonProps: {
+                  loading,
+                  size: 'large',
+                  style: {
+                    width: '100%',
+                  },
+                },
+              }}
+              onFinish={async (values) => {
+                run(values);
+                return data;
               }}
             >
-              <LoginFormPage
-                backgroundImageUrl={'/login-background.png'}
-                logo={'/full-logo.svg'}
-                subTitle={intl.formatMessage({
-                  id: 'pages.layout.title',
-                })}
-                initialValues={{
-                  'remember-me': false,
-                }}
-                form={form}
-                scrollToFirstError
-                submitter={{
-                  searchConfig: {
-                    submitText: intl.formatMessage({
-                      id: 'pages.login.submit',
-                    }),
-                  },
-                  render: (_, dom) => dom.pop(),
-                  submitButtonProps: {
-                    loading,
+              {userLoginState?.status !== RESULT_STATE.SUCCESS && userLoginState?.message && (
+                <>
+                  <LoginMessage content={userLoginState?.message} />
+                  <br />
+                </>
+              )}
+              <>
+                <ProFormText
+                  name="username"
+                  fieldProps={{
                     size: 'large',
-                    style: {
-                      width: '100%',
+                    prefix: (
+                      <UserOutlined className={classnames(`${prefixCls}-form-prefix-icon`)} />
+                    ),
+                    autoComplete: 'off',
+                  }}
+                  placeholder={intl.formatMessage({
+                    id: 'pages.login.username.placeholder',
+                  })}
+                  rules={[
+                    {
+                      required: true,
+                      message: <FormattedMessage id="pages.login.username.required" />,
                     },
-                  },
-                }}
-                onFinish={async (values) => {
-                  run(values);
-                  return data;
+                  ]}
+                />
+                <ProFormText.Password
+                  name="password"
+                  fieldProps={{
+                    size: 'large',
+                    autoComplete: 'new-password',
+                    prefix: (
+                      <LockOutlined className={classnames(`${prefixCls}-form-prefix-icon`)} />
+                    ),
+                  }}
+                  placeholder={intl.formatMessage({
+                    id: 'pages.login.password.placeholder',
+                  })}
+                  rules={[
+                    {
+                      required: true,
+                      message: <FormattedMessage id="pages.login.password.required" />,
+                    },
+                  ]}
+                />
+              </>
+              <div
+                style={{
+                  marginBottom: 24,
                 }}
               >
-                {userLoginState?.status !== RESULT_STATE.SUCCESS && userLoginState?.message && (
-                  <>
-                    <LoginMessage content={userLoginState?.message} />
-                    <br />
-                  </>
-                )}
-                <>
-                  <ProFormText
-                    name="username"
-                    fieldProps={{
-                      size: 'large',
-                      prefix: (
-                        <UserOutlined className={classnames(`${prefixCls}-form-prefix-icon`)} />
-                      ),
-                      autoComplete: 'off',
-                    }}
-                    placeholder={intl.formatMessage({
-                      id: 'pages.login.username.placeholder',
-                    })}
-                    rules={[
-                      {
-                        required: true,
-                        message: <FormattedMessage id="pages.login.username.required" />,
-                      },
-                    ]}
-                  />
-                  <ProFormText.Password
-                    name="password"
-                    fieldProps={{
-                      size: 'large',
-                      autoComplete: 'new-password',
-                      prefix: (
-                        <LockOutlined className={classnames(`${prefixCls}-form-prefix-icon`)} />
-                      ),
-                    }}
-                    placeholder={intl.formatMessage({
-                      id: 'pages.login.password.placeholder',
-                    })}
-                    rules={[
-                      {
-                        required: true,
-                        message: <FormattedMessage id="pages.login.password.required" />,
-                      },
-                    ]}
-                  />
-                </>
-                <div
+                <ProFormCheckbox noStyle name="remember-me">
+                  <FormattedMessage id="pages.login.remember-me" />
+                </ProFormCheckbox>
+                <a
                   style={{
-                    marginBottom: 24,
+                    float: 'right',
+                  }}
+                  onClick={async () => {
+                    message.info(
+                      intl.formatMessage({
+                        id: 'app.not_yet_realized',
+                      }),
+                    );
                   }}
                 >
-                  <ProFormCheckbox noStyle name="remember-me">
-                    <FormattedMessage id="pages.login.remember-me" />
-                  </ProFormCheckbox>
-                  <a
-                    style={{
-                      float: 'right',
-                    }}
-                    onClick={async () => {
-                      message.info(
-                        intl.formatMessage({
-                          id: 'app.not_yet_realized',
-                        }),
-                      );
-                    }}
-                  >
-                    <FormattedMessage id="pages.login.forgot-password" />
-                  </a>
-                </div>
-              </LoginFormPage>
-            </div>
+                  <FormattedMessage id="pages.login.forgot-password" />
+                </a>
+              </div>
+            </LoginFormPage>
           </div>
         </>
       ) : (

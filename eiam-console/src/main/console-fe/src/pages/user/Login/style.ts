@@ -23,6 +23,9 @@ const useStyle = createStyles(({ token, prefixCls }, prefix) => {
   return {
     main: {
       [`${prefixClassName}`]: {
+        backgroundColor: 'white',
+        height: '100vh',
+        border: '1px solid rgb(240, 240, 240)',
         [`${prefixClassName}-form-prefix-icon`]: {
           color: token.colorPrimary,
           fontSize: token.fontSize,
