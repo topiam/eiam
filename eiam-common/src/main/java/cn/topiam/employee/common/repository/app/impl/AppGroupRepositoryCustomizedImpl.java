@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import cn.topiam.employee.common.entity.app.AppEntity;
+import cn.topiam.employee.common.repository.app.impl.mapper.AppEntityMapper;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -115,7 +117,36 @@ public class AppGroupRepositoryCustomizedImpl implements AppGroupRepositoryCusto
      */
     @Override
     public List<AppGroupPO> getAppGroupList(Long userId, AppGroupQuery query) {
-        return null;
+        //@formatter:on
+        List<Object> paramList = Lists.newArrayList();
+        //当前用户加入的用户组Id
+        List<Long> groupIdList = userGroupMemberRepository.findByUserId(userId).stream()
+                .map(UserGroupMemberEntity::getGroupId).toList();
+        //当前用户加入的组织id
+        List<String> orgId = organizationMemberRepository.findAllByUserId(userId).stream()
+                .map(OrganizationMemberEntity::getOrgId).toList();
+        paramList.addAll(groupIdList);
+        paramList.addAll(orgId);
+        paramList.add(userId);
+        Map<String, Object> paramMap = new HashMap<>(16);
+        paramMap.put("subjectIds", paramList);
+        //@formatter:off
+        StringBuilder builder = new StringBuilder("SELECT `group`.id_, `group`.name_, `group`.code_, `group`.type_, `group`.create_time, `group`.remark_, IFNULL( ass.app_count, 0) AS app_count FROM app_group `group` LEFT JOIN(SELECT aga.group_id, COUNT(*) AS `app_count` FROM app_group_association aga INNER JOIN app ON aga.app_id = app.id_ AND app.is_deleted = 0 INNER JOIN app_access_policy app_acce  ON app.id_ = app_acce.app_id and app_acce.is_deleted = 0 WHERE aga.is_deleted = 0 and (app_acce.subject_id IN (:subjectIds) OR app.authorization_type = '"+ALL_ACCESS.getCode()+ "') GROUP BY aga.group_id ) ass ON `group`.id_ = ass.group_id WHERE is_deleted = '0'");
+        //分组名称
+        if (StringUtils.isNoneBlank(query.getName())) {
+            builder.append(" AND `group`.name_ like '%").append(query.getName()).append("%'");
+        }
+        //分组编码
+        if (StringUtils.isNoneBlank(query.getCode())) {
+            builder.append(" AND `group`.code_ like '%").append(query.getCode()).append("%'");
+        }
+        //分组类型
+        if (ObjectUtils.isNotEmpty(query.getType())) {
+            builder.append(" AND `group`.type_ like '%").append(query.getType().getCode()).append("%'");
+        }
+        builder.append(" ORDER BY `group`.create_time DESC");
+        return namedParameterJdbcTemplate.query(builder.toString(),paramMap, new AppGroupPoMapper());
+        //@formatter:off
     }
 
     /**
