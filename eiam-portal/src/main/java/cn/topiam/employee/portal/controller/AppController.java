@@ -19,6 +19,7 @@ package cn.topiam.employee.portal.controller;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,6 +50,24 @@ import static cn.topiam.employee.common.constant.AppConstants.APP_PATH;
 @RequestMapping(value = APP_PATH)
 @AllArgsConstructor
 public class AppController {
+
+    /**
+     * 获取应用数量
+     *
+     * @return {@link GetAppListResult}
+     */
+    @Operation(summary = "获取应用数量")
+    @GetMapping(value = "/count")
+    public ApiRestResult<String> getAppCount(String groupId) {
+        Long count;
+        if (StringUtils.isEmpty(groupId)) {
+            count = appService.getAppCount();
+        } else {
+            count = appService.getAppCount(groupId);
+        }
+        return ApiRestResult.ok(count.toString());
+    }
+
     /**
      * 获取应用列表
      *

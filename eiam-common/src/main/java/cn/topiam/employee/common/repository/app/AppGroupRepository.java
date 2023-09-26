@@ -108,4 +108,5 @@ public interface AppGroupRepository extends LogicDeleteRepository<AppGroupEntity
      * @return {@link AppGroupEntity}
      */
     Optional<AppGroupEntity> findByCode(@Param("code") String code);
+
 }

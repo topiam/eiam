@@ -94,7 +94,7 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
                 .append(",").append(pageable.getPageSize()).toString(),
             paramMap, new AppEntityMapper());
         //@formatter:off
-        String countSql = "SELECT count(*) FROM (" + sql + ") app_account_";
+        String countSql = "SELECT count(*) FROM (" + sql + ") app_";
         //@formatter:on
         Integer count = namedParameterJdbcTemplate.queryForObject(countSql, paramMap,
             Integer.class);
@@ -137,6 +137,17 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
         //@formatter:on
         Integer count = jdbcTemplate.queryForObject(countSql, Integer.class);
         return new PageImpl<>(list, pageable, Objects.requireNonNull(count).longValue());
+    }
+
+    /**
+     * 获取用户应用数量
+     *
+     * @param userId {@link Long}
+     * @return {@link Long}
+     */
+    @Override
+    public Long getAppCount(Long userId) {
+        return null;
     }
 
     /**

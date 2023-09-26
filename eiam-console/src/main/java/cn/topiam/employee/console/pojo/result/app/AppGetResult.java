@@ -24,6 +24,9 @@ import java.util.List;
 import cn.topiam.employee.common.enums.app.AppProtocol;
 import cn.topiam.employee.common.enums.app.AppType;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -110,5 +113,5 @@ public class AppGetResult implements Serializable {
      * 应用组ID集合
      */
     @Parameter(description = "应用组ID集合")
-    private List<Long>    groupIds;
+    private List<String>  groupIds;
 }

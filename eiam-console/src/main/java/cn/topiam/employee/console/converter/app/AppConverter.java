@@ -129,7 +129,7 @@ public interface AppConverter {
         appGetResult.setClientId(entity.getClientId());
         appGetResult.setClientSecret(entity.getClientSecret());
         appGetResult.setType(entity.getType());
-        appGetResult.setGroupIds(groupIds);
+        appGetResult.setGroupIds(groupIds.stream().map(String::valueOf).toList());
         //图标未配置，所以先从模版中拿
         if (StringUtils.isBlank(entity.getIcon())) {
             ApplicationService applicationService = getApplicationServiceLoader()

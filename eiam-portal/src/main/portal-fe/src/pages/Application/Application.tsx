@@ -135,32 +135,28 @@ const CardList = () => {
           manualRequest
           request={queryAppList}
           pagination={{}}
-          toolbar={
-            appGroupList?.length > 0
-              ? {
-                  menu: {
-                    type: 'tab',
-                    activeKey: currentGroup,
-                    items: getItems(),
-                    onChange(key) {
-                      if (key) {
-                        setCurrentGroup(key);
-                        if (key === all) {
-                          setSearchParams((values) => {
-                            return { ...values, groupId: undefined };
-                          });
-                        } else {
-                          setSearchParams((values) => {
-                            return { ...values, groupId: key };
-                          });
-                        }
-                        actionRef.current?.reload();
-                      }
-                    },
-                  },
+          toolbar={{
+            menu: {
+              type: 'tab',
+              activeKey: currentGroup,
+              items: getItems(),
+              onChange(key) {
+                if (key) {
+                  setCurrentGroup(key);
+                  if (key === all) {
+                    setSearchParams((values) => {
+                      return { ...values, groupId: undefined };
+                    });
+                  } else {
+                    setSearchParams((values) => {
+                      return { ...values, groupId: key };
+                    });
+                  }
+                  actionRef.current?.reload();
                 }
-              : {}
-          }
+              },
+            },
+          }}
           params={searchParams}
           actionRef={actionRef}
           renderItem={(item: AppList) => {

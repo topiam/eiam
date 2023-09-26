@@ -151,8 +151,8 @@ const Login: React.FC = () => {
           <Helmet>
             <link rel="icon" href={'/favicon.ico'} />
           </Helmet>
-          {showBanner && <Banner />}
           <div className={classnames(`${prefixCls}`)}>
+            {showBanner && <Banner />}
             <div
               style={{
                 backgroundColor: 'white',
@@ -187,7 +187,7 @@ const Login: React.FC = () => {
                   },
                 }}
                 onFinish={async (values) => {
-                  await run(values);
+                  run(values);
                   return data;
                 }}
               >

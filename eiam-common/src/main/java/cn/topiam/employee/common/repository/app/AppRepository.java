@@ -17,7 +17,6 @@
  */
 package cn.topiam.employee.common.repository.app;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.jetbrains.annotations.NotNull;
@@ -74,7 +73,7 @@ public interface AppRepository extends LogicDeleteRepository<AppEntity, Long>,
     @Modifying
     @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
-    @Query(value = "UPDATE app SET is_enabled = :enabled WHERE id_ = :id", nativeQuery = true)
+    @Query(value = "UPDATE AppEntity SET enabled = :enabled WHERE id = :id")
     Integer updateAppStatus(@Param(value = "id") Long id,
                             @Param(value = "enabled") Boolean enabled);
 
@@ -106,16 +105,8 @@ public interface AppRepository extends LogicDeleteRepository<AppEntity, Long>,
      */
     @NotNull
     @Cacheable
-    @Query(value = "SELECT * FROM app WHERE id_ = :id", nativeQuery = true)
+    @Query(value = "SELECT AppEntity FROM AppEntity WHERE id = :id")
     Optional<AppEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") Long id);
-
-    /**
-     *
-     * @return {@link AppEntity}
-     */
-    @NotNull
-    @Query(value = "SELECT a.* from app a LEFT JOIN app_group ag on a.group_id =ag.id_ WHERE a.group_id IS NOT NULL", nativeQuery = true)
-    List<AppEntity> getAppListByGroup();
 
     /**
      * 根据clientId获取配置
@@ -135,13 +126,5 @@ public interface AppRepository extends LogicDeleteRepository<AppEntity, Long>,
     @NotNull
     @Cacheable
     Optional<AppEntity> findByCode(String appCode);
-
-    /**
-     * 更新应用状态
-     *
-     * @param id      {@link  Long}
-     * @param enabled {@link  Boolean}
-     * @return {@link  Boolean}
-     */
 
 }

@@ -44,6 +44,26 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class AppGroupRepositoryCustomizedImpl implements AppGroupRepositoryCustomized {
 
+    private StringBuilder getBaseAppGroupListSql(AppGroupQuery query) {
+        //@formatter:off
+        StringBuilder builder = new StringBuilder("SELECT `group`.id_, `group`.name_, `group`.code_, `group`.type_, `group`.create_time, `group`.remark_, IFNULL( ass.app_count, 0) AS app_count FROM app_group `group` LEFT JOIN(SELECT aga.group_id, COUNT(*) AS `app_count` FROM app_group_association aga INNER JOIN app ON aga.app_id = app.id_ AND app.is_deleted = 0 GROUP BY aga.group_id ) ass ON `group`.id_ = ass.group_id WHERE is_deleted = '0'");
+        //分组名称
+        if (StringUtils.isNoneBlank(query.getName())) {
+            builder.append(" AND `group`.name_ like '%").append(query.getName()).append("%'");
+        }
+        //分组编码
+        if (StringUtils.isNoneBlank(query.getCode())) {
+            builder.append(" AND `group`.code_ like '%").append(query.getCode()).append("%'");
+        }
+        //分组类型
+        if (ObjectUtils.isNotEmpty(query.getType())) {
+            builder.append(" AND `group`.type_ like '%").append(query.getType().getCode()).append("%'");
+        }
+        builder.append(" ORDER BY `group`.create_time DESC");
+        //@formatter:on
+        return builder;
+    }
+
     /**
      * 获取应用组应用列表（分页）
      *
@@ -76,24 +96,28 @@ public class AppGroupRepositoryCustomizedImpl implements AppGroupRepositoryCusto
         return jdbcTemplate.query(getBaseAppGroupListSql(query).toString(), new AppGroupPoMapper());
     }
 
-    private StringBuilder getBaseAppGroupListSql(AppGroupQuery query) {
-        //@formatter:off
-        StringBuilder builder = new StringBuilder("SELECT `group`.id_, `group`.name_, `group`.code_, `group`.type_, `group`.create_time, `group`.remark_, IFNULL( ass.app_count, 0) AS app_count FROM app_group `group` LEFT JOIN(SELECT aga.group_id, COUNT(*) AS `app_count` FROM app_group_association aga INNER JOIN app ON aga.app_id = app.id_ AND app.is_deleted = 0 GROUP BY aga.group_id ) ass ON `group`.id_ = ass.group_id WHERE is_deleted = '0'");
-        //分组名称
-        if (StringUtils.isNoneBlank(query.getName())) {
-            builder.append(" AND `group`.name_ like '%").append(query.getName()).append("%'");
-        }
-        //分组编码
-        if (StringUtils.isNoneBlank(query.getCode())) {
-            builder.append(" AND `group`.code_ like '%").append(query.getCode()).append("%'");
-        }
-        //分组类型
-        if (ObjectUtils.isNotEmpty(query.getType())) {
-            builder.append(" AND `group`.type_ like '%").append(query.getType().getCode()).append("%'");
-        }
-        builder.append(" ORDER BY `group`.create_time DESC");
-        //@formatter:on
-        return builder;
+    /**
+     * 查询应用组列表
+     *
+     * @param userId {@link Long}
+     * @param query  {@link AppGroupQuery}
+     * @return {@link List}
+     */
+    @Override
+    public List<AppGroupPO> getAppGroupList(Long userId, AppGroupQuery query) {
+        return null;
+    }
+
+    /**
+     * 根据当前用户和分组获取应用数量
+     *
+     * @param groupId {@link Long}
+     * @param userId  {@link Long}
+     * @return {@link Long}
+     */
+    @Override
+    public Long getAppCount(String groupId, Long userId) {
+        return null;
     }
 
     private final JdbcTemplate jdbcTemplate;

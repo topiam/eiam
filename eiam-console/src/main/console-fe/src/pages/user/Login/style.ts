@@ -23,7 +23,6 @@ const useStyle = createStyles(({ token, prefixCls }, prefix) => {
   return {
     main: {
       [`${prefixClassName}`]: {
-        padding: '24px',
         [`${prefixClassName}-form-prefix-icon`]: {
           color: token.colorPrimary,
           fontSize: token.fontSize,
@@ -46,12 +45,18 @@ const useStyle = createStyles(({ token, prefixCls }, prefix) => {
         },
         [`${antCls}-pro-form-login-page-desc`]: {
           marginTop: '25px',
-          marginBottom: '25px',
+          marginBottom: '40px',
           color: 'rgba(0, 0, 0, 0.45)',
           fontSize: '14px',
         },
         [`${antCls}-pro-form-login-page-container`]: {
           height: 'auto',
+          [`${antCls}-pro-form-login-page-top`]: {
+            marginTop: '25px',
+          },
+        },
+        [`${antCls}-pro-form-login-page-main`]: {
+          marginBottom: '80px',
         },
       },
     },

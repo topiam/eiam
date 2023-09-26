@@ -54,4 +54,13 @@ public interface AppRepositoryCustomized {
      * @return {@link List}
      */
     Page<AppEntity> getAppList(AppQuery appQuery, Pageable pageable);
+
+    /**
+     * 获取用户应用数量
+     *
+     * @param userId {@link Long}
+     * @return {@link Long}
+     */
+    Long getAppCount(Long userId);
+
 }
