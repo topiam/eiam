@@ -118,18 +118,8 @@ public class AppGroupRepositoryCustomizedImpl implements AppGroupRepositoryCusto
     @Override
     public List<AppGroupPO> getAppGroupList(Long userId, AppGroupQuery query) {
         //@formatter:on
-        List<Object> paramList = Lists.newArrayList();
-        //当前用户加入的用户组Id
-        List<Long> groupIdList = userGroupMemberRepository.findByUserId(userId).stream()
-                .map(UserGroupMemberEntity::getGroupId).toList();
-        //当前用户加入的组织id
-        List<String> orgId = organizationMemberRepository.findAllByUserId(userId).stream()
-                .map(OrganizationMemberEntity::getOrgId).toList();
-        paramList.addAll(groupIdList);
-        paramList.addAll(orgId);
-        paramList.add(userId);
         Map<String, Object> paramMap = new HashMap<>(16);
-        paramMap.put("subjectIds", paramList);
+        paramMap.put("subjectIds", getAccessPolicysubjectIdsByUserId(userId));
         //@formatter:off
         StringBuilder builder = new StringBuilder("SELECT `group`.id_, `group`.name_, `group`.code_, `group`.type_, `group`.create_time, `group`.remark_, IFNULL( ass.app_count, 0) AS app_count FROM app_group `group` LEFT JOIN(SELECT aga.group_id, COUNT(*) AS `app_count` FROM app_group_association aga INNER JOIN app ON aga.app_id = app.id_ AND app.is_deleted = 0 INNER JOIN app_access_policy app_acce  ON app.id_ = app_acce.app_id and app_acce.is_deleted = 0 WHERE aga.is_deleted = 0 and (app_acce.subject_id IN (:subjectIds) OR app.authorization_type = '"+ALL_ACCESS.getCode()+ "') GROUP BY aga.group_id ) ass ON `group`.id_ = ass.group_id WHERE is_deleted = '0'");
         //分组名称
@@ -159,23 +149,36 @@ public class AppGroupRepositoryCustomizedImpl implements AppGroupRepositoryCusto
     @Override
     public Long getAppCount(String groupId, Long userId) {
         //@formatter:on
-        List<Object> paramList = Lists.newArrayList();
-        //当前用户加入的用户组Id
-        List<Long> groupIdList = userGroupMemberRepository.findByUserId(userId).stream()
-            .map(UserGroupMemberEntity::getGroupId).toList();
-        //当前用户加入的组织id
-        List<String> orgId = organizationMemberRepository.findAllByUserId(userId).stream()
-            .map(OrganizationMemberEntity::getOrgId).toList();
-        paramList.addAll(groupIdList);
-        paramList.addAll(orgId);
-        paramList.add(userId);
         Map<String, Object> paramMap = new HashMap<>(16);
-        paramMap.put("subjectIds", paramList);
+        paramMap.put("subjectIds", getAccessPolicysubjectIdsByUserId(userId));
         //@formatter:off
         StringBuilder builder = new StringBuilder("SELECT COUNT(DISTINCT app.id_) FROM app LEFT JOIN app_access_policy app_acce ON app.id_ = app_acce.app_id AND app_acce.is_deleted = '0' LEFT JOIN app_group_association ass ON app.id_ = ass.app_id AND ass.is_deleted = '0' WHERE app.is_enabled = 1 AND app.is_deleted = '0' AND (app_acce.subject_id IN (:subjectIds) OR app.authorization_type = '"+ALL_ACCESS.getCode()+"')");
         builder.append(" AND ass.group_id = ").append(groupId);
         return namedParameterJdbcTemplate.queryForObject(builder.toString(), paramMap,
                 Long.class);
+        //@formatter:off
+    }
+
+
+    /**
+     * 根据用户ID获取访问策略主体ID
+     *
+     * @param userId {@link Long}
+     * @return {@link List}
+     */
+    private List<Object> getAccessPolicysubjectIdsByUserId(Long userId){
+        //@formatter:on
+        List<Object> list = Lists.newArrayList();
+        //当前用户加入的用户组Id
+        List<Long> groupIdList = userGroupMemberRepository.findByUserId(userId).stream()
+                .map(UserGroupMemberEntity::getGroupId).toList();
+        //当前用户加入的组织id
+        List<String> orgId = organizationMemberRepository.findAllByUserId(userId).stream()
+                .map(OrganizationMemberEntity::getOrgId).toList();
+        list.addAll(groupIdList);
+        list.addAll(orgId);
+        list.add(userId);
+        return list;
         //@formatter:off
     }
 
