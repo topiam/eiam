@@ -161,7 +161,7 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
         Map<String, Object> paramMap = new HashMap<>(16);
         paramMap.put("subjectIds", paramList);
         StringBuilder builder = new StringBuilder(
-            "SELECT count(DISTINCT app.id_) FROM app LEFT JOIN app_access_policy app_acce ON app.id_ = app_acce.app_id AND app_acce.is_deleted = '0' WHERE app.is_enabled = 1 AND app.is_deleted = '0' AND (app_acce.subject_id IN (:subjectIds) OR app.authorization_type = '"
+            "SELECT COUNT(DISTINCT app.id_) FROM app LEFT JOIN app_access_policy app_acce ON app.id_ = app_acce.app_id AND app_acce.is_deleted = '0' WHERE app.is_enabled = 1 AND app.is_deleted = '0' AND (app_acce.subject_id IN (:subjectIds) OR app.authorization_type = '"
                                                   + ALL_ACCESS.getCode() + "')");
         return namedParameterJdbcTemplate.queryForObject(builder.toString(), paramMap, Long.class);
         //@formatter:off
