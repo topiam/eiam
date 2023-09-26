@@ -121,7 +121,7 @@ const Welcome: React.FC = () => {
               color: '#1A1A1A',
             }}
           >
-            欢迎使用 TopIAM 企业数字身份管控平台
+            欢迎使用 TOPIAM 企业数字身份管控平台
           </div>
           <p
             style={{
