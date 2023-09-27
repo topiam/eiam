@@ -121,7 +121,7 @@ public class AppGroupRepositoryCustomizedImpl implements AppGroupRepositoryCusto
         Map<String, Object> paramMap = new HashMap<>(16);
         paramMap.put("subjectIds", getAccessPolicysubjectIdsByUserId(userId));
         //@formatter:off
-        StringBuilder builder = new StringBuilder("SELECT `group`.id_, `group`.name_, `group`.code_, `group`.type_, `group`.create_time, `group`.remark_, IFNULL( ass.app_count, 0) AS app_count FROM app_group `group` LEFT JOIN(SELECT aga.group_id, COUNT(*) AS `app_count` FROM app_group_association aga INNER JOIN app ON aga.app_id = app.id_ AND app.is_deleted = 0 INNER JOIN app_access_policy app_acce  ON app.id_ = app_acce.app_id and app_acce.is_deleted = 0 WHERE aga.is_deleted = 0 and (app_acce.subject_id IN (:subjectIds) OR app.authorization_type = '"+ALL_ACCESS.getCode()+ "') GROUP BY aga.group_id ) ass ON `group`.id_ = ass.group_id WHERE is_deleted = '0'");
+        StringBuilder builder = new StringBuilder("SELECT `group`.id_, `group`.name_, `group`.code_, `group`.type_, `group`.create_time, `group`.remark_, IFNULL( ass.app_count, 0) AS app_count FROM app_group `group` LEFT JOIN(SELECT aga.group_id, COUNT(DISTINCT aga.id_) AS `app_count` FROM app_group_association aga LEFT JOIN app ON aga.app_id = app.id_ AND app.is_deleted = 0 LEFT JOIN app_access_policy app_acce  ON app.id_ = app_acce.app_id and app_acce.is_deleted = 0 WHERE aga.is_deleted = 0 and (app_acce.subject_id IN (:subjectIds) OR app.authorization_type = '"+ALL_ACCESS.getCode()+ "') GROUP BY aga.group_id ) ass ON `group`.id_ = ass.group_id WHERE is_deleted = '0'");
         //分组名称
         if (StringUtils.isNoneBlank(query.getName())) {
             builder.append(" AND `group`.name_ like '%").append(query.getName()).append("%'");
