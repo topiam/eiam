@@ -262,7 +262,7 @@ const BaseView = () => {
                 width="md"
                 name="phone"
                 readonly
-                label={intl.formatMessage({ id: 'page.account.base.form.username' })}
+                label={intl.formatMessage({ id: 'page.account.base.form.phone' })}
               />
               <ProFormText
                 width="md"

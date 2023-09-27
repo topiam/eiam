@@ -125,7 +125,7 @@ const AccountSettings = () => {
   };
 
   return wrapSSR(
-    <PageContainer pageHeaderRender={false} className={classnames(`${prefixCls}`, hashId)}>
+    <PageContainer className={classnames(`${prefixCls}`, hashId)}>
       <GridContent>
         <div
           className={classnames(`${prefixCls}-main`, hashId)}
