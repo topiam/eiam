@@ -159,10 +159,10 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
         List<Object> list = Lists.newArrayList();
         //当前用户加入的用户组Id
         List<Long> groupIdList = userGroupMemberRepository.findByUserId(userId).stream()
-                .map(UserGroupMemberEntity::getGroupId).toList();
+            .map(UserGroupMemberEntity::getGroupId).toList();
         //当前用户加入的组织id
         List<String> orgId = organizationMemberRepository.findAllByUserId(userId).stream()
-                .map(OrganizationMemberEntity::getOrgId).toList();
+            .map(OrganizationMemberEntity::getOrgId).toList();
         list.addAll(groupIdList);
         list.addAll(orgId);
         list.add(userId);

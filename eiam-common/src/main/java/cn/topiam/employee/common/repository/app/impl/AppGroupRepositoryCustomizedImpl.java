@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import cn.topiam.employee.common.entity.app.AppEntity;
-import cn.topiam.employee.common.repository.app.impl.mapper.AppEntityMapper;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -171,10 +169,10 @@ public class AppGroupRepositoryCustomizedImpl implements AppGroupRepositoryCusto
         List<Object> list = Lists.newArrayList();
         //当前用户加入的用户组Id
         List<Long> groupIdList = userGroupMemberRepository.findByUserId(userId).stream()
-                .map(UserGroupMemberEntity::getGroupId).toList();
+            .map(UserGroupMemberEntity::getGroupId).toList();
         //当前用户加入的组织id
         List<String> orgId = organizationMemberRepository.findAllByUserId(userId).stream()
-                .map(OrganizationMemberEntity::getOrgId).toList();
+            .map(OrganizationMemberEntity::getOrgId).toList();
         list.addAll(groupIdList);
         list.addAll(orgId);
         list.add(userId);
