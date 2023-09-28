@@ -256,7 +256,7 @@ public class AppServiceImpl implements AppService {
     private final AppConverter                  appConverter;
 
     /**
-     * AppGroupAssociationRepositorys
+     * AppGroupAssociationRepository
      */
     private final AppGroupAssociationRepository appGroupAssociationRepository;
 }
