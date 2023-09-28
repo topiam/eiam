@@ -66,7 +66,7 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
     @Override
     public Page<AppEntity> getAppList(Long userId, GetAppListQuery query, Pageable pageable) {
         Map<String, Object> paramMap = new HashMap<>(16);
-        paramMap.put("subjectIds", getAccessPolicysubjectIdsByUserId(userId));
+        paramMap.put("subjectIds", getSubjectIds(userId));
         //@formatter:off
         StringBuilder builder = new StringBuilder("SELECT DISTINCT app.* FROM app LEFT JOIN app_access_policy app_acce ON app.id_ = app_acce.app_id AND app_acce.is_deleted = '0' LEFT JOIN app_group_association ass ON app.id_ = ass.app_id AND ass.is_deleted = '0' WHERE app.is_enabled = 1 AND app.is_deleted = '0' AND (app_acce.subject_id IN (:subjectIds) OR app.authorization_type = '"+ALL_ACCESS.getCode()+"')");
         //用户名
@@ -139,7 +139,7 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
     public Long getAppCount(Long userId) {
         //@formatter:on
         Map<String, Object> paramMap = new HashMap<>(16);
-        paramMap.put("subjectIds", getAccessPolicysubjectIdsByUserId(userId));
+        paramMap.put("subjectIds", getSubjectIds(userId));
         StringBuilder builder = new StringBuilder(
             "SELECT COUNT(DISTINCT app.id_) FROM app LEFT JOIN app_access_policy app_acce ON app.id_ = app_acce.app_id AND app_acce.is_deleted = '0' WHERE app.is_enabled = 1 AND app.is_deleted = '0' AND (app_acce.subject_id IN (:subjectIds) OR app.authorization_type = '"
                                                   + ALL_ACCESS.getCode() + "')");
@@ -154,7 +154,7 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
      * @param userId {@link Long}
      * @return {@link List}
      */
-    private List<Object> getAccessPolicysubjectIdsByUserId(Long userId){
+    private List<Object> getSubjectIds(Long userId){
         //@formatter:on
         List<Object> list = Lists.newArrayList();
         //当前用户加入的用户组Id
