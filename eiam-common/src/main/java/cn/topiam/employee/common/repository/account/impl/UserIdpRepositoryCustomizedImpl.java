@@ -26,7 +26,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import cn.topiam.employee.common.entity.account.po.UserIdpBindPo;
+import cn.topiam.employee.common.entity.account.po.UserIdpBindPO;
 import cn.topiam.employee.common.repository.account.UserIdpRepositoryCustomized;
 import cn.topiam.employee.common.repository.account.impl.mapper.UserIdpBindPoMapper;
 import cn.topiam.employee.support.repository.page.domain.Page;
@@ -53,7 +53,7 @@ public class UserIdpRepositoryCustomizedImpl implements UserIdpRepositoryCustomi
      * @return {@link Optional}
      */
     @Override
-    public Optional<UserIdpBindPo> findByIdpIdAndOpenId(String idpId, String openId) {
+    public Optional<UserIdpBindPO> findByIdpIdAndOpenId(String idpId, String openId) {
         //@formatter:off
         StringBuilder builder = new StringBuilder("SELECT uidp.*,`user`.username_,idp.name_ as idp_name FROM user_idp_bind uidp LEFT JOIN `user` ON uidp.user_id = `user`.id_ AND `user`.is_deleted = '0' LEFT JOIN identity_provider idp ON uidp.idp_id = idp.id_ AND idp.is_deleted = '0' WHERE uidp.is_deleted = '0' ");
         //身份提供商ID
@@ -67,7 +67,7 @@ public class UserIdpRepositoryCustomizedImpl implements UserIdpRepositoryCustomi
         //@formatter:on
         String sql = builder.toString();
         try {
-            UserIdpBindPo userIdpBindPo = jdbcTemplate.queryForObject(sql,
+            UserIdpBindPO userIdpBindPo = jdbcTemplate.queryForObject(sql,
                 new UserIdpBindPoMapper());
             return Optional.ofNullable(userIdpBindPo);
         } catch (EmptyResultDataAccessException e) {
@@ -83,7 +83,7 @@ public class UserIdpRepositoryCustomizedImpl implements UserIdpRepositoryCustomi
      * @return {@link Optional}
      */
     @Override
-    public Optional<UserIdpBindPo> findByIdpIdAndUserId(String idpId, Long userId) {
+    public Optional<UserIdpBindPO> findByIdpIdAndUserId(String idpId, Long userId) {
         //@formatter:off
         StringBuilder builder = new StringBuilder("SELECT uidp.*,`user`.username_,idp.name_ as idp_name FROM user_idp_bind uidp LEFT JOIN `user` ON uidp.user_id = `user`.id_ AND `user`.is_deleted = '0' LEFT JOIN identity_provider idp ON uidp.idp_id = idp.id_ AND idp.is_deleted = '0' WHERE uidp.is_deleted = '0' ");
         //身份提供商ID
@@ -97,7 +97,7 @@ public class UserIdpRepositoryCustomizedImpl implements UserIdpRepositoryCustomi
         //@formatter:on
         String sql = builder.toString();
         try {
-            UserIdpBindPo userIdpBindPo = jdbcTemplate.queryForObject(sql,
+            UserIdpBindPO userIdpBindPo = jdbcTemplate.queryForObject(sql,
                 new UserIdpBindPoMapper());
             return Optional.ofNullable(userIdpBindPo);
         } catch (EmptyResultDataAccessException e) {
@@ -112,7 +112,7 @@ public class UserIdpRepositoryCustomizedImpl implements UserIdpRepositoryCustomi
      * @return {@link Page}
      */
     @Override
-    public Iterable<UserIdpBindPo> getUserIdpBindList(Long userId) {
+    public Iterable<UserIdpBindPO> getUserIdpBindList(Long userId) {
         //@formatter:off
         StringBuilder builder = new StringBuilder("SELECT uidp.*,idp.name_ as idp_name FROM user_idp_bind uidp LEFT JOIN identity_provider idp ON uidp.idp_id = idp.id_ AND idp.is_deleted = '0' WHERE uidp.is_deleted = '0' ");
         //用户ID

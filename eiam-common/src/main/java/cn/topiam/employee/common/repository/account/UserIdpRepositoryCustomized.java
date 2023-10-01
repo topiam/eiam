@@ -19,7 +19,7 @@ package cn.topiam.employee.common.repository.account;
 
 import java.util.Optional;
 
-import cn.topiam.employee.common.entity.account.po.UserIdpBindPo;
+import cn.topiam.employee.common.entity.account.po.UserIdpBindPO;
 import cn.topiam.employee.support.repository.page.domain.Page;
 
 /**
@@ -37,7 +37,7 @@ public interface UserIdpRepositoryCustomized {
      * @param openId {@link  String}
      * @return {@link Optional}
      */
-    Optional<UserIdpBindPo> findByIdpIdAndOpenId(String idpId, String openId);
+    Optional<UserIdpBindPO> findByIdpIdAndOpenId(String idpId, String openId);
 
     /**
      * 根据身份源ID和userId查询
@@ -46,7 +46,7 @@ public interface UserIdpRepositoryCustomized {
      * @param userId {@link  String}
      * @return {@link Optional}
      */
-    Optional<UserIdpBindPo> findByIdpIdAndUserId(String idpId, Long userId);
+    Optional<UserIdpBindPO> findByIdpIdAndUserId(String idpId, Long userId);
 
     /**
      * 查询用户身份提供商绑定
@@ -54,5 +54,5 @@ public interface UserIdpRepositoryCustomized {
      * @param userId     {@link  Long}
      * @return {@link Page}
      */
-    Iterable<UserIdpBindPo> getUserIdpBindList(Long userId);
+    Iterable<UserIdpBindPO> getUserIdpBindList(Long userId);
 }

@@ -40,7 +40,7 @@ import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.common.entity.account.UserDetailEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
-import cn.topiam.employee.common.entity.account.po.UserIdpBindPo;
+import cn.topiam.employee.common.entity.account.po.UserIdpBindPO;
 import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
 import cn.topiam.employee.common.enums.MailType;
 import cn.topiam.employee.common.enums.MessageNoticeChannel;
@@ -353,7 +353,7 @@ public class AccountServiceImpl implements AccountService {
         List<IdentityProviderEntity> identityProviderList = identityProviderRepository
             .findByEnabledIsTrueAndDisplayedIsTrue();
         // 获取已绑定idp
-        Iterable<UserIdpBindPo> userIdpBindList = userIdpRepository
+        Iterable<UserIdpBindPO> userIdpBindList = userIdpRepository
             .getUserIdpBindList(Long.valueOf(SecurityUtils.getCurrentUserId()));
         return accountConverter.entityConverterToBoundIdpListResult(identityProviderList,
             userIdpBindList);

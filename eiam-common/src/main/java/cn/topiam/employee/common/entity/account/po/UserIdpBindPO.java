@@ -17,55 +17,28 @@
  */
 package cn.topiam.employee.common.entity.account.po;
 
-import java.io.Serial;
-import java.util.Map;
-import java.util.Set;
-
-import cn.topiam.employee.common.entity.account.UserEntity;
+import cn.topiam.employee.common.entity.account.UserIdpBindEntity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 用户 PO
+ * 用户身份提供商绑定 PO
  *
  * @author TopIAM
  * Created by support@topiam.cn on  2022/2/10 22:46
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class UserEsPO extends UserEntity {
-
-    @Serial
-    private static final long   serialVersionUID = 2330202241972458786L;
+public class UserIdpBindPO extends UserIdpBindEntity {
 
     /**
-     * 证件类型
+     * 用户名称
      */
-    private String              idType;
+    private String userName;
 
     /**
-     * 身份证号
+     * 身份认证提供商名称
      */
-    private String              idCard;
-
-    /**
-     * 个人主页
-     */
-    private String              website;
-
-    /**
-     * 地址
-     */
-    private String              address;
-
-    /**
-     * 组织id列表
-     */
-    private Set<String>         organizationIds;
-
-    /**
-     * 静态用户组
-     */
-    private Map<String, String> userGroups;
+    private String idpName;
 }

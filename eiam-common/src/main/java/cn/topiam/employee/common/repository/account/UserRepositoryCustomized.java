@@ -21,16 +21,11 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 
-import cn.topiam.employee.common.entity.account.UserElasticSearchEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
-import cn.topiam.employee.common.entity.account.po.UserEsPO;
 import cn.topiam.employee.common.entity.account.po.UserPO;
 import cn.topiam.employee.common.entity.account.query.UserListNotInGroupQuery;
 import cn.topiam.employee.common.entity.account.query.UserListQuery;
-
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 
 /**
  * User Repository Customized
@@ -107,29 +102,4 @@ public interface UserRepositoryCustomized {
      */
     void batchUpdate(List<UserEntity> list);
 
-    /**
-     * 获取用户列表
-     *
-     * @param idList {@link  List}
-     * @return {@link List}
-     */
-    List<UserEsPO> getUserList(List<String> idList);
-
-    /**
-     * 查询es用户数据
-     *
-     * @param userIndex {@link IndexCoordinates}
-     * @return {@link List}
-     */
-    List<UserElasticSearchEntity> getAllUserElasticSearchEntity(IndexCoordinates userIndex);
-
-    /**
-     * 查询es用户数据
-     *
-     * @param userIndex {@link IndexCoordinates}
-     * @param queryBuilder {@link Query}
-     * @return {@link List}
-     */
-    List<UserElasticSearchEntity> getAllUserElasticSearchEntity(IndexCoordinates userIndex,
-                                                                Query queryBuilder);
 }

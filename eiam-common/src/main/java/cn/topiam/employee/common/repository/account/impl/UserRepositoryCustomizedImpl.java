@@ -21,7 +21,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,34 +30,21 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.client.elc.NativeQuery;
-import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
-import org.springframework.data.elasticsearch.core.SearchHit;
-import org.springframework.data.elasticsearch.core.SearchHitsIterator;
-import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.CollectionUtils;
 
-import cn.topiam.employee.common.entity.account.UserElasticSearchEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
-import cn.topiam.employee.common.entity.account.po.UserEsPO;
 import cn.topiam.employee.common.entity.account.po.UserPO;
 import cn.topiam.employee.common.entity.account.query.UserListNotInGroupQuery;
 import cn.topiam.employee.common.entity.account.query.UserListQuery;
 import cn.topiam.employee.common.repository.account.UserRepositoryCustomized;
 import cn.topiam.employee.common.repository.account.impl.mapper.UserEntityMapper;
-import cn.topiam.employee.common.repository.account.impl.mapper.UserEsMapper;
 import cn.topiam.employee.common.repository.account.impl.mapper.UserPoMapper;
 
 import lombok.AllArgsConstructor;
-
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import static cn.topiam.employee.common.constant.AccountConstants.USER_CACHE_NAME;
 
 /**
@@ -360,120 +346,6 @@ public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
                     }
                 });
         //@formatter:on
-    }
-
-    @Override
-
-    public List<UserEsPO> getUserList(List<String> idList) {
-        //@formatter:off
-        String whereUserId = "";
-        if (!CollectionUtils.isEmpty(idList)) {
-            if (idList.size() > 1) {
-                whereUserId =  "AND `user`.id_ IN ('%s')".formatted(String.join("','", idList));
-            }
-            else {
-                whereUserId =  "AND `user`.id_ = '%s'".formatted(idList.get(0));
-            }
-        }
-        String sql = """
-                SELECT
-                    `user`.id_,
-                    `user`.username_,
-                    `user`.email_,
-                    `user`.phone_,
-                    `user`.phone_area_code,
-                    `user`.full_name,
-                    `user`.nick_name,
-                    `user`.avatar_,
-                    `user`.status_,
-                    `user`.data_origin,
-                    `user`.email_verified,
-                    `user`.phone_verified,
-                    `user`.auth_total,
-                    `user`.last_auth_ip,
-                    `user`.last_auth_time,
-                    `user`.expand_,
-                    `user`.external_id,
-                    `user`.expire_date,
-                    `user`.create_by,
-                    `user`.create_time,
-                    `user`.update_by,
-                    `user`.update_time,
-                    `user`.remark_,
-                    `user`.identity_source_id,
-                    `user`.last_update_password_time,
-                    `user_detail`.id_type,
-                    `user_detail`.id_card,
-                    `user_detail`.website_,
-                    `user_detail`.address_,
-                    GROUP_CONCAT( DISTINCT `organization_member`.org_id SEPARATOR ',' ) AS organization_ids,
-                    CONCAT( '{', GROUP_CONCAT( DISTINCT CONCAT( '"', user_group.id_, '": "', user_group.name_, '"' ) SEPARATOR ',' ), '}' ) AS user_groups
-                FROM
-                    `user`
-                    LEFT JOIN `user_detail` ON `user`.id_ = user_detail.user_id
-                    AND user_detail.is_deleted = '0'
-                    LEFT JOIN `organization_member` ON `user`.id_ = organization_member.user_id
-                    AND organization_member.is_deleted = '0'
-                    LEFT JOIN `user_group_member` ON `user`.id_ = user_group_member.user_id
-                    AND user_group_member.is_deleted = '0'
-                    LEFT JOIN `user_group` ON `user_group`.id_ = user_group_member.group_id
-                    AND user_group.is_deleted = '0'
-                WHERE
-                    `user`.is_deleted = 0 %s
-                GROUP BY
-                    `user`.id_,
-                    `user`.username_,
-                    `user`.email_,
-                    `user`.phone_,
-                    `user`.phone_area_code,
-                    `user`.full_name,
-                    `user`.nick_name,
-                    `user`.avatar_,
-                    `user`.status_,
-                    `user`.data_origin,
-                    `user`.email_verified,
-                    `user`.phone_verified,
-                    `user`.auth_total,
-                    `user`.last_auth_ip,
-                    `user`.last_auth_time,
-                    `user`.expand_,
-                    `user`.external_id,
-                    `user`.expire_date,
-                    `user`.create_by,
-                    `user`.create_time,
-                    `user`.update_by,
-                    `user`.update_time,
-                    `user`.remark_,
-                    `user`.identity_source_id,
-                    `user`.last_update_password_time
-        """.formatted(whereUserId);
-        //@formatter:on
-        return jdbcTemplate.query(sql, new UserEsMapper());
-    }
-
-    @Override
-    public List<UserElasticSearchEntity> getAllUserElasticSearchEntity(IndexCoordinates userIndex) {
-        return getAllUserElasticSearchEntity(userIndex,
-            QueryBuilders.matchAll().build()._toQuery());
-    }
-
-    @Override
-    public List<UserElasticSearchEntity> getAllUserElasticSearchEntity(IndexCoordinates userIndex,
-                                                                       Query query) {
-        if (!elasticsearchTemplate.indexOps(userIndex).exists()) {
-            return null;
-        }
-        NativeQuery searchQuery = new NativeQueryBuilder().withQuery(query)
-            // 设置每页数据量
-            .withPageable(PageRequest.of(0, 2000)).build();
-        List<UserElasticSearchEntity> userElasticSearchEntityList = new ArrayList<>();
-        SearchHitsIterator<UserElasticSearchEntity> searchScrollHits = elasticsearchTemplate
-            .searchForStream(searchQuery, UserElasticSearchEntity.class, userIndex);
-        while (searchScrollHits.hasNext()) {
-            SearchHit<UserElasticSearchEntity> next = searchScrollHits.next();
-            userElasticSearchEntityList.add(next.getContent());
-        }
-        return userElasticSearchEntityList;
     }
 
     /**
