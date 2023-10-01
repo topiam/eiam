@@ -43,6 +43,7 @@ import cn.topiam.employee.application.oidc.model.OidcProtocolConfig;
 import cn.topiam.employee.core.help.ServerHelp;
 import cn.topiam.employee.support.util.HttpUrlUtils;
 import cn.topiam.employee.support.util.IpUtils;
+import cn.topiam.employee.support.web.servlet.RepeatedlyRequestWrapper;
 
 import lombok.Getter;
 
@@ -94,7 +95,6 @@ public final class OidcAuthorizationServerContextFilter extends OncePerRequestFi
             Map<String, String> variables = matcher.getVariables();
             String appCode = variables.get(APP_CODE);
             if (this.logger.isTraceEnabled()) {
-                String body = IOUtils.toString(request.getInputStream(),StandardCharsets.UTF_8).replaceAll("\\s+", " ");
                 String logs = "\n" +
                         "┣ " + SEPARATE + "\n" +
                         "┣ App: " + appCode + "\n" +
@@ -102,7 +102,7 @@ public final class OidcAuthorizationServerContextFilter extends OncePerRequestFi
                         "┣ Request ip: " + IpUtils.getIpAddr(request) + "\n" +
                         "┣ Request headers: " + JSONObject.toJSONString(getRequestHeaders(request)) + "\n" +
                         "┣ Request parameters: " + JSONObject.toJSONString(request.getParameterMap()) + "\n" +
-                        "┣ Request payload: " + StringUtils.defaultIfBlank(body, "-") + "\n" +
+                        "┣ Request payload: " + StringUtils.defaultIfBlank(IOUtils.toString(new RepeatedlyRequestWrapper(request, response).getInputStream(),StandardCharsets.UTF_8).replaceAll("\\s+", " "), "-") + "\n" +
                         "┣ " + SEPARATE;
                 logger.trace(logs);
             }

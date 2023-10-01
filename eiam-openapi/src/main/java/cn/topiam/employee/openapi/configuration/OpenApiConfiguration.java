@@ -28,7 +28,7 @@ import cn.topiam.employee.support.util.AppVersionUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
-import static cn.topiam.employee.openapi.constants.OpenApiV1Constants.*;
+import static cn.topiam.employee.openapi.constant.OpenApiV1Constants.*;
 
 /**
  * OpenAPI 文档

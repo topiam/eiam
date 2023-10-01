@@ -17,7 +17,7 @@
  */
 package cn.topiam.employee.openapi.exception;
 
-import cn.topiam.employee.openapi.constants.OpenApiStatus;
+import cn.topiam.employee.openapi.constant.OpenApiStatus;
 
 /**
  * OpenApiException

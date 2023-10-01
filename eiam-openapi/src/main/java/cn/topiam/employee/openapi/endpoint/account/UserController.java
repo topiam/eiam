@@ -40,7 +40,7 @@ import lombok.AllArgsConstructor;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import static cn.topiam.employee.openapi.constants.OpenApiV1Constants.USER_PATH;
+import static cn.topiam.employee.openapi.constant.OpenApiV1Constants.USER_PATH;
 
 /**
  * 系统账户-用户

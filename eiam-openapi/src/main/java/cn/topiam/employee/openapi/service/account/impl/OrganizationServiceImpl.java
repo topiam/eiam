@@ -43,7 +43,7 @@ import cn.topiam.employee.common.repository.account.OrganizationMemberRepository
 import cn.topiam.employee.common.repository.account.OrganizationRepository;
 import cn.topiam.employee.core.mq.UserMessagePublisher;
 import cn.topiam.employee.core.mq.UserMessageTag;
-import cn.topiam.employee.openapi.constants.OpenApiStatus;
+import cn.topiam.employee.openapi.constant.OpenApiStatus;
 import cn.topiam.employee.openapi.converter.account.OrganizationConverter;
 import cn.topiam.employee.openapi.exception.OpenApiException;
 import cn.topiam.employee.openapi.pojo.result.account.OrganizationChildResult;

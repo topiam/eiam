@@ -24,10 +24,8 @@ package cn.topiam.employee.common.constant;
  * Created by support@topiam.cn on 2020/7/26 21:07
  */
 public final class SecurityConstants {
-
     /**
-     * CODE
+     * 默认管理员用户名
      */
-    public static final String PASSWORD_POLICY_CODE = "default";
-
+    public static String DEFAULT_ADMIN_USERNAME = "admin";
 }

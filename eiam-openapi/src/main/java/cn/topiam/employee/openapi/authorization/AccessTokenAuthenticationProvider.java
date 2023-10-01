@@ -30,7 +30,7 @@ import org.springframework.util.Assert;
 import com.alibaba.fastjson2.JSONObject;
 
 import cn.topiam.employee.openapi.authorization.store.AccessTokenStore;
-import cn.topiam.employee.openapi.constants.OpenApiStatus;
+import cn.topiam.employee.openapi.constant.OpenApiStatus;
 
 /**
  *

@@ -35,13 +35,13 @@ import com.alibaba.fastjson2.JSONObject;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.repository.app.AppRepository;
 import cn.topiam.employee.openapi.authorization.store.AccessTokenStore;
-import cn.topiam.employee.openapi.constants.OpenApiStatus;
+import cn.topiam.employee.openapi.constant.OpenApiStatus;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import static cn.topiam.employee.openapi.constants.OpenApiStatus.*;
-import static cn.topiam.employee.openapi.constants.OpenApiV1Constants.ACCESS_TOKEN_EXPIRES_IN;
-import static cn.topiam.employee.openapi.constants.OpenApiV1Constants.AUTH_PATH;
+import static cn.topiam.employee.openapi.constant.OpenApiStatus.*;
+import static cn.topiam.employee.openapi.constant.OpenApiV1Constants.ACCESS_TOKEN_EXPIRES_IN;
+import static cn.topiam.employee.openapi.constant.OpenApiV1Constants.AUTH_PATH;
 
 /**
  * 获取 access_token 端点

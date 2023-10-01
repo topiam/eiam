@@ -100,7 +100,7 @@ public interface AdministratorConverter {
      * @param page {@link AdministratorEntity}
      * @return {@link AdministratorListResult}
      */
-    @Mapping(target = "initialized", expression = "java(page.getUsername().equals(cn.topiam.employee.console.access.DefaultAdministratorConstants.DEFAULT_ADMIN_USERNAME))")
+    @Mapping(target = "initialized", expression = "java(page.getUsername().equals(cn.topiam.employee.common.constant.SecurityConstants.DEFAULT_ADMIN_USERNAME))")
     @Mapping(target = "status", source = "status.code")
     @Mapping(target = "emailVerified", source = "emailVerified", defaultValue = "false")
     @Mapping(target = "authTotal", source = "authTotal", defaultValue = "0L")
@@ -195,7 +195,7 @@ public interface AdministratorConverter {
      * @return {@link AdministratorResult} 管理员详情
      */
     @Mapping(target = "status", source = "status.code")
-    @Mapping(target = "initialized", expression = "java(user.getUsername().equals(cn.topiam.employee.console.access.DefaultAdministratorConstants.DEFAULT_ADMIN_USERNAME))")
+    @Mapping(target = "initialized", expression = "java(user.getUsername().equals(cn.topiam.employee.common.constant.SecurityConstants.DEFAULT_ADMIN_USERNAME))")
     AdministratorResult entityConvertToAdministratorDetailsResult(AdministratorEntity user);
 
     /**

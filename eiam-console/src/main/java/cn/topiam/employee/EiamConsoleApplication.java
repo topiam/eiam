@@ -28,7 +28,7 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
  * Created by support@topiam.cn on  2020/7/9
  */
 @ServletComponentScan
-@SpringBootApplication(scanBasePackages = { "cn.topiam.employee" })
+@SpringBootApplication
 public class EiamConsoleApplication {
     public static void main(String[] args) {
         SpringApplication.run(EiamConsoleApplication.class, args);

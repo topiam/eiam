@@ -50,7 +50,7 @@ import cn.topiam.employee.core.message.mail.MailMsgEventPublish;
 import cn.topiam.employee.core.message.sms.SmsMsgEventPublish;
 import cn.topiam.employee.core.mq.UserMessagePublisher;
 import cn.topiam.employee.core.mq.UserMessageTag;
-import cn.topiam.employee.openapi.constants.OpenApiStatus;
+import cn.topiam.employee.openapi.constant.OpenApiStatus;
 import cn.topiam.employee.openapi.converter.account.UserConverter;
 import cn.topiam.employee.openapi.exception.OpenApiException;
 import cn.topiam.employee.openapi.pojo.result.account.UserListResult;

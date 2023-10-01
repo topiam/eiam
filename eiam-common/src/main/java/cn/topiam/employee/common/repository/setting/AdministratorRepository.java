@@ -63,7 +63,7 @@ public interface AdministratorRepository extends LogicDeleteRepository<Administr
      */
     @NotNull
     @Cacheable
-    @Query(value = "SELECT * FROM administrator WHERE id_ = :id", nativeQuery = true)
+    @Query(value = "SELECT AdministratorEntity FROM AdministratorEntity WHERE id = :id")
     Optional<AdministratorEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") Long id);
 
     /**
@@ -89,7 +89,6 @@ public interface AdministratorRepository extends LogicDeleteRepository<Administr
      *
      * @param entity must not be {@literal null}.
      * @return {@link AdministratorEntity}
-     * @param <S>
      */
     @Override
     @CacheEvict(allEntries = true)
@@ -128,7 +127,7 @@ public interface AdministratorRepository extends LogicDeleteRepository<Administr
     @Transactional(rollbackFor = Exception.class)
     @Modifying
     @CacheEvict(allEntries = true)
-    @Query(value = "update administrator set status_ = ?2 where id_ = ?1", nativeQuery = true)
+    @Query(value = "update AdministratorEntity set status = :status where id = :id")
     void updateStatus(@Param(value = "id") String id, @Param(value = "status") String status);
 
     /**
@@ -140,7 +139,7 @@ public interface AdministratorRepository extends LogicDeleteRepository<Administr
     @Transactional(rollbackFor = Exception.class)
     @Modifying
     @CacheEvict(allEntries = true)
-    @Query(value = "update administrator set password_ = ?2 where id_ = ?1", nativeQuery = true)
+    @Query(value = "update AdministratorEntity set password = :password where id = :id")
     void updatePassword(@Param(value = "id") String id, @Param(value = "password") String password);
 
     /**

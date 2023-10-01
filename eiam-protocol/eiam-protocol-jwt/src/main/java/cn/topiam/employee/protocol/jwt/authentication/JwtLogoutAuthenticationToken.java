@@ -37,10 +37,14 @@ public class JwtLogoutAuthenticationToken extends AbstractAuthenticationToken {
     @Getter
     private final String         sessionId;
 
-    public JwtLogoutAuthenticationToken(Authentication principal, String sessionId) {
+    private final String         postLogoutRedirectUri;
+
+    public JwtLogoutAuthenticationToken(Authentication principal, String sessionId,
+                                        String postLogoutRedirectUri) {
         super(new ArrayList<>());
         this.principal = principal;
         this.sessionId = sessionId;
+        this.postLogoutRedirectUri = postLogoutRedirectUri;
     }
 
     /**
@@ -81,5 +85,9 @@ public class JwtLogoutAuthenticationToken extends AbstractAuthenticationToken {
     public boolean isPrincipalAuthenticated() {
         return !AnonymousAuthenticationToken.class.isAssignableFrom(this.principal.getClass())
                && this.principal.isAuthenticated();
+    }
+
+    public String getPostLogoutRedirectUri() {
+        return postLogoutRedirectUri;
     }
 }
