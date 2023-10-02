@@ -21,7 +21,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -54,8 +53,6 @@ import cn.topiam.employee.common.repository.identitysource.IdentitySourceSyncRec
 import cn.topiam.employee.common.storage.Storage;
 import cn.topiam.employee.core.message.mail.MailMsgEventPublish;
 import cn.topiam.employee.core.message.sms.SmsMsgEventPublish;
-import cn.topiam.employee.core.mq.UserMessagePublisher;
-import cn.topiam.employee.core.mq.UserMessageTag;
 import cn.topiam.employee.identitysource.core.domain.User;
 import cn.topiam.employee.identitysource.core.processor.IdentitySourceSyncUserPostProcessor;
 import cn.topiam.employee.support.repository.domain.IdEntity;
@@ -100,19 +97,14 @@ public class DefaultIdentitySourceUserPostProcessor extends AbstractIdentitySour
             processData = processData(identitySource, initData);
             //校验数据
             validateData(processData);
-            String batchEsUserId = "";
             //批量保存用户
             if (!CollectionUtils.isEmpty(processData.getCreateUsers())) {
                 List<UserEntity> createUserList = Lists.newArrayList(processData.getCreateUsers());
-                batchEsUserId += createUserList.stream().map(user -> String.valueOf(user.getId()))
-                    .collect(Collectors.joining(","));
                 userRepository.batchSave(createUserList);
             }
             //批量更新用户
             if (!CollectionUtils.isEmpty(processData.getUpdateUsers())) {
                 List<UserEntity> updateUserList = Lists.newArrayList(processData.getUpdateUsers());
-                batchEsUserId += updateUserList.stream().map(user -> String.valueOf(user.getId()))
-                    .collect(Collectors.joining(","));
                 userRepository.batchUpdate(updateUserList);
             }
             //保存组织成员关系
@@ -148,13 +140,6 @@ public class DefaultIdentitySourceUserPostProcessor extends AbstractIdentitySour
             saveSyncHistoryRecord(history.getId(), processData);
             //提交事务
             platformTransactionManager.commit(transactionStatus);
-            // 异步更新ES用户数据
-            userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE, batchEsUserId);
-            // 异步删除用户ES数据
-            if (!CollectionUtils.isEmpty(processData.getDeleteUsers())) {
-                userMessagePublisher.sendUserChangeMessage(UserMessageTag.DELETE,
-                    deleteUserIds.stream().map(String::valueOf).collect(Collectors.joining(",")));
-            }
             if (!CollectionUtils.isEmpty(processData.getCreateUsers())) {
                 // 发送密码通知
                 publishMessage(Lists.newArrayList(processData.getCreateUsers()));
@@ -734,11 +719,6 @@ public class DefaultIdentitySourceUserPostProcessor extends AbstractIdentitySour
      */
     private final UserGroupMemberRepository    userGroupMemberRepository;
 
-    /**
-     * MessagePublisher
-     */
-    private final UserMessagePublisher         userMessagePublisher;
-
     public DefaultIdentitySourceUserPostProcessor(SmsMsgEventPublish smsMsgEventPublish,
                                                   MailMsgEventPublish mailMsgEventPublish,
                                                   TransactionDefinition transactionDefinition,
@@ -754,8 +734,7 @@ public class DefaultIdentitySourceUserPostProcessor extends AbstractIdentitySour
                                                   OrganizationMemberRepository organizationMemberRepository,
                                                   UserGroupMemberRepository userGroupMemberRepository,
                                                   OrganizationRepository organizationRepository,
-                                                  Storage storage,
-                                                  UserMessagePublisher userMessagePublisher) {
+                                                  Storage storage) {
         super(smsMsgEventPublish, mailMsgEventPublish, passwordEncoder, passwordGenerator,
             transactionDefinition, platformTransactionManager, entityManager,
             identitySourceRepository, identitySourceSyncHistoryRepository,
@@ -765,6 +744,5 @@ public class DefaultIdentitySourceUserPostProcessor extends AbstractIdentitySour
         this.organizationMemberRepository = organizationMemberRepository;
         this.userGroupMemberRepository = userGroupMemberRepository;
         this.organizationRepository = organizationRepository;
-        this.userMessagePublisher = userMessagePublisher;
     }
 }

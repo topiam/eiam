@@ -21,7 +21,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -34,18 +33,14 @@ import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.common.entity.account.OrganizationEntity;
-import cn.topiam.employee.common.entity.account.OrganizationMemberEntity;
 import cn.topiam.employee.common.entity.account.QUserEntity;
 import cn.topiam.employee.common.enums.DataOrigin;
-import cn.topiam.employee.common.repository.account.OrganizationMemberRepository;
 import cn.topiam.employee.common.repository.account.OrganizationRepository;
 import cn.topiam.employee.console.converter.account.OrganizationConverter;
 import cn.topiam.employee.console.pojo.result.account.*;
 import cn.topiam.employee.console.pojo.save.account.OrganizationCreateParam;
 import cn.topiam.employee.console.pojo.update.account.OrganizationUpdateParam;
 import cn.topiam.employee.console.service.account.OrganizationService;
-import cn.topiam.employee.core.mq.UserMessagePublisher;
-import cn.topiam.employee.core.mq.UserMessageTag;
 import cn.topiam.employee.support.repository.id.SnowflakeIdGenerator;
 import cn.topiam.employee.support.util.BeanUtils;
 
@@ -116,7 +111,6 @@ public class OrganizationServiceImpl implements OrganizationService {
         Optional<OrganizationEntity> optional = this.organizationRepository.findById(param.getId());
         if (optional.isPresent()) {
             OrganizationEntity entity = optional.get();
-            String userIds;
             //如果修改了名字，递归修改和该组织有关所有节点信息的展示路径
             if (!optional.get().getName().equals(param.getName())) {
                 //修改名称
@@ -126,22 +120,10 @@ public class OrganizationServiceImpl implements OrganizationService {
                 if (!entity.getLeaf()) {
                     recursiveUpdateDisplayPath(entity.getId(), entity.getId(), param.getName());
                 }
-                userIds = organizationRepository
-                    .getOrgMemberList(organization.getId(), QUserEntity.userEntity.id).stream()
-                    .map(String::valueOf).collect(Collectors.joining(","));
-            } else {
-                List<OrganizationMemberEntity> orgMemberList = organizationMemberRepository
-                    .findAllByOrgId(entity.getId());
-                userIds = orgMemberList.stream().map(item -> String.valueOf(item.getUserId()))
-                    .collect(Collectors.joining(","));
             }
             //修改
             BeanUtils.merge(organization, entity, LAST_MODIFIED_BY, LAST_MODIFIED_TIME);
             organizationRepository.save(entity);
-            // 更新用户es信息
-            if (StringUtils.isNotBlank(userIds)) {
-                userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE, userIds);
-            }
             AuditContext.setTarget(
                 Target.builder().id(entity.getId()).type(TargetType.ORGANIZATION).build());
             return true;
@@ -259,9 +241,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public OrganizationResult getOrganization(String id) {
         Optional<OrganizationEntity> entity = organizationRepository.findById(id);
-        OrganizationResult organizationResult = entity
-            .map(organizationConverter::entityConvertToGetOrganizationResult).orElse(null);
-        return organizationResult;
+        return entity.map(organizationConverter::entityConvertToGetOrganizationResult).orElse(null);
     }
 
     /**
@@ -315,13 +295,6 @@ public class OrganizationServiceImpl implements OrganizationService {
                 .name(organization.get().getName()).build());
             //存在子组织，递归更改子组织 path 和 displayPath
             recursiveUpdateChildNodePathAndDisplayPath(entity.getId());
-            // 更新用户es信息
-            String userIds = organizationRepository
-                .getOrgMemberList(entity.getId(), QUserEntity.userEntity.id).stream()
-                .map(String::valueOf).collect(Collectors.joining(","));
-            if (StringUtils.isNotBlank(userIds)) {
-                userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE, userIds);
-            }
             return true;
         }
         return false;
@@ -458,20 +431,11 @@ public class OrganizationServiceImpl implements OrganizationService {
     /**
      * 组织架构数据映射器
      */
-    private final OrganizationConverter        organizationConverter;
+    private final OrganizationConverter  organizationConverter;
 
     /**
      * OrganizationRepository
      */
-    private final OrganizationRepository       organizationRepository;
+    private final OrganizationRepository organizationRepository;
 
-    /**
-     * MessagePublisher
-     */
-    private final UserMessagePublisher         userMessagePublisher;
-
-    /**
-     * OrganizationMemberRepository
-     */
-    private final OrganizationMemberRepository organizationMemberRepository;
 }
