@@ -23,8 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -37,7 +36,6 @@ import com.google.common.collect.Maps;
 import cn.topiam.employee.audit.entity.*;
 import cn.topiam.employee.audit.enums.EventStatus;
 import cn.topiam.employee.audit.event.type.EventType;
-import cn.topiam.employee.audit.mq.AuditMessagePublisher;
 import cn.topiam.employee.support.context.ServletContextHelp;
 import cn.topiam.employee.support.geo.GeoLocationService;
 import cn.topiam.employee.support.security.authentication.WebAuthenticationDetails;
@@ -62,8 +60,6 @@ import static cn.topiam.employee.support.util.StringUtils.replaceBlank;
 @AllArgsConstructor
 public class AuditEventPublish {
 
-    private final Logger logger = LoggerFactory.getLogger(AuditEventPublish.class);
-
     /**
      * 发布 审计事件
      *
@@ -84,7 +80,7 @@ public class AuditEventPublish {
         //封装操作人
         Actor actor = getActor();
         //Publish AuditEvent
-        auditMessagePublisher.sendAuditChangeMessage(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, null));
+        applicationEventPublisher.publishEvent(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, null));
         //@formatter:on
     }
 
@@ -115,7 +111,7 @@ public class AuditEventPublish {
         //封装操作人
         Actor actor = getActor(authentication);
         //Publish AuditEvent
-        auditMessagePublisher.sendAuditChangeMessage(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, targets));
+        applicationEventPublisher.publishEvent(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, targets));
         //@formatter:on
     }
 
@@ -137,7 +133,7 @@ public class AuditEventPublish {
         //封装用户代理
         UserAgent userAgent = getUserAgent();
         //Publish AuditEvent
-        auditMessagePublisher.sendAuditChangeMessage(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, null));
+        applicationEventPublisher.publishEvent(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, null));
         //@formatter:on
     }
 
@@ -178,7 +174,7 @@ public class AuditEventPublish {
             actor = getActor();
         }
         //Publish AuditEvent
-        auditMessagePublisher.sendAuditChangeMessage(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, target));
+        applicationEventPublisher.publishEvent(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, target));
         //@formatter:on
     }
 
@@ -204,7 +200,7 @@ public class AuditEventPublish {
         //封装操作人
         Actor actor = getActor();
         //Publish AuditEvent
-        auditMessagePublisher.sendAuditChangeMessage(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, target));
+        applicationEventPublisher.publishEvent(new AuditEvent(TraceUtils.get(), ServletContextHelp.getSession().getId(), actor, event, userAgent, geoLocationModal, target));
         //@formatter:on
     }
 
@@ -384,13 +380,13 @@ public class AuditEventPublish {
     }
 
     /**
-     * AuditMessagePublisher
+     * ApplicationEventPublisher
      */
-    private final AuditMessagePublisher auditMessagePublisher;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     /**
      * 地理位置
      */
-    private final GeoLocationService    geoLocationService;
+    private final GeoLocationService        geoLocationService;
 
 }
