@@ -23,12 +23,15 @@ import java.io.Serializable;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import cn.topiam.employee.support.security.userdetails.UserType;
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 
 /**
  * Actor
+ *
  * @author TopIAM
  * Created by support@topiam.cn on  2022/11/5 23:30
  */
@@ -56,7 +59,7 @@ public class Actor implements Serializable {
      */
     @NonNull
     @Field(type = FieldType.Keyword, name = "type")
-    private cn.topiam.employee.support.security.userdetails.UserType type;
+    private UserType type;
 
     /**
      * 身份验证类型

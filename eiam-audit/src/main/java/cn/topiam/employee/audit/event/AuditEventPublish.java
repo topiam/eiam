@@ -45,8 +45,6 @@ import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.support.util.IpUtils;
 import cn.topiam.employee.support.web.useragent.UserAgentParser;
 
-import lombok.AllArgsConstructor;
-
 import jakarta.servlet.http.HttpServletRequest;
 import static cn.topiam.employee.support.util.StringUtils.replaceBlank;
 
@@ -57,7 +55,6 @@ import static cn.topiam.employee.support.util.StringUtils.replaceBlank;
  * Created by support@topiam.cn on  2021/8/1 21:04
  */
 @Component
-@AllArgsConstructor
 public class AuditEventPublish {
 
     /**
@@ -245,6 +242,9 @@ public class AuditEventPublish {
         if (principal instanceof UserDetails) {
             return ((UserDetails) principal).getId();
         }
+        if (principal instanceof String) {
+            return (String) principal;
+        }
         return null;
         //@formatter:on
     }
@@ -389,4 +389,9 @@ public class AuditEventPublish {
      */
     private final GeoLocationService        geoLocationService;
 
+    public AuditEventPublish(ApplicationEventPublisher applicationEventPublisher,
+                             GeoLocationService geoLocationService) {
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.geoLocationService = geoLocationService;
+    }
 }
