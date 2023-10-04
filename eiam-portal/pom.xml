@@ -131,7 +131,7 @@
                                 <phase>generate-resources</phase>
                                 <configuration>
                                     <nodeVersion>v18.17.1</nodeVersion>
-                                    <pnpmVersion>v8.7.0</pnpmVersion>
+                                    <pnpmVersion>v8.8.0</pnpmVersion>
                                     <nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</nodeDownloadRoot>
                                 </configuration>
                             </execution>
@@ -184,7 +184,7 @@
                                 <phase>generate-resources</phase>
                                 <configuration>
                                     <nodeVersion>v18.17.1</nodeVersion>
-                                    <pnpmVersion>v8.7.0</pnpmVersion>
+                                    <pnpmVersion>v8.8.0</pnpmVersion>
                                     <nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</nodeDownloadRoot>
                                 </configuration>
                             </execution>
