@@ -184,44 +184,53 @@ export default (props: UserListProps) => {
       dataIndex: 'orgDisplayPath',
       search: false,
       ellipsis: true,
-      render: (_, record) => [
-        <Popover
-          key="pop"
-          title={
-            <Tag color={'geekblue'} key={record.orgDisplayPath}>
-              {record.primaryOrgDisplayPath}
-            </Tag>
-          }
-          content={
-            <Space direction="vertical" size="small" style={{ display: 'flex' }}>
-              {record.orgDisplayPath.split(',')?.map((p: string) => {
-                return (
-                  <Tag color={'green'} key={p}>
-                    {p}
-                  </Tag>
-                );
-              })}
-            </Space>
-          }
-        >
-          <Space key="primary_path">
-            {
-              <Tag color={'geekblue'} key={record.primaryOrgDisplayPath}>
-                {record.primaryOrgDisplayPath}
-              </Tag>
-            }
-          </Space>
-          <Space key="path" direction="vertical" size="small" style={{ display: 'flex' }}>
-            {record.orgDisplayPath.split(',')?.map((p: string) => {
-              return (
-                <Tag color={'green'} key={p}>
-                  {p}
+      render: (_, record) => {
+        console.log(record.primaryOrgDisplayPath);
+        return (
+          <Popover
+            key="pop"
+            title={
+              record.primaryOrgDisplayPath && (
+                <Tag color={'geekblue'} key={record.orgDisplayPath}>
+                  {record.primaryOrgDisplayPath}
                 </Tag>
-              );
-            })}
-          </Space>
-        </Popover>,
-      ],
+              )
+            }
+            content={
+              <Space direction="vertical" size="small" style={{ display: 'flex' }}>
+                {record.orgDisplayPath?.split(',')?.map((p: string) => {
+                  return (
+                    <Tag color={'green'} key={p}>
+                      {p}
+                    </Tag>
+                  );
+                })}
+              </Space>
+            }
+          >
+            {record.primaryOrgDisplayPath && (
+              <Space key="primary_path">
+                {
+                  <Tag color={'geekblue'} key={record.primaryOrgDisplayPath}>
+                    {record.primaryOrgDisplayPath}
+                  </Tag>
+                }
+              </Space>
+            )}
+            {record.orgDisplayPath && (
+              <Space key="path" direction="vertical" size="small" style={{ display: 'flex' }}>
+                {record.orgDisplayPath?.split(',')?.map((p: string) => {
+                  return (
+                    <Tag color={'green'} key={p}>
+                      {p}
+                    </Tag>
+                  );
+                })}
+              </Space>
+            )}
+          </Popover>
+        );
+      },
     },
     {
       title: intl.formatMessage({ id: 'pages.account.user_list.user.columns.status' }),

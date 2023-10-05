@@ -49,12 +49,6 @@ public class UpdateUserInfoRequest implements Serializable {
     private String            nickName;
 
     /**
-     * 个人简介
-     */
-    @Schema(description = "个人简介")
-    private String            personalProfile;
-
-    /**
      * 头像
      */
     @Schema(description = "头像")

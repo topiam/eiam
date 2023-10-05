@@ -181,6 +181,7 @@ declare namespace AccountAPI {
     dataOrigin: string;
     authTotal: string;
     lastAuthTime: string;
+    primaryOrgDisplayPath: string;
     orgDisplayPath: string;
     remark: string;
     custom?: Record<string, any>;
