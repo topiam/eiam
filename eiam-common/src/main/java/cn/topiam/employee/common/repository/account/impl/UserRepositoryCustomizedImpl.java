@@ -69,7 +69,7 @@ public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
     @Override
     public Page<UserPO> getUserList(UserListQuery query, Pageable pageable) {
         //@formatter:off
-        StringBuilder builder = new StringBuilder("SELECT `user`.id_, `user`.username_,`user`.password_, `user`.email_, `user`.phone_,`user`.phone_area_code, `user`.full_name ,`user`.nick_name, `user`.avatar_ , `user`.status_, `user`.data_origin, `user`.email_verified, `user`.phone_verified, `user`.auth_total, `user`.last_auth_ip, `user`.last_auth_time, `user`.expand_, `user`.external_id , `user`.expire_date,`user`.create_by, `user`.create_time, `user`.update_by , `user`.update_time, `user`.remark_, group_concat(organization_.display_path) AS org_display_path FROM `user` INNER JOIN `organization_member` ON (`user`.id_ = organization_member.user_id) INNER JOIN `organization` organization_ ON (organization_.id_ = organization_member.org_id) WHERE `user`.is_deleted = 0");
+        StringBuilder builder = new StringBuilder("SELECT `user`.id_, `user`.username_,`user`.password_, `user`.email_, `user`.phone_,`user`.phone_area_code, `user`.full_name ,`user`.nick_name, `user`.avatar_ , `user`.status_, `user`.data_origin, `user`.email_verified, `user`.phone_verified, `user`.auth_total, `user`.last_auth_ip, `user`.last_auth_time, `user`.expand_, `user`.external_id , `user`.expire_date,`user`.create_by, `user`.create_time, `user`.update_by , `user`.update_time, `user`.remark_, group_concat( IF(organization_member.primary_ = 1, null, organization_.display_path ) ) AS org_display_path, group_concat( IF(organization_member.primary_ IS NULL, null, organization_.display_path ) ) AS primary_org_display_path FROM `user` INNER JOIN `organization_member` ON (`user`.id_ = organization_member.user_id) INNER JOIN `organization` organization_ ON (organization_.id_ = organization_member.org_id) WHERE `user`.is_deleted = 0");
         //组织条件
         if (StringUtils.isNotBlank(query.getOrganizationId())) {
             if (Boolean.TRUE.equals(query.getInclSubOrganization())) {
@@ -155,7 +155,8 @@ public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
                                             `user`.update_by,
                                             `user`.update_time,
                                             `user`.remark_,
-                                            group_concat( organization_.display_path ) AS org_display_path
+                                            group_concat( IF(organization_member.primary_ = 1, null, organization_.display_path ) ) AS org_display_path,
+                                            group_concat( IF(organization_member.primary_ IS NULL, null, organization_.display_path ) ) AS primary_org_display_path
                                         FROM `user`
                                         LEFT JOIN `organization_member` ON ( `user`.id_ = organization_member.user_id AND organization_member.is_deleted = '0' )
                                         LEFT JOIN `organization` organization_ ON ( organization_.id_ = organization_member.org_id AND organization_.is_deleted = '0' )
