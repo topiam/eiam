@@ -284,11 +284,6 @@ const BaseView = () => {
                   },
                 ]}
               />
-              <ProFormTextArea
-                width="md"
-                name="personalProfile"
-                label={intl.formatMessage({ id: 'page.account.base.form.personal_profile' })}
-              />
             </ProForm>
           </div>
           <div className={classnames(`${prefixCls}-right`, hashId)}>

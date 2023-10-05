@@ -27,7 +27,6 @@ export default {
   'page.account.base.form.full_name': '姓名',
   'page.account.base.form.nick_name': '昵称',
   'page.account.base.form.nick_name.rule.0': '请输入您的昵称',
-  'page.account.base.form.personal_profile': '个人简介',
   'page.account.common.form.password': '密码',
   'page.account.common.form.password.placeholder': '请输入密码',
   'page.account.common.form.password.rule.0': '请输入密码',
