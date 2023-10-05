@@ -23,11 +23,9 @@ import java.util.*;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.elasticsearch.client.elc.*;
-import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import cn.topiam.employee.audit.entity.AuditElasticSearchEntity;
 import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.audit.repository.AuditRepository;
 import cn.topiam.employee.audit.repository.result.AuditStatisticsResult;
@@ -45,7 +43,6 @@ import cn.topiam.employee.support.autoconfiguration.SupportProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
@@ -156,7 +153,7 @@ public class AnalysisServiceImpl implements AnalysisService {
      * 登录区域统计
      *
      * @param params {@link AnalysisQuery}
-     * @return {@link List< AuthnZoneResult >}
+     * @return {@link AuthnZoneResult}
      */
     @Override
     public List<AuthnZoneResult> authnZone(AnalysisQuery params) {
@@ -180,24 +177,6 @@ public class AnalysisServiceImpl implements AnalysisService {
         }
         AppEntity app = appRepository.findById(Long.valueOf(targetId)).orElse(new AppEntity());
         return app.getName();
-    }
-
-    /**
-     * ES聚合查询
-     *
-     * @param searchHits {@link SearchHits<AuditElasticSearchEntity>}
-     * @return {@link Aggregation}
-     */
-    private ElasticsearchAggregation getCountAggregation(SearchHits<AuditElasticSearchEntity> searchHits) {
-        ElasticsearchAggregations elasticsearchAggregations = (ElasticsearchAggregations) searchHits
-            .getAggregations();
-        if (elasticsearchAggregations == null) {
-            return null;
-        }
-        List<ElasticsearchAggregation> aggregations = elasticsearchAggregations.aggregations();
-        return aggregations.stream()
-            .filter(aggregation -> aggregation.aggregation().getName().equals(COUNT)).findFirst()
-            .orElse(null);
     }
 
     /**
