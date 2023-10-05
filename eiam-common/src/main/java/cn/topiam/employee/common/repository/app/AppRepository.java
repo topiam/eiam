@@ -105,7 +105,7 @@ public interface AppRepository extends LogicDeleteRepository<AppEntity, Long>,
      */
     @NotNull
     @Cacheable
-    @Query(value = "SELECT AppEntity FROM AppEntity WHERE id = :id")
+    @Query(value = "FROM AppEntity WHERE id = :id")
     Optional<AppEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") Long id);
 
     /**

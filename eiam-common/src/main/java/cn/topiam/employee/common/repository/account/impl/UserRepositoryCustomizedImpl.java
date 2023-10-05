@@ -31,7 +31,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -352,10 +351,5 @@ public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
     /**
      * JdbcTemplate
      */
-    private final JdbcTemplate          jdbcTemplate;
-
-    /**
-     * ElasticsearchTemplate
-     */
-    private final ElasticsearchTemplate elasticsearchTemplate;
+    private final JdbcTemplate jdbcTemplate;
 }

@@ -25,10 +25,7 @@ import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.client.elc.NativeQuery;
-import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,12 +34,15 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 
 import cn.topiam.employee.audit.context.AuditContext;
-import cn.topiam.employee.audit.entity.AuditElasticSearchEntity;
+import cn.topiam.employee.audit.entity.QAuditEntity;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
+import cn.topiam.employee.audit.repository.AuditRepository;
 import cn.topiam.employee.common.entity.account.*;
 import cn.topiam.employee.common.entity.account.po.UserPO;
 import cn.topiam.employee.common.entity.account.query.UserListNotInGroupQuery;
@@ -61,7 +61,6 @@ import cn.topiam.employee.console.service.account.UserService;
 import cn.topiam.employee.core.message.MsgVariable;
 import cn.topiam.employee.core.message.mail.MailMsgEventPublish;
 import cn.topiam.employee.core.message.sms.SmsMsgEventPublish;
-import cn.topiam.employee.support.autoconfiguration.SupportProperties;
 import cn.topiam.employee.support.exception.BadParamsException;
 import cn.topiam.employee.support.exception.InfoValidityFailException;
 import cn.topiam.employee.support.exception.TopIamException;
@@ -76,7 +75,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import static cn.topiam.employee.audit.enums.TargetType.USER;
 import static cn.topiam.employee.audit.enums.TargetType.USER_DETAIL;
-import static cn.topiam.employee.common.constant.AuditConstants.getAuditIndexPrefix;
+import static cn.topiam.employee.audit.service.converter.AuditDataConverter.SORT_EVENT_TIME;
 import static cn.topiam.employee.core.message.sms.SmsMsgEventPublish.USERNAME;
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
@@ -501,13 +500,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<UserLoginAuditListResult> findUserLoginAuditList(Long id, PageModel pageModel) {
         //查询入参转查询条件
-        NativeQuery nsq = userConverter.auditListRequestConvertToNativeQuery(id, pageModel);
-        //查询列表
-        SearchHits<AuditElasticSearchEntity> search = elasticsearchTemplate.search(nsq,
-            AuditElasticSearchEntity.class, IndexCoordinates
-                .of(getAuditIndexPrefix(supportProperties.getAudit().getIndexPrefix() + "*")));
-        //结果转返回结果
-        return userConverter.searchHitsConvertToAuditListResult(search, pageModel);
+        Predicate predicate = userConverter.auditListRequestConvertToNativeQuery(id);
+        // 字段排序
+        OrderSpecifier<LocalDateTime> order = QAuditEntity.auditEntity.eventTime.desc();
+        for (PageModel.Sort sort : pageModel.getSorts()) {
+            if (org.apache.commons.lang3.StringUtils.equals(sort.getSorter(), SORT_EVENT_TIME)) {
+                if (sort.getAsc()) {
+                    order = QAuditEntity.auditEntity.eventTime.asc();
+                }
+            }
+        }
+        //分页条件
+        QPageRequest request = QPageRequest.of(pageModel.getCurrent(), pageModel.getPageSize(),
+            order);
+        return userConverter
+            .entityConvertToAuditListResult(auditRepository.findAll(predicate, request), pageModel);
     }
 
     /**
@@ -573,11 +580,6 @@ public class UserServiceImpl implements UserService {
     private final UserHistoryPasswordRepository     userHistoryPasswordRepository;
 
     /**
-     * ElasticsearchTemplate
-     */
-    private final ElasticsearchTemplate             elasticsearchTemplate;
-
-    /**
      * 邮件消息发布
      */
     private final MailMsgEventPublish               mailMsgEventPublish;
@@ -588,13 +590,12 @@ public class UserServiceImpl implements UserService {
     private final SmsMsgEventPublish                smsMsgEventPublish;
 
     /**
-     * EiamSupportProperties
-     */
-    private final SupportProperties                 supportProperties;
-
-    /**
      * PasswordPolicyManager
      */
     private final PasswordPolicyManager<UserEntity> passwordPolicyManager;
 
+    /**
+     * AuditRepository
+     */
+    private final AuditRepository                   auditRepository;
 }

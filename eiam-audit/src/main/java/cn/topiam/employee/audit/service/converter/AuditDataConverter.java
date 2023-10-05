@@ -17,28 +17,22 @@
  */
 package cn.topiam.employee.audit.service.converter;
 
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.mapstruct.Mapper;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.elasticsearch.client.elc.NativeQuery;
-import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
-import org.springframework.data.elasticsearch.client.elc.Queries;
-import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import com.google.common.collect.Lists;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
 
 import cn.topiam.employee.audit.controller.pojo.AuditListQuery;
 import cn.topiam.employee.audit.controller.pojo.AuditListResult;
 import cn.topiam.employee.audit.entity.AuditEntity;
+import cn.topiam.employee.audit.entity.QAuditEntity;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.common.entity.account.OrganizationEntity;
@@ -61,19 +55,6 @@ import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.security.userdetails.UserType;
 
-import co.elastic.clients.elasticsearch._types.FieldSort;
-import co.elastic.clients.elasticsearch._types.FieldValue;
-import co.elastic.clients.elasticsearch._types.SortOptions;
-import co.elastic.clients.elasticsearch._types.SortOrder;
-import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
-import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
-import co.elastic.clients.json.JsonData;
-import static cn.topiam.employee.audit.entity.Actor.ACTOR_ID;
-import static cn.topiam.employee.audit.entity.Actor.ACTOR_TYPE;
-import static cn.topiam.employee.audit.entity.Event.*;
-import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIME_FORMATTER_PATTERN;
-
 /**
  * 审计数据转换
  *
@@ -87,46 +68,45 @@ public interface AuditDataConverter {
     /**
      * searchHits 转审计列表
      *
-     * @param search {@link SearchHits}
+     * @param auditEntityPage {@link Page}
      * @param page   {@link PageModel}
      * @return {@link Page}
      */
-    default Page<AuditListResult> searchHitsConvertToAuditListResult(SearchHits<AuditEntity> search,
-                                                                     PageModel page) {
+    default Page<AuditListResult> entityConvertToAuditListResult(org.springframework.data.domain.Page<AuditEntity> auditEntityPage,
+                                                                 PageModel page) {
         List<AuditListResult> list = new ArrayList<>();
         //总记录数
-        search.forEach(hit -> {
-            AuditEntity content = hit.getContent();
+        auditEntityPage.forEach(audit -> {
             AuditListResult result = new AuditListResult();
-            result.setId(content.getId().toString());
-            result.setEventStatus(content.getEventStatus());
-            result.setEventType(content.getEventType().getDesc());
-            result.setEventTime(content.getEventTime());
+            result.setId(audit.getId().toString());
+            result.setEventStatus(audit.getEventStatus());
+            result.setEventType(audit.getEventType().getDesc());
+            result.setEventTime(audit.getEventTime());
             //用户代理
-            result.setUserAgent(content.getUserAgent());
-            result.setGeoLocation(content.getGeoLocation());
+            result.setUserAgent(audit.getUserAgent());
+            result.setGeoLocation(audit.getGeoLocation());
             //用户ID
-            result.setUserId(content.getActorId());
-            result.setUsername(getUsername(content.getActorType(), content.getActorId()));
+            result.setUserId(audit.getActorId());
+            result.setUsername(getUsername(audit.getActorType(), audit.getActorId()));
             //用户类型
-            result.setUserType(content.getActorType().getType());
+            result.setUserType(audit.getActorType().getType());
             //操作对象
-            if (Objects.nonNull(content.getTargets())) {
-                for (Target target : content.getTargets()) {
+            if (Objects.nonNull(audit.getTargets())) {
+                for (Target target : audit.getTargets()) {
                     if (Objects.nonNull(target.getId())) {
                         target.setName(getTargetName(target.getType(), target.getId()));
                     }
                     target.setTypeName(target.getType().getDesc());
                 }
             }
-            result.setTargets(content.getTargets());
+            result.setTargets(audit.getTargets());
             list.add(result);
         });
         //@formatter:off
         Page<AuditListResult> result = new Page<>();
         result.setPagination(Page.Pagination.builder()
-                .total(search.getTotalHits())
-                .totalPages(Math.toIntExact(search.getTotalHits() / page.getPageSize()))
+                .total(auditEntityPage.getTotalElements())
+                .totalPages(auditEntityPage.getTotalPages())
                 .current(page.getCurrent() + 1)
                 .build());
         result.setList(list);
@@ -165,13 +145,12 @@ public interface AuditDataConverter {
      * 审计列表请求到本机搜索查询
      *
      * @param query {@link AuditListQuery}
-     * @param page  {@link PageModel}
-     * @return {@link NativeQuery}
+     * @return {@link Predicate}
      */
-    default NativeQuery auditListRequestConvertToNativeQuery(AuditListQuery query, PageModel page) {
-        //构建查询 builder下有 must、should 以及 mustNot 相当于 sql 中的 and、or 以及 not
-        BoolQuery.Builder queryBuilder = QueryBuilders.bool();
-        List<SortOptions> fieldSortBuilders = Lists.newArrayList();
+    default Predicate auditListRequestConvertToPredicate(AuditListQuery query) {
+        QAuditEntity auditEntity = QAuditEntity.auditEntity;
+        Predicate predicate = ExpressionUtils.and(auditEntity.isNotNull(),
+            auditEntity.deleted.eq(Boolean.FALSE));
         //用户名存在，查询用户ID
         if (StringUtils.hasText(query.getUsername())) {
             String actorId = "";
@@ -182,6 +161,8 @@ public interface AuditDataConverter {
                 if (!Objects.isNull(user)) {
                     actorId = user.getId().toString();
                 }
+                // 用户类型
+                predicate = ExpressionUtils.and(predicate, auditEntity.actorType.eq(UserType.USER));
             }
             if (UserType.ADMIN.getType().equals(query.getUserType())) {
                 AdministratorRepository administratorRepository = ApplicationContextHelp
@@ -191,61 +172,45 @@ public interface AuditDataConverter {
                 if (optional.isPresent()) {
                     actorId = optional.get().getId().toString();
                 }
+                // 用户类型
+                predicate = ExpressionUtils.and(predicate,
+                    auditEntity.actorType.eq(UserType.ADMIN));
             }
-            queryBuilder.must(Queries.termQueryAsQuery(ACTOR_ID, actorId));
+            predicate = ExpressionUtils.and(predicate, auditEntity.actorId.eq(actorId));
         }
-        //用户类型
-        queryBuilder.must(Queries.termQueryAsQuery(ACTOR_TYPE, query.getUserType()));
         //事件类型
         if (!CollectionUtils.isEmpty(query.getEventType())) {
-            queryBuilder.must(QueryBuilders.terms(builder -> {
-                builder
-                    .terms(
-                        new TermsQueryField.Builder()
-                            .value(query.getEventType().stream()
-                                .map(t -> FieldValue.of(t.getCode())).collect(Collectors.toList()))
-                            .build());
-                builder.field(EVENT_TYPE);
-                return builder;
-            }));
+            predicate = ExpressionUtils.and(predicate,
+                auditEntity.eventType.in(query.getEventType()));
         }
         //事件状态
         if (Objects.nonNull(query.getEventStatus())) {
-            queryBuilder
-                .must(Queries.termQueryAsQuery(EVENT_STATUS, query.getEventStatus().getCode()));
+            predicate = ExpressionUtils.and(predicate,
+                auditEntity.eventStatus.in(query.getEventStatus()));
         }
         //字段排序
-        page.getSorts().forEach(sort -> {
-            SortOrder sortOrder;
-            if (org.apache.commons.lang3.StringUtils.equals(sort.getSorter(), SORT_EVENT_TIME)) {
-                if (sort.getAsc()) {
-                    sortOrder = SortOrder.Asc;
-                } else {
-                    sortOrder = SortOrder.Desc;
-                }
-            } else {
-                sortOrder = SortOrder.Desc;
-            }
-            SortOptions eventTimeSortBuilder = SortOptions
-                .of(s -> s.field(FieldSort.of(f -> f.field(EVENT_TIME).order(sortOrder))));
-            fieldSortBuilders.add(eventTimeSortBuilder);
-        });
+        //        page.getSorts().forEach(sort -> {
+        //            SortOrder sortOrder;
+        //            if (org.apache.commons.lang3.StringUtils.equals(sort.getSorter(), SORT_EVENT_TIME)) {
+        //                if (sort.getAsc()) {
+        //                    sortOrder = SortOrder.Asc;
+        //                } else {
+        //                    sortOrder = SortOrder.Desc;
+        //                }
+        //            } else {
+        //                sortOrder = SortOrder.Desc;
+        //            }
+        //            SortOptions eventTimeSortBuilder = SortOptions
+        //                .of(s -> s.field(FieldSort.of(f -> f.field(EVENT_TIME).order(sortOrder))));
+        //            fieldSortBuilders.add(eventTimeSortBuilder);
+        //        });
         //事件时间
         if (!Objects.isNull(query.getStartEventTime())
             && !Objects.isNull(query.getEndEventTime())) {
-            queryBuilder.must(QueryBuilders.range(r -> r.field(EVENT_TIME)
-                .gte(JsonData.of(query.getStartEventTime()
-                    .format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMATTER_PATTERN))))
-                .lte(JsonData.of(query.getEndEventTime()
-                    .format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMATTER_PATTERN))))
-                .timeZone(ZoneId.systemDefault().getId())
-                .format(DEFAULT_DATE_TIME_FORMATTER_PATTERN)));
+            predicate = ExpressionUtils.and(predicate,
+                auditEntity.eventTime.between(query.getStartEventTime(), query.getEndEventTime()));
         }
-        return new NativeQueryBuilder().withQuery(queryBuilder.build()._toQuery())
-            //分页参数
-            .withPageable(PageRequest.of(page.getCurrent(), page.getPageSize()))
-            //排序
-            .withSort(fieldSortBuilders).build();
+        return predicate;
     }
 
     /**

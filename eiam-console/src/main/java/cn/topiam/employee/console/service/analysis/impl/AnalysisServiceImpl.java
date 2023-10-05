@@ -18,16 +18,11 @@
 package cn.topiam.employee.console.service.analysis.impl;
 
 import java.time.*;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import org.jetbrains.annotations.NotNull;
-import org.springframework.data.elasticsearch.client.elc.*;
-import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import cn.topiam.employee.audit.entity.AuditElasticSearchEntity;
 import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.audit.repository.AuditRepository;
 import cn.topiam.employee.audit.repository.result.AuditStatisticsResult;
@@ -40,19 +35,10 @@ import cn.topiam.employee.common.repository.authentication.IdentityProviderRepos
 import cn.topiam.employee.console.pojo.query.analysis.AnalysisQuery;
 import cn.topiam.employee.console.pojo.result.analysis.*;
 import cn.topiam.employee.console.service.analysis.AnalysisService;
-import cn.topiam.employee.support.autoconfiguration.SupportProperties;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
-import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
-import co.elastic.clients.json.JsonData;
-import static cn.topiam.employee.audit.entity.Event.*;
 import static cn.topiam.employee.console.converter.authn.IdentityProviderConverter.getIdentityProviderType;
-import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIME_FORMATTER_PATTERN;
 
 /**
  * @author TopIAM
@@ -62,8 +48,6 @@ import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIM
 @Slf4j
 @RequiredArgsConstructor
 public class AnalysisServiceImpl implements AnalysisService {
-
-    public static final String COUNT = "count";
 
     /**
      * 概述
@@ -117,22 +101,6 @@ public class AnalysisServiceImpl implements AnalysisService {
     }
 
     /**
-     * 时间查询条件
-     *
-     * @param params {@link AnalysisQuery}
-     * @return {@link Query}
-     */
-    private Query getRangeQueryBuilder(AnalysisQuery params) {
-        String min = params.getStartTime()
-            .format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMATTER_PATTERN));
-        String max = params.getEndTime()
-            .format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMATTER_PATTERN));
-        // 查询条件
-        return QueryBuilders.range(range -> range.field(EVENT_TIME).timeZone(ZONE_ID)
-            .format(DEFAULT_DATE_TIME_FORMATTER_PATTERN).gt(JsonData.of(min)).lt(JsonData.of(max)));
-    }
-
-    /**
      * 热门认证方式
      * @param params {@link AnalysisQuery}
      * @return {@link List<AuthnQuantityResult>}
@@ -156,7 +124,7 @@ public class AnalysisServiceImpl implements AnalysisService {
      * 登录区域统计
      *
      * @param params {@link AnalysisQuery}
-     * @return {@link List< AuthnZoneResult >}
+     * @return {@link List<AuthnZoneResult>}
      */
     @Override
     public List<AuthnZoneResult> authnZone(AnalysisQuery params) {
@@ -181,60 +149,6 @@ public class AnalysisServiceImpl implements AnalysisService {
         AppEntity app = appRepository.findById(Long.valueOf(targetId)).orElse(new AppEntity());
         return app.getName();
     }
-
-    /**
-     * ES聚合查询
-     *
-     * @param searchHits {@link SearchHits<AuditElasticSearchEntity>}
-     * @return {@link Aggregation}
-     */
-    private ElasticsearchAggregation getCountAggregation(SearchHits<AuditElasticSearchEntity> searchHits) {
-        ElasticsearchAggregations elasticsearchAggregations = (ElasticsearchAggregations) searchHits
-            .getAggregations();
-        if (elasticsearchAggregations == null) {
-            return null;
-        }
-        List<ElasticsearchAggregation> aggregations = elasticsearchAggregations.aggregations();
-        return aggregations.stream()
-            .filter(aggregation -> aggregation.aggregation().getName().equals(COUNT)).findFirst()
-            .orElse(null);
-    }
-
-    /**
-     * 拼装查询条件
-     *
-     * @param query {@link Query}
-     * @param eventType {@link EventType}
-     * @return {@link BoolQuery.Builder}
-     */
-    @NotNull
-    private BoolQuery.Builder getQueryBuilder(Query query, EventType eventType) {
-        // 查询条件
-        BoolQuery.Builder queryBuilder = QueryBuilders.bool();
-        // 事件类型
-        queryBuilder.must(Queries.termQueryAsQuery(EVENT_TYPE, eventType.getCode()));
-        // 日期条件
-        queryBuilder.filter(query);
-        return queryBuilder;
-    }
-
-    /**
-     * 拼装查询条件
-     *
-     * @param query {@link Query}
-     * @param eventType {@link EventType}
-     * @return {@link Query}
-     */
-    @NotNull
-    private Query getQuery(Query query, EventType eventType) {
-        return getQueryBuilder(query, eventType).build()._toQuery();
-    }
-
-    private final String                     ZONE_ID = ZoneId.systemDefault().getId();
-
-    private final SupportProperties          supportProperties;
-
-    //    private final ElasticsearchTemplate      elasticsearchTemplate;
 
     private final AuditRepository            auditRepository;
 
