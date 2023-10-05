@@ -79,6 +79,13 @@ public class AccountEventType {
         "eiam:event:account:move_organization", "移动组织", ORG_ACCOUNT_RESOURCE, List.of(ADMIN));
 
     /**
+     * 添加组织用户
+     */
+    public static Type CREATE_ORGANIZATION_MEMBER            = new Type(
+        "eiam:event:account:create_organization_member", "添加组织用户", ORG_ACCOUNT_RESOURCE,
+        List.of(ADMIN));
+
+    /**
      * 用户离职
      */
     public static Type USER_RESIGN                           = new Type(

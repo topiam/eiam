@@ -273,7 +273,9 @@ export async function removeUser(id: string): Promise<API.ApiResult<boolean>> {
 /**
  * Remove  Batch User
  */
-export async function removeBatchUser(ids: (number | string)[]): Promise<API.ApiResult<boolean>> {
+export async function removeBatchUser(
+  ids: (number | string | Key)[],
+): Promise<API.ApiResult<boolean>> {
   return request<API.ApiResult<boolean>>(`/api/v1/user/batch_delete`, {
     method: 'DELETE',
     params: { ids: ids },

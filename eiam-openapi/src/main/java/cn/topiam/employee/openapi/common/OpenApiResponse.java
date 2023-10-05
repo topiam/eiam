@@ -19,7 +19,7 @@ package cn.topiam.employee.openapi.common;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import cn.topiam.employee.openapi.constants.OpenApiStatus;
+import cn.topiam.employee.openapi.constant.OpenApiStatus;
 import cn.topiam.employee.support.trace.TraceUtils;
 
 import lombok.Data;

@@ -24,14 +24,14 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.lang.NonNull;
 
-import cn.topiam.employee.common.entity.account.po.UserIdpBindPo;
+import cn.topiam.employee.common.entity.account.po.UserIdpBindPO;
 
 /**
  * @author TopIAM
  * Created by support@topiam.cn on  2022/2/13 22:25
  */
 @SuppressWarnings("DuplicatedCode")
-public class UserIdpBindPoMapper implements RowMapper<UserIdpBindPo> {
+public class UserIdpBindPoMapper implements RowMapper<UserIdpBindPO> {
     /**
      * Implementations must implement this method to map each row of data
      * in the ResultSet. This method should not call {@code next()} on
@@ -44,9 +44,9 @@ public class UserIdpBindPoMapper implements RowMapper<UserIdpBindPo> {
      *                      column values (that is, there's no need to catch SQLException)
      */
     @Override
-    public UserIdpBindPo mapRow(@NonNull ResultSet rs, int rowNum) throws SQLException {
+    public UserIdpBindPO mapRow(@NonNull ResultSet rs, int rowNum) throws SQLException {
         //@formatter:off
-        UserIdpBindPo userIdpBindPo = new UserIdpBindPo();
+        UserIdpBindPO userIdpBindPo = new UserIdpBindPO();
         userIdpBindPo.setId(rs.getLong("id_"));
         userIdpBindPo.setUserId(rs.getLong("user_id"));
         userIdpBindPo.setOpenId(rs.getString("open_id"));

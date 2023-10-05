@@ -39,6 +39,7 @@ import cn.topiam.employee.application.exception.AppNotExistException;
 import cn.topiam.employee.application.form.FormApplicationService;
 import cn.topiam.employee.application.form.model.FormProtocolConfig;
 import cn.topiam.employee.support.util.IpUtils;
+import cn.topiam.employee.support.web.servlet.RepeatedlyRequestWrapper;
 
 import lombok.Getter;
 
@@ -82,12 +83,12 @@ public final class FormAuthorizationServerContextFilter extends OncePerRequestFi
             filterChain.doFilter(request, response);
             return;
         }
+
         try {
             //@formatter:off
             Map<String, String> variables = matcher.getVariables();
             String appCode = variables.get(APP_CODE);
             if (this.logger.isTraceEnabled()) {
-                String body = IOUtils.toString(request.getInputStream(),StandardCharsets.UTF_8).replaceAll("\\s+", " ");
                 String logs = "\n" +
                         "┣ " + SEPARATE + "\n" +
                         "┣ App: " + appCode + "\n" +
@@ -95,7 +96,7 @@ public final class FormAuthorizationServerContextFilter extends OncePerRequestFi
                         "┣ Request ip: " + IpUtils.getIpAddr(request) + "\n" +
                         "┣ Request headers: " + JSONObject.toJSONString(getRequestHeaders(request)) + "\n" +
                         "┣ Request parameters: " + JSONObject.toJSONString(request.getParameterMap()) + "\n" +
-                        "┣ Request payload: " + StringUtils.defaultIfBlank(body, "-") + "\n" +
+                        "┣ Request payload: " + StringUtils.defaultIfBlank(IOUtils.toString(new RepeatedlyRequestWrapper(request, response).getInputStream(),StandardCharsets.UTF_8).replaceAll("\\s+", " "), "-") + "\n" +
                         "┣ " + SEPARATE;
                 logger.trace(logs);
             }

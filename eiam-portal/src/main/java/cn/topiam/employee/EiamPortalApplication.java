@@ -29,7 +29,7 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
  */
 
 @ServletComponentScan
-@SpringBootApplication(scanBasePackages = { "cn.topiam.employee" })
+@SpringBootApplication
 public class EiamPortalApplication {
 
     public static void main(String[] args) {

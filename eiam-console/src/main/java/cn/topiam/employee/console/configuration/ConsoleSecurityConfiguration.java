@@ -54,19 +54,14 @@ import cn.topiam.employee.audit.event.AuditEventPublish;
 import cn.topiam.employee.authentication.common.jackjson.AuthenticationJacksonModule;
 import cn.topiam.employee.common.constant.AuthorizeConstants;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
-import cn.topiam.employee.common.repository.account.OrganizationRepository;
-import cn.topiam.employee.common.repository.account.UserElasticSearchRepository;
-import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.common.repository.setting.AdministratorRepository;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
-import cn.topiam.employee.console.handler.*;
-import cn.topiam.employee.console.listener.ConsoleAuthenticationFailureEventListener;
-import cn.topiam.employee.console.listener.ConsoleAuthenticationSuccessEventListener;
-import cn.topiam.employee.console.listener.ConsoleLogoutSuccessEventListener;
-import cn.topiam.employee.console.listener.ConsoleSessionInformationExpiredStrategy;
-import cn.topiam.employee.core.dynamic.UserSyncTask;
+import cn.topiam.employee.console.security.handler.*;
+import cn.topiam.employee.console.security.listener.ConsoleAuthenticationFailureEventListener;
+import cn.topiam.employee.console.security.listener.ConsoleAuthenticationSuccessEventListener;
+import cn.topiam.employee.console.security.listener.ConsoleLogoutSuccessEventListener;
+import cn.topiam.employee.console.security.listener.ConsoleSessionInformationExpiredStrategy;
 import cn.topiam.employee.core.security.form.FormLoginSecretFilter;
-import cn.topiam.employee.support.autoconfiguration.SupportProperties;
 import cn.topiam.employee.support.geo.GeoLocationService;
 import cn.topiam.employee.support.jackjson.SupportJackson2Module;
 import cn.topiam.employee.support.security.authentication.WebAuthenticationDetailsSource;
@@ -355,24 +350,6 @@ public class ConsoleSecurityConfiguration implements BeanClassLoaderAware {
         mapper.registerModules(new AuthenticationJacksonModule());
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         return new GenericJackson2JsonRedisSerializer(mapper);
-    }
-
-    /**
-     * 同步es用户数据定时任务
-     *
-     * @param supportProperties {@link SupportProperties}
-     * @param userElasticSearchRepository {@link UserElasticSearchRepository}
-     * @param userRepository {@link UserRepository}
-     * @param organizationRepository {@link OrganizationRepository}
-     * @return {@link UserSyncTask}
-     */
-    @Bean
-    public UserSyncTask userSyncTask(SupportProperties supportProperties,
-                                     UserElasticSearchRepository userElasticSearchRepository,
-                                     UserRepository userRepository,
-                                     OrganizationRepository organizationRepository) {
-        return new UserSyncTask(supportProperties, userElasticSearchRepository, userRepository,
-            organizationRepository);
     }
 
     /**

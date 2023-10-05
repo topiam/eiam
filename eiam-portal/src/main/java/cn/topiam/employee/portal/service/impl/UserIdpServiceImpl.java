@@ -28,7 +28,7 @@ import cn.topiam.employee.authentication.common.authentication.IdpUserDetails;
 import cn.topiam.employee.authentication.common.service.UserIdpService;
 import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.entity.account.UserIdpBindEntity;
-import cn.topiam.employee.common.entity.account.po.UserIdpBindPo;
+import cn.topiam.employee.common.entity.account.po.UserIdpBindPO;
 import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
 import cn.topiam.employee.common.repository.account.UserIdpRepository;
 import cn.topiam.employee.common.repository.account.UserRepository;
@@ -68,7 +68,7 @@ public class UserIdpServiceImpl implements UserIdpService {
         if (!source.get().getEnabled()) {
             throw new TopIamException("认证源已禁用");
         }
-        Optional<UserIdpBindPo> authnBind = userIdpRepository.findByIdpIdAndOpenId(providerId,
+        Optional<UserIdpBindPO> authnBind = userIdpRepository.findByIdpIdAndOpenId(providerId,
             openId);
         return authnBind.isPresent();
     }
@@ -119,7 +119,7 @@ public class UserIdpServiceImpl implements UserIdpService {
     }
 
     private UserEntity getUser(String openId, String providerId) {
-        Optional<UserIdpBindPo> bindEntity = userIdpRepository.findByIdpIdAndOpenId(providerId,
+        Optional<UserIdpBindPO> bindEntity = userIdpRepository.findByIdpIdAndOpenId(providerId,
             openId);
         if (bindEntity.isEmpty()) {
             throw new NullPointerException("用户未绑定");

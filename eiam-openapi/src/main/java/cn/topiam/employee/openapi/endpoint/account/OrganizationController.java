@@ -38,7 +38,7 @@ import lombok.RequiredArgsConstructor;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import static cn.topiam.employee.openapi.constants.OpenApiV1Constants.ORGANIZATION_PATH;
+import static cn.topiam.employee.openapi.constant.OpenApiV1Constants.ORGANIZATION_PATH;
 
 /**
  * 系统账户-组织架构

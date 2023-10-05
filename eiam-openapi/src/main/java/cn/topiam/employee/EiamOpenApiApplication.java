@@ -20,13 +20,6 @@ package cn.topiam.employee;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
-
-import cn.topiam.employee.audit.controller.AuditController;
-import cn.topiam.employee.common.exception.handler.GlobalExceptionHandler;
-import cn.topiam.employee.common.storage.controller.StorageFileResource;
-import cn.topiam.employee.core.configuration.EiamApiConfiguration;
 
 /**
  * 应用程序启动入口
@@ -35,11 +28,7 @@ import cn.topiam.employee.core.configuration.EiamApiConfiguration;
  * Created by support@topiam.cn on  2020/7/9
  */
 @ServletComponentScan
-@SpringBootApplication(scanBasePackages = { "cn.topiam.employee" })
-@ComponentScan(excludeFilters = { @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = { EiamApiConfiguration.class,
-                                                                                                     StorageFileResource.class,
-                                                                                                     AuditController.class,
-                                                                                                     GlobalExceptionHandler.class }) })
+@SpringBootApplication
 public class EiamOpenApiApplication {
     public static void main(String[] args) {
         SpringApplication.run(EiamOpenApiApplication.class, args);

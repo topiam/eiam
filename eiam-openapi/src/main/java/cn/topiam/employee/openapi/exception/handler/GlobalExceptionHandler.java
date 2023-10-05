@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.ModelAndView;
 
 import cn.topiam.employee.openapi.common.OpenApiResponse;
-import cn.topiam.employee.openapi.constants.OpenApiStatus;
+import cn.topiam.employee.openapi.constant.OpenApiStatus;
 import cn.topiam.employee.openapi.exception.OpenApiException;
 
 import lombok.AllArgsConstructor;

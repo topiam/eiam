@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.mapstruct.Mapper;
 
-import cn.topiam.employee.common.entity.account.po.UserIdpBindPo;
+import cn.topiam.employee.common.entity.account.po.UserIdpBindPO;
 import cn.topiam.employee.console.pojo.result.app.UserIdpBindListResult;
 import cn.topiam.employee.support.repository.page.domain.Page;
 
@@ -41,9 +41,9 @@ public interface UserIdpBindConverter {
      * @param page {@link Page}
      * @return {@link Page}
      */
-    default List<UserIdpBindListResult> userIdpBindEntityConvertToUserIdpBindListResult(Iterable<UserIdpBindPo> page) {
+    default List<UserIdpBindListResult> userIdpBindEntityConvertToUserIdpBindListResult(Iterable<UserIdpBindPO> page) {
         List<UserIdpBindListResult> list = new ArrayList<>();
-        for (UserIdpBindPo entity : page) {
+        for (UserIdpBindPO entity : page) {
             list.add(entityConvertToAppAccountResult(entity));
         }
         return list;
@@ -52,8 +52,8 @@ public interface UserIdpBindConverter {
     /**
      * 用户身份提供商绑定关系转换结果
      *
-     * @param userIdpBindPo {@link UserIdpBindPo}
+     * @param userIdpBindPo {@link UserIdpBindPO}
      * @return {@link UserIdpBindListResult}
      */
-    UserIdpBindListResult entityConvertToAppAccountResult(UserIdpBindPo userIdpBindPo);
+    UserIdpBindListResult entityConvertToAppAccountResult(UserIdpBindPO userIdpBindPo);
 }

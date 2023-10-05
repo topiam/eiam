@@ -35,10 +35,11 @@ public final class JwtLogoutAuthenticationProvider implements AuthenticationProv
         JwtLogoutAuthenticationToken logoutAuthenticationToken = (JwtLogoutAuthenticationToken) authentication;
         SessionInformation sessionInformation = sessionRegistry
             .getSessionInformation(logoutAuthenticationToken.getSessionId());
-        if (sessionInformation.isExpired()) {
-
-        }
-        return null;
+        //        if (StringUtils.hasText(logoutAuthenticationToken.getPostLogoutRedirectUri()) &&
+        //                !registeredClient.getPostLogoutRedirectUris().contains(logoutAuthenticationToken.getPostLogoutRedirectUri())) {
+        //            throwError(new JwtError(JwtErrorCodes.INVALID_REQUEST, "post_logout_redirect_uri"));
+        //        }
+        return logoutAuthenticationToken;
     }
 
     @Override

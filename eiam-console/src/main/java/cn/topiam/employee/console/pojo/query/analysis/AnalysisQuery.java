@@ -69,15 +69,15 @@ public class AnalysisQuery implements Serializable {
                           /**
                            * HOUR
                            */
-                          HOUR(CalendarInterval.Hour, "HH时"),
+                          HOUR(CalendarInterval.Hour, "%h时"),
                           /**
                            * DAY
                            */
-                          DAY(CalendarInterval.Day, "dd日"),
+                          DAY(CalendarInterval.Day, "%d日"),
                           /**
                            * MONTH
                            */
-                          MONTH(CalendarInterval.Month, "MM月");
+                          MONTH(CalendarInterval.Month, "%m月");
 
         private final CalendarInterval type;
         private final String           format;

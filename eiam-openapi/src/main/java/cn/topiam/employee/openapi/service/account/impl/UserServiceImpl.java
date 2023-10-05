@@ -48,9 +48,7 @@ import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.core.message.MsgVariable;
 import cn.topiam.employee.core.message.mail.MailMsgEventPublish;
 import cn.topiam.employee.core.message.sms.SmsMsgEventPublish;
-import cn.topiam.employee.core.mq.UserMessagePublisher;
-import cn.topiam.employee.core.mq.UserMessageTag;
-import cn.topiam.employee.openapi.constants.OpenApiStatus;
+import cn.topiam.employee.openapi.constant.OpenApiStatus;
 import cn.topiam.employee.openapi.converter.account.UserConverter;
 import cn.topiam.employee.openapi.exception.OpenApiException;
 import cn.topiam.employee.openapi.pojo.result.account.UserListResult;
@@ -115,8 +113,6 @@ public class UserServiceImpl implements UserService {
         }
         AuditContext.setTarget(Target.builder().id(id.toString()).type(TargetType.USER).build());
         userRepository.updateUserStatus(id, status);
-        // 更新用户索引数据
-        userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE, String.valueOf(id));
     }
 
     /**
@@ -168,9 +164,6 @@ public class UserServiceImpl implements UserService {
         organizationMemberRepository.save(member);
         AuditContext.setTarget(Target.builder().type(USER).id(user.getId().toString()).build(),
             Target.builder().type(USER_DETAIL).id(detail.getId().toString()).build());
-        // 保存ES用户信息
-        userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE,
-            String.valueOf(user.getId()));
         // 发送短信和邮件的欢迎信息（密码通知）
         UserCreateParam.PasswordInitializeConfig passwordInitializeConfig = param
             .getPasswordInitializeConfig();
@@ -266,9 +259,6 @@ public class UserServiceImpl implements UserService {
         userDetailsRepository.save(detail);
         AuditContext.setTarget(Target.builder().type(USER).id(user.getId().toString()).build(),
             Target.builder().type(USER_DETAIL).id(detail.getId().toString()).build());
-        // 更新ES用户信息
-        userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE,
-            String.valueOf(user.getId()));
     }
 
     /**
@@ -294,8 +284,6 @@ public class UserServiceImpl implements UserService {
         organizationMemberRepository.deleteByUserId(Long.valueOf(id));
         //删除用户组用户详情
         userGroupMemberRepository.deleteByUserId(Long.valueOf(id));
-        // 删除ES用户信息
-        userMessagePublisher.sendUserChangeMessage(UserMessageTag.DELETE, id);
     }
 
     @Override
@@ -427,19 +415,13 @@ public class UserServiceImpl implements UserService {
      */
     private final PasswordPolicyManager<UserEntity> passwordPolicyManager;
 
-    /**
-     * UserMessagePublisher
-     */
-    private final UserMessagePublisher              userMessagePublisher;
-
     public UserServiceImpl(UserConverter userConverter, UserRepository userRepository,
                            OrganizationMemberRepository organizationMemberRepository,
                            UserGroupMemberRepository userGroupMemberRepository,
                            UserDetailRepository userDetailsRepository,
                            MailMsgEventPublish mailMsgEventPublish,
                            SmsMsgEventPublish smsMsgEventPublish,
-                           PasswordPolicyManager<UserEntity> passwordPolicyManager,
-                           UserMessagePublisher userMessagePublisher) {
+                           PasswordPolicyManager<UserEntity> passwordPolicyManager) {
         this.userConverter = userConverter;
         this.userRepository = userRepository;
         this.organizationMemberRepository = organizationMemberRepository;
@@ -448,6 +430,5 @@ public class UserServiceImpl implements UserService {
         this.mailMsgEventPublish = mailMsgEventPublish;
         this.smsMsgEventPublish = smsMsgEventPublish;
         this.passwordPolicyManager = passwordPolicyManager;
-        this.userMessagePublisher = userMessagePublisher;
     }
 }

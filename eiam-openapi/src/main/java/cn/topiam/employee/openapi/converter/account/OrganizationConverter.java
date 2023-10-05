@@ -17,6 +17,7 @@
  */
 package cn.topiam.employee.openapi.converter.account;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,10 +26,15 @@ import org.mapstruct.Mapping;
 import org.springframework.util.CollectionUtils;
 
 import cn.topiam.employee.common.entity.account.OrganizationEntity;
+import cn.topiam.employee.common.entity.account.OrganizationMemberEntity;
 import cn.topiam.employee.openapi.pojo.result.account.OrganizationChildResult;
+import cn.topiam.employee.openapi.pojo.result.account.OrganizationMember;
 import cn.topiam.employee.openapi.pojo.result.account.OrganizationResult;
 import cn.topiam.employee.openapi.pojo.save.account.OrganizationCreateParam;
+import cn.topiam.employee.openapi.pojo.save.account.OrganizationMemberCreateParam;
 import cn.topiam.employee.openapi.pojo.update.account.OrganizationUpdateParam;
+import cn.topiam.employee.support.exception.BadParamsException;
+import cn.topiam.employee.support.security.util.SecurityUtils;
 
 /**
  * 组织架构数据映射
@@ -119,4 +125,42 @@ public interface OrganizationConverter {
      * @return {@link OrganizationResult}
      */
     OrganizationResult entityConvertToOrgDetailResult(OrganizationEntity organization);
+
+    /**
+     * 组织用户关系入参转entity
+     *
+     * @param createParam {@link OrganizationMemberCreateParam}
+     * @return {@link List}
+     */
+    default List<OrganizationMemberEntity> orgMemberConvertToEntity(OrganizationMemberCreateParam createParam) {
+        List<OrganizationMemberCreateParam.Organization> list = createParam.getOrganizationList();
+        if (list == null) {
+            return null;
+        }
+        if (!(list.stream().filter(OrganizationMemberCreateParam.Organization::getPrimary)
+            .count() == 1)) {
+            throw new BadParamsException("主组织有且只能存在一个");
+        }
+        List<OrganizationMemberEntity> entities = new ArrayList<>(list.size());
+        for (OrganizationMemberCreateParam.Organization organization : list) {
+            OrganizationMemberEntity organizationMemberEntity = new OrganizationMemberEntity();
+            organizationMemberEntity.setOrgId(organization.getOrgId());
+            organizationMemberEntity.setUserId(createParam.getUserId());
+            organizationMemberEntity.setPrimary(organization.getPrimary());
+            organizationMemberEntity.setCreateBy(SecurityUtils.getCurrentUserId());
+            organizationMemberEntity.setCreateTime(LocalDateTime.now());
+            organizationMemberEntity.setUpdateBy(SecurityUtils.getCurrentUserId());
+            organizationMemberEntity.setUpdateTime(LocalDateTime.now());
+            entities.add(organizationMemberEntity);
+        }
+        return entities;
+    };
+
+    /**
+     * entity转组织用户关系
+     *
+     * @param list {@link List}
+     * @return {@link List}
+     */
+    List<OrganizationMember> entityConvertToOrgMember(List<OrganizationMemberEntity> list);
 }

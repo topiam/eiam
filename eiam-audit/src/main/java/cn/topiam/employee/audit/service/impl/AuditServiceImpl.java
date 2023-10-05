@@ -33,7 +33,7 @@ import org.springframework.util.CollectionUtils;
 import cn.topiam.employee.audit.controller.pojo.AuditListQuery;
 import cn.topiam.employee.audit.controller.pojo.AuditListResult;
 import cn.topiam.employee.audit.controller.pojo.DictResult;
-import cn.topiam.employee.audit.entity.AuditElasticSearchEntity;
+import cn.topiam.employee.audit.entity.AuditEntity;
 import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.audit.service.AuditService;
 import cn.topiam.employee.audit.service.converter.AuditDataConverter;
@@ -71,8 +71,8 @@ public class AuditServiceImpl implements AuditService {
         //查询入参转查询条件
         NativeQuery nsq = auditDataConverter.auditListRequestConvertToNativeQuery(query, page);
         //查询列表
-        SearchHits<AuditElasticSearchEntity> search = elasticsearchTemplate.search(nsq,
-            AuditElasticSearchEntity.class, IndexCoordinates
+        SearchHits<AuditEntity> search = elasticsearchTemplate.search(nsq, AuditEntity.class,
+            IndexCoordinates
                 .of(getAuditIndexPrefix(supportProperties.getAudit().getIndexPrefix()) + "*"));
         //结果转返回结果
         return auditDataConverter.searchHitsConvertToAuditListResult(search, page);

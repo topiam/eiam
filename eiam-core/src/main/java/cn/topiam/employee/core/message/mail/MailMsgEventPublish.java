@@ -23,15 +23,14 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.topiam.employee.common.enums.MailType;
 import cn.topiam.employee.common.enums.MessageCategory;
-import cn.topiam.employee.common.message.enums.MessageType;
 import cn.topiam.employee.common.message.mail.MailProviderConfig;
-import cn.topiam.employee.core.mq.NoticeMessagePublisher;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.exception.TopIamException;
 
@@ -53,10 +52,11 @@ import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIM
 @Slf4j
 @AllArgsConstructor
 public class MailMsgEventPublish {
+
     /**
-     * NoticeMessagePublisher
+     * ApplicationEventPublisher
      */
-    private final NoticeMessagePublisher noticeMessageProducer;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     /**
      * 发布验证代码
@@ -101,7 +101,7 @@ public class MailMsgEventPublish {
         parameter.put(USER_EMAIL, receiver);
         // publish event
         ObjectMapper objectMapper = ApplicationContextHelp.getBean(ObjectMapper.class);
-        noticeMessageProducer.sendNotice(MessageType.MAIL,
-            objectMapper.writeValueAsString(new MailMessage(type, receiver, parameter)));
+        applicationEventPublisher.publishEvent(new MailMsgEvent(type, receiver, parameter));
+
     }
 }

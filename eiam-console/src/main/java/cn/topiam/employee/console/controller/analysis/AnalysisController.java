@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import cn.topiam.employee.audit.repository.result.AuthnQuantityResult;
+import cn.topiam.employee.audit.repository.result.AuthnZoneResult;
 import cn.topiam.employee.console.pojo.query.analysis.AnalysisQuery;
 import cn.topiam.employee.console.pojo.result.analysis.*;
 import cn.topiam.employee.console.service.analysis.AnalysisService;

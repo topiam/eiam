@@ -65,7 +65,7 @@ import cn.topiam.employee.support.util.PhoneNumberUtils;
 import cn.topiam.employee.support.validation.annotation.ValidationPhone;
 
 import lombok.extern.slf4j.Slf4j;
-import static cn.topiam.employee.console.access.DefaultAdministratorConstants.DEFAULT_ADMIN_USERNAME;
+import static cn.topiam.employee.common.constant.SecurityConstants.DEFAULT_ADMIN_USERNAME;
 import static cn.topiam.employee.support.util.PhoneNumberUtils.getPhoneNumber;
 
 /**

@@ -61,12 +61,10 @@
         <module>eiam-protocol</module>
         <module>eiam-console</module>
         <module>eiam-portal</module>
-        <module>eiam-synchronizer</module>
         <module>eiam-identity-source</module>
         <module>eiam-openapi</module>
         <module>eiam-authentication</module>
         <module>eiam-audit</module>
-        <module>eiam-alert</module>
     </modules>
     <!--dependencies-->
     <dependencies>

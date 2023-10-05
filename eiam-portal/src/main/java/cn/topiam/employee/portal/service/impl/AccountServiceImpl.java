@@ -40,7 +40,7 @@ import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.common.entity.account.UserDetailEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
-import cn.topiam.employee.common.entity.account.po.UserIdpBindPo;
+import cn.topiam.employee.common.entity.account.po.UserIdpBindPO;
 import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
 import cn.topiam.employee.common.enums.MailType;
 import cn.topiam.employee.common.enums.MessageNoticeChannel;
@@ -52,8 +52,6 @@ import cn.topiam.employee.common.repository.account.UserIdpRepository;
 import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 import cn.topiam.employee.core.message.sms.SmsMsgEventPublish;
-import cn.topiam.employee.core.mq.UserMessagePublisher;
-import cn.topiam.employee.core.mq.UserMessageTag;
 import cn.topiam.employee.core.security.otp.OtpContextHelp;
 import cn.topiam.employee.portal.converter.AccountConverter;
 import cn.topiam.employee.portal.pojo.request.*;
@@ -108,9 +106,6 @@ public class AccountServiceImpl implements AccountService {
         toUserDetailsEntity.setId(detail.getId());
         BeanUtils.merge(toUserDetailsEntity, detail, LAST_MODIFIED_BY, LAST_MODIFIED_TIME);
         userDetailsRepository.save(detail);
-        // 更新ES用户信息
-        userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE,
-            String.valueOf(detail.getId()));
         return true;
     }
 
@@ -182,8 +177,6 @@ public class AccountServiceImpl implements AccountService {
         }
         Long id = Long.valueOf(SecurityUtils.getCurrentUser().getId());
         userRepository.updateUserPhone(id, param.getPhone());
-        // 更新ES用户手机号信息
-        userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE, String.valueOf(id));
         // 修改手机号成功发送短信
         LinkedHashMap<String, String> parameter = Maps.newLinkedHashMap();
         parameter.put(USERNAME, user.getUsername());
@@ -239,9 +232,6 @@ public class AccountServiceImpl implements AccountService {
         }
         userRepository.updateUserEmail(Long.valueOf(SecurityUtils.getCurrentUser().getId()),
             param.getEmail());
-        // 更新ES用户邮箱信息
-        userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE,
-            String.valueOf(user.getId()));
         return true;
     }
 
@@ -353,7 +343,7 @@ public class AccountServiceImpl implements AccountService {
         List<IdentityProviderEntity> identityProviderList = identityProviderRepository
             .findByEnabledIsTrueAndDisplayedIsTrue();
         // 获取已绑定idp
-        Iterable<UserIdpBindPo> userIdpBindList = userIdpRepository
+        Iterable<UserIdpBindPO> userIdpBindList = userIdpRepository
             .getUserIdpBindList(Long.valueOf(SecurityUtils.getCurrentUserId()));
         return accountConverter.entityConverterToBoundIdpListResult(identityProviderList,
             userIdpBindList);
@@ -476,11 +466,6 @@ public class AccountServiceImpl implements AccountService {
      */
     private final UserIdpRepository                 userIdpRepository;
 
-    /**
-     * MessagePublisher
-     */
-    private final UserMessagePublisher              userMessagePublisher;
-
     public AccountServiceImpl(AsyncConfigurer asyncConfigurer, AccountConverter accountConverter,
                               PasswordEncoder passwordEncoder, UserRepository userRepository,
                               UserDetailRepository userDetailsRepository,
@@ -489,8 +474,7 @@ public class AccountServiceImpl implements AccountService {
                               StringRedisTemplate stringRedisTemplate,
                               PasswordPolicyManager<UserEntity> passwordPolicyManager,
                               IdentityProviderRepository identityProviderRepository,
-                              UserIdpRepository userIdpRepository,
-                              UserMessagePublisher userMessagePublisher) {
+                              UserIdpRepository userIdpRepository) {
         this.executor = asyncConfigurer.getAsyncExecutor();
         this.accountConverter = accountConverter;
         this.passwordEncoder = passwordEncoder;
@@ -503,6 +487,5 @@ public class AccountServiceImpl implements AccountService {
         this.passwordPolicyManager = passwordPolicyManager;
         this.identityProviderRepository = identityProviderRepository;
         this.userIdpRepository = userIdpRepository;
-        this.userMessagePublisher = userMessagePublisher;
     }
 }

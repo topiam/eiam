@@ -70,7 +70,6 @@ import cn.topiam.employee.common.repository.authentication.IdentityProviderRepos
 import cn.topiam.employee.common.repository.setting.SettingRepository;
 import cn.topiam.employee.core.message.mail.MailMsgEventPublish;
 import cn.topiam.employee.core.message.sms.SmsMsgEventPublish;
-import cn.topiam.employee.core.mq.UserMessagePublisher;
 import cn.topiam.employee.core.security.form.FormLoginSecretFilter;
 import cn.topiam.employee.core.security.otp.OtpContextHelp;
 import cn.topiam.employee.core.security.password.task.PasswordExpireTask;
@@ -78,12 +77,11 @@ import cn.topiam.employee.core.security.password.task.impl.PasswordExpireLockTas
 import cn.topiam.employee.core.security.password.task.impl.PasswordExpireWarnTask;
 import cn.topiam.employee.core.security.task.UserExpireLockTask;
 import cn.topiam.employee.core.security.task.UserUnlockTask;
-import cn.topiam.employee.portal.handler.PortalAuthenticationFailureHandler;
-import cn.topiam.employee.portal.handler.PortalAuthenticationSuccessHandler;
-import cn.topiam.employee.portal.listener.PortalAuthenticationFailureEventListener;
-import cn.topiam.employee.portal.listener.PortalAuthenticationSuccessEventListener;
-import cn.topiam.employee.portal.listener.PortalLogoutSuccessEventListener;
-import cn.topiam.employee.support.autoconfiguration.SupportProperties;
+import cn.topiam.employee.portal.security.handler.PortalAuthenticationFailureHandler;
+import cn.topiam.employee.portal.security.handler.PortalAuthenticationSuccessHandler;
+import cn.topiam.employee.portal.security.listener.PortalAuthenticationFailureEventListener;
+import cn.topiam.employee.portal.security.listener.PortalAuthenticationSuccessEventListener;
+import cn.topiam.employee.portal.security.listener.PortalLogoutSuccessEventListener;
 import cn.topiam.employee.support.geo.GeoLocationService;
 import cn.topiam.employee.support.jackjson.SupportJackson2Module;
 import cn.topiam.employee.support.security.authentication.WebAuthenticationDetailsSource;
@@ -409,17 +407,12 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
      *
      * @param settingRepository {@link  SettingRepository}
      * @param userRepository    {@link  UserRepository}
-     * @param supportProperties    {@link  SupportProperties}
-     * @param userMessagePublisher    {@link  UserMessagePublisher}
      * @return {@link  PasswordExpireTask}
      */
     @Bean
     public PasswordExpireTask passwordExpireLockTask(SettingRepository settingRepository,
-                                                     UserRepository userRepository,
-                                                     SupportProperties supportProperties,
-                                                     UserMessagePublisher userMessagePublisher) {
-        return new PasswordExpireLockTask(settingRepository, userRepository, supportProperties,
-            userMessagePublisher);
+                                                     UserRepository userRepository) {
+        return new PasswordExpireLockTask(settingRepository, userRepository);
     }
 
     @Bean
@@ -445,10 +438,9 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
     public PasswordExpireTask passwordExpireWarnTask(SettingRepository settingRepository,
                                                      UserRepository userRepository,
                                                      MailMsgEventPublish mailMsgEventPublish,
-                                                     SmsMsgEventPublish smsMsgEventPublish,
-                                                     SupportProperties supportProperties) {
+                                                     SmsMsgEventPublish smsMsgEventPublish) {
         return new PasswordExpireWarnTask(settingRepository, userRepository, mailMsgEventPublish,
-            smsMsgEventPublish, supportProperties);
+            smsMsgEventPublish);
     }
 
     /**

@@ -35,8 +35,8 @@ import cn.topiam.employee.openapi.authorization.AccessTokenAuthenticationProvide
 import cn.topiam.employee.openapi.authorization.store.AccessTokenStore;
 import cn.topiam.employee.openapi.authorization.store.RedisAccessTokenStore;
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.DEFAULT_SECURITY_FILTER_CHAIN;
-import static cn.topiam.employee.openapi.constants.OpenApiV1Constants.AUTH_PATH;
-import static cn.topiam.employee.openapi.constants.OpenApiV1Constants.OPEN_API_V1_PATH;
+import static cn.topiam.employee.openapi.constant.OpenApiV1Constants.AUTH_PATH;
+import static cn.topiam.employee.openapi.constant.OpenApiV1Constants.OPEN_API_V1_PATH;
 
 /**
  * ConsoleSecurityConfiguration

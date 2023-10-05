@@ -41,4 +41,9 @@ public class UserPO extends UserEntity {
      * 组织机构显示目录
      */
     private String            orgDisplayPath;
+
+    /**
+     * 主组织机构显示目录
+     */
+    private String            primaryOrgDisplayPath;
 }

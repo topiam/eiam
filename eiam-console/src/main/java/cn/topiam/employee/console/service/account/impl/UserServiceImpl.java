@@ -61,8 +61,6 @@ import cn.topiam.employee.console.service.account.UserService;
 import cn.topiam.employee.core.message.MsgVariable;
 import cn.topiam.employee.core.message.mail.MailMsgEventPublish;
 import cn.topiam.employee.core.message.sms.SmsMsgEventPublish;
-import cn.topiam.employee.core.mq.UserMessagePublisher;
-import cn.topiam.employee.core.mq.UserMessageTag;
 import cn.topiam.employee.support.autoconfiguration.SupportProperties;
 import cn.topiam.employee.support.exception.BadParamsException;
 import cn.topiam.employee.support.exception.InfoValidityFailException;
@@ -200,12 +198,7 @@ public class UserServiceImpl implements UserService {
             throw new TopIamException(AuditContext.getContent());
         }
         AuditContext.setTarget(Target.builder().id(id.toString()).type(TargetType.USER).build());
-        boolean update = userRepository.updateUserStatus(id, status) > 0;
-        if (update) {
-            // 更新索引数据
-            userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE, String.valueOf(id));
-        }
-        return update;
+        return userRepository.updateUserStatus(id, status) > 0;
     }
 
     /**
@@ -258,9 +251,6 @@ public class UserServiceImpl implements UserService {
         organizationMemberRepository.save(member);
         AuditContext.setTarget(Target.builder().type(USER).id(user.getId().toString()).build(),
             Target.builder().type(USER_DETAIL).id(detail.getId().toString()).build());
-        // 保存ES用户信息
-        userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE,
-            String.valueOf(user.getId()));
         // 发送短信和邮件的欢迎信息（密码通知）
         UserCreateParam.PasswordInitializeConfig passwordInitializeConfig = param
             .getPasswordInitializeConfig();
@@ -369,9 +359,6 @@ public class UserServiceImpl implements UserService {
         userDetailsRepository.save(detail);
         AuditContext.setTarget(Target.builder().type(USER).id(user.getId().toString()).build(),
             Target.builder().type(USER_DETAIL).id(detail.getId().toString()).build());
-        // 更新ES用户信息
-        userMessagePublisher.sendUserChangeMessage(UserMessageTag.SAVE,
-            String.valueOf(user.getId()));
         return true;
     }
 
@@ -400,8 +387,6 @@ public class UserServiceImpl implements UserService {
         //删除用户组用户详情
         userGroupMemberRepository.deleteByUserId(Long.valueOf(id));
         AuditContext.setTarget(Target.builder().id(id).type(TargetType.USER).build());
-        // 删除ES用户信息
-        userMessagePublisher.sendUserChangeMessage(UserMessageTag.DELETE, id);
         return true;
     }
 
@@ -445,8 +430,6 @@ public class UserServiceImpl implements UserService {
         organizationMemberRepository.deleteAllByUserId(idList);
         //删除用户组关系
         userGroupMemberRepository.deleteAllByUserId(idList);
-        // 批量删除ES用户信息
-        userMessagePublisher.sendUserChangeMessage(UserMessageTag.DELETE, String.join(",", ids));
         return true;
     }
 
@@ -614,8 +597,4 @@ public class UserServiceImpl implements UserService {
      */
     private final PasswordPolicyManager<UserEntity> passwordPolicyManager;
 
-    /**
-     * MessagePublisher
-     */
-    private final UserMessagePublisher              userMessagePublisher;
 }

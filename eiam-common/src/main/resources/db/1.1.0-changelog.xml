@@ -82,10 +82,21 @@
                 <constraints nullable="true"/>
             </column>
         </createTable>
+        <!-- 添加字段 -->
+        <addColumn tableName="organization_member">
+            <column name="primary_" remarks="主组织" type="TINYINT(1)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
         <!--创建索引-->
         <createIndex tableName="app_group_association" indexName="uk_app_group_association" unique="true">
             <column name="group_id"/>
             <column name="app_id"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex tableName="organization_member" indexName="uk_organization_member_primary" unique="true">
+            <column name="user_id"/>
+            <column name="primary_"/>
             <column name="is_deleted"/>
         </createIndex>
     </changeSet>

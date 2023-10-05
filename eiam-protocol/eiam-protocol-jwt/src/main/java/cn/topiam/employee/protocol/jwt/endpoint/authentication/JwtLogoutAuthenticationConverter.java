@@ -21,17 +21,12 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.web.authentication.AuthenticationConverter;
-import org.springframework.util.StringUtils;
 
 import cn.topiam.employee.protocol.jwt.authentication.JwtLogoutAuthenticationToken;
-import cn.topiam.employee.protocol.jwt.exception.JwtError;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import static cn.topiam.employee.protocol.jwt.constant.JwtProtocolConstants.S_ID;
-import static cn.topiam.employee.protocol.jwt.endpoint.JwtAuthenticationEndpointUtils.throwError;
 
 /**
  *
@@ -44,26 +39,13 @@ public final class JwtLogoutAuthenticationConverter implements AuthenticationCon
 
     @Override
     public Authentication convert(HttpServletRequest request) {
-
-        if (request.getParameterValues(S_ID).length != 1) {
-            throwError(new JwtError(OAuth2ErrorCodes.INVALID_REQUEST,
-                "JWT Logout Request Parameter: " + S_ID));
-        }
-
-        String sessionId = request.getParameter(S_ID);
-        if (!StringUtils.hasText(sessionId)) {
-            HttpSession session = request.getSession(false);
-            if (session != null) {
-                sessionId = session.getId();
-            }
-        }
-
+        HttpSession session = request.getSession(false);
+        String sessionId = session.getId();
         Authentication principal = SecurityContextHolder.getContext().getAuthentication();
         if (principal == null) {
             principal = ANONYMOUS_AUTHENTICATION;
         }
-
-        return new JwtLogoutAuthenticationToken(principal, sessionId);
+        return new JwtLogoutAuthenticationToken(principal, sessionId, "");
     }
 
 }

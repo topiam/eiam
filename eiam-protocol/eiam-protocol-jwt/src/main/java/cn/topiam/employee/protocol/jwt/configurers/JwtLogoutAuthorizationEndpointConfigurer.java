@@ -55,6 +55,7 @@ public class JwtLogoutAuthorizationEndpointConfigurer extends AbstractConfigurer
     @Override
     public void init(HttpSecurity httpSecurity) {
         requestMatcher = new OrRequestMatcher(
+            new AntPathRequestMatcher(JWT_SLO_PATH, HttpMethod.GET.name()),
             new AntPathRequestMatcher(JWT_SLO_PATH, HttpMethod.POST.name()));
         httpSecurity.authenticationProvider(
             new JwtLogoutAuthenticationProvider(getSessionRegistry(httpSecurity)));

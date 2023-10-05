@@ -38,9 +38,7 @@ import com.google.common.collect.Lists;
 
 import cn.topiam.employee.audit.controller.pojo.AuditListQuery;
 import cn.topiam.employee.audit.controller.pojo.AuditListResult;
-import cn.topiam.employee.audit.entity.Actor;
-import cn.topiam.employee.audit.entity.AuditElasticSearchEntity;
-import cn.topiam.employee.audit.entity.Event;
+import cn.topiam.employee.audit.entity.AuditEntity;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.common.entity.account.OrganizationEntity;
@@ -93,27 +91,25 @@ public interface AuditDataConverter {
      * @param page   {@link PageModel}
      * @return {@link Page}
      */
-    default Page<AuditListResult> searchHitsConvertToAuditListResult(SearchHits<AuditElasticSearchEntity> search,
+    default Page<AuditListResult> searchHitsConvertToAuditListResult(SearchHits<AuditEntity> search,
                                                                      PageModel page) {
         List<AuditListResult> list = new ArrayList<>();
         //总记录数
         search.forEach(hit -> {
-            AuditElasticSearchEntity content = hit.getContent();
-            Event event = content.getEvent();
+            AuditEntity content = hit.getContent();
             AuditListResult result = new AuditListResult();
-            result.setId(content.getId());
-            result.setEventStatus(event.getStatus());
-            result.setEventType(event.getType().getDesc());
-            result.setEventTime(event.getTime());
+            result.setId(content.getId().toString());
+            result.setEventStatus(content.getEventStatus());
+            result.setEventType(content.getEventType().getDesc());
+            result.setEventTime(content.getEventTime());
             //用户代理
             result.setUserAgent(content.getUserAgent());
             result.setGeoLocation(content.getGeoLocation());
-            Actor actor = content.getActor();
             //用户ID
-            result.setUserId(actor.getId());
-            result.setUsername(getUsername(actor.getType(), actor.getId()));
+            result.setUserId(content.getActorId());
+            result.setUsername(getUsername(content.getActorType(), content.getActorId()));
             //用户类型
-            result.setUserType(actor.getType().getType());
+            result.setUserType(content.getActorType().getType());
             //操作对象
             if (Objects.nonNull(content.getTargets())) {
                 for (Target target : content.getTargets()) {

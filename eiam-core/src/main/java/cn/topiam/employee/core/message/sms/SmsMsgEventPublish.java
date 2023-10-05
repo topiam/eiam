@@ -23,18 +23,15 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.alibaba.fastjson2.JSON;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.topiam.employee.common.entity.setting.config.SmsConfig;
 import cn.topiam.employee.common.enums.MessageCategory;
 import cn.topiam.employee.common.enums.SmsType;
-import cn.topiam.employee.common.message.enums.MessageType;
-import cn.topiam.employee.core.mq.NoticeMessagePublisher;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.exception.TopIamException;
 
 import lombok.AllArgsConstructor;
@@ -55,18 +52,13 @@ import static cn.topiam.employee.core.message.MsgVariable.VERIFY_CODE;
 @Slf4j
 @AllArgsConstructor
 public class SmsMsgEventPublish {
-    public static final String           TEMPLATE_CODE = "template_code";
+    public static final String TEMPLATE_CODE = "template_code";
 
-    public static final String           CONTENT       = "content";
+    public static final String CONTENT       = "content";
 
-    /**
-     * NoticeMessagePublisher
-     */
-    private final NoticeMessagePublisher noticeMessageProducer;
+    public static final String PHONE         = "phone";
 
-    public static final String           PHONE         = "phone";
-
-    public static final String           USERNAME      = "username";
+    public static final String USERNAME      = "username";
 
     /**
      * 发布验证代码
@@ -110,9 +102,11 @@ public class SmsMsgEventPublish {
         parameter.put(TEMPLATE_CODE, templateConfig.getCode());
         parameter.put(CONTENT, JSON.toJSONString(parameter));
         // publish event
-        ObjectMapper objectMapper = ApplicationContextHelp.getBean(ObjectMapper.class);
-        noticeMessageProducer.sendNotice(MessageType.SMS,
-            objectMapper.writeValueAsString(new SmsMessage(type, parameter)));
+        applicationEventPublisher.publishEvent(new SmsMsgEvent(type, parameter));
     }
 
+    /**
+     * ApplicationEventPublisher
+     */
+    private final ApplicationEventPublisher applicationEventPublisher;
 }
