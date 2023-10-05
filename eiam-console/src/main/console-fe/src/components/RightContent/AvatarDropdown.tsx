@@ -120,9 +120,9 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ children }) =
 
   const menuItems: ItemType[] = [
     {
-      key: 'center',
+      key: 'profile',
       icon: <UserOutlined />,
-      label: intl.formatMessage({ id: 'components.right_content.center' }),
+      label: intl.formatMessage({ id: 'components.right_content.profile' }),
     },
     {
       type: 'divider',

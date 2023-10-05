@@ -1,5 +1,5 @@
 /*
- * eiam-audit - Employee Identity and Access Management
+ * eiam-console - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,45 +15,41 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.audit.entity;
+package cn.topiam.employee.console.pojo.update.user;
 
 import java.io.Serial;
 import java.io.Serializable;
 
-import cn.topiam.employee.support.security.userdetails.UserType;
-
-import lombok.Builder;
 import lombok.Data;
-import lombok.NonNull;
+
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 
 /**
- * Actor
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/11/5 23:30
+ * Created by support@topiam.cn on  2022/8/8 21:15
  */
 @Data
-@Builder
-public class Actor implements Serializable {
+@Schema(description = "准备更改电子邮件入参")
+public class PrepareChangeEmailRequest implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = -1144169992714000310L;
+    private static final long serialVersionUID = 5681761697876754485L;
 
     /**
-     * 行动者ID
+     * 邮箱
      */
-    @NonNull
-    private String            id;
+    @NotEmpty(message = "邮箱不能为空")
+    @Parameter(description = "邮箱")
+    private String            email;
 
     /**
-     * 行动者类型
+     * 密码
      */
-    @NonNull
-    private UserType          type;
-
-    /**
-     * 身份验证类型
-     */
-    private String            authType;
+    @NotEmpty(message = "密码不能为空")
+    @Parameter(description = "密码")
+    private String            password;
 
 }

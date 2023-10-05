@@ -20,9 +20,6 @@ package cn.topiam.employee.audit.entity;
 import java.io.Serial;
 import java.io.Serializable;
 
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
-import org.springframework.data.elasticsearch.annotations.GeoPointField;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 
 import cn.topiam.employee.support.geo.GeoLocationProvider;

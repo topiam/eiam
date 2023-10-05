@@ -1,5 +1,5 @@
 /*
- * eiam-audit - Employee Identity and Access Management
+ * eiam-console - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,45 +15,42 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.audit.entity;
+package cn.topiam.employee.console.pojo.update.user;
 
 import java.io.Serial;
 import java.io.Serializable;
 
-import cn.topiam.employee.support.security.userdetails.UserType;
-
-import lombok.Builder;
 import lombok.Data;
-import lombok.NonNull;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
- * Actor
+ * 编辑用户入参
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/11/5 23:30
+ * Created by support@topiam.cn on 2020/8/11 23:16
  */
 @Data
-@Builder
-public class Actor implements Serializable {
-
+@Schema(description = "修改用户入参")
+public class UpdateUserInfoRequest implements Serializable {
     @Serial
-    private static final long serialVersionUID = -1144169992714000310L;
+    private static final long serialVersionUID = -6616249172773611157L;
 
     /**
-     * 行动者ID
+     * 姓名
      */
-    @NonNull
-    private String            id;
+    @Schema(description = "姓名")
+    private String            fullName;
 
     /**
-     * 行动者类型
+     * 昵称
      */
-    @NonNull
-    private UserType          type;
+    @Schema(description = "昵称")
+    private String            nickName;
 
     /**
-     * 身份验证类型
+     * 头像
      */
-    private String            authType;
-
+    @Schema(description = "头像")
+    private String            avatar;
 }

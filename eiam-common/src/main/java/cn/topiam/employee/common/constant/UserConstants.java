@@ -1,5 +1,5 @@
 /*
- * eiam-audit - Employee Identity and Access Management
+ * eiam-common - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,45 +15,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.audit.entity;
-
-import java.io.Serial;
-import java.io.Serializable;
-
-import cn.topiam.employee.support.security.userdetails.UserType;
-
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
+package cn.topiam.employee.common.constant;
 
 /**
- * Actor
  *
- * @author TopIAM
- * Created by support@topiam.cn on  2022/11/5 23:30
+ * @author SanLi
+ * Created by qinggang.zuo@gmail.com / 2689170096@qq.com on  2023/10/5 15:11
  */
-@Data
-@Builder
-public class Actor implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = -1144169992714000310L;
+public class UserConstants {
 
     /**
-     * 行动者ID
+     * 忘记密码预认证
      */
-    @NonNull
-    private String            id;
+    public static final String PREPARE_FORGET_PASSWORD = "/prepare_forget_password";
 
     /**
-     * 行动者类型
+     * 忘记密码
      */
-    @NonNull
-    private UserType          type;
+    public static final String FORGET_PASSWORD         = "/forget_password";
 
     /**
-     * 身份验证类型
+     * 忘记密码发送验证码
      */
-    private String            authType;
-
+    public static final String FORGET_PASSWORD_CODE    = "/forget_password_code";
 }

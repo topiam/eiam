@@ -1,5 +1,5 @@
 /*
- * eiam-audit - Employee Identity and Access Management
+ * eiam-console - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,45 +15,31 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.audit.entity;
+/**
+ * 账户信息
+ */
+export type AccountInfo = {
+  /** 用户ID */
+  id: string;
+  avatar: string;
+  username: string;
+  phone: string;
+  access: string;
+};
 
-import java.io.Serial;
-import java.io.Serializable;
-
-import cn.topiam.employee.support.security.userdetails.UserType;
-
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
+export interface GetBoundIdpList {
+  code: string;
+  name: string;
+  type: string;
+  category: string;
+  bound: boolean;
+  idpId: string;
+}
 
 /**
- * Actor
- *
- * @author TopIAM
- * Created by support@topiam.cn on  2022/11/5 23:30
+ * 账户菜单类型
  */
-@Data
-@Builder
-public class Actor implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = -1144169992714000310L;
-
-    /**
-     * 行动者ID
-     */
-    @NonNull
-    private String            id;
-
-    /**
-     * 行动者类型
-     */
-    @NonNull
-    private UserType          type;
-
-    /**
-     * 身份验证类型
-     */
-    private String            authType;
-
+export enum AccountSettingsStateKey {
+  base = 'base',
+  security = 'security',
 }

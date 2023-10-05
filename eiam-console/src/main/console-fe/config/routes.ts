@@ -41,10 +41,10 @@ export default [
     component: './user/SessionExpired',
   },
   {
-    name: 'account.center',
-    path: '/user/center',
+    name: 'account.profile',
+    path: '/user/profile',
     hideInMenu: true,
-    component: './user/Center',
+    component: './user/Profile',
   },
   /*欢迎页*/
   {

@@ -19,7 +19,7 @@ export default {
   'component.tagSelect.expand': '展开',
   'component.tagSelect.collapse': '收起',
   'component.tagSelect.all': '全部',
-  'components.right_content.center': '个人中心',
+  'components.right_content.profile': '个人中心',
   'components.right_content.change-password': '修改密码',
   'components.right_content.logout': '退出登录',
 

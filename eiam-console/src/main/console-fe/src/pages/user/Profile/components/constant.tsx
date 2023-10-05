@@ -1,5 +1,5 @@
 /*
- * eiam-audit - Employee Identity and Access Management
+ * eiam-console - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,35 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.audit.entity;
-
-import java.io.Serializable;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-/**
- * UserAgent
- * @author TopIAM
- * Created by support@topiam.cn on  2022/11/5 23:31
- */
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class UserAgent implements Serializable {
-
-    private String deviceType;
-
-    private String platform;
-
-    private String platformVersion;
-
-    private String browser;
-
-    private String browserType;
-
-    private String browserMajorVersion;
-}
+export const FormLayout = {
+  labelCol: { span: 4 },
+  wrapperCol: { span: 20 },
+};

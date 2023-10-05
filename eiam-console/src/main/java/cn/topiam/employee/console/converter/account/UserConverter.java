@@ -21,8 +21,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.topiam.employee.audit.entity.GeoLocation;
-import cn.topiam.employee.audit.entity.UserAgent;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -33,7 +31,9 @@ import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 
 import cn.topiam.employee.audit.entity.AuditEntity;
+import cn.topiam.employee.audit.entity.GeoLocation;
 import cn.topiam.employee.audit.entity.QAuditEntity;
+import cn.topiam.employee.audit.entity.UserAgent;
 import cn.topiam.employee.audit.event.type.PortalEventType;
 import cn.topiam.employee.common.constant.CommonConstants;
 import cn.topiam.employee.common.entity.account.UserDetailEntity;
