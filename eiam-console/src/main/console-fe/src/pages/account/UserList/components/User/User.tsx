@@ -40,7 +40,7 @@ import {
   Tooltip,
   Typography,
   Tag,
-  Popover
+  Popover,
 } from 'antd';
 import React, { useRef, useState } from 'react';
 import CreateUser from '../CreateUser';
@@ -185,43 +185,42 @@ export default (props: UserListProps) => {
       search: false,
       ellipsis: true,
       render: (_, record) => [
-          <Popover
-              key="pop"
-              title={
-                  <Tag color={'geekblue'} key={record.primaryOrgDisplayPath}>
-                      {record.primaryOrgDisplayPath}
+        <Popover
+          key="pop"
+          title={
+            <Tag color={'geekblue'} key={record.orgDisplayPath}>
+              {record.primaryOrgDisplayPath}
+            </Tag>
+          }
+          content={
+            <Space direction="vertical" size="small" style={{ display: 'flex' }}>
+              {record.orgDisplayPath.split(',')?.map((p: string) => {
+                return (
+                  <Tag color={'green'} key={p}>
+                    {p}
                   </Tag>
-              }
-              content={
-                  <Space direction="vertical" size="small" style={{ display: 'flex' }}>
-                      {record.orgDisplayPath.split(",")?.map((p: string) => {
-                          return (
-                              <Tag color={'green'} key={p}>
-                                  {p}
-                              </Tag>
-                          )
-                      })}
-                  </Space>
-              }>
-              <Space key="primary_path">
-                  {
-                      <Tag color={'geekblue'} key={record.primaryOrgDisplayPath}>
-                          {record.primaryOrgDisplayPath}
-                      </Tag>
-                  }
-              </Space>
-              <Space key="path" direction="vertical" size="small" style={{ display: 'flex' }}>
-                  {
-                      record.orgDisplayPath.split(",")?.map((p: string) => {
-                          return (
-                              <Tag color={'green'} key={p}>
-                                  {p}
-                              </Tag>
-                          )
-                      })
-                  }
-              </Space>
-          </Popover>
+                );
+              })}
+            </Space>
+          }
+        >
+          <Space key="primary_path">
+            {
+              <Tag color={'geekblue'} key={record.primaryOrgDisplayPath}>
+                {record.primaryOrgDisplayPath}
+              </Tag>
+            }
+          </Space>
+          <Space key="path" direction="vertical" size="small" style={{ display: 'flex' }}>
+            {record.orgDisplayPath.split(',')?.map((p: string) => {
+              return (
+                <Tag color={'green'} key={p}>
+                  {p}
+                </Tag>
+              );
+            })}
+          </Space>
+        </Popover>,
       ],
     },
     {
