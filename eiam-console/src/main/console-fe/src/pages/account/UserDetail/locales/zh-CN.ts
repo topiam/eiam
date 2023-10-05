@@ -67,6 +67,7 @@ export default {
   'pages.account.user_detail.login_audit.columns.app_name': '应用名称',
   'pages.account.user_detail.login_audit.columns.client_ip': '客户端IP',
   'pages.account.user_detail.login_audit.columns.browser': '浏览器',
+  'pages.account.user_detail.login_audit.columns.platform': '操作系统',
   'pages.account.user_detail.login_audit.columns.location': '地理位置',
   'pages.account.user_detail.login_audit.columns.event_time': '登录时间',
   'pages.account.user_detail.login_audit.columns.event_status': '登录结果',

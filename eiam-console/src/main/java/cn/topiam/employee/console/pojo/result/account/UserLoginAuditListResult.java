@@ -54,6 +54,12 @@ public class UserLoginAuditListResult {
     private String        clientIp;
 
     /**
+     * 操作系统
+     */
+    @Parameter(description = "操作系统")
+    private String        platform;
+
+    /**
      * 登录结果
      */
     @Parameter(description = "浏览器")

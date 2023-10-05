@@ -221,6 +221,10 @@ declare namespace AccountAPI {
   export interface UserLoginAuditList {
     appName: string;
     clientIp: string;
+    userAgent: {
+      platformVersion:string;
+      platform:string
+    };
     browser: string;
     eventStatus: string;
     eventTime: string;

@@ -55,6 +55,13 @@ export default (props: { userId: string }) => {
       },
     },
     {
+      title: intl.formatMessage({ id: 'pages.account.user_detail.login_audit.columns.platform' }),
+      ellipsis: true,
+      dataIndex: 'platform',
+      width: 110,
+      search: false,
+    },
+    {
       title: intl.formatMessage({ id: 'pages.account.user_detail.login_audit.columns.browser' }),
       dataIndex: 'browser',
       search: false,

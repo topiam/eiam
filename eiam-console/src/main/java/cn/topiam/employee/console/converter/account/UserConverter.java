@@ -21,6 +21,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.topiam.employee.audit.entity.GeoLocation;
+import cn.topiam.employee.audit.entity.UserAgent;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -275,10 +277,13 @@ public interface UserConverter {
             if (audit.getEventType().getCode().equals(PortalEventType.LOGIN_PORTAL.getCode())) {
                 result.setAppName(PORTAL.getDesc());
             }
+            UserAgent userAgent=audit.getUserAgent();
+            GeoLocation geoLocation= audit.getGeoLocation();
             result.setEventTime(audit.getEventTime());
-            result.setClientIp(audit.getGeoLocation().getIp());
-            result.setBrowser(audit.getUserAgent().getBrowser());
-            result.setLocation(audit.getGeoLocation().getCityName());
+            result.setClientIp(geoLocation.getIp());
+            result.setLocation(geoLocation.getCityName());
+            result.setBrowser(userAgent.getBrowser());
+            result.setPlatform(userAgent.getPlatform()+" "+userAgent.getPlatformVersion());
             result.setEventStatus(audit.getEventStatus());
             list.add(result);
         });

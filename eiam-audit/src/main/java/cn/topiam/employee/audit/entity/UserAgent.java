@@ -38,21 +38,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserAgent implements Serializable {
 
-    @Field(type = FieldType.Keyword, name = "device_type")
     private String deviceType;
 
-    @Field(type = FieldType.Keyword, name = "platform")
     private String platform;
 
-    @Field(type = FieldType.Keyword, name = "platform_version")
     private String platformVersion;
 
-    @Field(type = FieldType.Keyword, name = "browser")
     private String browser;
 
-    @Field(type = FieldType.Keyword, name = "browser_type")
     private String browserType;
 
-    @Field(type = FieldType.Keyword, name = "browser_major_version")
     private String browserMajorVersion;
 }

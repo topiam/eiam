@@ -50,24 +50,20 @@ public class Target implements Serializable {
     /**
      * 目标 ID
      */
-    @Field(type = FieldType.Keyword, name = "id")
     private String             id;
 
     /**
      * 目标名称
      */
-    @Field(type = FieldType.Keyword, name = "name")
     private String             name;
     /**
      *
      * 目标类型
      */
-    @Field(type = FieldType.Keyword, name = "type")
     private TargetType         type;
 
     /**
      * 目标类型名称
      */
-    @Field(type = FieldType.Keyword, name = "type_name")
     private String             typeName;
 }
