@@ -73,6 +73,11 @@ public enum EventType {
                        MOVE_ORGANIZATION(AccountEventType.MOVE_ORGANIZATION),
 
                        /**
+                        * 添加组织用户
+                        */
+                       CREATE_ORGANIZATION_MEMBER(AccountEventType.CREATE_ORGANIZATION_MEMBER),
+
+                       /**
                         * 创建用户
                         */
                        CREATE_USER(AccountEventType.CREATE_USER),

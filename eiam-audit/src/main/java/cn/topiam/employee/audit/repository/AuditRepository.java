@@ -36,7 +36,7 @@ import cn.topiam.employee.support.repository.LogicDeleteRepository;
  */
 @Repository
 public interface AuditRepository extends LogicDeleteRepository<AuditEntity, Long>,
-                                 QuerydslPredicateExecutor<AuditEntity> {
+                                 QuerydslPredicateExecutor<AuditEntity>, AuditCustomizedRepository {
 
     /**
      * 统计指定时间范围内用户登录失败次数
@@ -58,4 +58,8 @@ public interface AuditRepository extends LogicDeleteRepository<AuditEntity, Long
      * @return {@link AuditEntity}
      */
     Optional<AuditEntity> findByRequestId(String requestId);
+
+    @Query(value = "SELECT COUNT(*) FROM audit WHERE event_type = :type AND event_time BETWEEN :startTime AND :endTime", nativeQuery = true)
+    Long countByTypeAndTime(@Param("type") String type, @Param("startTime") LocalDateTime startTime,
+                            @Param("endTime") LocalDateTime endTime);
 }

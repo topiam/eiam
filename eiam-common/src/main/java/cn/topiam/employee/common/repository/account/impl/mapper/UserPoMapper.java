@@ -70,6 +70,7 @@ public class UserPoMapper implements RowMapper<UserPO> {
         user.setExpireDate(ObjectUtils.isNotEmpty(rs.getTimestamp("expire_date")) ? rs.getDate("expire_date").toLocalDate() : null);
         user.setLastAuthTime(ObjectUtils.isNotEmpty(rs.getTimestamp("last_auth_time")) ? rs.getTimestamp("last_auth_time").toLocalDateTime() : null);
         user.setOrgDisplayPath(rs.getString("org_display_path"));
+        user.setPrimaryOrgDisplayPath(rs.getString("primary_org_display_path"));
         //额外数据
         user.setCreateBy(rs.getString("create_by"));
         user.setCreateTime(ObjectUtils.isNotEmpty(rs.getTimestamp("create_time")) ? rs.getTimestamp("create_time").toLocalDateTime() : null);

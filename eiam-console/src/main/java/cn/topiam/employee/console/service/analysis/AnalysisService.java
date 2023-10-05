@@ -19,6 +19,8 @@ package cn.topiam.employee.console.service.analysis;
 
 import java.util.List;
 
+import cn.topiam.employee.audit.repository.result.AuthnQuantityResult;
+import cn.topiam.employee.audit.repository.result.AuthnZoneResult;
 import cn.topiam.employee.console.pojo.query.analysis.AnalysisQuery;
 import cn.topiam.employee.console.pojo.result.analysis.*;
 
@@ -65,7 +67,7 @@ public interface AnalysisService {
      * 登录区域统计
      *
      * @param params {@link AnalysisQuery}
-     * @return {@link List<AuthnZoneResult>}
+     * @return {@link List< AuthnZoneResult >}
      */
     List<AuthnZoneResult> authnZone(AnalysisQuery params);
 }

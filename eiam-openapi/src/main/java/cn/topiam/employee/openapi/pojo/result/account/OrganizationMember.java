@@ -1,5 +1,5 @@
 /*
- * eiam-common - Employee Identity and Access Management
+ * eiam-openapi - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,35 +15,49 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.common.entity.account.po;
+package cn.topiam.employee.openapi.pojo.result.account;
 
 import java.io.Serial;
-
-import cn.topiam.employee.common.entity.account.UserEntity;
+import java.io.Serializable;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
- * 用户 PO
+ * 组织用户关系
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/10 22:46
+ * Created by support@topiam.cn on 2020/8/11 21:27
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class UserPO extends UserEntity {
+@Schema(description = "组织用户关系")
+public class OrganizationMember implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = 2330202241971348786L;
+    private static final long serialVersionUID = 5599721546299698344L;
 
     /**
-     * 组织机构显示目录
+     * 主键ID
      */
-    private String            orgDisplayPath;
+    @Schema(description = "ID")
+    private String            id;
 
     /**
-     * 主组织机构显示目录
+     * 用户ID
      */
-    private String            primaryOrgDisplayPath;
+    @Schema(description = "用户ID")
+    private String            userId;
+
+    /**
+     * 组织ID
+     */
+    @Schema(description = "组织ID")
+    private String            orgId;
+
+    /**
+     * 是否主组织
+     */
+    @Schema(description = "是否主组织")
+    private Boolean           primary;
 }

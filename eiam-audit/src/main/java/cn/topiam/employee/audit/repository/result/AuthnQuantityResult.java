@@ -1,5 +1,5 @@
 /*
- * eiam-common - Employee Identity and Access Management
+ * eiam-audit - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,35 +15,43 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.common.entity.account.po;
+package cn.topiam.employee.audit.repository.result;
 
-import java.io.Serial;
+import java.io.Serializable;
 
-import cn.topiam.employee.common.entity.account.UserEntity;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
- * 用户 PO
+ * 认证量统计结果
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/10 22:46
+ * Created by support@topiam.cn on 2020/11/22 23:16
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class UserPO extends UserEntity {
-
-    @Serial
-    private static final long serialVersionUID = 2330202241971348786L;
-
-    /**
-     * 组织机构显示目录
-     */
-    private String            orgDisplayPath;
+@NoArgsConstructor
+@AllArgsConstructor
+@Schema(description = "认证量统计响应")
+public class AuthnQuantityResult implements Serializable {
 
     /**
-     * 主组织机构显示目录
+     * 名称
      */
-    private String            primaryOrgDisplayPath;
+    @Schema(description = "名称")
+    private String name;
+
+    /**
+     * 数量
+     */
+    @Schema(description = "数量")
+    private Long   count;
+
+    /**
+     * 状态
+     */
+    @Schema(description = "状态")
+    private String status;
 }

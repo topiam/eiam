@@ -24,14 +24,15 @@ import java.util.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.elasticsearch.client.elc.*;
 import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import cn.topiam.employee.audit.entity.AuditElasticSearchEntity;
-import cn.topiam.employee.audit.enums.EventStatus;
 import cn.topiam.employee.audit.event.type.EventType;
-import cn.topiam.employee.authentication.common.IdentityProviderType;
+import cn.topiam.employee.audit.repository.AuditRepository;
+import cn.topiam.employee.audit.repository.result.AuditStatisticsResult;
+import cn.topiam.employee.audit.repository.result.AuthnQuantityResult;
+import cn.topiam.employee.audit.repository.result.AuthnZoneResult;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.common.repository.app.AppRepository;
@@ -44,17 +45,12 @@ import cn.topiam.employee.support.autoconfiguration.SupportProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import co.elastic.clients.elasticsearch._types.aggregations.*;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.json.JsonData;
-import static cn.topiam.employee.audit.entity.Actor.ACTOR_AUTH_TYPE;
 import static cn.topiam.employee.audit.entity.Event.*;
-import static cn.topiam.employee.audit.entity.GeoLocation.GEO_LOCATION_PROVINCE_CODE;
-import static cn.topiam.employee.audit.entity.Target.TARGET_ID_KEYWORD;
-import static cn.topiam.employee.common.constant.AuditConstants.getAuditIndexPrefix;
 import static cn.topiam.employee.console.converter.authn.IdentityProviderConverter.getIdentityProviderType;
 import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIME_FORMATTER_PATTERN;
 
@@ -76,27 +72,13 @@ public class AnalysisServiceImpl implements AnalysisService {
      */
     @Override
     public OverviewResult overview() {
-        IndexCoordinates indexCoordinates = IndexCoordinates
-            .of(getAuditIndexPrefix(supportProperties.getAudit().getIndexPrefix()) + "*");
-        // 不存在索引
-        if (!elasticsearchTemplate.indexOps(indexCoordinates).exists()) {
-            return new OverviewResult();
-        }
         OverviewResult result = new OverviewResult();
         result.setAppCount(appRepository.count());
         result.setUserCount(userRepository.count());
         result.setIdpCount(identityProviderRepository.count());
         // 查询今日认证量条件
-        Query rangeQuery = QueryBuilders.range(range -> range.field(EVENT_TIME)
-            .gte(JsonData.of(LocalDateTime.of(LocalDate.now(), LocalTime.MIN)
-                .format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMATTER_PATTERN))))
-            .lt(JsonData.of(LocalDateTime.of(LocalDate.now(), LocalTime.MAX)
-                .format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMATTER_PATTERN))))
-            .timeZone(ZONE_ID).format(DEFAULT_DATE_TIME_FORMATTER_PATTERN));
-        Query query = getQuery(rangeQuery, EventType.LOGIN_PORTAL);
-        result.setTodayAuthnCount(
-            elasticsearchTemplate.count(new NativeQueryBuilder().withQuery(query).build(),
-                AuditElasticSearchEntity.class, indexCoordinates));
+        result.setTodayAuthnCount(auditRepository.countByTypeAndTime(
+            EventType.LOGIN_PORTAL.getCode(), LocalDateTime.MIN, LocalDateTime.MAX));
         return result;
     }
 
@@ -108,71 +90,11 @@ public class AnalysisServiceImpl implements AnalysisService {
      */
     @Override
     public List<AuthnQuantityResult> authnQuantity(AnalysisQuery params) {
-        IndexCoordinates indexCoordinates = IndexCoordinates
-            .of(getAuditIndexPrefix(supportProperties.getAudit().getIndexPrefix()) + "*");
-        // 不存在索引
-        if (!elasticsearchTemplate.indexOps(indexCoordinates).exists()) {
-            return new ArrayList<>();
-        }
         LocalDateTime min = params.getStartTime();
         LocalDateTime max = params.getEndTime();
         AnalysisQuery.Interval timeInterval = params.getTimeInterval();
-        // 根据事件月份分组统计认证数量 count
-        Aggregation dateGroup = AggregationBuilders
-            .dateHistogram(count -> count.calendarInterval(timeInterval.getType()).extendedBounds(
-                fieldDateMathBuilder -> fieldDateMathBuilder.min(FieldDateMath.of(math -> {
-                    math.value(
-                        (double) min.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
-                    return math;
-                })).max(FieldDateMath.of(math -> {
-                    math.value(
-                        (double) max.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
-                    return math;
-                }))).field(EVENT_TIME).timeZone(ZONE_ID).format(timeInterval.getFormat()));
-        // 事件状态group
-        TermsAggregation statusGroup = AggregationBuilders.terms(t -> t.field(EVENT_STATUS))
-            .terms();
-        Aggregation group = new Aggregation.Builder().aggregations("dateGroup", dateGroup)
-            .terms(statusGroup).build();
-
-        return getAuthnQuantityResults(indexCoordinates, min, max, group);
-    }
-
-    @NotNull
-    private List<AuthnQuantityResult> getAuthnQuantityResults(IndexCoordinates indexCoordinates,
-                                                              LocalDateTime min, LocalDateTime max,
-                                                              Aggregation aggregation) {
-        // 查询条件
-        Query rangeBuilder = QueryBuilders.range(range -> range.field(EVENT_TIME).timeZone(ZONE_ID)
-            .format(DEFAULT_DATE_TIME_FORMATTER_PATTERN)
-            .gt(JsonData
-                .of(min.format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMATTER_PATTERN))))
-            .lt(JsonData
-                .of(max.format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMATTER_PATTERN)))));
-        Query query = getQuery(rangeBuilder, EventType.LOGIN_PORTAL);
-        NativeQuery authCountBuild = new NativeQueryBuilder().withQuery(query)
-            .withAggregation(COUNT, aggregation).withMaxResults(0).build();
-        // 统计认证量
-        SearchHits<AuditElasticSearchEntity> authCountResult = elasticsearchTemplate
-            .search(authCountBuild, AuditElasticSearchEntity.class, indexCoordinates);
-        ElasticsearchAggregation countGroupAggregation = getCountAggregation(authCountResult);
-        List<AuthnQuantityResult> authCountList = new ArrayList<>();
-        if (countGroupAggregation != null) {
-            List<StringTermsBucket> buckets = countGroupAggregation.aggregation().getAggregate()
-                .sterms().buckets().array();
-            for (StringTermsBucket bucket : buckets) {
-                // success/fail
-                String statusGroupKey = bucket.key().stringValue();
-                List<DateHistogramBucket> dateGroupList = bucket.aggregations().get("dateGroup")
-                    .dateHistogram().buckets().array();
-                for (DateHistogramBucket dateGroup : dateGroupList) {
-                    String dateGroupKey = dateGroup.keyAsString();
-                    authCountList.add(new AuthnQuantityResult(dateGroupKey, dateGroup.docCount(),
-                        Objects.requireNonNull(EventStatus.getType(statusGroupKey)).getDesc()));
-                }
-            }
-        }
-        return authCountList;
+        return auditRepository.authnQuantity(EventType.LOGIN_PORTAL, min, max,
+            timeInterval.getFormat());
     }
 
     /**
@@ -183,32 +105,13 @@ public class AnalysisServiceImpl implements AnalysisService {
      */
     @Override
     public List<AppVisitRankResult> appVisitRank(AnalysisQuery params) {
-        IndexCoordinates indexCoordinates = IndexCoordinates
-            .of(getAuditIndexPrefix(supportProperties.getAudit().getIndexPrefix()) + "*");
-        // 不存在索引
-        if (!elasticsearchTemplate.indexOps(indexCoordinates).exists()) {
-            return new ArrayList<>();
-        }
-        Query rangeQuery = getRangeQueryBuilder(params);
-        Query query = getQuery(rangeQuery, EventType.APP_SSO);
-        // 应用访问频次前10条
-        Aggregation groupAppVisit = AggregationBuilders
-            .terms(terms -> terms.field(TARGET_ID_KEYWORD).size(10));
-        NativeQuery appVisitBuild = new NativeQueryBuilder().withQuery(query)
-            .withAggregation(COUNT, groupAppVisit).build();
-        SearchHits<AuditElasticSearchEntity> appVisitResult = elasticsearchTemplate
-            .search(appVisitBuild, AuditElasticSearchEntity.class, indexCoordinates);
-        ElasticsearchAggregation countAggregation = getCountAggregation(appVisitResult);
         List<AppVisitRankResult> applicationVisitList = new ArrayList<>();
-        if (countAggregation != null) {
-            List<StringTermsBucket> array = countAggregation.aggregation().getAggregate().sterms()
-                .buckets().array();
-            for (StringTermsBucket bucket : array) {
-                String key = bucket.key().stringValue();
-                // 单点登录
-                String name = getAppName(key);
-                applicationVisitList.add(new AppVisitRankResult(name, bucket.docCount()));
-            }
+        List<AuditStatisticsResult> auditRankResults = auditRepository
+            .appVisitRank(EventType.APP_SSO, params.getStartTime(), params.getEndTime());
+        for (AuditStatisticsResult auditRankResult : auditRankResults) {
+            // 单点登录
+            String name = getAppName(auditRankResult.getKey());
+            applicationVisitList.add(new AppVisitRankResult(name, auditRankResult.getCount()));
         }
         return applicationVisitList;
     }
@@ -236,33 +139,14 @@ public class AnalysisServiceImpl implements AnalysisService {
      */
     @Override
     public List<AuthnHotProviderResult> authnHotProvider(AnalysisQuery params) {
-        IndexCoordinates indexCoordinates = IndexCoordinates
-            .of(getAuditIndexPrefix(supportProperties.getAudit().getIndexPrefix()) + "*");
-        // 不存在索引
-        if (!elasticsearchTemplate.indexOps(indexCoordinates).exists()) {
-            return new ArrayList<>();
-        }
-        Query builder = getRangeQueryBuilder(params);
-        BoolQuery.Builder queryBuilder = getQueryBuilder(builder, EventType.LOGIN_PORTAL);
-        queryBuilder.must(QueryBuilders.exists(e -> e.field(ACTOR_AUTH_TYPE)));
-        // 授权类型频次
-        Aggregation groupAuthType = AggregationBuilders
-            .terms(terms -> terms.field(ACTOR_AUTH_TYPE).size(IdentityProviderType.size()));
-        NativeQuery appVisitBuild = new NativeQueryBuilder()
-            .withQuery(queryBuilder.build()._toQuery()).withAggregation(COUNT, groupAuthType)
-            .build();
-        SearchHits<AuditElasticSearchEntity> authTypeResult = elasticsearchTemplate
-            .search(appVisitBuild, AuditElasticSearchEntity.class, indexCoordinates);
-        ElasticsearchAggregation authTypeStringTerms = getCountAggregation(authTypeResult);
         List<AuthnHotProviderResult> authTypeList = new ArrayList<>();
-        if (authTypeStringTerms != null) {
-            List<StringTermsBucket> array = authTypeStringTerms.aggregation().getAggregate()
-                .sterms().buckets().array();
-            for (StringTermsBucket bucket : array) {
-                String key = bucket.key().stringValue();
-                // 授权类型
-                String name = getIdentityProviderType(key).name();
-                authTypeList.add(new AuthnHotProviderResult(name, bucket.docCount()));
+        List<AuditStatisticsResult> auditRankResults = auditRepository
+            .authnHotProvider(EventType.LOGIN_PORTAL, params.getStartTime(), params.getEndTime());
+        for (AuditStatisticsResult auditRankResult : auditRankResults) {
+            // 授权类型
+            if (Objects.nonNull(auditRankResult.getKey())) {
+                String name = getIdentityProviderType(auditRankResult.getKey()).name();
+                authTypeList.add(new AuthnHotProviderResult(name, auditRankResult.getCount()));
             }
         }
         return authTypeList;
@@ -272,38 +156,16 @@ public class AnalysisServiceImpl implements AnalysisService {
      * 登录区域统计
      *
      * @param params {@link AnalysisQuery}
-     * @return {@link List<AuthnZoneResult>}
+     * @return {@link List< AuthnZoneResult >}
      */
     @Override
     public List<AuthnZoneResult> authnZone(AnalysisQuery params) {
-        IndexCoordinates indexCoordinates = IndexCoordinates
-            .of(getAuditIndexPrefix(supportProperties.getAudit().getIndexPrefix()) + "*");
-        // 不存在索引
-        if (!elasticsearchTemplate.indexOps(indexCoordinates).exists()) {
-            return new ArrayList<>();
-        }
-        Query builder = getRangeQueryBuilder(params);
-        BoolQuery.Builder queryBuilder = getQueryBuilder(builder, EventType.LOGIN_PORTAL);
-        queryBuilder.must(QueryBuilders.exists(exists -> exists.field(GEO_LOCATION_PROVINCE_CODE)));
-        // 登录城市分组统计
-        Aggregation groupAuthZone = AggregationBuilders
-            .terms(terms -> terms.field(GEO_LOCATION_PROVINCE_CODE).size(36));
-        NativeQuery appVisitBuild = new NativeQueryBuilder()
-            .withQuery(queryBuilder.build()._toQuery()).withAggregation(COUNT, groupAuthZone)
-            .build();
-        SearchHits<AuditElasticSearchEntity> authZoneResult = elasticsearchTemplate
-            .search(appVisitBuild, AuditElasticSearchEntity.class, indexCoordinates);
-        ElasticsearchAggregation authZoneStringTerms = getCountAggregation(authZoneResult);
-        List<AuthnZoneResult> authnZoneResults = new ArrayList<>();
-        if (authZoneStringTerms != null) {
-            List<StringTermsBucket> array = authZoneStringTerms.aggregation().getAggregate()
-                .sterms().buckets().array();
-            for (StringTermsBucket bucket : array) {
-                String key = bucket.key().stringValue();
-                authnZoneResults.add(new AuthnZoneResult(key, bucket.docCount()));
-            }
-        }
-        return authnZoneResults;
+        List<AuditStatisticsResult> auditStatisticsResults = auditRepository
+            .authnZone(EventType.LOGIN_PORTAL, params.getStartTime(), params.getEndTime());
+        return auditStatisticsResults.stream()
+            .map(auditStatisticsResult -> new AuthnZoneResult(auditStatisticsResult.getKey(),
+                auditStatisticsResult.getCount()))
+            .toList();
     }
 
     /**
@@ -372,7 +234,9 @@ public class AnalysisServiceImpl implements AnalysisService {
 
     private final SupportProperties          supportProperties;
 
-    private final ElasticsearchTemplate      elasticsearchTemplate;
+    //    private final ElasticsearchTemplate      elasticsearchTemplate;
+
+    private final AuditRepository            auditRepository;
 
     private final AppRepository              appRepository;
 

@@ -73,6 +73,7 @@ public class AuditEventListener implements ApplicationListener<AuditEvent> {
             entity.setUserAgent(userAgent);
             entity.setActorId(actor.getId());
             entity.setActorType(actor.getType());
+            entity.setActorAuthType(actor.getAuthType());
             auditRepository.save(entity);
         } catch (Exception e) {
             logger.error("Audit record saving failed: {}", JSONObject.toJSONString(entity), e);

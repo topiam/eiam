@@ -55,13 +55,19 @@ public class OrganizationMemberEntity extends LogicDeleteEntity<Long> {
      * 组织机构ID
      */
     @Column(name = "org_id")
-    private String orgId;
+    private String  orgId;
 
     /**
      * 用户ID
      */
     @Column(name = "user_id")
-    private Long   userId;
+    private Long    userId;
+
+    /**
+     * 主组织
+     */
+    @Column(name = "primary_")
+    private Boolean primary;
 
     public OrganizationMemberEntity() {
     }
