@@ -31,7 +31,6 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 import { omit } from 'lodash';
 import classNames from 'classnames';
 import { ParamCheckType } from '@/constant';
-import AppAccess from '../AppAccess';
 import { useIntl } from '@umijs/max';
 
 const prefixCls = 'user-detail-info';
