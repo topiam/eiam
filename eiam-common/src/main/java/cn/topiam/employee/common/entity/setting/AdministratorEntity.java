@@ -65,6 +65,18 @@ public class AdministratorEntity extends LogicDeleteEntity<Long> {
     private String            username;
 
     /**
+     * 姓名
+     */
+    @Column(name = "full_name")
+    private String            fullName;
+
+    /**
+     * 昵称
+     */
+    @Column(name = "nick_name")
+    private String            nickName;
+
+    /**
      * 密码
      */
     @Column(name = "password_")

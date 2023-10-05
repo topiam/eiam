@@ -277,13 +277,13 @@ public interface UserConverter {
             if (audit.getEventType().getCode().equals(PortalEventType.LOGIN_PORTAL.getCode())) {
                 result.setAppName(PORTAL.getDesc());
             }
-            UserAgent userAgent=audit.getUserAgent();
-            GeoLocation geoLocation= audit.getGeoLocation();
+            UserAgent userAgent = audit.getUserAgent();
+            GeoLocation geoLocation = audit.getGeoLocation();
             result.setEventTime(audit.getEventTime());
             result.setClientIp(geoLocation.getIp());
             result.setLocation(geoLocation.getCityName());
             result.setBrowser(userAgent.getBrowser());
-            result.setPlatform(userAgent.getPlatform()+" "+userAgent.getPlatformVersion());
+            result.setPlatform(userAgent.getPlatform() + " " + userAgent.getPlatformVersion());
             result.setEventStatus(audit.getEventStatus());
             list.add(result);
         });

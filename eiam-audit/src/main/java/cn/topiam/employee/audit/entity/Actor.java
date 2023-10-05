@@ -40,23 +40,23 @@ import lombok.NonNull;
 public class Actor implements Serializable {
 
     @Serial
-    private static final long  serialVersionUID = -1144169992714000310L;
+    private static final long serialVersionUID = -1144169992714000310L;
 
     /**
      * 行动者ID
      */
     @NonNull
-    private String             id;
+    private String            id;
 
     /**
      * 行动者类型
      */
     @NonNull
-    private UserType           type;
+    private UserType          type;
 
     /**
      * 身份验证类型
      */
-    private String             authType;
+    private String            authType;
 
 }
