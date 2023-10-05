@@ -40,6 +40,12 @@ export default [
     hideInMenu: true,
     component: './user/SessionExpired',
   },
+  {
+    name: 'account.center',
+    path: '/user/center',
+    hideInMenu: true,
+    component: './user/Center',
+  },
   /*欢迎页*/
   {
     name: 'welcome',
