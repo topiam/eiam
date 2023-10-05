@@ -51,7 +51,7 @@ public interface AccountConverter {
      * @param param {@link UpdateUserInfoRequest} 更新参数
      * @return {@link UserEntity} 用户实体
      */
-    @Mapping(target = "plaintext", ignore = true)
+    @Mapping(target = "passwordPlainText", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "identitySourceId", ignore = true)
     @Mapping(target = "phoneVerified", ignore = true)
@@ -124,8 +124,8 @@ public interface AccountConverter {
      * 账号绑定entity转result
      *
      * @param identityProviderList {@link List<IdentityProviderEntity>}
-     * @param userIdpBindList {@link Iterable< UserIdpBindPO >}
-     * @return {@link List< BoundIdpListResult >}
+     * @param userIdpBindList {@link Iterable<UserIdpBindPO>}
+     * @return {@link List<BoundIdpListResult>}
      */
     default List<BoundIdpListResult> entityConverterToBoundIdpListResult(List<IdentityProviderEntity> identityProviderList,
                                                                          Iterable<UserIdpBindPO> userIdpBindList) {

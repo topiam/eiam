@@ -178,7 +178,7 @@ public class AbstractIdentitySourcePostProcessor {
         entity.setDataOrigin(dataOrigin);
         entity.setIdentitySourceId(identitySource.getId());
         entity.setPassword(passwordEncoder.encode(defaultPassword));
-        entity.setPlaintext(defaultPassword);
+        entity.setPasswordPlainText(defaultPassword);
 
         //必须字段
         entity.setCreateBy(SYSTEM_DEFAULT_USER_NAME);
@@ -302,14 +302,14 @@ public class AbstractIdentitySourcePostProcessor {
                 thirdPartyUser.getEmail(), thirdPartyUser.getPhone());
             if (StringUtils.isNotEmpty(thirdPartyUser.getEmail())) {
                 Map<String, Object> parameter = new HashMap<>(16);
-                parameter.put(MsgVariable.PASSWORD, thirdPartyUser.getPlaintext());
+                parameter.put(MsgVariable.PASSWORD, thirdPartyUser.getPasswordPlainText());
                 mailMsgEventPublish.publish(MailType.RESET_PASSWORD_CONFIRM,
                     thirdPartyUser.getEmail(), parameter);
             }
             if (StringUtils.isNotEmpty(thirdPartyUser.getPhone())) {
                 LinkedHashMap<String, String> parameter = new LinkedHashMap<>();
                 parameter.put(USERNAME, thirdPartyUser.getUsername());
-                parameter.put(MsgVariable.PASSWORD, thirdPartyUser.getPlaintext());
+                parameter.put(MsgVariable.PASSWORD, thirdPartyUser.getPasswordPlainText());
                 smsMsgEventPublish.publish(SmsType.RESET_PASSWORD_SUCCESS,
                     thirdPartyUser.getPhone(), parameter);
             }

@@ -187,7 +187,7 @@ public class UserEntity extends LogicDeleteEntity<Long> {
      */
     @Transient
     @JsonIgnore
-    private String            plaintext;
+    private String            passwordPlainText;
 
     @Override
     public boolean equals(Object o) {
