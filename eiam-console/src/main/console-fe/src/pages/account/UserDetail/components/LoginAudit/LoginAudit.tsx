@@ -70,6 +70,7 @@ export default (props: { userId: string }) => {
       sorter: true,
       valueType: 'dateTime',
       search: false,
+      ellipsis: true,
     },
     {
       title: intl.formatMessage({
