@@ -266,6 +266,7 @@ public interface UserConverter {
         //总记录数
         auditEntityPage.forEach(audit -> {
             UserLoginAuditListResult result = new UserLoginAuditListResult();
+            result.setId(audit.getId().toString());
             //单点登录
             if (audit.getEventType().getCode().equals(PortalEventType.APP_SSO.getCode())) {
                 result.setAppName(getAppName(audit.getTargets().get(0).getId()));

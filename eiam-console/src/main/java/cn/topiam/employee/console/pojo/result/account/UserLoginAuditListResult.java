@@ -35,6 +35,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Data
 @Schema(description = "用户登录日志返回响应")
 public class UserLoginAuditListResult {
+    /**
+     * ID
+     */
+    @Parameter(description = "ID")
+    private String        id;
 
     /**
      * 应用名称

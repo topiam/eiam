@@ -96,6 +96,7 @@ export default (props: { userId: string }) => {
       <ProTable
         columns={columns}
         search={false}
+        rowKey={'id'}
         request={getLoginAuditList}
         params={{ userId: userId }}
         pagination={{ pageSize: 10 }}
