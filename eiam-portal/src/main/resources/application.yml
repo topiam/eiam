@@ -132,10 +132,6 @@ spring:
     overwrite-existing-jobs: true
     jdbc:
       initialize-schema: never
-  #rabbitmq
-  rabbitmq:
-    template:
-      reply-timeout: 60000
 #日志配置
 logging:
   config: classpath:config/logback-spring.xml
