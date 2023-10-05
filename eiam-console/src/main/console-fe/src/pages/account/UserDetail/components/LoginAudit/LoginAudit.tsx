@@ -105,6 +105,7 @@ export default (props: { userId: string }) => {
         columns={columns}
         search={false}
         rowKey={'id'}
+        scroll={{ x: 1200 }}
         request={getLoginAuditList}
         params={{ userId: userId }}
         pagination={{ pageSize: 10 }}

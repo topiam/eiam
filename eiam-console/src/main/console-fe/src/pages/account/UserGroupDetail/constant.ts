@@ -20,9 +20,9 @@
  */
 export enum UserGroupDetailTabs {
   //app_access
-  app_access = 'app-access',
+  app_access = 'app_access',
   //权限
-  permission_info = 'permission-info',
+  permission_info = 'permission_info',
   //member
   member = 'member',
 }
