@@ -39,7 +39,6 @@ import {
   Table,
   Tooltip,
   Typography,
-  Tag,
   Popover,
 } from 'antd';
 import React, { useRef, useState } from 'react';
@@ -185,46 +184,34 @@ export default (props: UserListProps) => {
       search: false,
       ellipsis: true,
       render: (_, record) => {
-        console.log(record.primaryOrgDisplayPath);
         return (
           <Popover
             key="pop"
-            title={
-              record.primaryOrgDisplayPath && (
-                <Tag color={'geekblue'} key={record.orgDisplayPath}>
-                  {record.primaryOrgDisplayPath}
-                </Tag>
-              )
-            }
+            title={intl.formatMessage({
+              id: 'pages.account.user_list.user.columns.org_display_path',
+            })}
             content={
-              <Space direction="vertical" size="small" style={{ display: 'flex' }}>
-                {record.orgDisplayPath?.split(',')?.map((p: string) => {
-                  return (
-                    <Tag color={'green'} key={p}>
-                      {p}
-                    </Tag>
-                  );
-                })}
-              </Space>
+              <>
+                {record.primaryOrgDisplayPath && (
+                  <Space key="primary_path">{record.primaryOrgDisplayPath}</Space>
+                )}
+                {record.orgDisplayPath && (
+                  <Space key="path" direction="vertical" size="small" style={{ display: 'flex' }}>
+                    {record.orgDisplayPath?.split(',')?.map((p: string) => {
+                      return p;
+                    })}
+                  </Space>
+                )}
+              </>
             }
           >
             {record.primaryOrgDisplayPath && (
-              <Space key="primary_path">
-                {
-                  <Tag color={'geekblue'} key={record.primaryOrgDisplayPath}>
-                    {record.primaryOrgDisplayPath}
-                  </Tag>
-                }
-              </Space>
+              <Space key="primary_path">{record.primaryOrgDisplayPath}</Space>
             )}
             {record.orgDisplayPath && (
               <Space key="path" direction="vertical" size="small" style={{ display: 'flex' }}>
                 {record.orgDisplayPath?.split(',')?.map((p: string) => {
-                  return (
-                    <Tag color={'green'} key={p}>
-                      {p}
-                    </Tag>
-                  );
+                  return p;
                 })}
               </Space>
             )}
