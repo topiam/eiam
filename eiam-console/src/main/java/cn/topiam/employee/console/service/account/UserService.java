@@ -121,15 +121,6 @@ public interface UserService {
     boolean deleteUser(String id);
 
     /**
-     * 用户转岗
-     *
-     * @param userId {@link String}
-     * @param orgId  {@link String}
-     * @return {@link Boolean}
-     */
-    Boolean userTransfer(String userId, String orgId);
-
-    /**
      * 批量删除用户
      *
      * @param ids {@link String}

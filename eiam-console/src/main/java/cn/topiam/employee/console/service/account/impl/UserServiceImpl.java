@@ -44,6 +44,7 @@ import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.audit.repository.AuditRepository;
 import cn.topiam.employee.common.entity.account.*;
+import cn.topiam.employee.common.entity.account.QUserEntity;
 import cn.topiam.employee.common.entity.account.po.UserPO;
 import cn.topiam.employee.common.entity.account.query.UserListNotInGroupQuery;
 import cn.topiam.employee.common.entity.account.query.UserListQuery;
@@ -390,28 +391,6 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * 用户转岗
-     *
-     * @param userId {@link String}
-     * @param orgId  {@link String}
-     * @return {@link  Boolean}
-     */
-    @Override
-    public Boolean userTransfer(String userId, String orgId) {
-        Optional<OrganizationEntity> entity = organizationRepository.findById(orgId);
-        //additionalContent
-        if (entity.isEmpty()) {
-            AuditContext.setContent("操作失败，组织不存在");
-            log.warn(AuditContext.getContent());
-            throw new TopIamException(AuditContext.getContent());
-        }
-        organizationMemberRepository.deleteByOrgIdAndUserId(orgId, Long.valueOf(userId));
-        userRepository.save(null);
-        AuditContext.setTarget(Target.builder().id(userId).type(TargetType.USER).build());
-        return true;
-    }
-
-    /**
      * 批量删除用户
      *
      * @param ids {@link String}
@@ -504,7 +483,7 @@ public class UserServiceImpl implements UserService {
         // 字段排序
         OrderSpecifier<LocalDateTime> order = QAuditEntity.auditEntity.eventTime.desc();
         for (PageModel.Sort sort : pageModel.getSorts()) {
-            if (org.apache.commons.lang3.StringUtils.equals(sort.getSorter(), SORT_EVENT_TIME)) {
+            if (StringUtils.equals(sort.getSorter(), SORT_EVENT_TIME)) {
                 if (sort.getAsc()) {
                     order = QAuditEntity.auditEntity.eventTime.asc();
                 }

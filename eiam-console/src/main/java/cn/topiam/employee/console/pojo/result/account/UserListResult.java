@@ -126,7 +126,7 @@ public class UserListResult implements Serializable {
      * 主组织目录
      */
     @Parameter(description = "主组织机构目录")
-    private String primaryOrgDisplayPath;
+    private String            primaryOrgDisplayPath;
 
     /**
      * 最后修改密码时间

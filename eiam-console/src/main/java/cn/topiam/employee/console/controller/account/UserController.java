@@ -227,24 +227,6 @@ public class UserController {
     }
 
     /**
-     * 用户转岗
-     *
-     * @param userId {@link String}
-     * @param orgId  {@link String}
-     * @return {@link Boolean}
-     */
-    @Lock
-    @Preview
-    @Operation(summary = "用户转岗")
-    @PutMapping(value = "/transfer")
-    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
-    public ApiRestResult<Boolean> userTransfer(@Parameter(description = "用户ID") @NotBlank(message = "用户ID不能为空") String userId,
-                                               @Parameter(description = "组织ID") @NotBlank(message = "组织ID不能为空") String orgId) {
-        return ApiRestResult.<Boolean> builder().result(userService.userTransfer(userId, orgId))
-            .build();
-    }
-
-    /**
      * 用户离职
      *
      * @param id {@link String}
