@@ -286,7 +286,7 @@ public class UserController {
     @Operation(description = "查询用户登录审计列表")
     @GetMapping(value = "/login_audit/list")
     @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
-    public ApiRestResult<Page<UserLoginAuditListResult>> getUserLoginAuditList(@Parameter(description = "ID") Long id,
+    public ApiRestResult<Page<UserLoginAuditListResult>> getUserLoginAuditList(@Parameter(description = "ID") @RequestParam(value = "userId", required = false) @NotBlank(message = "用户ID不能为空") Long id,
                                                                                PageModel pageModel) {
         Page<UserLoginAuditListResult> list = userService.findUserLoginAuditList(id, pageModel);
         return ApiRestResult.ok(list);
