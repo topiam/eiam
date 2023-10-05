@@ -188,22 +188,6 @@ public interface AuditDataConverter {
             predicate = ExpressionUtils.and(predicate,
                 auditEntity.eventStatus.in(query.getEventStatus()));
         }
-        //字段排序
-        //        page.getSorts().forEach(sort -> {
-        //            SortOrder sortOrder;
-        //            if (org.apache.commons.lang3.StringUtils.equals(sort.getSorter(), SORT_EVENT_TIME)) {
-        //                if (sort.getAsc()) {
-        //                    sortOrder = SortOrder.Asc;
-        //                } else {
-        //                    sortOrder = SortOrder.Desc;
-        //                }
-        //            } else {
-        //                sortOrder = SortOrder.Desc;
-        //            }
-        //            SortOptions eventTimeSortBuilder = SortOptions
-        //                .of(s -> s.field(FieldSort.of(f -> f.field(EVENT_TIME).order(sortOrder))));
-        //            fieldSortBuilders.add(eventTimeSortBuilder);
-        //        });
         //事件时间
         if (!Objects.isNull(query.getStartEventTime())
             && !Objects.isNull(query.getEndEventTime())) {
