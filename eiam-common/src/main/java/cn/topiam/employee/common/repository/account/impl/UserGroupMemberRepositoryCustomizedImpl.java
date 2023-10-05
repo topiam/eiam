@@ -79,8 +79,8 @@ public class UserGroupMemberRepositoryCustomizedImpl implements
                 	`u`.update_by,
                 	`u`.update_time,
                 	`u`.remark_,
-                	group_concat( IF(organization_member.primary_ = 1, null, organization_.display_path ) ) AS org_display_path,
-                    group_concat( IF(organization_member.primary_ IS NULL, null, organization_.display_path ) ) AS primary_org_display_path
+                	group_concat( IF(organization_member.primary_ = 1, null, organization_.display_path ) ) AS primary_org_display_path,
+                    group_concat( IF(organization_member.primary_ IS NULL, null, organization_.display_path ) ) AS org_display_path
                 FROM
                 	user_group_member ugm
                 	INNER JOIN user u ON ugm.user_id = u.id_ AND u.is_deleted = '0'
