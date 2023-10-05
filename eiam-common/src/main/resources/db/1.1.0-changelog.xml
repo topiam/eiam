@@ -88,6 +88,10 @@
                 <constraints nullable="true"/>
             </column>
         </addColumn>
+        <addColumn tableName="administrator">
+            <column name="full_name" remarks="姓名" type="VARCHAR(100)"/>
+            <column name="nick_name" remarks="昵称" type="VARCHAR(50)"/>
+        </addColumn>
         <!--创建索引-->
         <createIndex tableName="app_group_association" indexName="uk_app_group_association" unique="true">
             <column name="group_id"/>
