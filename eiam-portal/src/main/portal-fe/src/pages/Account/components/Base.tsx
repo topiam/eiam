@@ -184,6 +184,7 @@ const BaseView = () => {
       </div>
       <ImgCrop
         rotationSlider
+        aspectSlider
         modalOk={intl.formatMessage({ id: 'app.confirm' })}
         modalCancel={intl.formatMessage({ id: 'app.cancel' })}
       >
