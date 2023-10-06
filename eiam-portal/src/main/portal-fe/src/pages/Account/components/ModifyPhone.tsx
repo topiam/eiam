@@ -139,11 +139,7 @@ export default (props: {
           rules={[
             {
               required: true,
-              message: (
-                <FormattedMessage
-                  id={intl.formatMessage({ id: 'page.account.common.form.phone.rule.0' })}
-                />
-              ),
+              message: <FormattedMessage id={'page.account.common.form.phone.rule.0'} />,
             },
             {
               validator: async (rule, value) => {
@@ -196,9 +192,6 @@ export default (props: {
                 formRef.current?.setFields([{ name: FieldNames.PASSWORD, errors: [`${message}`] }]);
                 return Promise.reject();
               }
-              if (!success) {
-                return Promise.reject();
-              }
               if (success && result) {
                 setHasSendCaptcha(true);
                 useApp.message.success(intl.formatMessage({ id: 'app.send_successfully' }));
@@ -206,6 +199,7 @@ export default (props: {
               }
               useApp.message.error(message);
               captchaRef.current?.endTiming();
+              return Promise.reject();
             }
             return Promise.reject();
           }}
