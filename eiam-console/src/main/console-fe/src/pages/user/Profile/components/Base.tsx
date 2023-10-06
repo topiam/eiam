@@ -110,6 +110,7 @@ const BaseView = () => {
   const [loading, setLoading] = useState<boolean>();
   const { initialState, setInitialState } = useModel('@@initialState');
   const [avatarURL, setAvatarURL] = useState<string | undefined>(initialState?.currentUser?.avatar);
+  const [avatarUploaded, setAvatarUploaded] = useState<boolean>(false);
   const [name, setName] = useState<string>('');
 
   useAsyncEffect(async () => {
@@ -126,7 +127,8 @@ const BaseView = () => {
   const handleFinish = async (values: Record<string, string>) => {
     const { success } = await changeBaseInfo({
       fullName: values.fullName,
-      nikeName: values.nikeName,
+      nickName: values.nickName,
+      avatar: avatarUploaded ? avatarURL : undefined,
     });
     if (success) {
       useApp.message.success(intl.formatMessage({ id: 'app.update_success' }));
@@ -283,7 +285,14 @@ const BaseView = () => {
             </ProForm>
           </div>
           <div className={classnames(`${prefixCls}-right`, hashId)}>
-            <AvatarView avatar={avatarURL} callBack={setAvatarURL} name={name} />
+            <AvatarView
+              avatar={avatarURL}
+              callBack={(avatarUrl: string) => {
+                setAvatarURL(avatarUrl);
+                setAvatarUploaded(true);
+              }}
+              name={name}
+            />
           </div>
         </>
       )}
