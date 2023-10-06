@@ -53,9 +53,9 @@ const goLogin = () => {
  * 获取当前用户信息
  */
 const fetchUserInfo = async (): Promise<API.CurrentUser | undefined> => {
-  const { result, success } = await getCurrent();
-  if (success && result) {
-    return result;
+  const result = await getCurrent().catch(() => undefined);
+  if (result?.success && result.result) {
+    return result.result;
   }
   return undefined;
 };

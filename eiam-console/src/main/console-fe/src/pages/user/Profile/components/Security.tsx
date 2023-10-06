@@ -78,21 +78,9 @@ const SecurityView = () => {
     }
   }, [refresh]);
 
-  const passwordStrength = {
-    strong: <span className={classnames(`${prefixCls}-strong`, hashId)}>强</span>,
-    medium: <span className={classnames(`${prefixCls}-medium`, hashId)}>中</span>,
-    weak: <span className={classnames(`${prefixCls}-weak`, hashId)}>弱</span>,
-  };
-
   const getData = () => [
     {
       title: '账户密码',
-      description: (
-        <>
-          当前密码强度：
-          {passwordStrength.strong}
-        </>
-      ),
       actions: [
         <a
           key="Modify"
