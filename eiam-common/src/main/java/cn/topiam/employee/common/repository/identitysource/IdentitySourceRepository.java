@@ -20,6 +20,7 @@ package cn.topiam.employee.common.repository.identitysource;
 import java.util.List;
 import java.util.Optional;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -55,9 +56,10 @@ public interface IdentitySourceRepository extends LogicDeleteRepository<Identity
      * @param id {@link Long}
      * @return {@link IdentitySourceEntity}
      */
+    @NotNull
     @Override
     @Cacheable(key = "#p0", unless = "#result==null")
-    Optional<IdentitySourceEntity> findById(@Param(value = "id") Long id);
+    Optional<IdentitySourceEntity> findById(@NotNull @Param(value = "id") Long id);
 
     /**
      * 根据ID查询
@@ -66,7 +68,7 @@ public interface IdentitySourceRepository extends LogicDeleteRepository<Identity
      * @return {@link IdentitySourceEntity}
      */
     @Cacheable(key = "#p0", unless = "#result==null")
-    @Query(value = "SELECT * FROM identity_source WHERE id_ = :id", nativeQuery = true)
+    @Query(value = "SELECT IdentitySourceEntity FROM IdentitySourceEntity WHERE id = :id")
     Optional<IdentitySourceEntity> findByIdContainsDeleted(@Param(value = "id") Long id);
 
     /**
@@ -123,7 +125,7 @@ public interface IdentitySourceRepository extends LogicDeleteRepository<Identity
     @Transactional(rollbackFor = Exception.class)
     @Modifying
     @CacheEvict(allEntries = true)
-    @Query(value = "UPDATE identity_source SET strategy_config = :strategyConfig where id_ = :id", nativeQuery = true)
+    @Query(value = "UPDATE IdentitySourceEntity SET strategyConfig = :strategyConfig where id = :id")
     void updateStrategyConfig(@Param(value = "id") Long id,
                               @Param(value = "strategyConfig") String strategyConfig);
 
