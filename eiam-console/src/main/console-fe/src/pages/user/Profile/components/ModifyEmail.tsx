@@ -22,7 +22,6 @@ import { ModalForm, ProFormCaptcha, ProFormText } from '@ant-design/pro-componen
 import { App, Spin } from 'antd';
 import { omit } from 'lodash';
 import { useEffect, useRef, useState } from 'react';
-import { FormLayout } from './constant';
 import { useIntl } from '@@/exports';
 
 export default (props: {
@@ -39,10 +38,12 @@ export default (props: {
   const [hasSendCaptcha, setHasSendCaptcha] = useState<boolean>(false);
   const captchaRef = useRef<CaptFieldRef>();
   const formRef = useRef<ProFormInstance>();
+
   useEffect(() => {
     setLoading(true);
     setLoading(false);
   }, [visible]);
+
   return (
     <>
       <ModalForm
@@ -52,7 +53,12 @@ export default (props: {
         labelAlign={'right'}
         preserve={false}
         layout={'horizontal'}
-        {...FormLayout}
+        labelCol={{
+          span: 4,
+        }}
+        wrapperCol={{
+          span: 20,
+        }}
         autoFocusFirstInput
         open={visible}
         modalProps={{

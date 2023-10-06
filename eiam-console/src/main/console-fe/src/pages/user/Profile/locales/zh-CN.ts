@@ -62,6 +62,11 @@ export default {
   'page.user.profile.modify_email.form.email.rule.1': '邮箱格式不正确',
   'page.user.profile.modify_password.form': '修改密码',
   'page.user.profile.modify_password.success': '修改成功，请重新登录',
+
+  'page.user.profile.modify_password.form.old_password': '旧密码',
+  'page.user.profile.modify_password.form.old_password.placeholder': '请输入旧密码',
+  'page.user.profile.modify_password.form.old_password.rule.0': '请输入请输入旧密码',
+
   'page.user.profile.modify_password.form.new_password': '新密码',
   'page.user.profile.modify_password.form.new_password.placeholder': '请输入新密码',
   'page.user.profile.modify_password.form.new_password.rule.0': '请输入请输入新密码',

@@ -33,11 +33,13 @@ export default (props: {
   const [loading, setLoading] = useState<boolean>(false);
   const formRef = useRef<ProFormInstance>();
   const intl = useIntl();
+
   useEffect(() => {
     setLoading(true);
     formRef.current?.setFieldsValue({ id });
     setLoading(false);
   }, [visible, id]);
+
   return (
     <ModalForm
       title={intl.formatMessage({ id: 'pages.setting.administrator.reset_password_modal' })}
@@ -52,7 +54,7 @@ export default (props: {
         destroyOnClose: true,
         onCancel: onCancel,
       }}
-      onFinish={(formData: { password: string }) => {
+      onFinish={async (formData: { password: string }) => {
         setLoading(true);
         const password = Base64.encode(formData.password, true);
         onFinish({ id, password }).finally(() => {

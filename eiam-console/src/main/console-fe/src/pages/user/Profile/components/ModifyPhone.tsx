@@ -29,7 +29,6 @@ import {
 import { App, ConfigProvider, Spin } from 'antd';
 import { omit } from 'lodash';
 import { useContext, useEffect, useRef, useState } from 'react';
-import { FormLayout } from './constant';
 import classnames from 'classnames';
 import { ConfigContext } from 'antd/es/config-provider';
 import { useIntl } from '@@/exports';
@@ -84,7 +83,12 @@ export default (props: {
       labelAlign={'right'}
       preserve={false}
       layout={'horizontal'}
-      {...FormLayout}
+      labelCol={{
+        span: 4,
+      }}
+      wrapperCol={{
+        span: 20,
+      }}
       autoFocusFirstInput
       open={visible}
       modalProps={{

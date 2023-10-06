@@ -16,21 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { FieldNames } from '../constant';
-import { changePassword, prepareChangePassword } from '../service';
-import { aesEcbEncrypt } from '@/utils/aes';
-import { onGetEncryptSecret } from '@/utils/utils';
-import {
-  ModalForm,
-  ProFormCaptcha,
-  ProFormDependency,
-  ProFormInstance,
-  ProFormRadio,
-  ProFormText,
-} from '@ant-design/pro-components';
+import { changePassword } from '../service';
+import { ModalForm, ProFormInstance, ProFormText } from '@ant-design/pro-components';
 import { App, Spin } from 'antd';
 import { useEffect, useRef, useState } from 'react';
-import { FormLayout } from './constant';
-import { FormattedMessage, useIntl, useModel } from '@@/exports';
+import * as React from 'react';
+import { useIntl } from '@umijs/max';
 
 /**
  * 修改密码
@@ -43,12 +34,12 @@ const ModifyPassword = (props: {
   setRefresh: (visible: boolean) => void;
   setVisible: (visible: boolean) => void;
 }) => {
-  const { initialState } = useModel('@@initialState');
   const intl = useIntl();
   const { message } = App.useApp();
   const { visible, setVisible, setRefresh } = props;
   const [loading, setLoading] = useState<boolean>(false);
   const formRef = useRef<ProFormInstance>();
+
   useEffect(() => {
     setLoading(true);
     setLoading(false);
@@ -63,7 +54,12 @@ const ModifyPassword = (props: {
       labelAlign={'right'}
       preserve={false}
       layout={'horizontal'}
-      {...FormLayout}
+      labelCol={{
+        span: 5,
+      }}
+      wrapperCol={{
+        span: 19,
+      }}
       autoFocusFirstInput
       open={visible}
       modalProps={{
@@ -74,31 +70,36 @@ const ModifyPassword = (props: {
         },
       }}
       onFinish={async (formData: Record<string, any>) => {
-        const publicSecret = await onGetEncryptSecret();
-        if (publicSecret) {
-          //加密传输
-          const { success, result } = await changePassword(
-            aesEcbEncrypt(
-              JSON.stringify({
-                ...formData,
-                newPassword: formData[FieldNames.NEW_PASSWORD] as string,
-                verifyCode: formData[FieldNames.VERIFY_CODE] as string,
-                channel: formData[FieldNames.CHANNEL] as string,
-              }),
-              publicSecret,
-            ),
-          );
-          if (success && result) {
-            setVisible(false);
-            message.success(intl.formatMessage({ id: 'page.user.profile.modify_password.success' }));
-            setRefresh(true);
-            return Promise.resolve();
-          }
+        const { success, result } = await changePassword({
+          oldPassword: formData[FieldNames.NEW_PASSWORD] as string,
+          newPassword: formData[FieldNames.OLD_PASSWORD] as string,
+        });
+        if (success && result) {
+          setVisible(false);
+          message.success(intl.formatMessage({ id: 'page.user.profile.modify_password.success' }));
+          setRefresh(true);
+          return Promise.resolve();
         }
         return Promise.reject();
       }}
     >
       <Spin spinning={loading}>
+        <ProFormText.Password
+          placeholder={intl.formatMessage({
+            id: 'page.user.profile.modify_password.form.old_password.placeholder',
+          })}
+          label={intl.formatMessage({ id: 'page.user.profile.modify_password.form.old_password' })}
+          name={FieldNames.OLD_PASSWORD}
+          fieldProps={{ autoComplete: 'off' }}
+          rules={[
+            {
+              required: true,
+              message: intl.formatMessage({
+                id: 'page.user.profile.modify_password.form.old_password.rule.0',
+              }),
+            },
+          ]}
+        />
         <ProFormText.Password
           placeholder={intl.formatMessage({
             id: 'page.user.profile.modify_password.form.new_password.placeholder',
@@ -115,114 +116,33 @@ const ModifyPassword = (props: {
             },
           ]}
         />
-        <ProFormRadio.Group
-          name={FieldNames.CHANNEL}
+        <ProFormText.Password
           label={intl.formatMessage({
-            id: 'page.user.profile.modify_password.form.verify-code-type.label',
+            id: 'pages.setting.administrator.reset_password_modal.from.confirm_password',
           })}
-          options={[
-            {
-              label: intl.formatMessage({
-                id: 'page.user.profile.modify_password.form.phone.label',
-              }),
-              value: 'sms',
-            },
-            {
-              label: intl.formatMessage({
-                id: 'page.user.profile.modify_password.form.mail.label',
-              }),
-              value: 'mail',
-            },
-          ]}
+          placeholder={intl.formatMessage({
+            id: 'pages.setting.administrator.reset_password_modal.from.confirm_password.placeholder',
+          })}
+          name={'confirmPassword'}
+          fieldProps={{ autoComplete: 'off' }}
           rules={[
             {
               required: true,
               message: intl.formatMessage({
-                id: 'page.user.profile.modify_password.form.verify-code-type.rule.0',
+                id: 'pages.setting.administrator.reset_password_modal.from.confirm_password.rule.0.message',
               }),
             },
-          ]}
-        />
-        <ProFormDependency name={[FieldNames.CHANNEL]}>
-          {({ channel }) => {
-            if (channel === 'sms') {
-              return (
-                <ProFormText
-                  key={'sms'}
-                  label={intl.formatMessage({
-                    id: 'page.user.profile.modify_password.form.phone',
-                  })}
-                  name={'show'}
-                  initialValue={initialState?.currentUser?.phone}
-                  readonly
-                />
-              );
-            }
-            return (
-              <ProFormText
-                key={'mail'}
-                label={intl.formatMessage({
-                  id: 'page.user.profile.modify_password.form.mail',
-                })}
-                name={'show'}
-                initialValue={initialState?.currentUser?.email}
-                readonly
-              />
-            );
-          }}
-        </ProFormDependency>
-        <ProFormCaptcha
-          label={intl.formatMessage({ id: 'page.user.profile.modify_password.form.verify-code' })}
-          fieldProps={{
-            maxLength: 6,
-          }}
-          captchaProps={{}}
-          phoneName={'show'}
-          placeholder={intl.formatMessage({
-            id: 'pages.login.captcha.placeholder',
-          })}
-          captchaTextRender={(timing, count) => {
-            if (timing) {
-              return `${count} ${intl.formatMessage({
-                id: 'pages.login.phone.captcha-second-text',
-              })}`;
-            }
-            return intl.formatMessage({
-              id: 'pages.login.phone.get-opt-code',
-            });
-          }}
-          name={FieldNames.VERIFY_CODE}
-          rules={[
-            {
-              required: true,
-              message: <FormattedMessage id="pages.login.captcha.required" />,
-            },
-          ]}
-          onGetCaptcha={async () => {
-            const validate = await formRef.current?.validateFields([FieldNames.CHANNEL]);
-            if (!validate) {
-              return;
-            }
-            let channel = formRef.current?.getFieldValue(FieldNames.CHANNEL);
-            const publicSecret = await onGetEncryptSecret();
-            if (publicSecret) {
-              const { success } = await prepareChangePassword(
-                aesEcbEncrypt(
-                  JSON.stringify({
-                    channel: channel as string,
-                  }),
-                  publicSecret,
-                ),
-              );
-              if (success) {
-                message.success(
-                  intl.formatMessage({
-                    id: 'pages.login.phone.get-opt-code.success',
-                  }),
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                if (!value || getFieldValue(FieldNames.NEW_PASSWORD) === value) {
+                  return Promise.resolve();
+                }
+                return Promise.reject(
+                  new Error(intl.formatMessage({ id: 'app.password.not_match' })),
                 );
-              }
-            }
-          }}
+              },
+            }),
+          ]}
         />
       </Spin>
     </ModalForm>

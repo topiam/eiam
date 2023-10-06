@@ -109,17 +109,3 @@ export async function changeBaseInfo(
     method: 'PUT',
   });
 }
-
-
-/**
- * 准备修改账户密码
- */
-export async function prepareChangePassword(encrypt: string): Promise<API.ApiResult<boolean>> {
-  return request('/api/v1/user/profile/prepare_change_password', {
-    method: 'POST',
-    data: { encrypt: encrypt },
-    skipErrorHandler: true,
-  }).catch(({ response: { data } }) => {
-    return data;
-  });
-}
