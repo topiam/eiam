@@ -20,8 +20,8 @@ package cn.topiam.employee.console.converter.user;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import cn.topiam.employee.common.entity.account.UserDetailEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
+import cn.topiam.employee.common.entity.setting.AdministratorEntity;
 import cn.topiam.employee.console.pojo.update.user.UpdateUserInfoRequest;
 
 /**
@@ -39,9 +39,7 @@ public interface UserProfileConverter {
      * @param param {@link UpdateUserInfoRequest} 更新参数
      * @return {@link UserEntity} 用户实体
      */
-    @Mapping(target = "passwordPlainText", ignore = true)
     @Mapping(target = "deleted", ignore = true)
-    @Mapping(target = "identitySourceId", ignore = true)
     @Mapping(target = "phoneVerified", ignore = true)
     @Mapping(target = "phoneAreaCode", ignore = true)
     @Mapping(target = "username", ignore = true)
@@ -55,34 +53,11 @@ public interface UserProfileConverter {
     @Mapping(target = "lastAuthTime", ignore = true)
     @Mapping(target = "lastAuthIp", ignore = true)
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "externalId", ignore = true)
-    @Mapping(target = "expireDate", ignore = true)
     @Mapping(target = "expand", ignore = true)
     @Mapping(target = "emailVerified", ignore = true)
     @Mapping(target = "email", ignore = true)
-    @Mapping(target = "dataOrigin", ignore = true)
     @Mapping(target = "createTime", ignore = true)
     @Mapping(target = "createBy", ignore = true)
     @Mapping(target = "authTotal", ignore = true)
-    UserEntity userUpdateParamConvertToUserEntity(UpdateUserInfoRequest param);
-
-    /**
-     * 用户详情修改入参转换用户详情实体
-     *
-     * @param param {@link UpdateUserInfoRequest}
-     * @return {@link UserDetailEntity}
-     */
-    @Mapping(target = "deleted", ignore = true)
-    @Mapping(target = "website", ignore = true)
-    @Mapping(target = "idType", ignore = true)
-    @Mapping(target = "userId", ignore = true)
-    @Mapping(target = "remark", ignore = true)
-    @Mapping(target = "idCard", ignore = true)
-    @Mapping(target = "address", ignore = true)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "updateTime", ignore = true)
-    @Mapping(target = "updateBy", ignore = true)
-    @Mapping(target = "createTime", ignore = true)
-    @Mapping(target = "createBy", ignore = true)
-    UserDetailEntity userUpdateParamConvertToUserDetailsEntity(UpdateUserInfoRequest param);
+    AdministratorEntity userUpdateParamConvertToAdministratorEntity(UpdateUserInfoRequest param);
 }

@@ -36,17 +36,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Maps;
 
-import cn.topiam.employee.common.entity.account.UserDetailEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
+import cn.topiam.employee.common.entity.setting.AdministratorEntity;
 import cn.topiam.employee.common.enums.MailType;
 import cn.topiam.employee.common.enums.MessageNoticeChannel;
 import cn.topiam.employee.common.enums.SmsType;
 import cn.topiam.employee.common.exception.PasswordValidatedFailException;
 import cn.topiam.employee.common.exception.UserNotFoundException;
-import cn.topiam.employee.common.repository.account.UserDetailRepository;
-import cn.topiam.employee.common.repository.account.UserIdpRepository;
-import cn.topiam.employee.common.repository.account.UserRepository;
-import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
+import cn.topiam.employee.common.repository.setting.AdministratorRepository;
 import cn.topiam.employee.console.converter.user.UserProfileConverter;
 import cn.topiam.employee.console.pojo.update.user.*;
 import cn.topiam.employee.console.service.user.UserProfileService;
@@ -56,7 +53,6 @@ import cn.topiam.employee.support.context.ServletContextHelp;
 import cn.topiam.employee.support.exception.BadParamsException;
 import cn.topiam.employee.support.exception.InfoValidityFailException;
 import cn.topiam.employee.support.exception.TopIamException;
-import cn.topiam.employee.support.security.password.PasswordPolicyManager;
 import cn.topiam.employee.support.security.util.SecurityUtils;
 import cn.topiam.employee.support.util.BeanUtils;
 import cn.topiam.employee.support.util.PhoneNumberUtils;
@@ -73,8 +69,9 @@ import static cn.topiam.employee.support.util.EmailUtils.isEmailValidate;
 import static cn.topiam.employee.support.util.PhoneNumberUtils.isPhoneValidate;
 
 /**
+ *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/4/3 22:20
+ * Created by support@topiam.cn on  2022/10/3 22:20
  */
 @Slf4j
 @Service
@@ -86,20 +83,12 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Transactional(rollbackFor = Exception.class)
     public Boolean changeInfo(UpdateUserInfoRequest param) {
         //用户信息
-        UserEntity toUserEntity = userProfileConverter.userUpdateParamConvertToUserEntity(param);
-        UserEntity user = userRepository
+        AdministratorEntity administrator = userProfileConverter
+            .userUpdateParamConvertToAdministratorEntity(param);
+        AdministratorEntity user = administratorRepository
             .findById(Long.valueOf(SecurityUtils.getCurrentUser().getId())).orElseThrow();
-        BeanUtils.merge(toUserEntity, user, LAST_MODIFIED_BY, LAST_MODIFIED_TIME);
-        userRepository.save(user);
-        //用户详情
-        String currentUserId = SecurityUtils.getCurrentUserId();
-        UserDetailEntity detail = userDetailsRepository.findByUserId(Long.valueOf(currentUserId))
-            .orElse(new UserDetailEntity().setUserId(user.getId()));
-        UserDetailEntity toUserDetailsEntity = userProfileConverter
-            .userUpdateParamConvertToUserDetailsEntity(param);
-        toUserDetailsEntity.setId(detail.getId());
-        BeanUtils.merge(toUserDetailsEntity, detail, LAST_MODIFIED_BY, LAST_MODIFIED_TIME);
-        userDetailsRepository.save(detail);
+        BeanUtils.merge(administrator, user, LAST_MODIFIED_BY, LAST_MODIFIED_TIME);
+        administratorRepository.save(user);
         return true;
     }
 
@@ -107,22 +96,22 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Transactional(rollbackFor = Exception.class)
     public Boolean changePassword(ChangePasswordRequest param) {
         //获取用户
-        UserEntity user = getCurrentUser();
+        AdministratorEntity administrator = getCurrentUser();
         Boolean checkOtp = otpContextHelp.checkOtp(
             MessageNoticeChannel.SMS == param.getChannel() ? SmsType.UPDATE_PASSWORD.getCode()
                 : MailType.UPDATE_PASSWORD.getCode(),
             param.getChannel(),
-            MessageNoticeChannel.SMS == param.getChannel() ? user.getPhone() : user.getEmail(),
+            MessageNoticeChannel.SMS == param.getChannel() ? administrator.getPhone()
+                : administrator.getEmail(),
             param.getVerifyCode());
         if (!checkOtp) {
             throw new InfoValidityFailException(EX000102.getMessage());
         }
-        // 校验密码
-        passwordPolicyManager.validate(user, param.getNewPassword());
         //修改密码
-        userRepository.updateUserPassword(Long.valueOf(SecurityUtils.getCurrentUser().getId()),
+        administratorRepository.updatePassword(Long.valueOf(SecurityUtils.getCurrentUser().getId()),
             passwordEncoder.encode(param.getNewPassword()), LocalDateTime.now());
-        logger.info("用户ID: [{}] 用户名: [{}] 修改密码成功", user.getId(), user.getUsername());
+        logger.info("用户ID: [{}] 用户名: [{}] 修改密码成功", administrator.getId(),
+            administrator.getUsername());
         //异步下线所有用户
         removeSession(SecurityUtils.getCurrentUserName());
         //@formatter:on
@@ -132,7 +121,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean prepareChangePhone(PrepareChangePhoneRequest param) {
-        UserEntity user = validatedPassword(param.getPassword());
+        AdministratorEntity user = validatedPassword(param.getPassword());
         // 发送短信验证码
         if (StringUtils.isNotBlank(user.getPhone())) {
             otpContextHelp.sendOtp(param.getPhone(), SmsType.UPDATE_PHONE.getCode(),
@@ -152,7 +141,7 @@ public class UserProfileServiceImpl implements UserProfileService {
      */
     @Override
     public Boolean changePhone(ChangePhoneRequest param) {
-        UserEntity user = getCurrentUser();
+        AdministratorEntity user = getCurrentUser();
         Boolean checkOtp;
         if (StringUtils.isNotBlank(user.getPhone())) {
             checkOtp = otpContextHelp.checkOtp(SmsType.UPDATE_PHONE.getCode(),
@@ -165,12 +154,14 @@ public class UserProfileServiceImpl implements UserProfileService {
             throw new InfoValidityFailException(EX000102.getMessage());
         }
         // 校验是否已经存在
-        UserEntity byEmail = userRepository.findByPhone(param.getPhone());
-        if (Objects.nonNull(byEmail) && !user.getId().equals(byEmail.getId())) {
+        Optional<AdministratorEntity> optionalAdministrator = administratorRepository
+            .findByPhone(param.getPhone());
+        if (optionalAdministrator.isPresent()
+            && !user.getId().equals(optionalAdministrator.get().getId())) {
             throw new TopIamException("系统中已存在[" + param.getPhone() + "]手机号, 请先解绑");
         }
         Long id = Long.valueOf(SecurityUtils.getCurrentUser().getId());
-        userRepository.updateUserPhone(id, param.getPhone());
+        administratorRepository.updatePhone(id, param.getPhone());
         // 修改手机号成功发送短信
         LinkedHashMap<String, String> parameter = Maps.newLinkedHashMap();
         parameter.put(USERNAME, user.getUsername());
@@ -186,7 +177,7 @@ public class UserProfileServiceImpl implements UserProfileService {
      */
     @Override
     public Boolean prepareChangeEmail(PrepareChangeEmailRequest param) {
-        UserEntity user = validatedPassword(param.getPassword());
+        AdministratorEntity user = validatedPassword(param.getPassword());
         // 发送邮箱验证码
         if (StringUtils.isNotBlank(user.getEmail())) {
             otpContextHelp.sendOtp(param.getEmail(), MailType.UPDATE_BIND_MAIL.getCode(),
@@ -207,9 +198,9 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean changeEmail(ChangeEmailRequest param) {
-        UserEntity user = getCurrentUser();
+        AdministratorEntity administrator = getCurrentUser();
         Boolean checkOtp;
-        if (StringUtils.isNotBlank(user.getEmail())) {
+        if (StringUtils.isNotBlank(administrator.getEmail())) {
             checkOtp = otpContextHelp.checkOtp(MailType.UPDATE_BIND_MAIL.getCode(),
                 MessageNoticeChannel.MAIL, param.getEmail(), param.getOtp());
         } else {
@@ -220,18 +211,20 @@ public class UserProfileServiceImpl implements UserProfileService {
             throw new InfoValidityFailException(EX000102.getMessage());
         }
         // 校验是否已经存在
-        UserEntity byEmail = userRepository.findByEmail(param.getEmail());
-        if (Objects.nonNull(byEmail) && !user.getId().equals(byEmail.getId())) {
+        Optional<AdministratorEntity> optionalAdministrator = administratorRepository
+            .findByEmail(param.getEmail());
+        if (optionalAdministrator.isPresent()
+            && !administrator.getId().equals(optionalAdministrator.get().getId())) {
             throw new TopIamException("系统中已存在[" + param.getEmail() + "]邮箱, 请先解绑");
         }
-        userRepository.updateUserEmail(Long.valueOf(SecurityUtils.getCurrentUser().getId()),
+        administratorRepository.updateEmail(Long.valueOf(SecurityUtils.getCurrentUser().getId()),
             param.getEmail());
         return true;
     }
 
     @Override
     public Boolean prepareChangePassword(PrepareChangePasswordRequest param) {
-        UserEntity user = getCurrentUser();
+        AdministratorEntity user = getCurrentUser();
         // 发送短信验证码
         if (MessageNoticeChannel.SMS == param.getChannel()) {
             otpContextHelp.sendOtp(user.getPhone(), SmsType.UPDATE_PASSWORD.getCode(),
@@ -247,26 +240,25 @@ public class UserProfileServiceImpl implements UserProfileService {
     public Boolean forgetPasswordCode(String recipient) {
         if (isEmailValidate(recipient)) {
             // 验证在库中是否有邮箱
-            Optional<UserEntity> byEmail = Optional
-                .ofNullable(userRepository.findByEmail(recipient));
+            Optional<AdministratorEntity> byEmail = administratorRepository.findByEmail(recipient);
             if (byEmail.isPresent()) {
                 otpContextHelp.sendOtp(recipient, MailType.FORGET_PASSWORD.getCode(),
                     MessageNoticeChannel.MAIL);
                 return true;
             }
-            log.warn("忘记密码: : 邮箱: [{}] 不存在", recipient);
+            log.warn("忘记密码: 邮箱: [{}] 不存在", recipient);
         } else if (isPhoneValidate(recipient)) {
             // 验证在库中是否有手机号
-            Optional<UserEntity> byPhone = Optional
-                .ofNullable(userRepository.findByPhone(PhoneNumberUtils.getPhoneNumber(recipient)));
+            Optional<AdministratorEntity> byPhone = administratorRepository
+                .findByPhone(PhoneNumberUtils.getPhoneNumber(recipient));
             if (byPhone.isPresent()) {
                 otpContextHelp.sendOtp(recipient, SmsType.FORGET_PASSWORD.getCode(),
                     MessageNoticeChannel.SMS);
                 return true;
             }
-            log.warn("忘记密码: : 手机号: [{}] 不存在", recipient);
+            log.warn("忘记密码: 手机号: [{}] 不存在", recipient);
         }
-        log.error("忘记密码: : 接受者: [{}] 格式错误", recipient);
+        log.error("忘记密码: 接受者: [{}] 格式错误", recipient);
         throw new BadParamsException("请输入正确的手机号或邮箱");
     }
 
@@ -274,16 +266,15 @@ public class UserProfileServiceImpl implements UserProfileService {
     public Boolean prepareForgetPassword(String recipient, String code) {
         // 校验验证码
         Boolean checkOtp = false;
-        Optional<UserEntity> user = Optional.empty();
+        Optional<AdministratorEntity> user = Optional.empty();
         if (isEmailValidate(recipient)) {
-            user = Optional.ofNullable(userRepository.findByEmail(recipient));
+            user = administratorRepository.findByEmail(recipient);
             if (user.isPresent()) {
                 checkOtp = otpContextHelp.checkOtp(MailType.FORGET_PASSWORD.getCode(),
                     MessageNoticeChannel.MAIL, recipient, code);
             }
         } else if (isPhoneValidate(recipient)) {
-            user = Optional
-                .ofNullable(userRepository.findByPhone(PhoneNumberUtils.getPhoneNumber(recipient)));
+            user = administratorRepository.findByPhone(PhoneNumberUtils.getPhoneNumber(recipient));
             if (user.isPresent()) {
                 checkOtp = otpContextHelp.checkOtp(SmsType.FORGET_PASSWORD.getCode(),
                     MessageNoticeChannel.SMS, recipient, code);
@@ -316,15 +307,15 @@ public class UserProfileServiceImpl implements UserProfileService {
             return false;
         }
         //修改密码
-        Optional<UserEntity> user = userRepository.findById(Long.valueOf(userId));
+        Optional<AdministratorEntity> user = administratorRepository.findById(Long.valueOf(userId));
         if (user.isPresent()) {
-            UserEntity userEntity = user.get();
-            userRepository.updateUserPassword(userEntity.getId(),
+            AdministratorEntity administratorEntity = user.get();
+            administratorRepository.updatePassword(administratorEntity.getId(),
                 passwordEncoder.encode(forgetPasswordRequest.getNewPassword()),
                 LocalDateTime.now());
-            logger.info("忘记密码: 用户ID: [{}] 用户名: [{}] 修改密码成功", userEntity.getId(),
-                userEntity.getUsername());
-            removeSession(userEntity.getUsername());
+            logger.info("忘记密码: 用户ID: [{}] 用户名: [{}] 修改密码成功", administratorEntity.getId(),
+                administratorEntity.getUsername());
+            removeSession(administratorEntity.getUsername());
             stringRedisTemplate.delete(redisTokenId);
             return true;
         }
@@ -351,9 +342,10 @@ public class UserProfileServiceImpl implements UserProfileService {
      *
      * @return {@link UserEntity}
      */
-    public UserEntity getCurrentUser() {
+    public AdministratorEntity getCurrentUser() {
         String userId = SecurityUtils.getCurrentUserId();
-        Optional<UserEntity> optional = userRepository.findById(Long.valueOf(userId));
+        Optional<AdministratorEntity> optional = administratorRepository
+            .findById(Long.valueOf(userId));
         if (optional.isPresent()) {
             return optional.get();
         }
@@ -368,8 +360,8 @@ public class UserProfileServiceImpl implements UserProfileService {
      * @param password {@link String}
      * @return {@link UserEntity}
      */
-    public UserEntity validatedPassword(String password) {
-        UserEntity user = getCurrentUser();
+    public AdministratorEntity validatedPassword(String password) {
+        AdministratorEntity user = getCurrentUser();
         boolean matches = passwordEncoder.matches(password, user.getPassword());
         if (!matches) {
             logger.error("用户ID: [{}] 用户名: [{}] 密码匹配失败", user.getId(), user.getUsername());
@@ -381,84 +373,57 @@ public class UserProfileServiceImpl implements UserProfileService {
     /**
      * Executor
      */
-    private final Executor                          executor;
+    private final Executor                executor;
 
     /**
      *  AccountConverter
      */
-    private final UserProfileConverter              userProfileConverter;
+    private final UserProfileConverter    userProfileConverter;
 
     /**
      *  PasswordEncoder
      */
-    private final PasswordEncoder                   passwordEncoder;
+    private final PasswordEncoder         passwordEncoder;
 
     /**
-     * UserRepository
+     * AdministratorRepository
      */
-    private final UserRepository                    userRepository;
-
-    /**
-     * 用户详情Repository
-     */
-    private final UserDetailRepository              userDetailsRepository;
+    private final AdministratorRepository administratorRepository;
 
     /**
      * SessionRegistry
      */
-    private final SessionRegistry                   sessionRegistry;
+    private final SessionRegistry         sessionRegistry;
 
     /**
      * OtpContextHelp
      */
-    private final OtpContextHelp                    otpContextHelp;
+    private final OtpContextHelp          otpContextHelp;
 
     /**
      * SmsMsgEventPublish
      */
-    private final SmsMsgEventPublish                smsMsgEventPublish;
+    private final SmsMsgEventPublish      smsMsgEventPublish;
 
     /**
      * StringRedisTemplate
      */
-    private final StringRedisTemplate               stringRedisTemplate;
-
-    /**
-     * PasswordPolicyManager
-     */
-    private final PasswordPolicyManager<UserEntity> passwordPolicyManager;
-
-    /**
-     * IdentityProviderRepository
-     */
-    private final IdentityProviderRepository        identityProviderRepository;
-
-    /**
-     * UserAuthnBindRepository
-     */
-    private final UserIdpRepository                 userIdpRepository;
+    private final StringRedisTemplate     stringRedisTemplate;
 
     public UserProfileServiceImpl(AsyncConfigurer asyncConfigurer,
                                   UserProfileConverter userProfileConverter,
-                                  PasswordEncoder passwordEncoder, UserRepository userRepository,
-                                  UserDetailRepository userDetailsRepository,
+                                  PasswordEncoder passwordEncoder,
+                                  AdministratorRepository administratorRepository,
                                   SessionRegistry sessionRegistry, OtpContextHelp otpContextHelp,
                                   SmsMsgEventPublish smsMsgEventPublish,
-                                  StringRedisTemplate stringRedisTemplate,
-                                  PasswordPolicyManager<UserEntity> passwordPolicyManager,
-                                  IdentityProviderRepository identityProviderRepository,
-                                  UserIdpRepository userIdpRepository) {
+                                  StringRedisTemplate stringRedisTemplate) {
         this.executor = asyncConfigurer.getAsyncExecutor();
         this.userProfileConverter = userProfileConverter;
         this.passwordEncoder = passwordEncoder;
-        this.userRepository = userRepository;
-        this.userDetailsRepository = userDetailsRepository;
+        this.administratorRepository = administratorRepository;
         this.sessionRegistry = sessionRegistry;
         this.otpContextHelp = otpContextHelp;
         this.smsMsgEventPublish = smsMsgEventPublish;
         this.stringRedisTemplate = stringRedisTemplate;
-        this.passwordPolicyManager = passwordPolicyManager;
-        this.identityProviderRepository = identityProviderRepository;
-        this.userIdpRepository = userIdpRepository;
     }
 }

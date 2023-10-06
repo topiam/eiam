@@ -25,7 +25,6 @@ import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.console.pojo.update.user.*;
 import cn.topiam.employee.console.service.user.UserProfileService;
 import cn.topiam.employee.support.result.ApiRestResult;
-import cn.topiam.employee.support.web.decrypt.DecryptRequestBody;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -50,7 +49,7 @@ public class UserProfileController {
     @Audit(type = EventType.MODIFY_ACCOUNT_INFO_PORTAL)
     @Operation(summary = "修改账户信息")
     @PutMapping("/change_info")
-    public ApiRestResult<Boolean> changeInfo(@DecryptRequestBody @RequestBody @Validated UpdateUserInfoRequest param) {
+    public ApiRestResult<Boolean> changeInfo(@RequestBody @Validated UpdateUserInfoRequest param) {
         Boolean result = userProfileService.changeInfo(param);
         return ApiRestResult.ok(result);
     }
@@ -63,7 +62,7 @@ public class UserProfileController {
     @Audit(type = EventType.PREPARE_MODIFY_PASSWORD)
     @Operation(summary = "准备修改账户密码")
     @PostMapping("/prepare_change_password")
-    public ApiRestResult<Boolean> prepareChangePassword(@DecryptRequestBody @RequestBody @Validated PrepareChangePasswordRequest param) {
+    public ApiRestResult<Boolean> prepareChangePassword(@RequestBody @Validated PrepareChangePasswordRequest param) {
         return ApiRestResult.ok(userProfileService.prepareChangePassword(param));
     }
 
@@ -75,7 +74,7 @@ public class UserProfileController {
     @Audit(type = EventType.MODIFY_USER_PASSWORD_PORTAL)
     @Operation(summary = "修改账户密码")
     @PutMapping("/change_password")
-    public ApiRestResult<Boolean> changePassword(@DecryptRequestBody @RequestBody @Validated ChangePasswordRequest param) {
+    public ApiRestResult<Boolean> changePassword(@RequestBody @Validated ChangePasswordRequest param) {
         return ApiRestResult.ok(userProfileService.changePassword(param));
     }
 
@@ -87,7 +86,7 @@ public class UserProfileController {
     @Audit(type = EventType.PREPARE_MODIFY_PHONE)
     @Operation(summary = "准备修改手机")
     @PostMapping("/prepare_change_phone")
-    public ApiRestResult<Boolean> prepareChangePhone(@DecryptRequestBody @RequestBody @Validated PrepareChangePhoneRequest param) {
+    public ApiRestResult<Boolean> prepareChangePhone(@RequestBody @Validated PrepareChangePhoneRequest param) {
         return ApiRestResult.ok(userProfileService.prepareChangePhone(param));
     }
 
@@ -111,7 +110,7 @@ public class UserProfileController {
     @Audit(type = EventType.PREPARE_MODIFY_EMAIL)
     @Operation(summary = "准备修改邮箱")
     @PostMapping("/prepare_change_email")
-    public ApiRestResult<Boolean> prepareChangeEmail(@DecryptRequestBody @RequestBody @Validated PrepareChangeEmailRequest param) {
+    public ApiRestResult<Boolean> prepareChangeEmail(@RequestBody @Validated PrepareChangeEmailRequest param) {
         return ApiRestResult.ok(userProfileService.prepareChangeEmail(param));
     }
 
@@ -145,7 +144,7 @@ public class UserProfileController {
      */
     @Operation(summary = "忘记密码预认证")
     @PostMapping(PREPARE_FORGET_PASSWORD)
-    public ApiRestResult<Boolean> prepareForgetPassword(@DecryptRequestBody @RequestBody @Validated PrepareForgetPasswordRequest param) {
+    public ApiRestResult<Boolean> prepareForgetPassword(@RequestBody @Validated PrepareForgetPasswordRequest param) {
         return ApiRestResult
             .ok(userProfileService.prepareForgetPassword(param.getRecipient(), param.getCode()));
     }
@@ -157,7 +156,7 @@ public class UserProfileController {
      */
     @Operation(summary = "忘记密码")
     @PutMapping(FORGET_PASSWORD)
-    public ApiRestResult<Boolean> forgetPassword(@DecryptRequestBody @RequestBody @Validated ForgetPasswordRequest forgetPasswordRequest) {
+    public ApiRestResult<Boolean> forgetPassword(@RequestBody @Validated ForgetPasswordRequest forgetPasswordRequest) {
         return ApiRestResult.ok(userProfileService.forgetPassword(forgetPasswordRequest));
     }
 
