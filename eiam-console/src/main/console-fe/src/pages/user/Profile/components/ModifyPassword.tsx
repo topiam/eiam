@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { FieldNames } from '../constant';
+import { FieldNames, ServerExceptionStatus } from '../constant';
 import { changePassword } from '../service';
 import { ModalForm, ProFormInstance, ProFormText } from '@ant-design/pro-components';
 import { App, Spin } from 'antd';
@@ -35,7 +35,7 @@ const ModifyPassword = (props: {
   setVisible: (visible: boolean) => void;
 }) => {
   const intl = useIntl();
-  const { message } = App.useApp();
+  const useApp = App.useApp();
   const { visible, setVisible, setRefresh } = props;
   const [loading, setLoading] = useState<boolean>(false);
   const formRef = useRef<ProFormInstance>();
@@ -70,13 +70,19 @@ const ModifyPassword = (props: {
         },
       }}
       onFinish={async (formData: Record<string, any>) => {
-        const { success, result } = await changePassword({
+        const { success, result, status, message } = await changePassword({
           oldPassword: formData[FieldNames.NEW_PASSWORD] as string,
           newPassword: formData[FieldNames.OLD_PASSWORD] as string,
         });
+        if (!success && status === ServerExceptionStatus.PASSWORD_VALIDATED_FAIL_ERROR) {
+          formRef.current?.setFields([{ name: FieldNames.OLD_PASSWORD, errors: [`${message}`] }]);
+          return Promise.reject();
+        }
         if (success && result) {
           setVisible(false);
-          message.success(intl.formatMessage({ id: 'page.user.profile.modify_password.success' }));
+          useApp.message.success(
+            intl.formatMessage({ id: 'page.user.profile.modify_password.success' }),
+          );
           setRefresh(true);
           return Promise.resolve();
         }

@@ -76,14 +76,6 @@ public interface UserProfileService {
     Boolean changeEmail(ChangeEmailRequest param);
 
     /**
-     * 修改密码预认证
-     *
-     * @param param {@link PrepareChangePasswordRequest}
-     * @return {@link Boolean}
-     */
-    Boolean prepareChangePassword(PrepareChangePasswordRequest param);
-
-    /**
      * 忘记密码发送验证码
      *
      * @param recipient {@link String} 验证码接收者（邮箱/手机号）

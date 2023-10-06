@@ -55,18 +55,6 @@ public class UserProfileController {
     }
 
     /**
-     * 准备修改密码
-     *
-     * @return {@link  ApiRestResult}
-     */
-    @Audit(type = EventType.PREPARE_MODIFY_PASSWORD)
-    @Operation(summary = "准备修改账户密码")
-    @PostMapping("/prepare_change_password")
-    public ApiRestResult<Boolean> prepareChangePassword(@RequestBody @Validated PrepareChangePasswordRequest param) {
-        return ApiRestResult.ok(userProfileService.prepareChangePassword(param));
-    }
-
-    /**
      * 修改密码
      *
      * @return {@link  ApiRestResult}

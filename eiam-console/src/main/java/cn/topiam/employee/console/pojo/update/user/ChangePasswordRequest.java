@@ -52,14 +52,7 @@ public class ChangePasswordRequest implements Serializable {
     /**
      * 验证码
      */
-    @NotEmpty(message = "验证码不能为空")
-    @Parameter(description = "验证码")
-    private String               verifyCode;
-
-    /**
-     * 消息类型
-     */
-    @NotNull(message = "消息类型不能为空")
-    @Parameter(description = "消息类型")
-    private MessageNoticeChannel channel;
+    @NotEmpty(message = "旧密码不能为空")
+    @Parameter(description = "旧密码")
+    private String               oldPassword;
 }
