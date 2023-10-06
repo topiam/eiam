@@ -54,7 +54,7 @@ public class IdentitySourceEventReceiveEndpoint {
      * 事件通知处理
      *
      * @param request {@link  HttpServletRequest}
-     * @param response {@link  HttpServletRequest}
+     * @param code {@link  String}
      * @return {@link  ResponseEntity}
      */
     @Trace

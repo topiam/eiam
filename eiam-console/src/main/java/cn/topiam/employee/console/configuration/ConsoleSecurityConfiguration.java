@@ -68,6 +68,8 @@ import cn.topiam.employee.support.security.authentication.WebAuthenticationDetai
 import cn.topiam.employee.support.security.csrf.SpaCsrfTokenRequestHandler;
 
 import lombok.RequiredArgsConstructor;
+
+import static cn.topiam.employee.common.constant.SynchronizerConstants.EVENT_RECEIVE_PATH;
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.header.writers.XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK;
 import static org.springframework.web.cors.CorsConfiguration.ALL;
@@ -99,12 +101,8 @@ public class ConsoleSecurityConfiguration implements BeanClassLoaderAware {
      */
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers(
-            new AntPathRequestMatcher("/css/**", HttpMethod.GET.name()),
-            new AntPathRequestMatcher("/js/**", HttpMethod.GET.name()),
-            new AntPathRequestMatcher("/webjars/**", HttpMethod.GET.name()),
-            new AntPathRequestMatcher("/images/**", HttpMethod.GET.name()),
-            new AntPathRequestMatcher("/favicon.ico", HttpMethod.GET.name()));
+        return web -> {
+        };
     }
 
     /**
@@ -134,7 +132,7 @@ public class ConsoleSecurityConfiguration implements BeanClassLoaderAware {
                 //记住我
                 .rememberMe(withRememberMeConfigurerDefaults(settingRepository))
                 //CSRF
-                .csrf(withCsrfConfigurerDefaults())
+                .csrf(withCsrfConfigurerDefaults(new AntPathRequestMatcher(EVENT_RECEIVE_PATH+"/{code}")))
                 //headers
                 .headers(withHeadersConfigurerDefaults(settingRepository))
                 //cors
@@ -157,6 +155,7 @@ public class ConsoleSecurityConfiguration implements BeanClassLoaderAware {
     public Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> authorizeHttpRequests() {
         //@formatter:off
         return registry -> {
+            registry.requestMatchers(new AntPathRequestMatcher(EVENT_RECEIVE_PATH+"/{code}")).permitAll();
             registry.requestMatchers(new AntPathRequestMatcher(CURRENT_STATUS, HttpMethod.GET.name())).permitAll();
             registry.requestMatchers(new AntPathRequestMatcher(PUBLIC_SECRET_PATH, HttpMethod.GET.name())).permitAll();
             registry.anyRequest().authenticated();
