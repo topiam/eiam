@@ -17,8 +17,6 @@
  */
 import { FieldNames, ServerExceptionStatus } from '../constant';
 import { changeEmail, prepareChangeEmail } from '../service';
-import { aesEcbEncrypt } from '@/utils/aes';
-import { onGetEncryptSecret } from '@/utils/utils';
 import type { CaptFieldRef, ProFormInstance } from '@ant-design/pro-components';
 import { ModalForm, ProFormCaptcha, ProFormText } from '@ant-design/pro-components';
 import { App, Spin } from 'antd';
@@ -94,7 +92,9 @@ export default (props: {
             rules={[
               {
                 required: true,
-                message: intl.formatMessage({ id: 'page.user.profile.common.form.password.rule.0' }),
+                message: intl.formatMessage({
+                  id: 'page.user.profile.common.form.password.rule.0',
+                }),
               },
             ]}
           />
@@ -110,49 +110,44 @@ export default (props: {
             rules={[
               {
                 required: true,
-                message: intl.formatMessage({ id: 'page.user.profile.modify_email.form.email.rule.0' }),
+                message: intl.formatMessage({
+                  id: 'page.user.profile.modify_email.form.email.rule.0',
+                }),
               },
               {
                 type: 'email',
-                message: intl.formatMessage({ id: 'page.user.profile.modify_email.form.email.rule.1' }),
+                message: intl.formatMessage({
+                  id: 'page.user.profile.modify_email.form.email.rule.1',
+                }),
               },
             ]}
             onGetCaptcha={async (email) => {
               if (!(await formRef.current?.validateFields([FieldNames.PASSWORD]))) {
                 return Promise.reject();
               }
-              const publicSecret = await onGetEncryptSecret();
-              if (publicSecret !== undefined) {
-                //加密传输
-                const { success, message, result, status } = await prepareChangeEmail(
-                  aesEcbEncrypt(
-                    JSON.stringify({
-                      email: email,
-                      password: formRef.current?.getFieldValue(FieldNames.PASSWORD),
-                    }),
-                    publicSecret,
-                  ),
-                );
-                if (!success && status === ServerExceptionStatus.PASSWORD_VALIDATED_FAIL_ERROR) {
-                  formRef.current?.setFields([
-                    { name: FieldNames.PASSWORD, errors: [`${message}`] },
-                  ]);
-                  return Promise.reject();
-                }
-                if (success && result) {
-                  setHasSendCaptcha(true);
-                  useApp.message.success(intl.formatMessage({ id: 'app.send_successfully' }));
-                  return Promise.resolve();
-                }
-                useApp.message.error(message);
-                captchaRef.current?.endTiming();
+              const { success, message, result, status } = await prepareChangeEmail({
+                email: email,
+                password: formRef.current?.getFieldValue(FieldNames.PASSWORD),
+              });
+              if (!success && status === ServerExceptionStatus.PASSWORD_VALIDATED_FAIL_ERROR) {
+                formRef.current?.setFields([{ name: FieldNames.PASSWORD, errors: [`${message}`] }]);
                 return Promise.reject();
               }
+              if (success && result) {
+                setHasSendCaptcha(true);
+                useApp.message.success(intl.formatMessage({ id: 'app.send_successfully' }));
+                return Promise.resolve();
+              }
+              useApp.message.error(message);
+              captchaRef.current?.endTiming();
+              return Promise.reject();
             }}
           />
           <ProFormText
             label={intl.formatMessage({ id: 'page.user.profile.common.form.code' })}
-            placeholder={intl.formatMessage({ id: 'page.user.profile.common.form.code.placeholder' })}
+            placeholder={intl.formatMessage({
+              id: 'page.user.profile.common.form.code.placeholder',
+            })}
             name={FieldNames.OTP}
             fieldProps={{ autoComplete: 'off' }}
             rules={[

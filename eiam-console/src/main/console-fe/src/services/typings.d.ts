@@ -67,7 +67,6 @@ declare namespace API {
     secret: string;
   };
 
-
   /**
    * 加密秘钥
    */
@@ -222,8 +221,8 @@ declare namespace AccountAPI {
     appName: string;
     clientIp: string;
     userAgent: {
-      platformVersion:string;
-      platform:string
+      platformVersion: string;
+      platform: string;
     };
     browser: string;
     eventStatus: string;

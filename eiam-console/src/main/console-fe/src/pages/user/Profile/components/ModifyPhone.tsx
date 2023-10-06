@@ -1,5 +1,5 @@
 /*
- * eiam-console - Employee Identity and Access Management
+ * eiam-portal - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,17 +15,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {FieldNames} from '../constant';
-import {changePhone} from '../service';
-import type {CaptFieldRef, ProFormInstance} from '@ant-design/pro-components';
-import {ModalForm, ProFormText, useStyle as useAntdStyle,} from '@ant-design/pro-components';
-import {App, ConfigProvider, Spin} from 'antd';
-import {omit} from 'lodash';
-import {useContext, useEffect, useRef, useState} from 'react';
-import {FormLayout} from './constant';
+import { changePhone, prepareChangePhone } from '../service';
+import { phoneIsValidNumber } from '@/utils/utils';
+import { FormattedMessage } from '@@/plugin-locale/localeExports';
+import type { CaptFieldRef, ProFormInstance } from '@ant-design/pro-components';
+import {
+  ModalForm,
+  ProFormCaptcha,
+  ProFormDependency,
+  ProFormText,
+  useStyle as useAntdStyle,
+} from '@ant-design/pro-components';
+import { App, ConfigProvider, Spin } from 'antd';
+import { omit } from 'lodash';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { FormLayout } from './constant';
 import classnames from 'classnames';
-import {ConfigContext} from 'antd/es/config-provider';
-import {useIntl} from '@@/exports';
+import { ConfigContext } from 'antd/es/config-provider';
+import { useIntl } from '@@/exports';
+import FormPhoneAreaCodeSelect from '@/components/FormPhoneAreaCodeSelect';
+import { FieldNames, ServerExceptionStatus } from '../constant';
+import * as React from 'react';
 
 function useStyle(prefixCls: string) {
   const { getPrefixCls } = useContext(ConfigContext || ConfigProvider.ConfigContext);
@@ -57,8 +67,6 @@ export default (props: {
   const captchaRef = useRef<CaptFieldRef>();
   /**已发送验证码*/
   const [hasSendCaptcha, setHasSendCaptcha] = useState<boolean>(false);
-  /**手机区域*/
-  const [phoneRegion, setPhoneRegion] = useState<string>('86');
   const formRef = useRef<ProFormInstance>();
   const { wrapSSR, hashId } = useStyle(prefixCls);
 
@@ -89,7 +97,9 @@ export default (props: {
       }}
       onFinish={async (formData: Record<string, any>) => {
         if (!hasSendCaptcha) {
-          useApp.message.error(intl.formatMessage({ id: 'page.user.profile.please_send_code.message' }));
+          useApp.message.error(
+            intl.formatMessage({ id: 'page.user.profile.please_send_code.message' }),
+          );
           return Promise.reject();
         }
         const { success } = await changePhone(omit(formData, FieldNames.PASSWORD));
@@ -118,7 +128,84 @@ export default (props: {
             },
           ]}
         />
-
+        <ProFormDependency name={['phoneAreaCode']}>
+          {({ phoneAreaCode }) => {
+            return (
+              <ProFormCaptcha
+                name={FieldNames.PHONE}
+                placeholder={intl.formatMessage({
+                  id: 'page.user.profile.common.form.phone.placeholder',
+                })}
+                label={intl.formatMessage({ id: 'page.user.profile.common.form.phone' })}
+                fieldProps={{ autoComplete: 'off' }}
+                fieldRef={captchaRef}
+                formItemProps={{ className: classnames(`${prefixCls}-captcha`, hashId) }}
+                rules={[
+                  {
+                    required: true,
+                    message: <FormattedMessage id={'page.user.profile.common.form.phone.rule.0'} />,
+                  },
+                  {
+                    validator: async (rule, value) => {
+                      if (!value) {
+                        return Promise.resolve();
+                      }
+                      //校验手机号格式
+                      const isValidNumber = await phoneIsValidNumber(value, phoneAreaCode);
+                      if (!isValidNumber) {
+                        return Promise.reject<any>(
+                          new Error(
+                            intl.formatMessage({
+                              id: 'page.user.profile.common.form.phone.rule.1',
+                            }),
+                          ),
+                        );
+                      }
+                    },
+                    validateTrigger: ['onBlur'],
+                  },
+                ]}
+                phoneName={FieldNames.PHONE}
+                addonBefore={
+                  <FormPhoneAreaCodeSelect
+                    name={'phoneAreaCode'}
+                    showSearch
+                    noStyle
+                    allowClear={false}
+                    style={{ maxWidth: '200px' }}
+                    fieldProps={{
+                      placement: 'bottomLeft',
+                    }}
+                  />
+                }
+                onGetCaptcha={async (mobile) => {
+                  if (!(await formRef.current?.validateFields([FieldNames.PASSWORD]))) {
+                    return Promise.reject();
+                  }
+                  const { success, message, status, result } = await prepareChangePhone({
+                    phone: mobile as string,
+                    phoneRegion: phoneAreaCode,
+                    password: formRef.current?.getFieldValue(FieldNames.PASSWORD),
+                  });
+                  if (!success && status === ServerExceptionStatus.PASSWORD_VALIDATED_FAIL_ERROR) {
+                    formRef.current?.setFields([
+                      { name: FieldNames.PASSWORD, errors: [`${message}`] },
+                    ]);
+                    return Promise.reject();
+                  }
+                  if (success && result) {
+                    setHasSendCaptcha(true);
+                    useApp.message.success(intl.formatMessage({ id: 'app.send_successfully' }));
+                    return Promise.resolve();
+                  }
+                  useApp.message.error(message);
+                  captchaRef.current?.endTiming();
+                  return Promise.reject();
+                }}
+              />
+            );
+          }}
+        </ProFormDependency>
         <ProFormText
           placeholder={intl.formatMessage({ id: 'page.user.profile.common.form.code.placeholder' })}
           label={intl.formatMessage({ id: 'page.user.profile.common.form.code' })}

@@ -39,6 +39,8 @@ export enum FieldNames {
   PHONE = 'phone',
   /**邮箱 */
   EMAIL = 'email',
+  /**旧密码 */
+  OLD_PASSWORD = 'oldPassword',
   /**新密码 */
   NEW_PASSWORD = 'newPassword',
   /**验证码*/

@@ -16,17 +16,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 export default {
-  'page.user.profile.menu.base': '基本设置',
+  'page.user.profile.menu.base': '基础信息',
   'page.user.profile.menu.security': '安全设置',
   'page.user.profile.menu.bind': '账号绑定',
   'page.user.profile.base.avatar_title': '头像',
   'page.user.profile.base.avatar_change_title': '更换头像',
-  'page.user.profile.base.form.username': '用户名称',
+  'page.user.profile.base.form.account_id': '账户ID',
+  'page.user.profile.base.form.username': '用户名',
   'page.user.profile.base.form.email': '邮箱',
   'page.user.profile.base.form.phone': '手机号',
   'page.user.profile.base.form.full_name': '姓名',
   'page.user.profile.base.form.nick_name': '昵称',
   'page.user.profile.base.form.nick_name.rule.0': '请输入您的昵称',
+  'page.user.profile.base.form.update_button': '更新',
   'page.user.profile.common.form.password': '密码',
   'page.user.profile.common.form.password.placeholder': '请输入密码',
   'page.user.profile.common.form.password.rule.0': '请输入密码',
@@ -35,7 +37,6 @@ export default {
   'page.user.profile.common.form.phone.placeholder': '请输入手机号',
   'page.user.profile.common.form.phone.rule.0': '手机号未填写',
   'page.user.profile.common.form.phone.rule.1': '手机号不合法',
-  'page.user.profile.common.form.phone.rule.2': '手机号已存在',
 
   'page.user.profile.common.form.code': '验证码',
   'page.user.profile.common.form.code.placeholder': '请输入验证码',
@@ -50,7 +51,8 @@ export default {
   'page.user.profile.bind.totp.form.verify.placeholder': '输入密码确认身份',
   'page.user.profile.bind.totp.form.bind': '绑定动态口令',
   'page.user.profile.bind.totp.form.bind.placeholder': '使用移动端认证器绑定口令',
-  'page.user.profile.bind.totp.form.bind.alert': '请使用市面常见认证器 APP，扫描下方二维码，完成绑定。',
+  'page.user.profile.bind.totp.form.bind.alert':
+    '请使用市面常见认证器 APP，扫描下方二维码，完成绑定。',
   'page.user.profile.bind.totp.form.bind.paragraph':
     '扫码绑定后，请您输入移动端 APP 中的六位动态口令，完成本次绑定。',
   'page.user.profile.bind.totp.form.update_email': '修改邮箱',

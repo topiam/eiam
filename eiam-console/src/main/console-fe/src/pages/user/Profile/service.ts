@@ -15,17 +15,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { ParamCheckType } from '@/constant';
 import { request } from '@@/plugin-request/request';
 
 /**
  * 准备修改手机号
  *
- * @param encrypt
+ * @param data
  */
-export async function prepareChangePhone(encrypt: string): Promise<API.ApiResult<boolean>> {
+export async function prepareChangePhone(data: {
+  phone: string;
+  phoneRegion: string;
+  password: string;
+}): Promise<API.ApiResult<boolean>> {
   return request(`/api/v1/user/profile/prepare_change_phone`, {
-    data: { encrypt: encrypt },
+    data: data,
     method: 'POST',
     skipErrorHandler: true,
   }).catch(({ response: { data } }) => {
@@ -48,11 +51,14 @@ export async function changePhone(data: Record<string, string>): Promise<API.Api
 /**
  * 准备更换邮箱
  *
- * @param encrypt
+ * @param data
  */
-export async function prepareChangeEmail(encrypt: string): Promise<API.ApiResult<boolean>> {
+export async function prepareChangeEmail(data: {
+  password: string;
+  email: string;
+}): Promise<API.ApiResult<boolean>> {
   return request(`/api/v1/user/profile/prepare_change_email`, {
-    data: { encrypt: encrypt },
+    data: data,
     method: 'POST',
     skipErrorHandler: true,
   }).catch(({ response: { data } }) => {
@@ -75,11 +81,14 @@ export async function changeEmail(data: Record<string, string>): Promise<API.Api
 /**
  * 更换密码
  *
- * @param encrypt
+ * @param data
  */
-export async function changePassword(encrypt: string): Promise<API.ApiResult<boolean>> {
+export async function changePassword(data: {
+  oldPassword: string;
+  newPassword: string;
+}): Promise<API.ApiResult<boolean>> {
   return request(`/api/v1/user/profile/change_password`, {
-    data: { encrypt: encrypt },
+    data: data,
     method: 'PUT',
     skipErrorHandler: true,
   }).catch(({ response: { data } }) => {
@@ -90,32 +99,17 @@ export async function changePassword(encrypt: string): Promise<API.ApiResult<boo
 /**
  * 更改基础信息
  *
- * @param encrypt
+ * @param data
  */
-export async function changeBaseInfo(encrypt: string): Promise<API.ApiResult<boolean>> {
+export async function changeBaseInfo(
+  data: Record<string, string | undefined>,
+): Promise<API.ApiResult<boolean>> {
   return request(`/api/v1/user/profile/change_info`, {
-    data: { encrypt: encrypt },
+    data: data,
     method: 'PUT',
   });
 }
 
-/**
- * 验证用户信息
- *
- * @param type
- * @param value
- * @param id
- */
-export async function userParamCheck(
-  type: ParamCheckType,
-  value: string,
-  id?: string,
-): Promise<API.ApiResult<boolean>> {
-  return request(`/api/v1/user/param_check`, {
-    params: { id, type, value },
-    method: 'GET',
-  });
-}
 
 /**
  * 准备修改账户密码

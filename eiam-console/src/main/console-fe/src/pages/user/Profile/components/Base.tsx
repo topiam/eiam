@@ -16,17 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { UploadOutlined } from '@ant-design/icons';
-import {
-  ProForm,
-  ProFormText,
-  useStyle as useAntdStyle,
-} from '@ant-design/pro-components';
+import { ProForm, ProFormText, useStyle as useAntdStyle } from '@ant-design/pro-components';
 import { App, Avatar, Button, Form, Skeleton, Upload } from 'antd';
 import { useState } from 'react';
 
 import { changeBaseInfo } from '../service';
-import { aesEcbEncrypt } from '@/utils/aes';
-import { onGetEncryptSecret } from '@/utils/utils';
 import { useAsyncEffect } from 'ahooks';
 import ImgCrop from 'antd-img-crop';
 import { uploadFile } from '@/services/upload';
@@ -114,7 +108,7 @@ const BaseView = () => {
   const useApp = App.useApp();
   const { wrapSSR, hashId } = useStyle();
   const [loading, setLoading] = useState<boolean>();
-  const { initialState } = useModel('@@initialState');
+  const { initialState, setInitialState } = useModel('@@initialState');
   const [avatarURL, setAvatarURL] = useState<string | undefined>(initialState?.currentUser?.avatar);
   const [name, setName] = useState<string>('');
 
@@ -123,28 +117,22 @@ const BaseView = () => {
     if (initialState && initialState.currentUser) {
       setAvatarURL(initialState?.currentUser?.avatar);
       setName(initialState?.currentUser?.fullName || initialState?.currentUser?.username);
-      setLoading(false);
+      setTimeout(async () => {
+        setLoading(false);
+      }, 500);
     }
   }, [initialState]);
 
   const handleFinish = async (values: Record<string, string>) => {
-    //加密传输
-    const publicSecret = await onGetEncryptSecret();
-    if (publicSecret) {
-      const { success } = await changeBaseInfo(
-        aesEcbEncrypt(
-          JSON.stringify({
-            fullName: values.fullName,
-            nickName: values.nickName,
-            personalProfile: values.personalProfile,
-            avatar: avatarURL,
-          }),
-          publicSecret,
-        ),
-      );
-      if (success) {
-        useApp.message.success(intl.formatMessage({ id: 'app.update_success' }));
-      }
+    const { success } = await changeBaseInfo({
+      fullName: values.fullName,
+      nikeName: values.nikeName,
+    });
+    if (success) {
+      useApp.message.success(intl.formatMessage({ id: 'app.update_success' }));
+      //获取当前用户信息
+      const currentUser = await initialState?.fetchUserInfo?.();
+      await setInitialState((s: any) => ({ ...s, currentUser: currentUser }));
     }
   };
 
@@ -218,7 +206,7 @@ const BaseView = () => {
   return wrapSSR(
     <div className={classnames(`${prefixCls}`, hashId)}>
       {loading ? (
-        <Skeleton paragraph={{ rows: 8 }} />
+        <Skeleton paragraph={{ rows: 8 }} active />
       ) : (
         <>
           <div className={classnames(`${prefixCls}-left`, hashId)}>
@@ -232,7 +220,9 @@ const BaseView = () => {
                   return <Form.Item wrapperCol={{ span: 19, offset: 5 }}>{dom}</Form.Item>;
                 },
                 searchConfig: {
-                  submitText: intl.formatMessage({ id: 'app.save' }),
+                  submitText: intl.formatMessage({
+                    id: 'page.user.profile.base.form.update_button',
+                  }),
                 },
                 resetButtonProps: {
                   style: {
@@ -246,6 +236,12 @@ const BaseView = () => {
               }}
               requiredMark={false}
             >
+              <ProFormText
+                width="md"
+                name="accountId"
+                readonly
+                label={intl.formatMessage({ id: 'page.user.profile.base.form.account_id' })}
+              />
               <ProFormText
                 width="md"
                 name="username"
