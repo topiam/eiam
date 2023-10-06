@@ -98,8 +98,9 @@ public class UserProfileServiceImpl implements UserProfileService {
         //获取用户
         AdministratorEntity administrator = getCurrentUser();
         //校验旧密码
-        if (!passwordEncoder.matches(param.getOldPassword(),administrator.getPassword())){
-            logger.error("用户ID: [{}] 用户名: [{}] 修改密码失败，原密码错误",administrator.getId(),administrator.getUsername());
+        if (!passwordEncoder.matches(param.getOldPassword(), administrator.getPassword())) {
+            logger.error("用户ID: [{}] 用户名: [{}] 修改密码失败，原密码错误", administrator.getId(),
+                administrator.getUsername());
             throw new PasswordValidatedFailException("旧密码错误");
         }
         //修改密码

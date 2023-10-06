@@ -40,19 +40,19 @@ import jakarta.validation.constraints.NotNull;
 public class ChangePasswordRequest implements Serializable {
 
     @Serial
-    private static final long    serialVersionUID = 5681761697876754485L;
+    private static final long serialVersionUID = 5681761697876754485L;
 
     /**
      * 新密码
      */
     @NotEmpty(message = "新密码不能为空")
     @Parameter(description = "新密码")
-    private String               newPassword;
+    private String            newPassword;
 
     /**
      * 验证码
      */
     @NotEmpty(message = "旧密码不能为空")
     @Parameter(description = "旧密码")
-    private String               oldPassword;
+    private String            oldPassword;
 }
