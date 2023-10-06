@@ -45,7 +45,6 @@ export default {
   'pages.account.user_detail.user_info.data_origin.value_enum.dingtalk': '钉钉导入',
   'pages.account.user_detail.user_info.data_origin.value_enum.wechat': '企业微信导入',
   'pages.account.user_detail.user_info.data_origin.value_enum.feishu': '飞书导入',
-  'pages.account.user_detail.user_info.data_origin.value_enum.ldap': 'LDAP导入',
   'pages.account.user_detail.user_info.id': '账户 ID',
   'pages.account.user_detail.user_info.external_id': '外部 ID',
   'pages.account.user_detail.user_info.phone': '手机号',

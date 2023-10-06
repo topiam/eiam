@@ -33,7 +33,6 @@ export default {
   'pages.account.user_list.user.columns.data_origin.value_enum.dingtalk': '钉钉导入',
   'pages.account.user_list.user.columns.data_origin.value_enum.wechat': '企业微信导入',
   'pages.account.user_list.user.columns.data_origin.value_enum.feishu': '飞书导入',
-  'pages.account.user_list.user.columns.data_origin.value_enum.ldap': 'LDAP导入',
   'pages.account.user_list.user.columns.org_display_path': '所属组织',
   'pages.account.user_list.user.columns.status': '状态',
   'pages.account.user_list.user.columns.status.value_enum.expired_locked': '过期锁定',

@@ -288,11 +288,6 @@ export default (props: { userId: string }) => {
                       id: 'pages.account.user_detail.user_info.data_origin.value_enum.feishu',
                     }),
                   },
-                  ldap: {
-                    text: intl.formatMessage({
-                      id: 'pages.account.user_detail.user_info.data_origin.value_enum.ldap',
-                    }),
-                  },
                 }}
               />
               <ProDescriptions.Item

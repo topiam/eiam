@@ -171,11 +171,6 @@ export default (props: UserListProps) => {
             id: 'pages.account.user_list.user.columns.data_origin.value_enum.feishu',
           }),
         },
-        ldap: {
-          text: intl.formatMessage({
-            id: 'pages.account.user_list.user.columns.data_origin.value_enum.ldap',
-          }),
-        },
       },
     },
     {
