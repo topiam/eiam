@@ -188,7 +188,7 @@ export default (props: UserListProps) => {
             content={
               <>
                 {record.primaryOrgDisplayPath && (
-                  <Space key="primary_path">{record.primaryOrgDisplayPath}</Space>
+                  <span>主组织：{record.primaryOrgDisplayPath}</span>
                 )}
                 {record.orgDisplayPath && (
                   <Space key="path" direction="vertical" size="small" style={{ display: 'flex' }}>
