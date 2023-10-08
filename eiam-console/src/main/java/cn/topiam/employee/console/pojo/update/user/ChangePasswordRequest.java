@@ -20,14 +20,11 @@ package cn.topiam.employee.console.pojo.update.user;
 import java.io.Serial;
 import java.io.Serializable;
 
-import cn.topiam.employee.common.enums.MessageNoticeChannel;
-
 import lombok.Data;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 
 /**
  * 更改密码入参

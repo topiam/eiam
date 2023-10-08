@@ -22,7 +22,6 @@ import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
-import cn.topiam.employee.support.security.password.exception.PasswordInvalidException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,8 +56,6 @@ import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.security.util.SecurityUtils;
 import cn.topiam.employee.support.util.BeanUtils;
 import cn.topiam.employee.support.util.PhoneNumberUtils;
-
-import lombok.extern.slf4j.Slf4j;
 
 import jakarta.servlet.http.HttpSession;
 import static cn.topiam.employee.core.message.sms.SmsMsgEventPublish.USERNAME;
