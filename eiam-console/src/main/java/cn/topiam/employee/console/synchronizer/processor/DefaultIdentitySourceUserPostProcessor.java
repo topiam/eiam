@@ -414,7 +414,7 @@ public class DefaultIdentitySourceUserPostProcessor extends AbstractIdentitySour
                     log.info("上游用户:[{}]对应系统用户:[{}]({})存在,用户信息不一致,修改用户信息：{}", thirdPartyUser.getUserId(), currentUser.getUsername(), currentUser.getId(), JSONObject.toJSONString(currentUser));
                     updateUsers.add(currentUser);
                 } else {
-                    skipUsers.add(SkipUser.builder().user(currentUser).actionType(IdentitySourceActionType.UPDATE).status(SyncStatus.SKIP).reason( "用户信息一致").build());
+                    skipUsers.add(SkipUser.builder().user(currentUser).actionType(IdentitySourceActionType.UPDATE).status(SyncStatus.SKIP).reason("用户信息一致").build());
                     log.info("上游用户:[{}]对应系统用户:[{}]({})存在,用户信息一致", thirdPartyUser.getUserId(), currentUser.getUsername(), currentUser.getId());
                 }
                 //处理组织机构关系

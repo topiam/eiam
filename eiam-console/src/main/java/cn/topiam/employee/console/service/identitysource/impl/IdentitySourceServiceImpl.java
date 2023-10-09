@@ -208,7 +208,6 @@ public class IdentitySourceServiceImpl implements IdentitySourceService {
     @Override
     public Boolean saveIdentitySourceConfig(IdentitySourceConfigSaveParam param) {
         IdentitySourceEntity entity = getIdentitySource(param.getId());
-        param.getBasicConfig().putAll(JSONObject.parseObject(entity.getBasicConfig()));
         //转换
         IdentitySourceEntity source = identitySourceConverter
             .saveConfigParamConverterToEntity(param, entity.getProvider());

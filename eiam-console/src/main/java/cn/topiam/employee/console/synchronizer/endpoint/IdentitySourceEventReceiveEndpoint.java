@@ -70,6 +70,7 @@ public class IdentitySourceEventReceiveEndpoint {
             Object event = identitySource.event(request, body);
             return ResponseEntity.ok(event);
         }
+        log.error("身份源信息不存在:[{}]", code);
         return ResponseEntity.ok().build();
     }
 
