@@ -31,7 +31,6 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 import { omit } from 'lodash';
 import classNames from 'classnames';
 import { ParamCheckType } from '@/constant';
-import AppAccess from '../AppAccess';
 import { useIntl } from '@umijs/max';
 
 const prefixCls = 'user-detail-info';
@@ -287,11 +286,6 @@ export default (props: { userId: string }) => {
                   feishu: {
                     text: intl.formatMessage({
                       id: 'pages.account.user_detail.user_info.data_origin.value_enum.feishu',
-                    }),
-                  },
-                  ldap: {
-                    text: intl.formatMessage({
-                      id: 'pages.account.user_detail.user_info.data_origin.value_enum.ldap',
                     }),
                   },
                 }}

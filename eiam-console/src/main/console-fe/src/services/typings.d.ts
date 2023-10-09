@@ -67,7 +67,6 @@ declare namespace API {
     secret: string;
   };
 
-
   /**
    * 加密秘钥
    */
@@ -181,6 +180,7 @@ declare namespace AccountAPI {
     dataOrigin: string;
     authTotal: string;
     lastAuthTime: string;
+    primaryOrgDisplayPath: string;
     orgDisplayPath: string;
     remark: string;
     custom?: Record<string, any>;
@@ -220,6 +220,10 @@ declare namespace AccountAPI {
   export interface UserLoginAuditList {
     appName: string;
     clientIp: string;
+    userAgent: {
+      platformVersion: string;
+      platform: string;
+    };
     browser: string;
     eventStatus: string;
     eventTime: string;

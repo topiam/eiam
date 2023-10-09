@@ -227,24 +227,6 @@ public class UserController {
     }
 
     /**
-     * 用户转岗
-     *
-     * @param userId {@link String}
-     * @param orgId  {@link String}
-     * @return {@link Boolean}
-     */
-    @Lock
-    @Preview
-    @Operation(summary = "用户转岗")
-    @PutMapping(value = "/transfer")
-    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
-    public ApiRestResult<Boolean> userTransfer(@Parameter(description = "用户ID") @NotBlank(message = "用户ID不能为空") String userId,
-                                               @Parameter(description = "组织ID") @NotBlank(message = "组织ID不能为空") String orgId) {
-        return ApiRestResult.<Boolean> builder().result(userService.userTransfer(userId, orgId))
-            .build();
-    }
-
-    /**
      * 用户离职
      *
      * @param id {@link String}
@@ -304,7 +286,7 @@ public class UserController {
     @Operation(description = "查询用户登录审计列表")
     @GetMapping(value = "/login_audit/list")
     @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
-    public ApiRestResult<Page<UserLoginAuditListResult>> getUserLoginAuditList(@Parameter(description = "ID") Long id,
+    public ApiRestResult<Page<UserLoginAuditListResult>> getUserLoginAuditList(@Parameter(description = "ID") @RequestParam(value = "userId", required = false) @NotNull(message = "用户ID不能为空") Long id,
                                                                                PageModel pageModel) {
         Page<UserLoginAuditListResult> list = userService.findUserLoginAuditList(id, pageModel);
         return ApiRestResult.ok(list);

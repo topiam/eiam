@@ -53,45 +53,7 @@ public class UserGroupMemberRepositoryCustomizedImpl implements
     @Override
     public Page<UserPO> getUserGroupMemberList(UserGroupMemberListQuery query, Pageable pageable) {
         //@formatter:off
-        StringBuilder builder = new StringBuilder("""
-                SELECT
-                	`u`.id_,
-                	`u`.username_,
-                	`u`.password_,
-                	`u`.email_,
-                	`u`.phone_,
-                	`u`.phone_area_code,
-                	`u`.full_name,
-                	`u`.nick_name,
-                	`u`.avatar_,
-                	`u`.status_,
-                	`u`.data_origin,
-                	`u`.email_verified,
-                	`u`.phone_verified,
-                	`u`.auth_total,
-                	`u`.last_auth_ip,
-                	`u`.last_auth_time,
-                	`u`.expand_,
-                	`u`.external_id,
-                	`u`.expire_date,
-                	`u`.create_by,
-                	`u`.create_time,
-                	`u`.update_by,
-                	`u`.update_time,
-                	`u`.remark_,
-                	group_concat( IF(organization_member.primary_ = 1, null, organization_.display_path ) ) AS primary_org_display_path,
-                    group_concat( IF(organization_member.primary_ IS NULL, null, organization_.display_path ) ) AS org_display_path
-                FROM
-                	user_group_member ugm
-                	INNER JOIN user u ON ugm.user_id = u.id_ AND u.is_deleted = '0'
-                	INNER JOIN user_group ug ON ug.id_ = ugm.group_id AND ug.is_deleted = '0'
-                	LEFT JOIN organization_member ON ( u.id_ = organization_member.user_id AND organization_member.is_deleted = '0')
-                    LEFT JOIN organization organization_ ON ( organization_.id_ = organization_member.org_id AND organization_.is_deleted = '0')
-                WHERE
-                    ugm.is_deleted = '0'
-                	AND ugm.group_id = '%s'
-                	AND ug.id_ = '%s'
-                """.formatted(query.getId(), query.getId()));
+        StringBuilder builder = new StringBuilder("SELECT `u`.id_, `u`.username_, `u`.password_, `u`.email_, `u`.phone_, `u`.phone_area_code, `u`.full_name, `u`.nick_name, `u`.avatar_, `u`.status_, `u`.data_origin, `u`.email_verified, `u`.phone_verified, `u`.auth_total, `u`.last_auth_ip, `u`.last_auth_time, `u`.expand_, `u`.external_id, `u`.expire_date, `u`.create_by, `u`.create_time, `u`.update_by, `u`.update_time, `u`.remark_, group_concat( IF( organization_member.primary_ = TRUE, organization_.display_path, NULL) ) AS primary_org_display_path, group_concat( IF ( organization_member.primary_ IS NULL, organization_.display_path, NULL ) ) AS org_display_path FROM user_group_member ugm LEFT JOIN user u ON ugm.user_id = u.id_ LEFT JOIN user_group ug ON ug.id_ = ugm.group_id LEFT JOIN organization_member ON ( u.id_ = organization_member.user_id) LEFT JOIN organization organization_ ON ( organization_.id_ = organization_member.org_id) WHERE ugm.is_deleted = '0' AND u.is_deleted = '0' AND ug.is_deleted = '0' AND organization_.is_deleted = '0' AND organization_member.is_deleted = '0' AND ugm.group_id = '%s' AND ug.id_ = '%s'".formatted(query.getId(), query.getId()));
         //用户名
         if (StringUtils.isNoneBlank(query.getFullName())) {
             builder.append(" AND full_name like '%").append(query.getFullName()).append("%'");

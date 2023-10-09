@@ -23,19 +23,17 @@ import java.util.List;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
-import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
-import org.springframework.data.elasticsearch.client.elc.Queries;
-import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import com.google.common.collect.Lists;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
 
-import cn.topiam.employee.audit.entity.AuditElasticSearchEntity;
-import cn.topiam.employee.audit.entity.Event;
-import cn.topiam.employee.audit.event.type.EventType;
+import cn.topiam.employee.audit.entity.AuditEntity;
+import cn.topiam.employee.audit.entity.GeoLocation;
+import cn.topiam.employee.audit.entity.QAuditEntity;
+import cn.topiam.employee.audit.entity.UserAgent;
 import cn.topiam.employee.audit.event.type.PortalEventType;
 import cn.topiam.employee.common.constant.CommonConstants;
 import cn.topiam.employee.common.entity.account.UserDetailEntity;
@@ -52,20 +50,9 @@ import cn.topiam.employee.console.pojo.update.account.UserUpdateParam;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
-
-import co.elastic.clients.elasticsearch._types.FieldSort;
-import co.elastic.clients.elasticsearch._types.FieldValue;
-import co.elastic.clients.elasticsearch._types.SortOptions;
-import co.elastic.clients.elasticsearch._types.SortOrder;
-import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
-import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
-import static cn.topiam.employee.audit.entity.Actor.ACTOR_ID;
-import static cn.topiam.employee.audit.entity.Event.EVENT_TIME;
-import static cn.topiam.employee.audit.entity.Event.EVENT_TYPE;
 import static cn.topiam.employee.audit.enums.TargetType.PORTAL;
+import static cn.topiam.employee.audit.event.type.EventType.APP_SSO;
 import static cn.topiam.employee.audit.event.type.EventType.LOGIN_PORTAL;
-import static cn.topiam.employee.audit.service.converter.AuditDataConverter.SORT_EVENT_TIME;
 import static cn.topiam.employee.common.util.ImageAvatarUtils.bufferedImageToBase64;
 import static cn.topiam.employee.common.util.ImageAvatarUtils.generateAvatarImg;
 import static cn.topiam.employee.support.util.PhoneNumberUtils.getPhoneAreaCode;
@@ -259,90 +246,56 @@ public interface UserConverter {
      * 审计列表请求到本机搜索查询
      *
      * @param id   {@link Long}
-     * @param page {@link PageModel}
      * @return {@link NativeQuery}
      */
-    default NativeQuery auditListRequestConvertToNativeQuery(Long id, PageModel page) {
-        //构建查询 builder下有 must、should 以及 mustNot 相当于 sql 中的 and、or 以及 not
-        BoolQuery.Builder queryBuilder = QueryBuilders.bool();
-        List<SortOptions> fieldSortBuilders = Lists.newArrayList();
-        //事件类型
-        List<FieldValue> set = new ArrayList<>();
-        set.add(FieldValue.of(LOGIN_PORTAL.getCode()));
-        set.add(FieldValue.of(EventType.APP_SSO.getCode()));
-        queryBuilder.must(QueryBuilders.terms(builder -> {
-            builder.terms(new TermsQueryField.Builder().value(set).build());
-            builder.field(EVENT_TYPE);
-            return builder;
-        }));
-        //用户id
-        queryBuilder.must(Queries.termQueryAsQuery(ACTOR_ID, id.toString()));
-        //字段排序
-        page.getSorts().forEach(sort -> {
-            co.elastic.clients.elasticsearch._types.SortOrder sortOrder;
-            if (org.apache.commons.lang3.StringUtils.equals(sort.getSorter(), SORT_EVENT_TIME)) {
-                if (sort.getAsc()) {
-                    sortOrder = co.elastic.clients.elasticsearch._types.SortOrder.Asc;
-                } else {
-                    sortOrder = SortOrder.Desc;
-                }
-            } else {
-                sortOrder = SortOrder.Desc;
-            }
-            SortOptions eventTimeSortBuilder = SortOptions
-                .of(s -> s.field(FieldSort.of(f -> f.field(EVENT_TIME).order(sortOrder))));
-            fieldSortBuilders.add(eventTimeSortBuilder);
-        });
-        NativeQueryBuilder nativeQueryBuilder = new NativeQueryBuilder()
-            .withQuery(queryBuilder.build()._toQuery())
-            //分页参数
-            .withPageable(PageRequest.of(page.getCurrent(), page.getPageSize()));
-        if (!CollectionUtils.isEmpty(fieldSortBuilders)) {
-            //排序
-            nativeQueryBuilder.withSort(fieldSortBuilders);
-        }
-        return nativeQueryBuilder.build();
+    default Predicate auditListRequestConvertToNativeQuery(Long id) {
+        QAuditEntity auditEntity = QAuditEntity.auditEntity;
+        return ExpressionUtils.and(auditEntity.isNotNull(),
+            auditEntity.deleted.eq(Boolean.FALSE).and(auditEntity.actorId.eq(id.toString()))
+                .and(auditEntity.eventType.in(LOGIN_PORTAL, APP_SSO)));
     }
 
     /**
      * searchHits 转用户登录日志列表
      *
-     * @param search {@link SearchHits}
+     * @param auditEntityPage {@link Page}
      * @param page   {@link PageModel}
      * @return {@link Page}
      */
-    default Page<UserLoginAuditListResult> searchHitsConvertToAuditListResult(SearchHits<AuditElasticSearchEntity> search,
-                                                                              PageModel page) {
+    default Page<UserLoginAuditListResult> entityConvertToAuditListResult(org.springframework.data.domain.Page<AuditEntity> auditEntityPage,
+                                                                          PageModel page) {
         List<UserLoginAuditListResult> list = new ArrayList<>();
         //总记录数
-        search.forEach(hit -> {
-            AuditElasticSearchEntity content = hit.getContent();
-            Event event = content.getEvent();
+        auditEntityPage.forEach(audit -> {
             UserLoginAuditListResult result = new UserLoginAuditListResult();
+            result.setId(audit.getId().toString());
             //单点登录
-            if (event.getType().getCode().equals(PortalEventType.APP_SSO.getCode())) {
-                result.setAppName(getAppName(content.getTargets().get(0).getId()));
+            if (audit.getEventType().getCode().equals(PortalEventType.APP_SSO.getCode())) {
+                result.setAppName(getAppName(audit.getTargets().get(0).getId()));
             }
             //登录门户
-            if (event.getType().getCode().equals(PortalEventType.LOGIN_PORTAL.getCode())) {
+            if (audit.getEventType().getCode().equals(PortalEventType.LOGIN_PORTAL.getCode())) {
                 result.setAppName(PORTAL.getDesc());
             }
-            result.setEventTime(event.getTime());
-            result.setClientIp(content.getGeoLocation().getIp());
-            result.setBrowser(content.getUserAgent().getBrowser());
-            result.setLocation(content.getGeoLocation().getCityName());
-            result.setEventStatus(event.getStatus());
+            UserAgent userAgent = audit.getUserAgent();
+            GeoLocation geoLocation = audit.getGeoLocation();
+            result.setEventTime(audit.getEventTime());
+            result.setClientIp(geoLocation.getIp());
+            result.setLocation(geoLocation.getCityName());
+            result.setBrowser(userAgent.getBrowser());
+            result.setPlatform(userAgent.getPlatform() + " " + userAgent.getPlatformVersion());
+            result.setEventStatus(audit.getEventStatus());
             list.add(result);
         });
         //@formatter:off
-        Page<UserLoginAuditListResult> result = new Page<>();
-        result.setPagination(Page.Pagination.builder()
-                .total(search.getTotalHits())
-                .totalPages(Math.toIntExact(search.getTotalHits() / page.getPageSize()))
-                .current(page.getCurrent() + 1)
-                .build());
-        result.setList(list);
-        //@formatter:on
+            Page<UserLoginAuditListResult> result = new Page<>();
+            result.setPagination(Page.Pagination.builder()
+                    .total(auditEntityPage.getTotalElements())
+                    .totalPages(auditEntityPage.getTotalPages())
+                    .current(page.getCurrent() + 1)
+                    .build());
+            result.setList(list);
+            //@formatter:on
         return result;
     }
 

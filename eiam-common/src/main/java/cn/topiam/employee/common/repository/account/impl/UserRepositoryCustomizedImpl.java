@@ -31,7 +31,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -69,7 +68,7 @@ public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
     @Override
     public Page<UserPO> getUserList(UserListQuery query, Pageable pageable) {
         //@formatter:off
-        StringBuilder builder = new StringBuilder("SELECT `user`.id_, `user`.username_,`user`.password_, `user`.email_, `user`.phone_,`user`.phone_area_code, `user`.full_name ,`user`.nick_name, `user`.avatar_ , `user`.status_, `user`.data_origin, `user`.email_verified, `user`.phone_verified, `user`.auth_total, `user`.last_auth_ip, `user`.last_auth_time, `user`.expand_, `user`.external_id , `user`.expire_date,`user`.create_by, `user`.create_time, `user`.update_by , `user`.update_time, `user`.remark_, group_concat( IF(organization_member.primary_ = 1, null, organization_.display_path ) ) AS primary_org_display_path, group_concat( IF(organization_member.primary_ IS NULL, null, organization_.display_path ) ) AS org_display_path FROM `user` INNER JOIN `organization_member` ON (`user`.id_ = organization_member.user_id) INNER JOIN `organization` organization_ ON (organization_.id_ = organization_member.org_id) WHERE `user`.is_deleted = 0");
+        StringBuilder builder = new StringBuilder("SELECT `user`.id_, `user`.username_, `user`.password_, `user`.email_, `user`.phone_, `user`.phone_area_code, `user`.full_name, `user`.nick_name, `user`.avatar_, `user`.status_, `user`.data_origin, `user`.email_verified, `user`.phone_verified, `user`.auth_total, `user`.last_auth_ip, `user`.last_auth_time, `user`.expand_, `user`.external_id, `user`.expire_date, `user`.create_by, `user`.create_time, `user`.update_by, `user`.update_time, `user`.remark_, group_concat( IF( organization_member.primary_ = TRUE, organization_.display_path, NULL) ) AS primary_org_display_path, group_concat( IF ( organization_member.primary_ IS NULL, organization_.display_path, NULL ) ) AS org_display_path FROM `user` INNER JOIN `organization_member` ON ( `user`.id_ = organization_member.user_id ) INNER JOIN `organization` organization_ ON ( organization_.id_ = organization_member.org_id ) WHERE `user`.is_deleted = 0 AND organization_member.is_deleted = 0 ");
         //组织条件
         if (StringUtils.isNotBlank(query.getOrganizationId())) {
             if (Boolean.TRUE.equals(query.getInclSubOrganization())) {
@@ -128,51 +127,7 @@ public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
     @Override
     public Page<UserPO> getUserListNotInGroupId(UserListNotInGroupQuery query, Pageable pageable) {
         //@formatter:off
-        StringBuilder builder = new StringBuilder(
-                """
-                        SELECT
-                                            `user`.id_,
-                                            `user`.username_,
-                                            `user`.password_,
-                                            `user`.email_,
-                                            `user`.phone_,
-                                            `user`.phone_area_code,
-                                            `user`.full_name,
-                                            `user`.nick_name,
-                                            `user`.avatar_,
-                                            `user`.status_,
-                                            `user`.data_origin,
-                                            `user`.email_verified,
-                                            `user`.phone_verified,
-                                            `user`.auth_total,
-                                            `user`.last_auth_ip,
-                                            `user`.last_auth_time,
-                                            `user`.expand_,
-                                            `user`.external_id,
-                                            `user`.expire_date,
-                                            `user`.create_by,
-                                            `user`.create_time,
-                                            `user`.update_by,
-                                            `user`.update_time,
-                                            `user`.remark_,
-                                            group_concat( IF(organization_member.primary_ = 1, null, organization_.display_path ) ) AS primary_org_display_path,
-                                            group_concat( IF(organization_member.primary_ IS NULL, null, organization_.display_path ) ) AS org_display_path
-                                        FROM `user`
-                                        LEFT JOIN `organization_member` ON ( `user`.id_ = organization_member.user_id AND organization_member.is_deleted = '0' )
-                                        LEFT JOIN `organization` organization_ ON ( organization_.id_ = organization_member.org_id AND organization_.is_deleted = '0' )
-                                        WHERE
-                                            user.is_deleted = 0 AND
-                                            user.id_ NOT IN (
-                                            SELECT
-                                                u.id_
-                                            FROM
-                                                user u
-                                                INNER JOIN user_group_member ugm ON ugm.user_id = u.id_
-                                                INNER JOIN user_group ug ON ug.id_ = ugm.group_id
-                                            WHERE
-                                            u.is_deleted = '0' AND ugm.is_deleted = '0'
-                                            AND ug.id_ = '%s' AND ugm.group_id = '%s')
-                        """.formatted(query.getId(), query.getId()));
+        StringBuilder builder = new StringBuilder("SELECT `user`.id_, `user`.username_, `user`.password_, `user`.email_, `user`.phone_, `user`.phone_area_code, `user`.full_name, `user`.nick_name, `user`.avatar_, `user`.status_, `user`.data_origin, `user`.email_verified, `user`.phone_verified, `user`.auth_total, `user`.last_auth_ip, `user`.last_auth_time, `user`.expand_, `user`.external_id, `user`.expire_date, `user`.create_by, `user`.create_time, `user`.update_by, `user`.update_time, `user`.remark_, group_concat( IF( organization_member.primary_ = TRUE, organization_.display_path, NULL) ) AS primary_org_display_path, group_concat( IF ( organization_member.primary_ IS NULL, organization_.display_path, NULL ) ) AS org_display_path FROM `user` LEFT JOIN `organization_member` ON ( `user`.id_ = organization_member.user_id AND organization_member.is_deleted = '0' ) LEFT JOIN `organization` organization_ ON ( organization_.id_ = organization_member.org_id AND organization_.is_deleted = '0' ) WHERE user.is_deleted = 0 AND organization_member.is_deleted = 0 AND user.id_ NOT IN ( SELECT u.id_ FROM user u INNER JOIN user_group_member ugm ON ugm.user_id = u.id_ INNER JOIN user_group ug ON ug.id_ = ugm.group_id WHERE u.is_deleted = '0' AND ugm.is_deleted = '0' AND ug.id_ = '%s' AND ugm.group_id = '%s')".formatted(query.getId(), query.getId()));
         if (StringUtils.isNoneBlank(query.getKeyword())) {
             builder.append(" AND  user.username_ LIKE '%").append(query.getKeyword()).append("%'");
             builder.append(" OR  user.full_name LIKE '%").append(query.getKeyword()).append("%'");
@@ -352,10 +307,5 @@ public class UserRepositoryCustomizedImpl implements UserRepositoryCustomized {
     /**
      * JdbcTemplate
      */
-    private final JdbcTemplate          jdbcTemplate;
-
-    /**
-     * ElasticsearchTemplate
-     */
-    private final ElasticsearchTemplate elasticsearchTemplate;
+    private final JdbcTemplate jdbcTemplate;
 }

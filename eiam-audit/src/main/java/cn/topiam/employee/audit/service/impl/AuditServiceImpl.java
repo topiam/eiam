@@ -17,33 +17,36 @@
  */
 package cn.topiam.employee.audit.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.client.elc.NativeQuery;
-import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
 
 import cn.topiam.employee.audit.controller.pojo.AuditListQuery;
 import cn.topiam.employee.audit.controller.pojo.AuditListResult;
 import cn.topiam.employee.audit.controller.pojo.DictResult;
-import cn.topiam.employee.audit.entity.AuditEntity;
+import cn.topiam.employee.audit.entity.QAuditEntity;
 import cn.topiam.employee.audit.event.type.EventType;
+import cn.topiam.employee.audit.repository.AuditRepository;
 import cn.topiam.employee.audit.service.AuditService;
 import cn.topiam.employee.audit.service.converter.AuditDataConverter;
-import cn.topiam.employee.support.autoconfiguration.SupportProperties;
 import cn.topiam.employee.support.exception.BadParamsException;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.security.userdetails.UserType;
 import cn.topiam.employee.support.security.util.SecurityUtils;
-import static cn.topiam.employee.common.constant.AuditConstants.getAuditIndexPrefix;
+
+import lombok.RequiredArgsConstructor;
+import static cn.topiam.employee.audit.service.converter.AuditDataConverter.SORT_EVENT_TIME;
 import static cn.topiam.employee.support.security.userdetails.UserType.USER;
 
 /**
@@ -53,6 +56,7 @@ import static cn.topiam.employee.support.security.userdetails.UserType.USER;
  * Created by support@topiam.cn on  2021/9/10 23:06
  */
 @Service
+@RequiredArgsConstructor
 public class AuditServiceImpl implements AuditService {
 
     /**
@@ -69,13 +73,21 @@ public class AuditServiceImpl implements AuditService {
             throw new BadParamsException("用户类型错误");
         }
         //查询入参转查询条件
-        NativeQuery nsq = auditDataConverter.auditListRequestConvertToNativeQuery(query, page);
+        Predicate predicate = auditDataConverter.auditListRequestConvertToPredicate(query);
+        // 字段排序
+        OrderSpecifier<LocalDateTime> order = QAuditEntity.auditEntity.eventTime.desc();
+        for (PageModel.Sort sort : page.getSorts()) {
+            if (org.apache.commons.lang3.StringUtils.equals(sort.getSorter(), SORT_EVENT_TIME)) {
+                if (sort.getAsc()) {
+                    order = QAuditEntity.auditEntity.eventTime.asc();
+                }
+            }
+        }
+        //分页条件
+        QPageRequest request = QPageRequest.of(page.getCurrent(), page.getPageSize(), order);
         //查询列表
-        SearchHits<AuditEntity> search = elasticsearchTemplate.search(nsq, AuditEntity.class,
-            IndexCoordinates
-                .of(getAuditIndexPrefix(supportProperties.getAudit().getIndexPrefix()) + "*"));
-        //结果转返回结果
-        return auditDataConverter.searchHitsConvertToAuditListResult(search, page);
+        return auditDataConverter
+            .entityConvertToAuditListResult(auditRepository.findAll(predicate, request), page);
     }
 
     /**
@@ -117,26 +129,12 @@ public class AuditServiceImpl implements AuditService {
     }
 
     /**
-     * AuditProperties
-     */
-    private final SupportProperties     supportProperties;
-
-    /**
-     * ElasticsearchTemplate
-     */
-    private final ElasticsearchTemplate elasticsearchTemplate;
-
-    /**
      * AuditDataConverter
      */
-    private final AuditDataConverter    auditDataConverter;
+    private final AuditDataConverter auditDataConverter;
 
-    public AuditServiceImpl(SupportProperties supportProperties,
-                            ElasticsearchTemplate elasticsearchTemplate,
-                            AuditDataConverter auditDataConverter) {
-        this.supportProperties = supportProperties;
-        this.elasticsearchTemplate = elasticsearchTemplate;
-        this.auditDataConverter = auditDataConverter;
-    }
-
+    /**
+     * AuditRepository
+     */
+    private final AuditRepository    auditRepository;
 }

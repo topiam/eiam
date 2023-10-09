@@ -1,5 +1,5 @@
 /*
- * eiam-portal - Employee Identity and Access Management
+ * eiam-console - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,18 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.portal.controller;
+import Profile from './Profile';
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-/**
- * message
- *
- * @author TopIAM
- * Created by support@topiam.cn on  2021/9/12 21:42
- */
-@RestController
-@RequestMapping(value = "/notice")
-public class NoticeController {
-}
+export default Profile;

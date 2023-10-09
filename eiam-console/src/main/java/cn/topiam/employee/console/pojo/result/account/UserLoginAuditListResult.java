@@ -35,6 +35,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Data
 @Schema(description = "用户登录日志返回响应")
 public class UserLoginAuditListResult {
+    /**
+     * ID
+     */
+    @Parameter(description = "ID")
+    private String        id;
 
     /**
      * 应用名称
@@ -47,6 +52,12 @@ public class UserLoginAuditListResult {
      */
     @Parameter(description = "客户端IP")
     private String        clientIp;
+
+    /**
+     * 操作系统
+     */
+    @Parameter(description = "操作系统")
+    private String        platform;
 
     /**
      * 登录结果

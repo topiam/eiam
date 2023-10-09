@@ -53,9 +53,9 @@ public class JwtUtils {
     public static Claims parserToken(String token, String publicKey) {
         try {
             PublicKey readPublicKey = X509Utils.readPublicKey(publicKey, "");
-            JwtParser jwtParser = Jwts.parserBuilder().setSigningKey(readPublicKey).build();
+            JwtParser jwtParser = Jwts.parser().verifyWith(readPublicKey).build();
             // 解析 JWT
-            return jwtParser.parseClaimsJws(token).getBody();
+            return jwtParser.parseSignedClaims(token).getPayload();
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             logger.info("Invalid JWT signature.");
             logger.trace("Invalid JWT signature trace: {}", e.getMessage());

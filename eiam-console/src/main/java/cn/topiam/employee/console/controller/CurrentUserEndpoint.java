@@ -71,6 +71,10 @@ public class CurrentUserEndpoint {
         result.setAccountId(userDetails.getId());
         //用户名
         result.setUsername(administrator.getUsername());
+        //姓名
+        result.setFullName(administrator.getFullName());
+        //昵称
+        result.setNickName(administrator.getNickName());
         //头像
         if (StringUtils.isEmpty(administrator.getAvatar())) {
             result.setAvatar(bufferedImageToBase64(generateAvatarImg(administrator.getUsername())));
@@ -104,6 +108,18 @@ public class CurrentUserEndpoint {
          */
         @Schema(description = "用户名")
         private String      username;
+
+        /**
+         * 姓名
+         */
+        @Schema(description = "姓名")
+        private String      fullName;
+
+        /**
+         * 昵称
+         */
+        @Schema(description = "昵称")
+        private String      nickName;
 
         /**
          * 头像

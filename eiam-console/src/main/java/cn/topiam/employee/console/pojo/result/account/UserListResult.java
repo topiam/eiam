@@ -117,10 +117,16 @@ public class UserListResult implements Serializable {
     private LocalDateTime     lastAuthTime;
 
     /**
-     * 目录
+     * 从组织机构目录
      */
-    @Parameter(description = "组织机构目录")
+    @Parameter(description = "从组织机构目录")
     private String            orgDisplayPath;
+
+    /**
+     * 主组织目录
+     */
+    @Parameter(description = "主组织机构目录")
+    private String            primaryOrgDisplayPath;
 
     /**
      * 最后修改密码时间

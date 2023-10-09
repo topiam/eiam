@@ -54,7 +54,7 @@ public class IdentitySourceEventReceiveEndpoint {
      * 事件通知处理
      *
      * @param request {@link  HttpServletRequest}
-     * @param response {@link  HttpServletRequest}
+     * @param code {@link  String}
      * @return {@link  ResponseEntity}
      */
     @Trace
@@ -70,6 +70,7 @@ public class IdentitySourceEventReceiveEndpoint {
             Object event = identitySource.event(request, body);
             return ResponseEntity.ok(event);
         }
+        log.error("身份源信息不存在:[{}]", code);
         return ResponseEntity.ok().build();
     }
 

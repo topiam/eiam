@@ -20,12 +20,13 @@ package cn.topiam.employee.console.synchronizer.configuration;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.ObjectUtils;
+import cn.topiam.employee.support.context.ApplicationContextHelp;
 import org.jetbrains.annotations.NotNull;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
@@ -69,6 +70,7 @@ import cn.topiam.employee.support.scheduler.SpringSchedulerRegister;
 import cn.topiam.employee.support.trace.TraceUtils;
 
 import lombok.extern.slf4j.Slf4j;
+
 import static cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider.DINGTALK;
 import static cn.topiam.employee.support.lock.LockAspect.getTopiamLockKeyPrefix;
 
@@ -123,12 +125,9 @@ public class IdentitySourceBeanRegistry implements IdentitySourceEventListener {
             .getBeanFactory();
         //如果已经存在，销毁
         try {
-            if (ObjectUtils
-                .isNotEmpty(beanFactory.getBean(IdentitySourceBeanUtils.getSourceBeanName(id)))) {
+            if (beanFactory.containsBean(IdentitySourceBeanUtils.getSourceBeanName(id))) {
                 destroyIdentitySourceBean(id, applicationContext);
             }
-        } catch (NoSuchBeanDefinitionException ignored) {
-
         } finally {
             BeanDefinitionHolder definitionHolder = getBeanDefinitionHolder(entity,
                 applicationContext);
@@ -197,8 +196,9 @@ public class IdentitySourceBeanRegistry implements IdentitySourceEventListener {
         definitionBuilder.addConstructorArgValue(identitySourceSyncUserPostProcessor);
         definitionBuilder.addConstructorArgValue(identitySourceSyncDeptPostProcessor);
         definitionBuilder.addConstructorArgValue(identitySourceEventPostProcessor);
-        //设置为 RefreshScope
-        definitionBuilder.setScope("refresh");
+        // 设置作用域为prototype
+        definitionBuilder.setScope(ConfigurableBeanFactory.SCOPE_PROTOTYPE);
+
         return new BeanDefinitionHolder(definitionBuilder.getBeanDefinition(),
             IdentitySourceBeanUtils.getSourceBeanName(entity.getId().toString()));
     }
@@ -211,7 +211,8 @@ public class IdentitySourceBeanRegistry implements IdentitySourceEventListener {
      */
     private static void destroyIdentitySourceBean(String id,
                                                   ApplicationContext applicationContext) {
-        BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) ((ConfigurableApplicationContext) applicationContext)
+        ConfigurableApplicationContext configurableApplicationContext = (ConfigurableApplicationContext) applicationContext;
+        BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) configurableApplicationContext
             .getBeanFactory();
         String beanName = IdentitySourceBeanUtils.getSourceBeanName(id);
         try {
@@ -279,6 +280,8 @@ public class IdentitySourceBeanRegistry implements IdentitySourceEventListener {
             registerIdentitySourceBean(entity, applicationContext);
             log.info("注册身份源: {} 同步任务", id);
             registerIdentitySourceSyncTask(entity, applicationContext);
+            // 刷新
+            ApplicationContextHelp.refresh(IdentitySourceBeanUtils.getSourceBeanName(id));
         }
     }
 

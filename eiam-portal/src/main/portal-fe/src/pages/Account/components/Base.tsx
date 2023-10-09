@@ -16,12 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { UploadOutlined } from '@ant-design/icons';
-import {
-  ProForm,
-  ProFormText,
-  ProFormTextArea,
-  useStyle as useAntdStyle,
-} from '@ant-design/pro-components';
+import { ProForm, ProFormText, useStyle as useAntdStyle } from '@ant-design/pro-components';
 import { App, Avatar, Button, Form, Skeleton, Upload } from 'antd';
 import { useState } from 'react';
 
@@ -103,10 +98,10 @@ function useStyle() {
 }
 export const FORM_ITEM_LAYOUT = {
   labelCol: {
-    span: 4,
+    span: 5,
   },
   wrapperCol: {
-    span: 20,
+    span: 19,
   },
 };
 
@@ -117,7 +112,8 @@ const BaseView = () => {
   const [loading, setLoading] = useState<boolean>();
   const { initialState } = useModel('@@initialState');
   const [avatarURL, setAvatarURL] = useState<string | undefined>(initialState?.currentUser?.avatar);
-  const [name, setName] = useState<string>('');
+  const [avatarUploaded, setAvatarUploaded] = useState<boolean>(false);
+  const [name, setName] = useState<string>();
 
   useAsyncEffect(async () => {
     setLoading(true);
@@ -138,7 +134,7 @@ const BaseView = () => {
             fullName: values.fullName,
             nickName: values.nickName,
             personalProfile: values.personalProfile,
-            avatar: avatarURL,
+            avatar: avatarUploaded ? avatarURL : undefined,
           }),
           publicSecret,
         ),
@@ -163,7 +159,7 @@ const BaseView = () => {
     callBack,
   }: {
     avatar: string | undefined;
-    name: string;
+    name?: string;
     callBack: any;
   }) => (
     <>
@@ -179,12 +175,13 @@ const BaseView = () => {
             className={classnames(`${prefixCls}-avatar-name`, hashId)}
             size={144}
           >
-            {name.substring(0, 1)}
+            {name?.substring(0, 1)}
           </Avatar>
         )}
       </div>
       <ImgCrop
         rotationSlider
+        aspectSlider
         modalOk={intl.formatMessage({ id: 'app.confirm' })}
         modalCancel={intl.formatMessage({ id: 'app.cancel' })}
       >
@@ -229,7 +226,7 @@ const BaseView = () => {
               onFinish={handleFinish}
               submitter={{
                 render: (p, dom) => {
-                  return <Form.Item wrapperCol={{ span: 20, offset: 4 }}>{dom}</Form.Item>;
+                  return <Form.Item wrapperCol={{ span: 19, offset: 5 }}>{dom}</Form.Item>;
                 },
                 searchConfig: {
                   submitText: intl.formatMessage({ id: 'app.save' }),
@@ -284,15 +281,17 @@ const BaseView = () => {
                   },
                 ]}
               />
-              <ProFormTextArea
-                width="md"
-                name="personalProfile"
-                label={intl.formatMessage({ id: 'page.account.base.form.personal_profile' })}
-              />
             </ProForm>
           </div>
           <div className={classnames(`${prefixCls}-right`, hashId)}>
-            <AvatarView avatar={avatarURL} callBack={setAvatarURL} name={name} />
+            <AvatarView
+              avatar={avatarURL}
+              callBack={(avatarUrl: string) => {
+                setAvatarURL(avatarUrl);
+                setAvatarUploaded(true);
+              }}
+              name={name}
+            />
           </div>
         </>
       )}

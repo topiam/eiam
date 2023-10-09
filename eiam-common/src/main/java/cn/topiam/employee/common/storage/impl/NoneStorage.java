@@ -39,11 +39,11 @@ public class NoneStorage extends AbstractStorage {
     @Override
     public String upload(@NotNull String fileName,
                          InputStream inputStream) throws StorageProviderException {
-        throw new StorageProviderException("暂未配置存储提供商或提供商异常，请联系管理员");
+        throw new StorageProviderException("暂未配置存储提供商");
     }
 
     @Override
     public String download(String path) throws StorageProviderException {
-        throw new StorageProviderException("暂未配置存储提供商或提供商异常，请联系管理员");
+        throw new StorageProviderException("暂未配置存储提供商");
     }
 }
