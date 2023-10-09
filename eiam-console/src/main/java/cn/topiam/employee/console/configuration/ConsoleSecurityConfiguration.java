@@ -68,8 +68,6 @@ import cn.topiam.employee.support.security.authentication.WebAuthenticationDetai
 import cn.topiam.employee.support.security.csrf.SpaCsrfTokenRequestHandler;
 
 import lombok.RequiredArgsConstructor;
-
-import static cn.topiam.employee.common.constant.SynchronizerConstants.EVENT_RECEIVE_PATH;
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.header.writers.XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK;
 import static org.springframework.web.cors.CorsConfiguration.ALL;
@@ -78,6 +76,7 @@ import static cn.topiam.employee.common.constant.AuthorizeConstants.FE_LOGIN;
 import static cn.topiam.employee.common.constant.AuthorizeConstants.FORM_LOGIN;
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.DEFAULT_SECURITY_FILTER_CHAIN;
 import static cn.topiam.employee.common.constant.SessionConstants.CURRENT_STATUS;
+import static cn.topiam.employee.common.constant.SynchronizerConstants.EVENT_RECEIVE_PATH;
 import static cn.topiam.employee.core.endpoint.security.PublicSecretEndpoint.PUBLIC_SECRET_PATH;
 import static cn.topiam.employee.core.setting.constant.SecuritySettingConstants.*;
 import static cn.topiam.employee.protocol.code.util.ProtocolConfigUtils.getAuthenticationDetailsSource;

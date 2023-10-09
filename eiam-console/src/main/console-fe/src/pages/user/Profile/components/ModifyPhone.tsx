@@ -1,5 +1,5 @@
 /*
- * eiam-portal - Employee Identity and Access Management
+ * eiam-console - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
