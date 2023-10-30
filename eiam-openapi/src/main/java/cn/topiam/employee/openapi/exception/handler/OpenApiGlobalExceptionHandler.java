@@ -37,7 +37,7 @@ import jakarta.validation.ConstraintViolationException;
  */
 @AllArgsConstructor
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class OpenApiGlobalExceptionHandler {
     /**
      * Exception
      *
