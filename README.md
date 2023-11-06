@@ -126,7 +126,7 @@
 
 ## 交流群
 
-![](https://eiam.topiam.cn/img/group-qr-code.jpg)
+![](https://eiam.topiam.cn/assets/images/group-qr-code-98138fd8e4ac7c8a70ec56b2af3dd38b.jpg)
 
 ## 参与贡献
 
