@@ -71,8 +71,8 @@ const ModifyPassword = (props: {
       }}
       onFinish={async (formData: Record<string, any>) => {
         const { success, result, status, message } = await changePassword({
-          oldPassword: formData[FieldNames.NEW_PASSWORD] as string,
-          newPassword: formData[FieldNames.OLD_PASSWORD] as string,
+          oldPassword: formData[FieldNames.OLD_PASSWORD] as string,
+          newPassword: formData[FieldNames.NEW_PASSWORD] as string,
         });
         if (!success && status === ServerExceptionStatus.PASSWORD_VALIDATED_FAIL_ERROR) {
           formRef.current?.setFields([{ name: FieldNames.OLD_PASSWORD, errors: [`${message}`] }]);
