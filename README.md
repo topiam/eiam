@@ -118,6 +118,10 @@
 + 成都益新臣辉科技有限公司
 + 贵州南智云数字产业发展有限公司
 + 青岛南邮信息技术有限公司
++ 福州创汇科技有限公司
++ 杭州群核信息技术有限公司
++ 深圳市佳信捷智慧物联有限公司
++ 南京优达创信息技术有限公司
 
 ## 微信公众号
 
@@ -127,7 +131,7 @@
 
 ## 交流群
 
-![](https://eiam.topiam.cn/assets/images/group-qr-code-98138fd8e4ac7c8a70ec56b2af3dd38b.jpg)
+![](https://eiam.topiam.cn/assets/images/group-qr-code-56e2f7dd5f440f90c428645b264e43f8.png)
 
 ## 参与贡献
 
