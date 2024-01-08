@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisOperations;
@@ -108,35 +109,43 @@ public class ClusterSessionRegistryImpl<T extends org.springframework.session.Se
                 SecurityContext securityContext = session.getAttribute(SPRING_SECURITY_CONTEXT);
                 //转为实体
                 Authentication authentication = securityContext.getAuthentication();
-                UserDetails principal = (UserDetails) authentication.getPrincipal();
-                WebAuthenticationDetails details = (WebAuthenticationDetails) authentication
-                    .getDetails();
-                Session sessionDetails = new Session(principal.getId(), principal.getUsername());
-                //last request
-                Instant instant = session.getLastAccessedTime();
-                ZoneId zoneId = ZoneId.systemDefault();
-                //最后请求时间
-                LocalDateTime lastRequestTime = instant.atZone(zoneId).toLocalDateTime();
-                sessionDetails.setLastRequestTime(lastRequestTime);
-                //登录时间
-                sessionDetails.setAuthenticationTime(details.getAuthenticationTime());
-                //登录时间
-                sessionDetails
-                    .setAuthenticationProvider(details.getAuthenticationProvider().getType());
-                //用户类型
-                sessionDetails.setUserType(principal.getUserType());
-                //地理位置
-                sessionDetails.setGeoLocation(details.getGeoLocation());
-                //用户代理
-                sessionDetails.setUserAgent(details.getUserAgent());
-                //会话ID
-                sessionDetails.setSessionId(session.getId());
-                list.add(sessionDetails);
+                Object principal = authentication.getPrincipal();
+                if (principal instanceof UserDetails userDetails) {
+                    Session sessionDetails = getSession(session, userDetails, authentication);
+                    list.add(sessionDetails);
+                }
             } catch (NullPointerException ignored) {
             }
         }
         //处理
         return list;
+    }
+
+    @NotNull
+    private static Session getSession(MapSession session, UserDetails userDetails, Authentication authentication) {
+        WebAuthenticationDetails details = (WebAuthenticationDetails) authentication
+        .getDetails();
+        Session sessionDetails = new Session(userDetails.getId(), userDetails.getUsername());
+        //last request
+        Instant instant = session.getLastAccessedTime();
+        ZoneId zoneId = ZoneId.systemDefault();
+        //最后请求时间
+        LocalDateTime lastRequestTime = instant.atZone(zoneId).toLocalDateTime();
+        sessionDetails.setLastRequestTime(lastRequestTime);
+        //登录时间
+        sessionDetails.setAuthenticationTime(details.getAuthenticationTime());
+        //登录时间
+        sessionDetails
+                .setAuthenticationProvider(details.getAuthenticationProvider().getType());
+        //用户类型
+        sessionDetails.setUserType(userDetails.getUserType());
+        //地理位置
+        sessionDetails.setGeoLocation(details.getGeoLocation());
+        //用户代理
+        sessionDetails.setUserAgent(details.getUserAgent());
+        //会话ID
+        sessionDetails.setSessionId(session.getId());
+        return sessionDetails;
     }
 
     /**
