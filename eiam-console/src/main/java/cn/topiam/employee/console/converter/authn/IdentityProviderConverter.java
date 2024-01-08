@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import cn.topiam.employee.authentication.wechat.WeChatIdpScanCodeConfig;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -246,7 +247,7 @@ public interface IdentityProviderConverter {
         IdentityProviderConfig identityProviderConfig;
         //微信扫码
         if (type.equals(WECHAT_QR.value())) {
-            identityProviderConfig = config.to(GiteeIdpOAuth2Config.class);
+            identityProviderConfig = config.to(WeChatIdpScanCodeConfig.class);
             //钉钉扫码
         } else if (type.equals(DINGTALK_QR.value())) {
             identityProviderConfig = config.to(DingTalkIdpScanCodeConfig.class);
@@ -296,6 +297,9 @@ public interface IdentityProviderConverter {
     static IdentityProviderType getIdentityProviderType(String type) {
         if (FEISHU_OAUTH.value().equals(type)) {
             return FEISHU_OAUTH;
+        }
+        if (MAIL.value().equals(type)) {
+            return MAIL;
         }
         if (DINGTALK_OAUTH.value().equals(type)) {
             return DINGTALK_OAUTH;
