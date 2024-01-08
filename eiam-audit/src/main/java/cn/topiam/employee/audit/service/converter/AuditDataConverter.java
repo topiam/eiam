@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import cn.topiam.employee.support.security.util.SecurityUtils;
 import org.mapstruct.Mapper;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -151,44 +152,56 @@ public interface AuditDataConverter {
         QAuditEntity auditEntity = QAuditEntity.auditEntity;
         Predicate predicate = ExpressionUtils.and(auditEntity.isNotNull(),
             auditEntity.deleted.eq(Boolean.FALSE));
-        //用户名存在，查询用户ID
-        if (StringUtils.hasText(query.getUsername())) {
-            String actorId = "";
-            if (UserType.USER.getType().equals(query.getUserType())) {
-                UserRepository userRepository = ApplicationContextHelp
-                    .getBean(UserRepository.class);
-                UserEntity user = userRepository.findByUsername(query.getUsername());
-                if (!Objects.isNull(user)) {
-                    actorId = user.getId().toString();
+        UserType userType = SecurityUtils.getCurrentUser().getUserType();
+        // 登录角色 管理员
+        if (UserType.ADMIN.equals(userType)) {
+            if (StringUtils.hasText(query.getUsername())) {
+                String actorId = "";
+                if (UserType.USER.getType().equals(query.getUserType())) {
+                    UserRepository userRepository = ApplicationContextHelp
+                            .getBean(UserRepository.class);
+                    UserEntity user = userRepository.findByUsername(query.getUsername());
+                    if (!Objects.isNull(user)) {
+                        actorId = user.getId().toString();
+                    }
                 }
-                // 用户类型
+                if (UserType.ADMIN.getType().equals(query.getUserType())) {
+                    AdministratorRepository administratorRepository = ApplicationContextHelp
+                            .getBean(AdministratorRepository.class);
+                    Optional<AdministratorEntity> optional = administratorRepository
+                            .findByUsername(query.getUsername());
+                    if (optional.isPresent()) {
+                        actorId = optional.get().getId().toString();
+                    }
+                }
+                predicate = ExpressionUtils.and(predicate, auditEntity.actorId.eq(actorId));
+            }
+            // 用户类型
+            if (UserType.USER.getType().equals(query.getUserType())) {
                 predicate = ExpressionUtils.and(predicate, auditEntity.actorType.eq(UserType.USER));
             }
             if (UserType.ADMIN.getType().equals(query.getUserType())) {
-                AdministratorRepository administratorRepository = ApplicationContextHelp
-                    .getBean(AdministratorRepository.class);
-                Optional<AdministratorEntity> optional = administratorRepository
-                    .findByUsername(query.getUsername());
-                if (optional.isPresent()) {
-                    actorId = optional.get().getId().toString();
-                }
-                // 用户类型
                 predicate = ExpressionUtils.and(predicate,
-                    auditEntity.actorType.eq(UserType.ADMIN));
+                        auditEntity.actorType.eq(UserType.ADMIN));
             }
-            predicate = ExpressionUtils.and(predicate, auditEntity.actorId.eq(actorId));
         }
-        //事件类型
+        // 登录角色 管理员
+        if (UserType.USER.equals(userType)) {
+            predicate = ExpressionUtils.and(predicate, auditEntity.actorId.eq(SecurityUtils.getCurrentUser().getId()));
+            // 用户类型
+            predicate = ExpressionUtils.and(predicate, auditEntity.actorType.eq(UserType.USER));
+        }
+        // 事件类型
         if (!CollectionUtils.isEmpty(query.getEventType())) {
             predicate = ExpressionUtils.and(predicate,
                 auditEntity.eventType.in(query.getEventType()));
         }
-        //事件状态
+        // 事件状态
         if (Objects.nonNull(query.getEventStatus())) {
             predicate = ExpressionUtils.and(predicate,
                 auditEntity.eventStatus.in(query.getEventStatus()));
         }
-        //事件时间
+        // 事件时间
         if (!Objects.isNull(query.getStartEventTime())
             && !Objects.isNull(query.getEndEventTime())) {
             predicate = ExpressionUtils.and(predicate,

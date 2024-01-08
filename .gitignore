@@ -5,6 +5,7 @@ target/
 !**/src/test/**
 !**/target/generated-sources/**
 logs/**
+*.log
 ### STS ###
 .apt_generated
 .classpath

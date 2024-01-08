@@ -89,6 +89,7 @@ export default () => {
       title: intl.formatMessage({ id: 'pages.audit.columns.username' }),
       ellipsis: true,
       dataIndex: 'username',
+      hideInSearch: true,
       fieldProps: {
         placeholder: intl.formatMessage({ id: 'pages.audit.columns.username.placeholder' }),
       },
