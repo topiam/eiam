@@ -57,4 +57,9 @@ public class OpenApiV1Constants {
      * 组织
      */
     public final static String  ORGANIZATION_PATH       = ACCOUNT_PATH + "/organization";
+
+    /**
+     * 组织
+     */
+    public final static String  APP_ACCOUNT_PATH       = ACCOUNT_PATH + "/app/account";
 }
