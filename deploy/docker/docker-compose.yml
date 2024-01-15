@@ -1,0 +1,157 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql:8.0.33
+    container_name: mysql
+    environment:
+      # 时区上海
+      TZ: Asia/Shanghai
+      # root 密码
+      MYSQL_ROOT_PASSWORD: root
+      # 初始化数据库(后续的初始化sql会在这个库执行)
+      MYSQL_DATABASE: topiam
+    ports:
+      - "3306:3306"
+    volumes:
+      # 数据挂载
+      - /docker/mysql/data/:/var/lib/mysql/
+      # 配置挂载
+      - /docker/mysql/conf/:/etc/mysql/conf.d/
+    command:
+      # 将mysql8.0默认密码策略 修改为 原先 策略 (mysql8.0对其默认策略做了更改 会导致密码无法匹配)
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --explicit_defaults_for_timestamp=true
+      --lower_case_table_names=1
+    privileged: true
+    network_mode: "host"
+
+  nginx-web:
+    image: nginx:1.23.4
+    container_name: nginx-web
+    environment:
+      # 时区上海
+      TZ: Asia/Shanghai
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # 证书映射
+      - /docker/nginx/cert:/etc/nginx/cert
+      # 配置文件映射
+      - /docker/nginx/conf/nginx.conf:/etc/nginx/nginx.conf
+      # 页面目录
+      - /docker/nginx/html:/usr/share/nginx/html
+      # 日志目录
+      - /docker/nginx/log:/var/log/nginx
+    privileged: true
+    network_mode: "host"
+
+  redis:
+    image: redis:6.2.12
+    container_name: redis
+    ports:
+      - "6379:6379"
+    environment:
+      # 时区上海
+      TZ: Asia/Shanghai
+    volumes:
+      # 配置文件
+      - /docker/redis/conf:/redis/config:rw
+      # 数据文件
+      - /docker/redis/data/:/redis/data/:rw
+    command: "redis-server /redis/config/redis.conf"
+    privileged: true
+    network_mode: "host"
+
+  elasticsearch:
+    image: elasticsearch:8.7.0
+    container_name: elasticsearch
+    deploy:
+      resources:
+        limits:
+          memory: 2048M
+    volumes:
+      - /docker/elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    environment:
+      - node.name=es
+      - cluster.name=elasticsearch
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+    privileged: true
+    network_mode: "host"
+    mem_limit: 1073741824
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: rabbitmq
+    deploy:
+      resources:
+        limits:
+          memory: 2048M
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbit
+      RABBITMQ_DEFAULT_PASS: 123456
+    privileged: true
+    network_mode: "host"
+    volumes:
+      - /docker/rabbitmq/data:/var/lib/rabbitmq
+
+  topiam-console-ce:
+    image: ccr.ccs.tencentyun.com/topiam/eiam-console-ce:1.0.1
+    container_name: topiam-console-ce
+    environment:
+      # 时区上海
+      TZ: Asia/Shanghai
+      SERVER_PORT: 1898
+    ports:
+      - "1898:1898"
+    volumes:
+      # 配置文件
+      - /docker/topiam/conf:/opt/topiam/conf
+    privileged: true
+    network_mode: "host"
+
+  topiam-portal-ce:
+    image: ccr.ccs.tencentyun.com/topiam/eiam-portal-ce:1.0.1
+    container_name: topiam-portal-ce
+    environment:
+      # 时区上海
+      TZ: Asia/Shanghai
+      SERVER_PORT: 1989
+    ports:
+      - "1989:1989"
+    volumes:
+      # 配置文件
+      - /docker/topiam/conf:/opt/topiam/conf
+    privileged: true
+    network_mode: "host"
+
+  topiam-portal-openapi:
+    image: ccr.ccs.tencentyun.com/topiam/eiam-openapi-ce:1.0.1
+    container_name: topiam-openapi-ce
+    environment:
+      # 时区上海
+      TZ: Asia/Shanghai
+      SERVER_PORT: 1988
+    ports:
+      - "1988:1988"
+    volumes:
+      # 配置文件
+      - /docker/topiam/conf:/opt/topiam/conf
+    privileged: true
+    network_mode: "host"
