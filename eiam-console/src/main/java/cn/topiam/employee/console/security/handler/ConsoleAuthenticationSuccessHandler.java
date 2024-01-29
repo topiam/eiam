@@ -79,7 +79,7 @@ public class ConsoleAuthenticationSuccessHandler implements AuthenticationSucces
         //更新认证次数
         updateAuthSuccessCount(authentication);
         //记录审计日志
-        List<Target> targets = Lists.newArrayList(Target.builder().type(TargetType.PORTAL).build());
+        List<Target> targets = Lists.newArrayList(Target.builder().type(TargetType.CONSOLE).build());
         auditEventPublish.publish(LOGIN_CONSOLE, authentication, EventStatus.SUCCESS, targets);
         //响应
         HttpResponseUtils.flushResponseJson(response, HttpStatus.OK.value(), result);
