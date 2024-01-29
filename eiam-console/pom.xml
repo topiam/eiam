@@ -147,9 +147,8 @@
                                 </goals>
                                 <phase>generate-resources</phase>
                                 <configuration>
-                                    <nodeVersion>v18.17.1</nodeVersion>
-                                    <pnpmVersion>v8.8.0</pnpmVersion>
-                                    <nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</nodeDownloadRoot>
+                                    <nodeVersion>v20.10.0</nodeVersion>
+                                    <pnpmVersion>v8.15.0</pnpmVersion>
                                 </configuration>
                             </execution>
                             <execution>
@@ -160,7 +159,7 @@
                                 <phase>generate-resources</phase>
                                 <configuration>
                                     <arguments>install</arguments>
-                                    <pnpmRegistryURL>https://registry.npm.taobao.org</pnpmRegistryURL>
+                                    <pnpmRegistryURL>https://registry.npmmirror.com</pnpmRegistryURL>
                                     <pnpmInheritsProxyConfigFromMaven>true</pnpmInheritsProxyConfigFromMaven>
                                 </configuration>
                             </execution>
@@ -200,9 +199,8 @@
                                 </goals>
                                 <phase>generate-resources</phase>
                                 <configuration>
-                                    <nodeVersion>v18.17.1</nodeVersion>
-                                    <pnpmVersion>v8.8.0</pnpmVersion>
-                                    <nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</nodeDownloadRoot>
+                                    <nodeVersion>v20.10.0</nodeVersion>
+                                    <pnpmVersion>v8.15.0</pnpmVersion>
                                 </configuration>
                             </execution>
                             <execution>
@@ -213,7 +211,7 @@
                                 <phase>generate-resources</phase>
                                 <configuration>
                                     <arguments>install</arguments>
-                                    <pnpmRegistryURL>https://registry.npm.taobao.org</pnpmRegistryURL>
+                                    <pnpmRegistryURL>https://registry.npmmirror.com</pnpmRegistryURL>
                                     <pnpmInheritsProxyConfigFromMaven>true</pnpmInheritsProxyConfigFromMaven>
                                 </configuration>
                             </execution>
@@ -224,7 +222,7 @@
                                 </goals>
                                 <phase>generate-resources</phase>
                                 <configuration>
-                                    <arguments>run build</arguments>
+                                    <arguments>run build:pre</arguments>
                                 </configuration>
                             </execution>
                         </executions>
