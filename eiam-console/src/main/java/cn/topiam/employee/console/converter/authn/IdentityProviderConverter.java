@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import cn.topiam.employee.authentication.wechat.WeChatIdpScanCodeConfig;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -44,6 +43,7 @@ import cn.topiam.employee.authentication.feishu.FeiShuIdpScanCodeConfig;
 import cn.topiam.employee.authentication.gitee.GiteeIdpOAuth2Config;
 import cn.topiam.employee.authentication.github.GithubIdpOauthConfig;
 import cn.topiam.employee.authentication.qq.QqIdpOauthConfig;
+import cn.topiam.employee.authentication.wechat.WeChatIdpScanCodeConfig;
 import cn.topiam.employee.authentication.wechatwork.WeChatWorkIdpScanCodeConfig;
 import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
 import cn.topiam.employee.common.entity.authn.QIdentityProviderEntity;

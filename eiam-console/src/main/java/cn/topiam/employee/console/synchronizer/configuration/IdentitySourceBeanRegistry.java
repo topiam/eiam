@@ -20,7 +20,6 @@ package cn.topiam.employee.console.synchronizer.configuration;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import cn.topiam.employee.support.context.ApplicationContextHelp;
 import org.jetbrains.annotations.NotNull;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -66,11 +65,11 @@ import cn.topiam.employee.identitysource.feishu.client.FeiShuClient;
 import cn.topiam.employee.identitysource.wechatwork.WeChatWorkConfig;
 import cn.topiam.employee.identitysource.wechatwork.WeChatWorkIdentitySource;
 import cn.topiam.employee.identitysource.wechatwork.client.WeChatWorkClient;
+import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.scheduler.SpringSchedulerRegister;
 import cn.topiam.employee.support.trace.TraceUtils;
 
 import lombok.extern.slf4j.Slf4j;
-
 import static cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider.DINGTALK;
 import static cn.topiam.employee.support.lock.LockAspect.getTopiamLockKeyPrefix;
 

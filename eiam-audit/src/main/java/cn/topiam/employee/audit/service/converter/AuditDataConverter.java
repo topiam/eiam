@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import cn.topiam.employee.support.security.util.SecurityUtils;
 import org.mapstruct.Mapper;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -55,6 +54,7 @@ import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.security.userdetails.UserType;
+import cn.topiam.employee.support.security.util.SecurityUtils;
 
 /**
  * 审计数据转换
@@ -159,7 +159,7 @@ public interface AuditDataConverter {
                 String actorId = "";
                 if (UserType.USER.getType().equals(query.getUserType())) {
                     UserRepository userRepository = ApplicationContextHelp
-                            .getBean(UserRepository.class);
+                        .getBean(UserRepository.class);
                     UserEntity user = userRepository.findByUsername(query.getUsername());
                     if (!Objects.isNull(user)) {
                         actorId = user.getId().toString();
@@ -167,9 +167,9 @@ public interface AuditDataConverter {
                 }
                 if (UserType.ADMIN.getType().equals(query.getUserType())) {
                     AdministratorRepository administratorRepository = ApplicationContextHelp
-                            .getBean(AdministratorRepository.class);
+                        .getBean(AdministratorRepository.class);
                     Optional<AdministratorEntity> optional = administratorRepository
-                            .findByUsername(query.getUsername());
+                        .findByUsername(query.getUsername());
                     if (optional.isPresent()) {
                         actorId = optional.get().getId().toString();
                     }
@@ -182,12 +182,13 @@ public interface AuditDataConverter {
             }
             if (UserType.ADMIN.getType().equals(query.getUserType())) {
                 predicate = ExpressionUtils.and(predicate,
-                        auditEntity.actorType.eq(UserType.ADMIN));
+                    auditEntity.actorType.eq(UserType.ADMIN));
             }
         }
         // 登录角色 管理员
         if (UserType.USER.equals(userType)) {
-            predicate = ExpressionUtils.and(predicate, auditEntity.actorId.eq(SecurityUtils.getCurrentUser().getId()));
+            predicate = ExpressionUtils.and(predicate,
+                auditEntity.actorId.eq(SecurityUtils.getCurrentUser().getId()));
             // 用户类型
             predicate = ExpressionUtils.and(predicate, auditEntity.actorType.eq(UserType.USER));
         }

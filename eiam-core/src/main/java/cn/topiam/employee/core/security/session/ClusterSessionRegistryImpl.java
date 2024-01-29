@@ -122,9 +122,9 @@ public class ClusterSessionRegistryImpl<T extends org.springframework.session.Se
     }
 
     @NotNull
-    private static Session getSession(MapSession session, UserDetails userDetails, Authentication authentication) {
-        WebAuthenticationDetails details = (WebAuthenticationDetails) authentication
-        .getDetails();
+    private static Session getSession(MapSession session, UserDetails userDetails,
+                                      Authentication authentication) {
+        WebAuthenticationDetails details = (WebAuthenticationDetails) authentication.getDetails();
         Session sessionDetails = new Session(userDetails.getId(), userDetails.getUsername());
         //last request
         Instant instant = session.getLastAccessedTime();
@@ -135,8 +135,7 @@ public class ClusterSessionRegistryImpl<T extends org.springframework.session.Se
         //登录时间
         sessionDetails.setAuthenticationTime(details.getAuthenticationTime());
         //登录时间
-        sessionDetails
-                .setAuthenticationProvider(details.getAuthenticationProvider().getType());
+        sessionDetails.setAuthenticationProvider(details.getAuthenticationProvider().getType());
         //用户类型
         sessionDetails.setUserType(userDetails.getUserType());
         //地理位置

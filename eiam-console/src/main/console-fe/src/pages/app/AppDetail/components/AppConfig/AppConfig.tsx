@@ -140,9 +140,13 @@ const AppBasic = (props: { app: GetApp }) => {
             label={intl.formatMessage({ id: 'pages.app.config.detail.config.icon' })}
             extra={
               <div style={{ color: 'rgba(0, 0, 0, 0.45)' }}>
-                <span>{intl.formatMessage({ id: 'pages.app.config.detail.config.icon.desc.1' })}</span>
+                <span>
+                  {intl.formatMessage({ id: 'pages.app.config.detail.config.icon.desc.1' })}
+                </span>
                 <br />
-                <span>{intl.formatMessage({ id: 'pages.app.config.detail.config.icon.desc.2' })}</span>
+                <span>
+                  {intl.formatMessage({ id: 'pages.app.config.detail.config.icon.desc.2' })}
+                </span>
               </div>
             }
           >
