@@ -17,10 +17,9 @@
  */
 package cn.topiam.employee.common.enums;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-
 import cn.topiam.employee.support.enums.BaseEnum;
 import cn.topiam.employee.support.web.converter.EnumConvert;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * <p>
@@ -1025,6 +1024,16 @@ public enum Country implements BaseEnum {
         Country[] values = values();
         for (Country country : values) {
             if (String.valueOf(country.getCode()).equals(code)) {
+                return country;
+            }
+        }
+        return null;
+    }
+
+    public static Country getByCountryName(String name) {
+        Country[] values = values();
+        for (Country country : values) {
+            if (String.valueOf(country.getName()).equals(name)) {
                 return country;
             }
         }
