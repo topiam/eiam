@@ -15,11 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.portal.security.handler;
+package cn.topiam.employee.portal.authentication;
 
 import java.io.IOException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
@@ -73,7 +72,7 @@ public class PortalAuthenticationFailureHandler implements
             //@formatter:off
             ApiRestResult.RestResultBuilder<String> builder = ApiRestResult.<String> builder()
                     .status(EX000101.getCode())
-                    .message(StringUtils.defaultString(exception.getMessage(),EX000101.getMessage()));
+                    .message(Objects.toString(exception.getMessage(),EX000101.getMessage()));
             //@formatter:on
             ApiRestResult<String> result = builder.build();
             request.getSession().removeAttribute(SecretType.LOGIN.getKey());

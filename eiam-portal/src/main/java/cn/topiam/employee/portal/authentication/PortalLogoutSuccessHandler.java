@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.portal.security.handler;
+package cn.topiam.employee.portal.authentication;
 
 import java.io.IOException;
 
@@ -27,7 +27,7 @@ import org.springframework.security.core.Authentication;
 import cn.topiam.employee.core.help.ServerHelp;
 import cn.topiam.employee.support.result.ApiRestResult;
 import cn.topiam.employee.support.util.HttpResponseUtils;
-import cn.topiam.employee.support.util.HttpUrlUtils;
+import cn.topiam.employee.support.util.UrlUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -61,7 +61,7 @@ public class PortalLogoutSuccessHandler implements
                     ApiRestResult.builder().status(SUCCESS).build());
             return;
         }
-        response.sendRedirect(HttpUrlUtils.format(ServerHelp.getPortalPublicBaseUrl() + FE_LOGIN));
+        response.sendRedirect(UrlUtils.format(ServerHelp.getPortalPublicBaseUrl() + FE_LOGIN));
         //@formatter:on
     }
 }

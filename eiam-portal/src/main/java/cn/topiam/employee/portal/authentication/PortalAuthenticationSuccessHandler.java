@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.portal.security.handler;
+package cn.topiam.employee.portal.authentication;
 
 import java.io.IOException;
 import java.util.List;
@@ -47,7 +47,7 @@ import cn.topiam.employee.support.security.authentication.AuthenticationProvider
 import cn.topiam.employee.support.security.authentication.WebAuthenticationDetails;
 import cn.topiam.employee.support.security.userdetails.UserDetails;
 import cn.topiam.employee.support.util.HttpResponseUtils;
-import cn.topiam.employee.support.util.HttpUrlUtils;
+import cn.topiam.employee.support.util.UrlUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -116,7 +116,7 @@ public class PortalAuthenticationSuccessHandler extends
         auditEventPublish.publish(LOGIN_PORTAL, authentication, EventStatus.SUCCESS,targets);
         //响应
         if (isHtmlRequest){
-            response.sendRedirect(HttpUrlUtils.format(getPortalPublicBaseUrl() + JUMP_PATH));
+            response.sendRedirect(UrlUtils.format(getPortalPublicBaseUrl() + JUMP_PATH));
             return;
         }
         HttpResponseUtils.flushResponseJson(response, HttpStatus.OK.value(), ApiRestResult.ok());
