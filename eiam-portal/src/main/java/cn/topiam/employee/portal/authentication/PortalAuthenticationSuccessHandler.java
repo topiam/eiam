@@ -103,7 +103,7 @@ public class PortalAuthenticationSuccessHandler extends
                 return;
             }
             //跳转登录，前端会有接口获取状态，并进行展示绑定页面
-            response.sendRedirect(HttpUrlUtils
+            response.sendRedirect(UrlUtils
                     .format(getPortalPublicBaseUrl() + AuthorizeConstants.FE_LOGIN));
             return;
         }
