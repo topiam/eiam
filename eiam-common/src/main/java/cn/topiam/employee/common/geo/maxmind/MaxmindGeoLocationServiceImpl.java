@@ -34,7 +34,6 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.ResourceAccessException;
@@ -133,9 +132,9 @@ public class MaxmindGeoLocationServiceImpl implements GeoLocationService {
                 .countryName(country.getName())
                 .countryCode(country.getGeoNameId().toString())
                 .cityName(city.getName())
-                .cityCode(StringUtils.defaultString(CITY_DISTRICT.get(city.getName()), String.valueOf(city.getGeoNameId())))
+                .cityCode(Objects.toString(CITY_DISTRICT.get(city.getName()), String.valueOf(city.getGeoNameId())))
                 .provinceName(subdivision.getName())
-                .provinceCode(StringUtils.defaultString(PROVINCE_DISTRICT.get(subdivision.getName()), subdivision.getIsoCode()))
+                .provinceCode(Objects.toString(PROVINCE_DISTRICT.get(subdivision.getName()), subdivision.getIsoCode()))
                 .longitude(location.getLongitude())
                 .latitude(location.getLatitude())
                 .provider(MAXMIND).build();
@@ -234,7 +233,7 @@ public class MaxmindGeoLocationServiceImpl implements GeoLocationService {
         File extractFolder = new File(extractPath);
         TarArchiveEntry entry;
         // 将 tar 文件解压到 extractPath 目录下
-        while ((entry = fin.getNextTarEntry()) != null) {
+        while ((entry = fin.getNextEntry()) != null) {
             if (entry.isDirectory()) {
                 continue;
             }
