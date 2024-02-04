@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.console.security.listener;
+package cn.topiam.employee.console.authentication;
 
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;

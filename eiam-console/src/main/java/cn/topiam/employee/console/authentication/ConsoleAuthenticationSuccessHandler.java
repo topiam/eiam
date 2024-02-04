@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.console.security.handler;
+package cn.topiam.employee.console.authentication;
 
 import java.util.List;
 
@@ -79,7 +79,8 @@ public class ConsoleAuthenticationSuccessHandler implements AuthenticationSucces
         //更新认证次数
         updateAuthSuccessCount(authentication);
         //记录审计日志
-        List<Target> targets = Lists.newArrayList(Target.builder().type(TargetType.CONSOLE).build());
+        List<Target> targets = Lists
+            .newArrayList(Target.builder().type(TargetType.CONSOLE).build());
         auditEventPublish.publish(LOGIN_CONSOLE, authentication, EventStatus.SUCCESS, targets);
         //响应
         HttpResponseUtils.flushResponseJson(response, HttpStatus.OK.value(), result);
