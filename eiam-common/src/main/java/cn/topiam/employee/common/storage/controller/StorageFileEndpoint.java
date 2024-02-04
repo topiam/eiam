@@ -55,7 +55,7 @@ import jakarta.servlet.MultipartConfigElement;
 @RequestMapping(value = StorageConstants.STORAGE_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 @AllArgsConstructor
 @Slf4j
-public class StorageFileResource {
+public class StorageFileEndpoint {
 
     /**
      * 上传文件

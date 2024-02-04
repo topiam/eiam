@@ -59,34 +59,9 @@ public class QiNiuKodoStorage extends AbstractStorage {
     public QiNiuKodoStorage(StorageConfig config) {
         super(config);
         qiNiuConfig = (Config) this.config.getConfig();
-        Configuration cfg = new Configuration(Region.huadong());
+        Configuration cfg = new Configuration(Region.createWithRegionId("z0"));
         uploadManager = new UploadManager(cfg);
-        //        try {
-        //            createBucket(cfg);
-        //        } catch (Exception e) {
-        //            log.error("create bucket error: {}", e.getMessage(), e);
-        //        }
     }
-
-    //    private void createBucket(Configuration cfg) {
-    //        try {
-    //            Auth auth = Auth.create(qiNiuConfig.getAccessKey(), qiNiuConfig.getSecretKey());
-    //            BucketManager bucketManager = new BucketManager(auth, cfg);
-    //            Response response = bucketManager.createBucket(qiNiuConfig.getBucket(), "z0");
-    //            //解析创建成功的结果
-    //            BucketInfo putRet = JSON.parseObject(response.bodyString(), BucketInfo.class);
-    //            log.info("qi niu create bucket response: {}", putRet);
-    //        } catch (QiniuException ex) {
-    //            Response r = ex.response;
-    //            log.error("qi niu create bucket fail response: {}", r.toString());
-    //            try {
-    //                log.error("qi niu create bucket fail response body： {}", r.bodyString());
-    //            } catch (QiniuException ex2) {
-    //                //ignore
-    //            }
-    //            throw new StorageProviderException("qiu niu create bucket exception", ex);
-    //        }
-    //    }
 
     @Override
     public String upload(@NotNull String fileName,

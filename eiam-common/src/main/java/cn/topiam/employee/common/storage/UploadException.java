@@ -15,34 +15,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.common.storage.impl;
+package cn.topiam.employee.common.storage;
 
-import java.io.InputStream;
+import java.io.Serial;
 
-import org.jetbrains.annotations.NotNull;
-
-import cn.topiam.employee.common.storage.Storage;
-import cn.topiam.employee.common.storage.StorageProviderException;
+import org.springframework.http.HttpStatus;
 
 /**
- * 本地存储配置
+ * 存储服务异常
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/10 21:32
+ * Created by support@topiam.cn on 2020/8/19 22:53
  */
-public class NoneStorage implements Storage {
+public class UploadException extends StorageProviderException {
+    @Serial
+    private static final long serialVersionUID = 6249098979022610064L;
 
-    public NoneStorage() {
+    public UploadException(Throwable cause) {
+        super(cause, "Upload fail", cause.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @Override
-    public String upload(@NotNull String fileName,
-                         InputStream inputStream) throws StorageProviderException {
-        throw new StorageProviderException("暂未配置存储提供商");
-    }
-
-    @Override
-    public String download(String path) throws StorageProviderException {
-        throw new StorageProviderException("暂未配置存储提供商");
-    }
 }
