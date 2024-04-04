@@ -18,15 +18,14 @@
 import { ProFormSwitch } from '@ant-design/pro-components';
 import { IdentityProviderType } from '../../constant';
 import DingTalkOauthConfig from './DingTalkOauthConfig';
-import DingTalkScanCode from './DingTalkScanCodeConfig';
 import FeiShuScanCodeConfig from './FeiShuScanCodeConfig';
 import QqOauthConfig from './QqOauthConfig';
 import WeChatScanCode from './WeChatScanCodeConfig';
-import WeWorkScanCode from './WeWorkScanCodeConfig';
+import WeChatWorkConfig from './WeChatWorkConfig';
 import GithubOauthConfig from './GithubOauthConfig';
 import GiteeOauthConfig from './GiteeOauthConfig';
+import AliPayOauthConfig from './AliPayOauthConfig';
 import { useIntl } from '@umijs/max';
-import AliPayOauthConfig from '@/pages/authn/IdentityProvider/components/Config/AliPayOauthConfig';
 
 /**
  * Config
@@ -41,8 +40,7 @@ const Config = (props: { type: IdentityProviderType | string; isCreate?: boolean
   return (
     <>
       {type === IdentityProviderType.wechat_qr && <WeChatScanCode isCreate={isCreate} />}
-      {type === IdentityProviderType.wechatwork_qr && <WeWorkScanCode isCreate={isCreate} />}
-      {type === IdentityProviderType.dingtalk_qr && <DingTalkScanCode isCreate={isCreate} />}
+      {type === IdentityProviderType.wechatwork_oauth && <WeChatWorkConfig isCreate={isCreate} />}
       {type === IdentityProviderType.dingtalk_oauth && <DingTalkOauthConfig isCreate={isCreate} />}
       {type === IdentityProviderType.qq_oauth && <QqOauthConfig isCreate={isCreate} />}
       {type === IdentityProviderType.feishu_oauth && <FeiShuScanCodeConfig isCreate={isCreate} />}

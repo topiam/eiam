@@ -28,8 +28,7 @@ export enum IdentityProviderCategory {
  */
 export enum IdentityProviderType {
   //企业
-  wechatwork_qr = 'wechatwork_qr',
-  dingtalk_qr = 'dingtalk_qr',
+  wechatwork_oauth = 'wechatwork_oauth',
   feishu_oauth = 'feishu_oauth',
   dingtalk_oauth = 'dingtalk_oauth',
   //社交
@@ -44,8 +43,7 @@ export enum IdentityProviderType {
  * 是否回调的提供商
  */
 export const EXIST_CALLBACK = [
-  IdentityProviderType.wechatwork_qr,
-  IdentityProviderType.dingtalk_qr,
+  IdentityProviderType.wechatwork_oauth,
   IdentityProviderType.dingtalk_oauth,
   IdentityProviderType.wechat_qr,
   IdentityProviderType.qq_oauth,

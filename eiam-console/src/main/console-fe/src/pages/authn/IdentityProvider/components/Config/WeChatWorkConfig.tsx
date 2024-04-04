@@ -16,46 +16,68 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { ProFormText } from '@ant-design/pro-components';
+import { Input } from 'antd';
 import CallbackUrl from './CallbackUrl';
 import { useIntl } from '@umijs/max';
 
 /**
- * 钉钉扫码登录
+ * 企业微信认证
  *
  * @constructor
  */
-const DingTalkScanCode = (props: { isCreate: boolean }) => {
+const WeWorkScanCode = (props: { isCreate: boolean }) => {
   const { isCreate } = props;
   const intl = useIntl();
 
   return (
     <>
       <ProFormText
-        name={['config', 'appKey']}
-        label="AppKey"
+        name={['config', 'corpId']}
+        label={intl.formatMessage({
+          id: 'pages.authn.identity_provider.config.wework_scan_code.corp_id',
+        })}
         rules={[{ required: true }]}
         extra={intl.formatMessage({
-          id: 'pages.authn.identity_provider.config.ding_talk_oauth.app_id.extra',
+          id: 'pages.authn.identity_provider.config.wework_scan_code.corp_id.extra',
         })}
-        fieldProps={{ autoComplete: 'off' }}
-        placeholder={intl.formatMessage({
-          id: 'pages.authn.identity_provider.config.ding_talk_oauth.app_id.placeholder',
+      >
+        <Input
+          autoComplete="off"
+          placeholder={intl.formatMessage({
+            id: 'pages.authn.identity_provider.config.wework_scan_code.corp_id.placeholder',
+          })}
+        />
+      </ProFormText>
+      <ProFormText
+        name={['config', 'agentId']}
+        label="AgentId"
+        rules={[{ required: true }]}
+        extra={intl.formatMessage({
+          id: 'pages.authn.identity_provider.config.wework_scan_code.agent_id.extra',
         })}
-      />
+      >
+        <Input
+          autoComplete="off"
+          placeholder={intl.formatMessage({
+            id: 'pages.authn.identity_provider.config.wework_scan_code.agent_id.placeholder',
+          })}
+        />
+      </ProFormText>
       <ProFormText.Password
-        rules={[{ required: true }]}
         name={['config', 'appSecret']}
-        label="AppSecret"
+        label="Secret"
+        rules={[{ required: true }]}
         extra={intl.formatMessage({
-          id: 'pages.authn.identity_provider.config.ding_talk_oauth.app_id.extra',
+          id: 'pages.authn.identity_provider.config.wework_scan_code.app_secret.extra',
         })}
+        fieldProps={{ autoComplete: 'new-password' }}
         placeholder={intl.formatMessage({
-          id: 'pages.authn.identity_provider.config.ding_talk_oauth.app_secret.placeholder',
+          id: 'pages.authn.identity_provider.config.wework_scan_code.app_secret.placeholder',
         })}
-        fieldProps={{ autoComplete: 'off' }}
       />
       {!isCreate && <CallbackUrl />}
     </>
   );
 };
-export default DingTalkScanCode;
+
+export default WeWorkScanCode;

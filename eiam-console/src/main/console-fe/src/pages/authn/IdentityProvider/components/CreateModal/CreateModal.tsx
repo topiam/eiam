@@ -23,9 +23,9 @@ import {
   ProFormTextArea,
 } from '@ant-design/pro-components';
 import { useAsyncEffect } from 'ahooks';
-import { Spin } from 'antd';
+import { Avatar, Space, Spin } from 'antd';
 import { useForm } from 'antd/es/form/Form';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
   DRAWER_FORM_ITEM_LAYOUT,
   IdentityProviderCategory,
@@ -33,6 +33,7 @@ import {
 } from '../../constant';
 import Config from '../Config';
 import { useIntl } from '@umijs/max';
+import { ICON_LIST } from '@/components/IconFont/constant';
 
 export type CreateDrawerProps = {
   visible?: boolean;
@@ -50,7 +51,7 @@ export default (props: CreateDrawerProps) => {
       if (category === IdentityProviderCategory.enterprise) {
         form?.setFieldsValue({
           displayed: true,
-          type: IdentityProviderType.dingtalk_qr,
+          type: IdentityProviderType.dingtalk_oauth,
         });
       }
       if (category === IdentityProviderCategory.social) {
@@ -108,36 +109,51 @@ export default (props: CreateDrawerProps) => {
                   required: true,
                 },
               ]}
+              fieldProps={{
+                optionRender: ({ data }) => {
+                  return (
+                    <Space>
+                      <Avatar shape={'square'} src={ICON_LIST[data?.icon]} />
+                      {data.label}
+                    </Space>
+                  );
+                },
+              }}
               options={[
                 {
                   value: IdentityProviderType.wechat_qr,
                   label: intl.formatMessage({
                     id: 'pages.authn.identity_provider.create_modal.form.type.wechat_qr',
                   }),
+                  icon: IdentityProviderType.wechat_qr,
                 },
                 {
                   value: IdentityProviderType.qq_oauth,
                   label: intl.formatMessage({
                     id: 'pages.authn.identity_provider.create_modal.form.type.qq',
                   }),
+                  icon: IdentityProviderType.qq_oauth,
                 },
                 {
                   value: IdentityProviderType.alipay_oauth,
                   label: intl.formatMessage({
                     id: 'pages.authn.identity_provider.create_modal.form.type.alipay_oauth',
                   }),
+                  icon: IdentityProviderType.alipay_oauth,
                 },
                 {
                   value: IdentityProviderType.github_oauth,
                   label: intl.formatMessage({
                     id: 'pages.authn.identity_provider.create_modal.form.type.github',
                   }),
+                  icon: IdentityProviderType.github_oauth,
                 },
                 {
                   value: IdentityProviderType.gitee_oauth,
                   label: intl.formatMessage({
                     id: 'pages.authn.identity_provider.create_modal.form.type.gitee',
                   }),
+                  icon: IdentityProviderType.gitee_oauth,
                 },
               ]}
             />
@@ -166,30 +182,37 @@ export default (props: CreateDrawerProps) => {
                   required: true,
                 },
               ]}
+              fieldProps={{
+                optionRender: ({ data }) => {
+                  return (
+                    <Space>
+                      <Avatar shape={'square'} src={ICON_LIST[data?.icon]} />
+                      {data.label}
+                    </Space>
+                  );
+                },
+              }}
               options={[
                 {
                   value: IdentityProviderType.dingtalk_oauth,
                   label: intl.formatMessage({
                     id: 'pages.authn.identity_provider.create_modal.form.type.dingtalk_oauth',
                   }),
-                },
-                {
-                  value: IdentityProviderType.dingtalk_qr,
-                  label: intl.formatMessage({
-                    id: 'pages.authn.identity_provider.create_modal.form.type.dingtalk_qr',
-                  }),
+                  icon: IdentityProviderType.dingtalk_oauth,
                 },
                 {
                   value: IdentityProviderType.feishu_oauth,
                   label: intl.formatMessage({
                     id: 'pages.authn.identity_provider.create_modal.form.type.feishu_oauth',
                   }),
+                  icon: IdentityProviderType.feishu_oauth,
                 },
                 {
-                  value: IdentityProviderType.wechatwork_qr,
+                  value: IdentityProviderType.wechatwork_oauth,
                   label: intl.formatMessage({
-                    id: 'pages.authn.identity_provider.create_modal.form.type.wechatwork_qr',
+                    id: 'pages.authn.identity_provider.create_modal.form.type.wechatwork_oauth',
                   }),
+                  icon: IdentityProviderType.wechatwork_oauth,
                 },
               ]}
             />
