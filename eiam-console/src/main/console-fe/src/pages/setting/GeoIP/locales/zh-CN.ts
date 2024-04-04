@@ -21,6 +21,7 @@ export default {
     '配置IP地理库根据访问者的IP地址迅速识别出其所在的地理位置。通过识别用户IP地址的地理位置，可以根据地理位置信息制定相应的访问策略，从而提高系统的安全性。例如，您可以设置地区限制，阻止来自特定国家或地区的潜在恶意访问。',
   'pages.setting.geoip.form.content': '关闭此功能将无法使用地理位置服务，请确认是否关闭。',
   'pages.setting.geoip.form_select': '提供商',
+  'pages.setting.geoip.form_select.option.default': '系统默认',
   'pages.setting.geoip.form_select.option.maxmind': 'MaxMind',
   'pages.setting.geoip.maxmind.form_text.label': '注册码',
   'pages.setting.geoip.maxmind.form_text.placeholder': '请输入MaxMind注册码',
