@@ -170,7 +170,10 @@ export default (props: {
             },
           ]}
           phoneName={FieldNames.PHONE}
-          addonBefore={<PhoneAreaCodeSelect defaultValue={phoneRegion} onChange={setPhoneRegion} />}
+          addonWarpStyle={{
+          flexWrap: 'nowrap',
+        }}
+addonBefore={<PhoneAreaCodeSelect defaultValue={phoneRegion} onChange={setPhoneRegion} />}
           onGetCaptcha={async (mobile) => {
             if (!(await formRef.current?.validateFields([FieldNames.PASSWORD]))) {
               return Promise.reject();
