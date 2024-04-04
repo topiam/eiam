@@ -55,7 +55,7 @@ export default (props: { id: string }) => {
       fixed: 'left',
       ellipsis: true,
       width: 100,
-      render: (dom, record) => (
+      render: (_dom, record) => (
         <Space>
           {record?.avatar ? (
             <Avatar
