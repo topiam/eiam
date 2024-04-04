@@ -17,24 +17,21 @@
  */
 package cn.topiam.employee.audit.service.impl;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Predicate;
 
 import cn.topiam.employee.audit.controller.pojo.AuditListQuery;
 import cn.topiam.employee.audit.controller.pojo.AuditListResult;
 import cn.topiam.employee.audit.controller.pojo.DictResult;
-import cn.topiam.employee.audit.entity.QAuditEntity;
+import cn.topiam.employee.audit.entity.AuditEntity;
 import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.audit.repository.AuditRepository;
 import cn.topiam.employee.audit.service.AuditService;
@@ -46,7 +43,6 @@ import cn.topiam.employee.support.security.userdetails.UserType;
 import cn.topiam.employee.support.security.util.SecurityUtils;
 
 import lombok.RequiredArgsConstructor;
-import static cn.topiam.employee.audit.service.converter.AuditDataConverter.SORT_EVENT_TIME;
 import static cn.topiam.employee.support.security.userdetails.UserType.USER;
 
 /**
@@ -73,21 +69,14 @@ public class AuditServiceImpl implements AuditService {
             throw new BadParamsException("用户类型错误");
         }
         //查询入参转查询条件
-        Predicate predicate = auditDataConverter.auditListRequestConvertToPredicate(query);
-        // 字段排序
-        OrderSpecifier<LocalDateTime> order = QAuditEntity.auditEntity.eventTime.desc();
-        for (PageModel.Sort sort : page.getSorts()) {
-            if (org.apache.commons.lang3.StringUtils.equals(sort.getSorter(), SORT_EVENT_TIME)) {
-                if (sort.getAsc()) {
-                    order = QAuditEntity.auditEntity.eventTime.asc();
-                }
-            }
-        }
+        Specification<AuditEntity> specification = auditDataConverter
+            .auditListRequestConvertToSpecification(query, page);
+
         //分页条件
-        QPageRequest request = QPageRequest.of(page.getCurrent(), page.getPageSize(), order);
+        PageRequest request = PageRequest.of(page.getCurrent(), page.getPageSize());
         //查询列表
         return auditDataConverter
-            .entityConvertToAuditListResult(auditRepository.findAll(predicate, request), page);
+            .entityConvertToAuditListResult(auditRepository.findAll(specification, request), page);
     }
 
     /**
