@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import type { RangePickerProps } from 'antd/es/date-picker/generatePicker';
 import dayjs from 'dayjs';
 import { Type } from '../TimeRange/TimeRange';
+import { RangePickerProps } from 'antd/es/date-picker';
 
-export type RangePickerValue = RangePickerProps<dayjs.Dayjs>['value'];
+export type RangePickerValue = RangePickerProps['value'];
 
 export function fixedZero(val: number) {
   return val < 10 ? `0${val}` : val;

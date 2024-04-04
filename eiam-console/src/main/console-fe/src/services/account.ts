@@ -59,7 +59,7 @@ export async function getFilterOrganizationTree(
  * Get organization Details
  */
 export async function getOrganization(
-  id: string | number,
+  id: Key,
 ): Promise<API.ApiResult<AccountAPI.GetOrganization>> {
   return request<API.ApiResult<AccountAPI.GetOrganization>>(`/api/v1/organization/get/${id}`);
 }
@@ -128,8 +128,8 @@ export async function moveOrganization(
  */
 export async function getUserList(
   params: Record<string, any>,
-  sort: Record<string, SortOrder>,
-  filter: Record<string, (string | number)[] | null>,
+  sort?: Record<string, SortOrder>,
+  filter?: Record<string, (string | number)[] | null>,
 ): Promise<RequestData<AccountAPI.ListUser>> {
   return request<API.ApiResult<AccountAPI.ListUser>>('/api/v1/user/list', {
     params: { ...params, ...sortParamConverter(sort), ...filterParamConverter(filter) },
@@ -419,7 +419,7 @@ export async function removeUserGroup(id: string): Promise<API.ApiResult<boolean
  */
 export async function removeUserGroupMember(
   id: string,
-  userIds: (number | string)[],
+  userIds: (number | string | Key)[],
 ): Promise<API.ApiResult<boolean>> {
   return request<API.ApiResult<boolean>>(`/api/v1/user_group/remove_member/${id}`, {
     method: 'DELETE',

@@ -135,7 +135,7 @@ export default (props: {
               }),
             },
             {
-              validator: async (rule, value) => {
+              validator: async (_rule, value) => {
                 if (!value) {
                   return Promise.resolve();
                 }
@@ -203,7 +203,7 @@ export default (props: {
                     validateTrigger: ['onBlur'],
                   },
                   {
-                    validator: async (rule, value) => {
+                    validator: async (_rule, value) => {
                       if (!value) {
                         return Promise.resolve();
                       }
@@ -285,7 +285,7 @@ export default (props: {
               }),
             },
             {
-              validator: async (rule, value) => {
+              validator: async (_rule, value) => {
                 if (!value) {
                   return Promise.resolve();
                 }

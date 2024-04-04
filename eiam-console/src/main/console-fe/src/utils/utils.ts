@@ -91,7 +91,7 @@ export const jsonToUrlParams = (params: Record<string, any>) => {
  *
  * @param value
  */
-export const sortParamConverter = (value: Record<string, SortOrder> | undefined) => {
+export const sortParamConverter = (value?: Record<string, SortOrder> | undefined) => {
   const param: Record<string, any> = {};
   if (value)
     Object.entries(value).forEach(([key, sort], index) => {
@@ -106,7 +106,7 @@ export const sortParamConverter = (value: Record<string, SortOrder> | undefined)
  *
  * @param value
  */
-export const filterParamConverter = (value: Record<string, (string | number)[] | null>) => {
+export const filterParamConverter = (value?: Record<string, (string | number)[] | null>) => {
   const param: Record<string, any> = {};
   if (value)
     Object.entries(value).forEach(([key], index) => {

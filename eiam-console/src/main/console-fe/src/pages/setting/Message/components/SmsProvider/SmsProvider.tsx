@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { SMS_PROVIDER } from '@/constant';
-import { Language } from '@/pages/setting/Storage/constant';
+import { Language } from '../../constant';
 import {
   disableSmsProvider,
   getSmsProviderConfig,
@@ -45,7 +45,7 @@ import QiNiu from './QiNiu';
 import Tencent from './Tencent';
 import { Container } from '@/components/Container';
 import { useIntl } from '@umijs/max';
-import { SmsTemplateList } from '@/pages/setting/Message/data';
+import { SmsTemplateList } from '../../data.d';
 
 const layout = {
   labelCol: {
@@ -345,13 +345,13 @@ export default (props: { visible: boolean }) => {
               },
             }}
             onFinish={async (values) => {
-              const fieldsValue: any = editorFormRef.current?.getFieldsValue();
+              const fieldsValue = editorFormRef.current?.getFieldsValue();
               const templates: { type: string; code: string }[] = [];
-              editableKeys?.forEach((i) => {
-                if (fieldsValue[i].code !== undefined) {
+              editableKeys?.forEach((i, index) => {
+                if (fieldsValue?.[index].code !== undefined) {
                   const config: { type: string; code: string } = {
                     type: `${i}`,
-                    code: fieldsValue[i].code,
+                    code: fieldsValue[index].code,
                   };
                   templates.push(config);
                 }
