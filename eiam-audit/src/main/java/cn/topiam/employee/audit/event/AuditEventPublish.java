@@ -303,7 +303,7 @@ public class AuditEventPublish {
                     .ip(geoLocation.getIp())
                     .provider(geoLocation.getProvider())
                     .build();
-       }
+        }
         GeoPoint geoPoint = null;
         if (!Objects.isNull(geoLocation.getLatitude()) && !Objects.isNull(geoLocation.getLongitude())) {
             geoPoint = new GeoPoint(geoLocation.getLatitude(), geoLocation.getLongitude());

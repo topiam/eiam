@@ -20,8 +20,8 @@ package cn.topiam.employee.audit.repository;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -36,7 +36,7 @@ import cn.topiam.employee.support.repository.LogicDeleteRepository;
  */
 @Repository
 public interface AuditRepository extends LogicDeleteRepository<AuditEntity, Long>,
-                                 QuerydslPredicateExecutor<AuditEntity>, AuditCustomizedRepository {
+                                 AuditCustomizedRepository, JpaSpecificationExecutor<AuditEntity> {
 
     /**
      * 统计指定时间范围内用户登录失败次数

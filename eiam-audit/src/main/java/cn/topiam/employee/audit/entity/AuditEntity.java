@@ -21,9 +21,10 @@ import java.io.Serial;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.Where;
+import org.hibernate.type.SqlTypes;
 
 import cn.topiam.employee.audit.enums.EventStatus;
 import cn.topiam.employee.audit.event.type.EventType;
@@ -36,7 +37,6 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -61,92 +61,98 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
 public class AuditEntity extends LogicDeleteEntity<Long> {
 
     @Serial
-    private static final long serialVersionUID = -3119319193111206582L;
+    private static final long  serialVersionUID      = -3119319193111206582L;
+
+    public static final String EVENT_TYPE_FIELD_NAME = "eventType";
+
+    public static final String ACTOR_ID_FIELD_NAME   = "actorId";
+
+    public static final String EVENT_TIME_FIELD_NAME = "eventTime";
 
     /**
      * Request Id
      */
     @Column(name = "request_id")
-    private String            requestId;
+    private String             requestId;
 
     /**
      * Session Id
      */
     @Column(name = "session_id")
-    private String            sessionId;
+    private String             sessionId;
 
     /**
      * 操作目标
      */
-    @Type(JsonType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "target_")
-    private List<Target>      targets;
+    private List<Target>       targets;
 
     /**
      * UserAgent
      */
-    @Type(JsonType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "user_agent")
-    private UserAgent         userAgent;
+    private UserAgent          userAgent;
 
     /**
      * 地理位置
      */
-    @Type(JsonType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "geo_location")
-    private GeoLocation       geoLocation;
+    private GeoLocation        geoLocation;
 
     /**
      * 审计事件类型
      */
     @Column(name = "event_type")
-    private EventType         eventType;
+    private EventType          eventType;
 
     /**
      * 参数
      */
     @Column(name = "event_param")
-    private String            eventParam;
+    private String             eventParam;
 
     /**
      * 事件内容
      */
     @Column(name = "event_content")
-    private String            eventContent;
+    private String             eventContent;
 
     /**
      * 事件结果
      */
     @Column(name = "event_result")
-    private String            eventResult;
+    private String             eventResult;
 
     /**
      * 事件时间
      */
     @Column(name = "event_time")
-    private LocalDateTime     eventTime;
+    private LocalDateTime      eventTime;
 
     /**
      * 事件状态
      */
     @Column(name = "event_status")
-    private EventStatus       eventStatus;
+    private EventStatus        eventStatus;
 
     /**
      * 操作者ID
      */
     @Column(name = "actor_id")
-    private String            actorId;
+    private String             actorId;
 
     /**
      * 操作人类型
      */
     @Column(name = "actor_type")
-    private UserType          actorType;
+    private UserType           actorType;
 
     /**
      * 身份验证类型
      */
     @Column(name = "actor_auth_type")
-    private String            actorAuthType;
+    private String             actorAuthType;
 }

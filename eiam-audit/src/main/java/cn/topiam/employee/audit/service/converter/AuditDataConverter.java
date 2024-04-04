@@ -23,16 +23,13 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.mapstruct.Mapper;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
 
 import cn.topiam.employee.audit.controller.pojo.AuditListQuery;
 import cn.topiam.employee.audit.controller.pojo.AuditListResult;
 import cn.topiam.employee.audit.entity.AuditEntity;
-import cn.topiam.employee.audit.entity.QAuditEntity;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.common.entity.account.OrganizationEntity;
@@ -49,12 +46,16 @@ import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.common.repository.app.AppRepository;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 import cn.topiam.employee.common.repository.identitysource.IdentitySourceRepository;
-import cn.topiam.employee.common.repository.setting.*;
+import cn.topiam.employee.common.repository.setting.AdministratorRepository;
+import cn.topiam.employee.common.repository.setting.MailTemplateRepository;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.security.userdetails.UserType;
 import cn.topiam.employee.support.security.util.SecurityUtils;
+
+import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Predicate;
 
 /**
  * 审计数据转换
@@ -129,8 +130,7 @@ public interface AuditDataConverter {
         if (UserType.USER.equals(actorType)) {
             UserRepository repository = ApplicationContextHelp.getBean(UserRepository.class);
             UserEntity user = repository.findById(Long.valueOf(actorId)).orElse(new UserEntity());
-            return org.apache.commons.lang3.StringUtils.defaultString(user.getFullName(),
-                user.getUsername());
+            return Objects.toString(user.getFullName(), user.getUsername());
         }
         if (UserType.ADMIN.equals(actorType)) {
             AdministratorRepository repository = ApplicationContextHelp
@@ -148,67 +148,82 @@ public interface AuditDataConverter {
      * @param query {@link AuditListQuery}
      * @return {@link Predicate}
      */
-    default Predicate auditListRequestConvertToPredicate(AuditListQuery query) {
-        QAuditEntity auditEntity = QAuditEntity.auditEntity;
-        Predicate predicate = ExpressionUtils.and(auditEntity.isNotNull(),
-            auditEntity.deleted.eq(Boolean.FALSE));
-        UserType userType = SecurityUtils.getCurrentUser().getUserType();
-        // 登录角色 管理员
-        if (UserType.ADMIN.equals(userType)) {
-            if (StringUtils.hasText(query.getUsername())) {
-                String actorId = "";
-                if (UserType.USER.getType().equals(query.getUserType())) {
-                    UserRepository userRepository = ApplicationContextHelp
-                        .getBean(UserRepository.class);
-                    UserEntity user = userRepository.findByUsername(query.getUsername());
-                    if (!Objects.isNull(user)) {
-                        actorId = user.getId().toString();
+    default Specification<AuditEntity> auditListRequestConvertToSpecification(AuditListQuery query,
+                                                                              PageModel page) {
+        return (root, criteriaQuery, criteriaBuilder) -> {
+            ArrayList<Predicate> predicates = new ArrayList<>();
+            ArrayList<Order> orders = new ArrayList<>();
+            UserType userType = SecurityUtils.getCurrentUser().getUserType();
+            // 登录角色 管理员
+            if (UserType.ADMIN.equals(userType)) {
+                if (StringUtils.hasText(query.getUsername())) {
+                    String actorId = "";
+                    if (UserType.USER.getType().equals(query.getUserType())) {
+                        UserRepository userRepository = ApplicationContextHelp
+                            .getBean(UserRepository.class);
+                        UserEntity user = userRepository.findByUsername(query.getUsername());
+                        if (!Objects.isNull(user)) {
+                            actorId = user.getId().toString();
+                        }
                     }
+                    if (UserType.ADMIN.getType().equals(query.getUserType())) {
+                        AdministratorRepository administratorRepository = ApplicationContextHelp
+                            .getBean(AdministratorRepository.class);
+                        Optional<AdministratorEntity> optional = administratorRepository
+                            .findByUsername(query.getUsername());
+                        if (optional.isPresent()) {
+                            actorId = optional.get().getId().toString();
+                        }
+                    }
+                    if (StringUtils.hasText(actorId)) {
+                        predicates.add(criteriaBuilder.equal(root.get("actorId"), actorId));
+                    }
+                }
+                // 用户类型
+                if (UserType.USER.getType().equals(query.getUserType())) {
+                    predicates.add(criteriaBuilder.equal(root.get("actorType"), UserType.USER));
                 }
                 if (UserType.ADMIN.getType().equals(query.getUserType())) {
-                    AdministratorRepository administratorRepository = ApplicationContextHelp
-                        .getBean(AdministratorRepository.class);
-                    Optional<AdministratorEntity> optional = administratorRepository
-                        .findByUsername(query.getUsername());
-                    if (optional.isPresent()) {
-                        actorId = optional.get().getId().toString();
+                    predicates.add(criteriaBuilder.equal(root.get("actorType"), UserType.ADMIN));
+                }
+            }
+            // 登录角色 用户
+            if (UserType.USER.equals(userType)) {
+                predicates.add(criteriaBuilder.equal(root.get("actorId"),
+                    SecurityUtils.getCurrentUser().getId()));
+                // 用户类型
+                predicates.add(criteriaBuilder.equal(root.get("actorType"), UserType.USER));
+            }
+            // 事件类型
+            if (!CollectionUtils.isEmpty(query.getEventType())) {
+                predicates
+                    .add(criteriaBuilder.in(root.get("eventType")).value(query.getEventType()));
+            }
+            // 事件状态
+            if (Objects.nonNull(query.getEventStatus())) {
+                predicates
+                    .add(criteriaBuilder.equal(root.get("eventStatus"), query.getEventStatus()));
+            }
+            // 事件时间
+            if (!Objects.isNull(query.getStartEventTime())
+                && !Objects.isNull(query.getEndEventTime())) {
+                predicates.add(criteriaBuilder.between(root.get("eventTime"),
+                    query.getStartEventTime(), query.getEndEventTime()));
+            }
+            //默认desc
+            criteriaQuery.orderBy(criteriaBuilder.desc(root.get("eventTime")));
+            for (PageModel.Sort sort : page.getSorts()) {
+                if (org.apache.commons.lang3.StringUtils.equals(sort.getSorter(),
+                    SORT_EVENT_TIME)) {
+                    if (sort.getAsc()) {
+                        orders.add(criteriaBuilder.asc(root.get("eventTime")));
                     }
                 }
-                predicate = ExpressionUtils.and(predicate, auditEntity.actorId.eq(actorId));
             }
-            // 用户类型
-            if (UserType.USER.getType().equals(query.getUserType())) {
-                predicate = ExpressionUtils.and(predicate, auditEntity.actorType.eq(UserType.USER));
-            }
-            if (UserType.ADMIN.getType().equals(query.getUserType())) {
-                predicate = ExpressionUtils.and(predicate,
-                    auditEntity.actorType.eq(UserType.ADMIN));
-            }
-        }
-        // 登录角色 管理员
-        if (UserType.USER.equals(userType)) {
-            predicate = ExpressionUtils.and(predicate,
-                auditEntity.actorId.eq(SecurityUtils.getCurrentUser().getId()));
-            // 用户类型
-            predicate = ExpressionUtils.and(predicate, auditEntity.actorType.eq(UserType.USER));
-        }
-        // 事件类型
-        if (!CollectionUtils.isEmpty(query.getEventType())) {
-            predicate = ExpressionUtils.and(predicate,
-                auditEntity.eventType.in(query.getEventType()));
-        }
-        // 事件状态
-        if (Objects.nonNull(query.getEventStatus())) {
-            predicate = ExpressionUtils.and(predicate,
-                auditEntity.eventStatus.in(query.getEventStatus()));
-        }
-        // 事件时间
-        if (!Objects.isNull(query.getStartEventTime())
-            && !Objects.isNull(query.getEndEventTime())) {
-            predicate = ExpressionUtils.and(predicate,
-                auditEntity.eventTime.between(query.getStartEventTime(), query.getEndEventTime()));
-        }
-        return predicate;
+            criteriaQuery.orderBy(orders);
+            criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
+            return criteriaQuery.getRestriction();
+        };
     }
 
     /**
@@ -227,7 +242,7 @@ public interface AuditDataConverter {
             Optional<UserEntity> user = userRepository.findByIdContainsDeleted(Long.valueOf(id));
             if (user.isPresent()) {
                 UserEntity entity = user.get();
-                name = org.apache.commons.lang3.StringUtils.defaultString(entity.getFullName(),
+                name = Objects.toString(entity.getFullName(),
                     entity.getUsername());
             }
         }
