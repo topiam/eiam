@@ -30,7 +30,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>eiam-protocol-all</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
     <dependencies>
         <dependency>
             <groupId>cn.topiam</groupId>
