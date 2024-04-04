@@ -59,7 +59,7 @@ export const requestConfig: RequestConfig = {
               };
             }
             const href = history.createHref(settings);
-            window.location.replace(href);
+            history.push(href);
           }
           return;
         }
