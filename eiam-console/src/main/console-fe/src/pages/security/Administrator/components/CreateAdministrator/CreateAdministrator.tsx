@@ -243,6 +243,9 @@ export default (props: {
                     validateTrigger: ['onBlur'],
                   },
                 ]}
+                addonWarpStyle={{
+                  flexWrap: 'nowrap',
+                }}
                 addonBefore={
                   <FormPhoneAreaCodeSelect
                     name={'phoneAreaCode'}

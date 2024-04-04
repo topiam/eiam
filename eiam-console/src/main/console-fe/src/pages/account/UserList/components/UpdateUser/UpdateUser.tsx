@@ -249,6 +249,9 @@ const UpdateUser = (props: UpdateFormProps) => {
                       validator: validatePhoneOrEmail,
                     },
                   ]}
+                  addonWarpStyle={{
+                    flexWrap: 'nowrap',
+                  }}
                   addonBefore={
                     <FormPhoneAreaCodeSelect name={'phoneAreaCode'} showSearch noStyle />
                   }

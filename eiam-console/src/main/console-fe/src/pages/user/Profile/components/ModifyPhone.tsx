@@ -170,6 +170,9 @@ export default (props: {
                   },
                 ]}
                 phoneName={FieldNames.PHONE}
+                addonWarpStyle={{
+                  flexWrap: 'nowrap',
+                }}
                 addonBefore={
                   <FormPhoneAreaCodeSelect
                     name={'phoneAreaCode'}

@@ -407,6 +407,9 @@ const CreateUser = (props: CreateUserProps) => {
                       validator: validatePhoneOrEmail,
                     },
                   ]}
+                  addonWarpStyle={{
+                    flexWrap: 'nowrap',
+                  }}
                   addonBefore={
                     <FormPhoneAreaCodeSelect
                       name={'phoneAreaCode'}
