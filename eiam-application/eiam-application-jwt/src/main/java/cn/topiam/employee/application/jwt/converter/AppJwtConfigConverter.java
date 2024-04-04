@@ -30,7 +30,7 @@ import cn.topiam.employee.application.jwt.pojo.AppJwtSaveConfigParam;
 import cn.topiam.employee.common.entity.app.AppJwtConfigEntity;
 import cn.topiam.employee.common.entity.app.po.AppJwtConfigPO;
 import cn.topiam.employee.core.help.ServerHelp;
-import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CODE;
+import static cn.topiam.employee.common.constant.AppConstants.APP_CODE;
 import static cn.topiam.employee.common.constant.ProtocolConstants.JwtEndpointConstants.JWT_SLO_PATH;
 import static cn.topiam.employee.common.constant.ProtocolConstants.JwtEndpointConstants.JWT_SSO_PATH;
 

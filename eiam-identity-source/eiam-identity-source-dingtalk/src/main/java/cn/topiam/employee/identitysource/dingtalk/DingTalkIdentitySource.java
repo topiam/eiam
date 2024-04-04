@@ -34,7 +34,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider;
-import cn.topiam.employee.common.util.RequestUtils;
 import cn.topiam.employee.identitysource.core.AbstractDefaultIdentitySource;
 import cn.topiam.employee.identitysource.core.client.IdentitySourceClient;
 import cn.topiam.employee.identitysource.core.enums.IdentitySourceEventReceiveType;
@@ -44,6 +43,7 @@ import cn.topiam.employee.identitysource.core.processor.IdentitySourceSyncUserPo
 import cn.topiam.employee.identitysource.core.processor.modal.IdentitySourceEventProcessData;
 import cn.topiam.employee.identitysource.dingtalk.enums.DingTalkEventType;
 import cn.topiam.employee.identitysource.dingtalk.util.DingTalkEventCryptoUtils;
+import cn.topiam.employee.support.util.HttpRequestUtils;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -75,7 +75,7 @@ public class DingTalkIdentitySource extends AbstractDefaultIdentitySource<DingTa
     @Override
     public Object event(HttpServletRequest request, String body) {
         LocalDateTime eventTime = LocalDateTime.now();
-        Map<String, Object> params = RequestUtils.getParams(request);
+        Map<String, String> params = HttpRequestUtils.getRequestParameters(request);
         if (StringUtils.isNoneBlank(body)) {
             String encrypt = JSON.parseObject(body).getString(ENCRYPT);
             log.info("钉钉身份源 [{}] 回调入参: {}, encrypt: {}", getId(), JSON.toJSONString(params),
@@ -96,13 +96,13 @@ public class DingTalkIdentitySource extends AbstractDefaultIdentitySource<DingTa
      * @param syncMap {@link  Map}
      * @return {@link  Map}
      */
-    private Object eventCallBack(LocalDateTime eventTime, Map<String, Object> syncMap,
+    private Object eventCallBack(LocalDateTime eventTime, Map<String, String> syncMap,
                                  String encrypt) {
         try {
             DingTalkConfig config = getConfig();
-            String msgSignature = (String) syncMap.get(MSG_SIGNATURE);
-            String timeStamp = (String) syncMap.get(TIMESTAMP);
-            String nonce = (String) syncMap.get(NONCE);
+            String msgSignature = syncMap.get(MSG_SIGNATURE);
+            String timeStamp = syncMap.get(TIMESTAMP);
+            String nonce = syncMap.get(NONCE);
             DingTalkEventCryptoUtils eventCryptoUtils = new DingTalkEventCryptoUtils(
                 config.getToken(), config.getAesKey(), config.getAppKey());
             String decryptMsg = eventCryptoUtils.getDecryptMsg(msgSignature, timeStamp, nonce,

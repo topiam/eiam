@@ -17,18 +17,14 @@
  */
 package cn.topiam.employee.core.security.password.manager;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.querydsl.QSort;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.BooleanExpression;
-
-import cn.topiam.employee.common.entity.account.QUserHistoryPasswordEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.entity.account.UserHistoryPasswordEntity;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
@@ -42,6 +38,7 @@ import cn.topiam.employee.support.security.password.enums.PasswordComplexityRule
 import cn.topiam.employee.support.security.password.validator.*;
 import cn.topiam.employee.support.security.password.weak.PasswordWeakLib;
 import static cn.topiam.employee.core.setting.constant.PasswordPolicySettingConstants.*;
+import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_TIME;
 
 /**
  * 密码策略管理器
@@ -83,7 +80,7 @@ public class DefaultPasswordPolicyManager implements PasswordPolicyManager<UserE
         if (userId.getId() != null) {
             //@formatter:off
             validators.add(getPasswordIncludeUserInfoValidator(userId.getId()));
-            validators.add(getHistoryPasswordValidator(userId.getId()));
+            validators.add(getHistoryPasswordValidator(String.valueOf(userId.getId())));
             //@formatter:on
         }
         validators.forEach(passwordValidator -> passwordValidator.validate(password));
@@ -117,7 +114,7 @@ public class DefaultPasswordPolicyManager implements PasswordPolicyManager<UserE
      *
      * @return {@link  HistoryPasswordValidator}
      */
-    private HistoryPasswordValidator getHistoryPasswordValidator(Long userId) {
+    private HistoryPasswordValidator getHistoryPasswordValidator(String userId) {
         SettingEntity historyCipherCheck = settingRepository.findByName(PasswordPolicySettingConstants.PASSWORD_POLICY_HISTORY_PASSWORD_CHECK);
         boolean enabled = Objects.isNull(historyCipherCheck)
                 ? Boolean.parseBoolean(PasswordPolicySettingConstants.PASSWORD_POLICY_DEFAULT_SETTINGS.get(PASSWORD_POLICY_HISTORY_PASSWORD_CHECK))
@@ -127,11 +124,9 @@ public class DefaultPasswordPolicyManager implements PasswordPolicyManager<UserE
             Integer count = Objects.isNull(historyCipherCheckCount)
                     ? Integer.valueOf(PasswordPolicySettingConstants.PASSWORD_POLICY_DEFAULT_SETTINGS.get(PASSWORD_POLICY_HISTORY_PASSWORD_CHECK_COUNT))
                     : Integer.valueOf(historyCipherCheckCount.getValue());
-            //构建查询条件
-            QUserHistoryPasswordEntity historyPasswordEntity = QUserHistoryPasswordEntity.userHistoryPasswordEntity;
-            BooleanExpression expression = historyPasswordEntity.userId.eq(String.valueOf(userId));
-            OrderSpecifier<LocalDateTime> desc = historyPasswordEntity.updateTime.desc();
-            Page<UserHistoryPasswordEntity> entities = userHistoryPasswordRepository.findAll(expression, PageRequest.of(0, count, QSort.by(desc)));
+            Page<UserHistoryPasswordEntity> entities = userHistoryPasswordRepository.findAll(
+                    Example.of(new UserHistoryPasswordEntity().setUserId(userId)),
+                    PageRequest.of(0, count, Sort.by(Sort.Direction.DESC, LAST_MODIFIED_TIME)));
             //构建历史密码验证器
             new HistoryPasswordValidator(entities.getContent().stream().map(UserHistoryPasswordEntity::getPassword).toList(), passwordEncoder);
         }

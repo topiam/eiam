@@ -27,17 +27,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
-import cn.topiam.employee.common.entity.account.*;
+import cn.topiam.employee.common.entity.account.OrganizationEntity;
 import cn.topiam.employee.common.repository.account.OrganizationRepository;
 import cn.topiam.employee.openapi.constant.OpenApiStatus;
 import cn.topiam.employee.openapi.converter.account.OrganizationConverter;
@@ -210,7 +203,7 @@ public class OrganizationServiceImpl implements OrganizationService {
             List<OrganizationEntity> list = organizationRepository.findByParentId(id);
             if (CollectionUtils.isEmpty(list)) {
                 //查询当前机构和当前机构下子机构下是否存在用户，不存在删除，存在抛出异常
-                Long count = getOrgMemberCount(id);
+                Integer count = getOrgMemberCount(id);
                 if (count > 0) {
                     throw new OpenApiException(OpenApiStatus.DEPARTMENT_HAS_USER);
                 }
@@ -265,23 +258,9 @@ public class OrganizationServiceImpl implements OrganizationService {
      * @param orgId {@link  String}
      * @return {@link  Long}
      */
-    public Long getOrgMemberCount(String orgId) {
-        //条件
-        QUserEntity user = QUserEntity.userEntity;
-        QOrganizationEntity qOrganization = QOrganizationEntity.organizationEntity;
-        Predicate predicate = ExpressionUtils.and(user.isNotNull(), user.deleted.eq(Boolean.FALSE));
-        //FIND_IN_SET函数
-        BooleanExpression template = Expressions.booleanTemplate(
-            "FIND_IN_SET({0}, replace({1}, '/', ','))> 0", orgId, qOrganization.path);
-        predicate = ExpressionUtils.and(predicate, qOrganization.id.eq(orgId).or(template));
-        //构造查询
-        JPAQuery<Long> jpaQuery = jpaQueryFactory.selectFrom(user).select(user.count())
-            .innerJoin(QOrganizationMemberEntity.organizationMemberEntity)
-            .on(user.id.eq(QOrganizationMemberEntity.organizationMemberEntity.userId))
-            .innerJoin(qOrganization)
-            .on(qOrganization.id.eq(QOrganizationMemberEntity.organizationMemberEntity.orgId))
-            .where(predicate);
-        return jpaQuery.fetch().get(0);
+    public Integer getOrgMemberCount(String orgId) {
+        return organizationRepository.getOrgMemberList(orgId).size();
+
     }
 
     @Override
@@ -291,8 +270,6 @@ public class OrganizationServiceImpl implements OrganizationService {
         return organization.map(IdEntity::getId)
             .orElseThrow(() -> new OpenApiException(OpenApiStatus.DEPARTMENT_NOT_EXIST));
     }
-
-    private final JPAQueryFactory        jpaQueryFactory;
 
     /**
      * 组织架构数据映射器

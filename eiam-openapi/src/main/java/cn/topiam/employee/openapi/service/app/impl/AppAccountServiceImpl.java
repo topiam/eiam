@@ -19,7 +19,7 @@ package cn.topiam.employee.openapi.service.app.impl;
 
 import java.util.Optional;
 
-import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,7 +64,7 @@ public class AppAccountServiceImpl implements AppAccountService {
     public Page<AppAccountListResult> getAppAccountList(PageModel pageModel,
                                                         AppAccountQuery query) {
         //分页条件
-        QPageRequest request = QPageRequest.of(pageModel.getCurrent(), pageModel.getPageSize());
+        PageRequest request = PageRequest.of(pageModel.getCurrent(), pageModel.getPageSize());
         //查询映射
         org.springframework.data.domain.Page<AppAccountPO> list = appAccountRepository
             .getAppAccountList(query, request);

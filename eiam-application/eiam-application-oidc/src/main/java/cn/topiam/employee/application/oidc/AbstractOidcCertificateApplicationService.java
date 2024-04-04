@@ -32,8 +32,9 @@ import cn.topiam.employee.application.oidc.model.OidcProtocolConfig;
 import cn.topiam.employee.common.entity.app.AppCertEntity;
 import cn.topiam.employee.common.entity.app.po.AppOidcConfigPO;
 import cn.topiam.employee.common.repository.app.*;
-import cn.topiam.employee.common.util.X509Utils;
 import static cn.topiam.employee.common.enums.app.AppCertUsingType.OIDC_JWK;
+import static cn.topiam.employee.support.util.CertUtils.readPrivateKey;
+import static cn.topiam.employee.support.util.CertUtils.readPublicKey;
 
 /**
  * OIDC 应用配置
@@ -80,8 +81,8 @@ public abstract class AbstractOidcCertificateApplicationService extends
         //@formatter:off
         try {
 
-            PrivateKey rsaPrivateKey = X509Utils.readPrivateKey(appCert.getPrivateKey(), "");
-            RSAPublicKey rsaPublicKey = (RSAPublicKey) X509Utils.readPublicKey(appCert.getPublicKey(), "");
+            PrivateKey rsaPrivateKey = readPrivateKey(appCert.getPrivateKey(), "");
+            RSAPublicKey rsaPublicKey = (RSAPublicKey) readPublicKey(appCert.getPublicKey(), "");
 
             RSAKey rsaKey = new RSAKey.Builder(rsaPublicKey)
                     .privateKey(rsaPrivateKey)

@@ -67,7 +67,7 @@ public abstract class AbstractCertificateApplicationService extends AbstractAppl
             //算法
             config.setSignAlgo("SHA256WITHRSA");
             RsaUtils.RsaResult keys = getKeys(config.getKeyLong());
-            X500Name x500Name = getX500Name("app_" + appCode, "TopIAM", "Jinan", "Shandong", "CN",
+            X500Name x500Name = getX500Name("app_" + appCode, "TOPIAM", "Jinan", "Shandong", "CN",
                 "EIAM");
             //发行者
             config.setIssuer(x500Name.toString());

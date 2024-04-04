@@ -32,7 +32,7 @@ import cn.topiam.employee.application.form.pojo.AppFormSaveConfigParam;
 import cn.topiam.employee.common.entity.app.AppFormConfigEntity;
 import cn.topiam.employee.common.entity.app.po.AppFormConfigPO;
 import cn.topiam.employee.core.help.ServerHelp;
-import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CODE;
+import static cn.topiam.employee.common.constant.AppConstants.APP_CODE;
 import static cn.topiam.employee.common.constant.ProtocolConstants.FormEndpointConstants.FORM_SSO_PATH;
 
 /**
