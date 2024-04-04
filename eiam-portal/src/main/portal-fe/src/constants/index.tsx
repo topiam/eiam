@@ -39,7 +39,7 @@ export enum IDP_TYPE {
   GITHUB_OAUTH = 'github_oauth',
   ALIPAY_OAUTH = 'alipay_oauth',
   WEIBO_OAUTH = 'weibo_oauth',
-  WECHATWORK_QR = 'wechatwork_qr',
+  WECHATWORK_QR = 'wechatwork_oauth',
 }
 
 export enum SESSION_STATUS {

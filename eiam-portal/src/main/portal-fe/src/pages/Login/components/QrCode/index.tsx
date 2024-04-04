@@ -51,9 +51,9 @@ const Index = (props: { code: string; name: string; type: IDP_TYPE | string }) =
       <Tabs activeKey={type} items={[{ label: name, key: type }]} />
       <div className={'qr'}>
         <div className={'code'}>
-          {/*企业微信扫码*/}
+          {/*企业微信*/}
           {type === IDP_TYPE.WECHATWORK_QR && <WeWorkQrCode code={code} />}
-          {/*钉钉扫码*/}
+          {/*钉钉认证*/}
           {type === IDP_TYPE.DINGTALK_QR && <DingTalkQrCode code={code} />}
           {/*微信扫码*/}
           {type === IDP_TYPE.WECHAT_QR && <WeChatQrCode code={code} />}
