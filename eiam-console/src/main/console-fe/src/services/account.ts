@@ -329,6 +329,15 @@ export async function disableUser(id: string): Promise<API.ApiResult<boolean>> {
 }
 
 /**
+ * UnLock User
+ */
+export async function unlockUser(id: string): Promise<API.ApiResult<boolean>> {
+  return request(`/api/v1/user/unlock/${id}`, {
+    method: 'PUT',
+  });
+}
+
+/**
  * Get user list not in group
  */
 export async function getUserListNotInGroup(
