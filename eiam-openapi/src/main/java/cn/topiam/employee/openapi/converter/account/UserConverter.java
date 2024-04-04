@@ -27,18 +27,16 @@ import org.mapstruct.Mapping;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import cn.topiam.employee.common.constant.CommonConstants;
 import cn.topiam.employee.common.entity.account.UserDetailEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.entity.account.po.UserPO;
-import cn.topiam.employee.common.entity.app.AppEntity;
-import cn.topiam.employee.common.repository.app.AppRepository;
 import cn.topiam.employee.openapi.pojo.result.account.UserListResult;
 import cn.topiam.employee.openapi.pojo.result.account.UserResult;
 import cn.topiam.employee.openapi.pojo.save.account.UserCreateParam;
 import cn.topiam.employee.openapi.pojo.update.account.UserUpdateParam;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.repository.page.domain.Page;
+import static cn.topiam.employee.support.util.ImageAvatarUtils.getRandomAvatar;
 import static cn.topiam.employee.support.util.PhoneNumberUtils.getPhoneAreaCode;
 import static cn.topiam.employee.support.util.PhoneNumberUtils.getPhoneNumber;
 
@@ -110,7 +108,7 @@ public interface UserConverter {
         userEntity.setNickName(param.getNickName());
         userEntity.setLastUpdatePasswordTime(LocalDateTime.now());
         userEntity.setStatus(cn.topiam.employee.common.enums.UserStatus.ENABLE);
-        userEntity.setAvatar(CommonConstants.getRandomAvatar());
+        userEntity.setAvatar(getRandomAvatar());
         userEntity.setDataOrigin(cn.topiam.employee.common.enums.DataOrigin.INPUT);
         userEntity.setExpireDate(
             Objects.isNull(param.getExpireDate()) ? java.time.LocalDate.of(2116, 12, 31)
@@ -230,20 +228,5 @@ public interface UserConverter {
     @Mapping(target = "authTotal", defaultValue = "0L", source = "authTotal")
     @Mapping(target = "dataOrigin", source = "dataOrigin.code")
     UserListResult userPoConvertToUserListResult(UserPO po);
-
-    /**
-     * 获取应用名称
-     *
-     * @param targetId {@link String}
-     * @return {@link String}
-     */
-    private String getAppName(String targetId) {
-        if (!StringUtils.hasText(targetId)) {
-            return null;
-        }
-        AppRepository repository = ApplicationContextHelp.getBean(AppRepository.class);
-        AppEntity app = repository.findById(Long.valueOf(targetId)).orElse(new AppEntity());
-        return app.getName();
-    }
 
 }
