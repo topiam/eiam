@@ -32,7 +32,7 @@ const Settings: ProLayoutProps & {
   title: '统一身份认证平台',
   logo: '/full-logo.svg',
   iconfontUrl: '',
-  siderWidth: 190,
+  siderWidth: 215,
 };
 
 export default Settings;

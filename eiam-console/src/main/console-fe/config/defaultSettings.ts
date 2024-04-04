@@ -31,7 +31,7 @@ const Settings: LayoutSettings & {
   colorWeak: false,
   title: '企业数字身份管控平台',
   logo: '/full-logo.svg',
-  siderWidth: 190,
+  siderWidth: 215,
 };
 
 export default Settings;
