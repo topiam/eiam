@@ -131,7 +131,7 @@
                                 <phase>generate-resources</phase>
                                 <configuration>
                                     <nodeVersion>v20.10.0</nodeVersion>
-                                    <pnpmVersion>v8.15.0</pnpmVersion>
+                                    <pnpmVersion>v8.15.6</pnpmVersion>
                                 </configuration>
                             </execution>
                             <execution>
@@ -183,7 +183,7 @@
                                 <phase>generate-resources</phase>
                                 <configuration>
                                     <nodeVersion>v20.10.0</nodeVersion>
-                                    <pnpmVersion>v8.15.0</pnpmVersion>
+                                    <pnpmVersion>v8.15.6</pnpmVersion>
                                 </configuration>
                             </execution>
                             <execution>
