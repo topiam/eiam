@@ -23,7 +23,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd
           http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/pro/liquibase-pro-4.3.xsd">
     <!--init-->
-    <changeSet author="TopIAM" id="1.1.0">
+    <changeSet author="TOPIAM" id="1.1.0">
         <!--应用分组-->
         <createTable remarks="应用分组" tableName="app_group">
             <column name="id_" remarks="主键ID" type="BIGINT">
