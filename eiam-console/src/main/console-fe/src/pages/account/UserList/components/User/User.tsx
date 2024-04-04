@@ -21,6 +21,7 @@ import {
   getUserList,
   removeBatchUser,
   removeUser,
+  unlockUser,
 } from '@/services/account';
 import { history } from '@@/core/history';
 import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
@@ -74,7 +75,7 @@ export default (props: UserListProps) => {
   const actionRef = useRef<ActionType>();
   const { styles: className } = useStyle();
   const intl = useIntl();
-  let useApp = App.useApp();
+  let { message, modal } = App.useApp();
   const [id, setId] = useState<string>();
   /** 包含子部门*/
   const [inclSubOrganization, setInclSubOrganization] = useState<boolean>(true);
@@ -93,7 +94,7 @@ export default (props: UserListProps) => {
       dataIndex: 'username',
       width: 130,
       ellipsis: true,
-      renderText: (dom, row) => (
+      renderText: (_dom, row) => (
         <Space>
           <Avatar avatar={row.avatar} username={row.username} />
           <a
@@ -249,9 +250,42 @@ export default (props: UserListProps) => {
       width: 110,
       align: 'center',
       fixed: 'right',
-      render: (text: any, row: AccountAPI.ListUser) => {
+      render: (_text: any, row: AccountAPI.ListUser) => {
         return [
           ...[
+            (row.status === 'locked' ||
+              row.status === 'expired_locked' ||
+              row.status === 'password_expired_locked') && (
+              <a
+                key="lock"
+                onClick={() => {
+                  const confirmed = modal.warning({
+                    title: intl.formatMessage({
+                      id: 'pages.account.user_list.user.columns.option.unlock_title',
+                    }),
+                    content: intl.formatMessage({
+                      id: 'pages.account.user_list.user.columns.option.unlock_content',
+                    }),
+                    okText: intl.formatMessage({ id: 'app.confirm' }),
+                    centered: true,
+                    okType: 'primary',
+                    okCancel: true,
+                    cancelText: intl.formatMessage({ id: 'app.cancel' }),
+                    onOk: async () => {
+                      const { success } = await unlockUser(row.id);
+                      if (success) {
+                        confirmed.destroy();
+                        message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                        actionRef.current?.reload();
+                        return;
+                      }
+                    },
+                  });
+                }}
+              >
+                {intl.formatMessage({ id: 'pages.account.user_list.user.columns.option.unlock' })}
+              </a>
+            ),
             row.status === 'enabled' ? (
               <Popconfirm
                 title={intl.formatMessage({
@@ -269,7 +303,7 @@ export default (props: UserListProps) => {
                 onConfirm={async () => {
                   const { success } = await disableUser(row.id);
                   if (success) {
-                    useApp.message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                    message.success(intl.formatMessage({ id: 'app.operation_success' }));
                     actionRef.current?.reload();
                     return;
                   }
@@ -291,7 +325,7 @@ export default (props: UserListProps) => {
                 onConfirm={async () => {
                   const { success } = await enableUser(row.id);
                   if (success) {
-                    useApp.message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                    message.success(intl.formatMessage({ id: 'app.operation_success' }));
                     actionRef.current?.reload();
                     return;
                   }
@@ -340,7 +374,7 @@ export default (props: UserListProps) => {
                     onConfirm={async () => {
                       const { success } = await removeUser(row.id);
                       if (success) {
-                        useApp.message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                        message.success(intl.formatMessage({ id: 'app.operation_success' }));
                         actionRef.current?.reload();
                         return;
                       }
@@ -424,7 +458,7 @@ export default (props: UserListProps) => {
                     onConfirm={async () => {
                       const { success } = await removeBatchUser(selectedRowKeys);
                       if (success) {
-                        useApp.message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                        message.success(intl.formatMessage({ id: 'app.operation_success' }));
                         onCleanSelected();
                         actionRef.current?.reload();
                       }
