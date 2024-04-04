@@ -59,7 +59,13 @@ export default (props: { userGroupId: string }) => {
         rowKey={'id'}
         renderItem={(row) => {
           return (
-            <Card hoverable bodyStyle={{ padding: 0 }} style={{ margin: 10 }}>
+            <Card
+              hoverable
+              styles={{
+                body: { padding: 0 },
+              }}
+              style={{ margin: 10 }}
+            >
               <div className={classNames(`${prefixCls}-content`)} key={row.id}>
                 <div className={classNames(`${prefixCls}-content-status`)} />
                 <div className={classNames(`${prefixCls}-content-title`)}>

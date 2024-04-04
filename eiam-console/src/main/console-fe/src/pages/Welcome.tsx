@@ -102,9 +102,11 @@ const Welcome: React.FC = () => {
         style={{
           borderRadius: 8,
         }}
-        bodyStyle={{
-          backgroundImage:
-            'radial-gradient(circle at 97% 10%, #EBF2FF 0%, #F5F8FF 28%, #EBF1FF 124%)',
+        styles={{
+          body: {
+            backgroundImage:
+              'radial-gradient(circle at 97% 10%, #EBF2FF 0%, #F5F8FF 28%, #EBF1FF 124%)',
+          },
         }}
       >
         <div

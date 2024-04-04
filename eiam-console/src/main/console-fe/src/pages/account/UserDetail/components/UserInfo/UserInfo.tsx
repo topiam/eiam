@@ -78,7 +78,7 @@ export default (props: { userId: string }) => {
       valueType: 'option',
       fixed: 'right',
       width: 100,
-      render: (text, row) => {
+      render: (_text, row) => {
         return [
           <Popconfirm
             title={intl.formatMessage({
@@ -113,11 +113,11 @@ export default (props: { userId: string }) => {
   /**
    * onSave
    *
-   * @param key
+   * @param _key
    * @param record
    */
   const onSave = async (
-    key: React.Key | React.Key[],
+    _key: React.Key | React.Key[],
     record: AccountAPI.UpdateUser,
   ): Promise<any | void> => {
     const { success } = await updateUser(
@@ -317,7 +317,7 @@ export default (props: { userId: string }) => {
                       }),
                     },
                     {
-                      validator: async (rule, value) => {
+                      validator: async (_rule, value) => {
                         if (!value) {
                           return Promise.resolve();
                         }
@@ -357,7 +357,7 @@ export default (props: { userId: string }) => {
                       }),
                     },
                     {
-                      validator: async (rule, value) => {
+                      validator: async (_rule, value) => {
                         if (!value) {
                           return Promise.resolve();
                         }
