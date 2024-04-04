@@ -29,7 +29,7 @@ import cn.topiam.employee.authentication.common.authentication.OtpAuthentication
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn  on  2023/7/14 21:45
+ * Created by support@topiam.cn on 2023/7/14 21:45
  */
 public class AuthenticationJacksonModule extends Module {
 

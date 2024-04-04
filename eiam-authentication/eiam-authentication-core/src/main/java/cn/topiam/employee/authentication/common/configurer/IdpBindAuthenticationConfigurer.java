@@ -38,7 +38,7 @@ import static cn.topiam.employee.support.security.util.HttpSecurityFilterOrderRe
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn  on  2023/8/6 23:43
+ * Created by support@topiam.cn on 2023/8/6 23:43
  */
 public class IdpBindAuthenticationConfigurer extends
                                              AbstractAuthenticationFilterConfigurer<HttpSecurity, IdpBindAuthenticationConfigurer, IdpBindUserAuthenticationFilter> {

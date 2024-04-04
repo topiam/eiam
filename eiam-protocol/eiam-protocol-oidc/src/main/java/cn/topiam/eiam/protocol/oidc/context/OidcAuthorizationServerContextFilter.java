@@ -41,8 +41,8 @@ import cn.topiam.employee.application.context.ApplicationContextHolder;
 import cn.topiam.employee.application.oidc.OidcApplicationService;
 import cn.topiam.employee.application.oidc.model.OidcProtocolConfig;
 import cn.topiam.employee.core.help.ServerHelp;
-import cn.topiam.employee.support.util.HttpUrlUtils;
 import cn.topiam.employee.support.util.IpUtils;
+import cn.topiam.employee.support.util.UrlUtils;
 import cn.topiam.employee.support.web.servlet.RepeatedlyRequestWrapper;
 
 import lombok.Getter;
@@ -53,7 +53,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import static org.springframework.security.oauth2.server.authorization.settings.ConfigurationSettingNames.Token.ACCESS_TOKEN_FORMAT;
 
-import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CODE;
+import static cn.topiam.employee.common.constant.AppConstants.APP_CODE;
 import static cn.topiam.employee.common.constant.ProtocolConstants.OidcEndpointConstants.*;
 import static cn.topiam.employee.support.util.HttpRequestUtils.getRequestHeaders;
 
@@ -111,7 +111,7 @@ public final class OidcAuthorizationServerContextFilter extends OncePerRequestFi
             //封装 ProviderSettings
             StringSubstitutor sub = new StringSubstitutor(variables, "{", "}");
             AuthorizationServerSettings providerSettings = AuthorizationServerSettings.builder()
-                    .issuer(sub.replace(HttpUrlUtils.format(ServerHelp.getPortalPublicBaseUrl() + OIDC_AUTHORIZE_PATH)))
+                    .issuer(sub.replace(UrlUtils.format(ServerHelp.getPortalPublicBaseUrl() + OIDC_AUTHORIZE_PATH)))
                     .authorizationEndpoint(sub.replace(AUTHORIZATION_ENDPOINT))
                     .tokenEndpoint(sub.replace(TOKEN_ENDPOINT))
                     .jwkSetEndpoint(sub.replace(JWK_SET_ENDPOINT))

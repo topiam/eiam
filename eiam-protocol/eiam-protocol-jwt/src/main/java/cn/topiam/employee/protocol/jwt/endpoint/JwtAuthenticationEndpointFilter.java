@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.*;
 
 import org.apache.commons.compress.utils.CharsetNames;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.entity.ContentType;
 import org.springframework.core.log.LogMessage;
 import org.springframework.lang.NonNull;
@@ -217,7 +216,7 @@ public final class JwtAuthenticationEndpointFilter extends OncePerRequestFilter 
             IdToken idToken = authenticationToken.getIdToken();
 
             JwtRequestAuthenticationToken requestAuthenticationToken= (JwtRequestAuthenticationToken) authenticationToken.getPrincipal();
-            String targetUri = StringUtils.defaultString(requestAuthenticationToken.getTargetUrl(), config.getTargetLinkUrl());
+            String targetUri = Objects.toString(requestAuthenticationToken.getTargetUrl(), config.getTargetLinkUrl());
             response.setCharacterEncoding(CharsetNames.UTF_8);
             response.setContentType(ContentType.TEXT_HTML.getMimeType());
 

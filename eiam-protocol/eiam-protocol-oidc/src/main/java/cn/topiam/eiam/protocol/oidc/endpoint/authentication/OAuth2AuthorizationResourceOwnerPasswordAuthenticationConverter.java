@@ -31,8 +31,10 @@ import org.springframework.util.StringUtils;
 import cn.topiam.eiam.protocol.oidc.authentication.OAuth2AuthorizationResourceOwnerPasswordAuthenticationToken;
 
 import jakarta.servlet.http.HttpServletRequest;
+import static org.springframework.http.HttpMethod.GET;
+
 import static cn.topiam.eiam.protocol.oidc.endpoint.OAuth2EndpointUtils.throwError;
-import static cn.topiam.employee.support.util.HttpRequestUtils.getParameters;
+import static cn.topiam.employee.support.util.HttpRequestUtils.*;
 
 /**
  * 密码模式认证转换器
@@ -56,7 +58,9 @@ public final class OAuth2AuthorizationResourceOwnerPasswordAuthenticationConvert
         }
         Authentication clientPrincipal = SecurityContextHolder.getContext().getAuthentication();
         //获取参数
-        MultiValueMap<String, String> parameters = getParameters(request);
+        MultiValueMap<String, String> parameters = GET.name().equals(request.getMethod())
+            ? getQueryParameters(request)
+            : getFormParameters(request);
         // username (必填)
         String username = parameters.getFirst(OAuth2ParameterNames.USERNAME);
         if (!StringUtils.hasText(username)

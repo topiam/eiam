@@ -30,8 +30,8 @@ import jakarta.servlet.http.HttpSession;
 
 /**
  *
- * @author SanLi
- * Created by qinggang.zuo@gmail.com / 2689170096@qq.com on  2023/9/4 16:01
+ * @author TopIAM
+ * Created by support@topiam.cn on 2023/9/4 16:01
  */
 public final class JwtLogoutAuthenticationConverter implements AuthenticationConverter {
     private static final Authentication ANONYMOUS_AUTHENTICATION = new AnonymousAuthenticationToken(

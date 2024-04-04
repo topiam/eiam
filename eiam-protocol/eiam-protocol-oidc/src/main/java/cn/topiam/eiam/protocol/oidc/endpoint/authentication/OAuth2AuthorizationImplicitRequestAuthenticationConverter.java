@@ -41,7 +41,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 
-import static cn.topiam.employee.support.util.HttpRequestUtils.getParameters;
+import static cn.topiam.employee.support.util.HttpRequestUtils.*;
 
 /**
  * OAuth2 授权简化模式请求身份验证转换器
@@ -68,7 +68,9 @@ public final class OAuth2AuthorizationImplicitRequestAuthenticationConverter imp
             return null;
         }
 
-        MultiValueMap<String, String> parameters = getParameters(request);
+        MultiValueMap<String, String> parameters = GET.name().equals(request.getMethod())
+            ? getQueryParameters(request)
+            : getFormParameters(request);
 
         // response_type (必填)
         Set<String> responseTypes = null;

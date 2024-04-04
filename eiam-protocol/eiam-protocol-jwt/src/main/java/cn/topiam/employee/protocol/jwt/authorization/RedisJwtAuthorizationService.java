@@ -45,7 +45,7 @@ import static cn.topiam.employee.protocol.jwt.constant.JwtProtocolConstants.JWT_
  *
  * @author TopIAM
  *
- * Created by support@topiam.cn / 2689170096@qq.com on  2023/9/1 12:51
+ * Created by support@topiam.cn on 2023/9/1 12:51
  */
 public class RedisJwtAuthorizationService implements JwtAuthorizationService {
     private static final String CID_TO_AUTHORIZATIONS = "cid_to_authorizations:";

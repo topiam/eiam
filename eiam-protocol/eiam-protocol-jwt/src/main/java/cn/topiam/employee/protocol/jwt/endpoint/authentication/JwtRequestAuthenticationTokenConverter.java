@@ -35,9 +35,12 @@ import cn.topiam.employee.protocol.jwt.exception.JwtError;
 import cn.topiam.employee.protocol.jwt.exception.JwtErrorCodes;
 
 import jakarta.servlet.http.HttpServletRequest;
+import static org.springframework.http.HttpMethod.GET;
+
 import static cn.topiam.employee.protocol.jwt.constant.JwtProtocolConstants.JWT_ERROR_URI;
 import static cn.topiam.employee.protocol.jwt.constant.JwtProtocolConstants.TARGET_URL;
-import static cn.topiam.employee.support.util.HttpRequestUtils.getParameters;
+import static cn.topiam.employee.support.util.HttpRequestUtils.getFormParameters;
+import static cn.topiam.employee.support.util.HttpRequestUtils.getQueryParameters;
 
 /**
  * @author TopIAM
@@ -47,7 +50,9 @@ public final class JwtRequestAuthenticationTokenConverter implements Authenticat
 
     @Override
     public Authentication convert(HttpServletRequest request) {
-        MultiValueMap<String, String> parameters = getParameters(request);
+        MultiValueMap<String, String> parameters = GET.name().equals(request.getMethod())
+            ? getQueryParameters(request)
+            : getFormParameters(request);
         String targetUrl = parameters.getFirst(TARGET_URL);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

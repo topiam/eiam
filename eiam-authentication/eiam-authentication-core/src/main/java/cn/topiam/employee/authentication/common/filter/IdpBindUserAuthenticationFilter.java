@@ -47,7 +47,7 @@ import static cn.topiam.employee.support.exception.enums.ExceptionStatus.EX00010
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn  on  2023/8/6 23:43
+ * Created by support@topiam.cn on 2023/8/6 23:43
  */
 @Slf4j
 public class IdpBindUserAuthenticationFilter extends AbstractAuthenticationProcessingFilter {

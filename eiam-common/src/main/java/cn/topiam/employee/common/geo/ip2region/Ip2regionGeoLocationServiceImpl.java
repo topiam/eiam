@@ -37,8 +37,8 @@ import static cn.topiam.employee.common.geo.District.PROVINCE_DISTRICT;
 /**
  * Ip2regionGeo
  *
- * @author SanLi
- * Created by qinggang.zuo@gmail.com / 2689170096@qq.com on  2023/10/30 19:11
+ * @author TopIAM
+ * Created by support@topiam.cn on 2023/10/30 19:11
  */
 @Slf4j
 public class Ip2regionGeoLocationServiceImpl implements GeoLocationService, DisposableBean {

@@ -20,25 +20,18 @@ package cn.topiam.employee.protocol.jwt.authentication;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 
 /**
  *
- * @author SanLi
- * Created by qinggang.zuo@gmail.com / 2689170096@qq.com on  2023/9/4 16:11
+ * @author TopIAM
+ * Created by support@topiam.cn on 2023/9/4 16:11
  */
 public final class JwtLogoutAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         JwtLogoutAuthenticationToken logoutAuthenticationToken = (JwtLogoutAuthenticationToken) authentication;
-        SessionInformation sessionInformation = sessionRegistry
-            .getSessionInformation(logoutAuthenticationToken.getSessionId());
-        //        if (StringUtils.hasText(logoutAuthenticationToken.getPostLogoutRedirectUri()) &&
-        //                !registeredClient.getPostLogoutRedirectUris().contains(logoutAuthenticationToken.getPostLogoutRedirectUri())) {
-        //            throwError(new JwtError(JwtErrorCodes.INVALID_REQUEST, "post_logout_redirect_uri"));
-        //        }
         return logoutAuthenticationToken;
     }
 

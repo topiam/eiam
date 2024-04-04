@@ -39,7 +39,7 @@ import cn.topiam.employee.protocol.jwt.token.IdTokenGenerator;
 import cn.topiam.employee.protocol.jwt.token.JwtIdTokenGenerator;
 import cn.topiam.employee.support.security.authentication.WebAuthenticationDetails;
 import cn.topiam.employee.support.security.userdetails.UserDetails;
-import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CODE_VARIABLE;
+import static cn.topiam.employee.common.constant.AppConstants.APP_CODE_VARIABLE;
 import static cn.topiam.employee.common.constant.ProtocolConstants.JwtEndpointConstants.JWT_SSO_PATH;
 import static cn.topiam.employee.protocol.jwt.constant.JwtProtocolConstants.JWT_ERROR_URI;
 import static cn.topiam.employee.support.security.util.SecurityUtils.isPrincipalAuthenticated;

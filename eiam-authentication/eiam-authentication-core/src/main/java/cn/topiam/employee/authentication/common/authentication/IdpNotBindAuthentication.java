@@ -24,7 +24,7 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn  on  2023/8/7 21:47
+ * Created by support@topiam.cn on 2023/8/7 21:47
  */
 public class IdpNotBindAuthentication extends AbstractAuthenticationToken
                                       implements java.io.Serializable {

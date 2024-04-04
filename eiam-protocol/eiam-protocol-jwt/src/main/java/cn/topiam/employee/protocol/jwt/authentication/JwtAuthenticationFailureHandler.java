@@ -36,8 +36,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 /**
  *
- * @author SanLi
- * Created by qinggang.zuo@gmail.com / 2689170096@qq.com on  2023/9/4 13:03
+ * @author TopIAM
+ * Created by support@topiam.cn on 2023/9/4 13:03
  */
 public class JwtAuthenticationFailureHandler implements AuthenticationFailureHandler {
     /**

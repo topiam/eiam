@@ -47,7 +47,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CODE;
+import static cn.topiam.employee.common.constant.AppConstants.APP_CODE;
 import static cn.topiam.employee.support.util.HttpRequestUtils.getRequestHeaders;
 
 /**
