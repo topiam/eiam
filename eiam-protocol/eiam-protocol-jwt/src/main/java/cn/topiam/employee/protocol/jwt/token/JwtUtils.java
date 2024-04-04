@@ -23,13 +23,12 @@ import java.security.PublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cn.topiam.employee.common.util.X509Utils;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import io.jsonwebtoken.*;
+import static cn.topiam.employee.support.util.CertUtils.readPublicKey;
 
 /**
  * JWT 工具类
@@ -52,7 +51,7 @@ public class JwtUtils {
      */
     public static Claims parserToken(String token, String publicKey) {
         try {
-            PublicKey readPublicKey = X509Utils.readPublicKey(publicKey, "");
+            PublicKey readPublicKey = readPublicKey(publicKey, "");
             JwtParser jwtParser = Jwts.parser().verifyWith(readPublicKey).build();
             // 解析 JWT
             return jwtParser.parseSignedClaims(token).getPayload();
