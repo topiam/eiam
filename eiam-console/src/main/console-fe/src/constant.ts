@@ -48,6 +48,7 @@ export enum SMS_PROVIDER {
 
 export enum GEO_IP_PROVIDER {
   MAXMIND = 'maxmind',
+  DEFAULT = 'default',
 }
 
 /**
