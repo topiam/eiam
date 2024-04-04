@@ -209,7 +209,7 @@ const CreateUser = (props: CreateUserProps) => {
                 }),
               },
               {
-                validator: async (rule, value) => {
+                validator: async (_rule, value) => {
                   if (!value) {
                     return Promise.resolve();
                   }
@@ -283,6 +283,9 @@ const CreateUser = (props: CreateUserProps) => {
                 }),
               },
             ]}
+            addonWarpStyle={{
+              flexWrap: 'nowrap',
+            }}
             addonAfter={
               <Button
                 key={'autoGeneration'}
@@ -365,7 +368,7 @@ const CreateUser = (props: CreateUserProps) => {
                   fieldProps={{ autoComplete: 'off' }}
                   rules={[
                     {
-                      validator: async (rule, value) => {
+                      validator: async (_rule, value) => {
                         if (!value) {
                           return Promise.resolve();
                         }
@@ -434,7 +437,7 @@ const CreateUser = (props: CreateUserProps) => {
                 }),
               },
               {
-                validator: async (rule, value) => {
+                validator: async (_rule, value) => {
                   if (!value) {
                     return Promise.resolve();
                   }

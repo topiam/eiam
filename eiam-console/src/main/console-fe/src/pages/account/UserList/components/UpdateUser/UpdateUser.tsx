@@ -276,7 +276,7 @@ const UpdateUser = (props: UpdateFormProps) => {
                 }),
               },
               {
-                validator: async (rule, value) => {
+                validator: async (_rule, value) => {
                   if (!value) {
                     return Promise.resolve();
                   }

@@ -26,4 +26,4 @@ export type WeakPasswordLib = {
 /**
  * 密码策略
  */
-export type PasswordPolicyConfig = {};
+export type PasswordPolicyConfig = NonNullable<unknown>;

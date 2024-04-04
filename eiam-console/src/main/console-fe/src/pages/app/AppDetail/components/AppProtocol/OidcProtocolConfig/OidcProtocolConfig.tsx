@@ -580,6 +580,9 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                         id: 'pages.app.config.detail.items.login_access.protocol_config.oidc.advanced.access_token_time_to_live',
                       })}
                       name={'accessTokenTimeToLive'}
+                      addonWarpStyle={{
+                        flexWrap: 'nowrap',
+                      }}
                       addonAfter={intl.formatMessage({ id: 'app.minute' })}
                       extra={intl.formatMessage({
                         id: 'pages.app.config.detail.items.login_access.protocol_config.oidc.advanced.access_token_time_to_live.extra',
@@ -590,6 +593,9 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                         id: 'pages.app.config.detail.items.login_access.protocol_config.oidc.advanced.refresh_token_time_to_live',
                       })}
                       name={'refreshTokenTimeToLive'}
+                      addonWarpStyle={{
+                        flexWrap: 'nowrap',
+                      }}
                       addonAfter={intl.formatMessage({ id: 'app.minute' })}
                       extra={intl.formatMessage({
                         id: 'pages.app.config.detail.items.login_access.protocol_config.oidc.advanced.refresh_token_time_to_live.extra',
@@ -601,6 +607,9 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                       })}
                       readonly
                       name={'idTokenTimeToLive'}
+                      addonWarpStyle={{
+                        flexWrap: 'nowrap',
+                      }}
                       addonAfter={intl.formatMessage({ id: 'app.minute.not_update' })}
                       extra={intl.formatMessage({
                         id: 'pages.app.config.detail.items.login_access.protocol_config.oidc.advanced.idtoken_time_to_live.extra',

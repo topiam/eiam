@@ -16,9 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { request } from '@@/exports';
-import {
-  GetApp,
-} from './data.d';
+import { GetApp } from './data.d';
 
 /**
  * Get Application
@@ -28,4 +26,3 @@ export async function getApp(id: string): Promise<API.ApiResult<GetApp>> {
     method: 'GET',
   });
 }
-

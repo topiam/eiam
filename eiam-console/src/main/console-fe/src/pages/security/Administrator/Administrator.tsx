@@ -102,7 +102,7 @@ export const Administrator = () => {
       title: intl.formatMessage({ id: 'pages.setting.administrator.table.columns.auth_total' }),
       dataIndex: 'authTotal',
       search: false,
-      render: (dom, record) => {
+      render: (_dom, record) => {
         return <span>{record.authTotal ? record.authTotal : 0}</span>;
       },
     },

@@ -30,5 +30,3 @@ export async function enableApp(id: string): Promise<API.ApiResult<boolean>> {
 export async function disableApp(id: string): Promise<API.ApiResult<boolean>> {
   return request(`/api/v1/app/disable/${id}`, { method: 'PUT' });
 }
-
-

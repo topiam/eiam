@@ -156,6 +156,9 @@ export default (props: { configured: boolean }) => {
                 addonBefore={intl.formatMessage({
                   id: 'pages.account.identity_source_detail.job_config.interval.addon_before',
                 })}
+                addonWarpStyle={{
+                  flexWrap: 'nowrap',
+                }}
                 addonAfter={intl.formatMessage({
                   id: 'pages.account.identity_source_detail.job_config.interval.addon_after',
                 })}

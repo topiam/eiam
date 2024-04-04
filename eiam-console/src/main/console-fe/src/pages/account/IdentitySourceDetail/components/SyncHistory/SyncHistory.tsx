@@ -168,7 +168,7 @@ export default (props: { identitySourceId: string }) => {
         fail: { text: intl.formatMessage({ id: 'app.fail' }) },
         pending: {
           text: intl.formatMessage({
-            id: 'pages.account.identity_source_detail.sync_history.columns.status.valu_enum.pending',
+            id: 'pages.account.identity_source_detail.sync_history.columns.status.pending',
           }),
         },
       },
@@ -181,7 +181,7 @@ export default (props: { identitySourceId: string }) => {
           {text === 'pending' && (
             <Tag icon={<SyncOutlined spin />} color="#1677ff">
               {intl.formatMessage({
-                id: 'pages.account.identity_source_detail.sync_history.columns.status.valu_enum.pending',
+                id: 'pages.account.identity_source_detail.sync_history.columns.status.pending',
               })}
             </Tag>
           )}

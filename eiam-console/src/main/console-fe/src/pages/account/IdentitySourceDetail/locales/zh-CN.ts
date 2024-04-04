@@ -56,7 +56,7 @@ export default {
   'pages.account.identity_source_detail.sync_history.columns.end_time': '结束时间',
   'pages.account.identity_source_detail.sync_history.columns.spend_time': '耗时',
   'pages.account.identity_source_detail.sync_history.columns.status': '状态',
-  'pages.account.identity_source_detail.sync_history.columns.status.valu_enum.pending': '同步中',
+  'pages.account.identity_source_detail.sync_history.columns.status.pending': '同步中',
   'pages.account.identity_source_detail.sync_history.columns.option': '操作',
   'pages.account.identity_source_detail.sync_history.tool_bar_render.title': '一键拉取',
   'pages.account.identity_source_detail.sync_history.tool_bar_render.success.title': '任务触发成功',

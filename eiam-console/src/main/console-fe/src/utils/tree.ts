@@ -31,6 +31,7 @@ export type DataNode = {
  * @param list
  * @param key
  * @param children
+ * @param disabledId
  */
 export function updateTreeData(
   list: DataNode[],

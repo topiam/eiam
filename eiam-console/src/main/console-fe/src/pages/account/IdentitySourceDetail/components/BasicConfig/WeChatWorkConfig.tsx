@@ -125,6 +125,9 @@ const WeChatWorkConfig = (props: {
             }),
           },
         ]}
+        addonWarpStyle={{
+          flexWrap: 'nowrap',
+        }}
         addonAfter={
           <Button type={'default'} onClick={configValidator}>
             {intl.formatMessage({ id: 'pages.account.identity_source_detail.common.test_connect' })}

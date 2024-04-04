@@ -32,7 +32,6 @@ export enum IdentityProviderType {
   dingtalk_qr = 'dingtalk_qr',
   feishu_oauth = 'feishu_oauth',
   dingtalk_oauth = 'dingtalk_oauth',
-  ldap = 'ldap',
   //社交
   qq_oauth = 'qq_oauth',
   gitee_oauth = 'gitee_oauth',

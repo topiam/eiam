@@ -58,9 +58,7 @@ export async function getFilterOrganizationTree(
 /**
  * Get organization Details
  */
-export async function getOrganization(
-  id: Key,
-): Promise<API.ApiResult<AccountAPI.GetOrganization>> {
+export async function getOrganization(id: Key): Promise<API.ApiResult<AccountAPI.GetOrganization>> {
   return request<API.ApiResult<AccountAPI.GetOrganization>>(`/api/v1/organization/get/${id}`);
 }
 

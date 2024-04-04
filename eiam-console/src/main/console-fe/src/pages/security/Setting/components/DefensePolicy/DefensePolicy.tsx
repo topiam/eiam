@@ -96,6 +96,9 @@ export default () => {
               id: 'pages.setting.security.basic.login_failure_duration',
             })}
             name="loginFailureDuration"
+            addonWarpStyle={{
+              flexWrap: 'nowrap',
+            }}
             addonAfter={intl.formatMessage({
               id: 'pages.setting.security.basic.login_failure_duration.addon_after',
             })}
@@ -109,6 +112,9 @@ export default () => {
             extra={intl.formatMessage({
               id: 'pages.setting.security.basic.login_failure_count.extra',
             })}
+            addonWarpStyle={{
+              flexWrap: 'nowrap',
+            }}
             addonAfter={intl.formatMessage({
               id: 'pages.setting.security.basic.login_failure_count.addon_after',
             })}
@@ -122,6 +128,9 @@ export default () => {
             extra={intl.formatMessage({
               id: 'pages.setting.security.basic.auto_unlock_time.extra',
             })}
+            addonWarpStyle={{
+              flexWrap: 'nowrap',
+            }}
             addonAfter={intl.formatMessage({
               id: 'pages.setting.security.basic.auto_unlock_time.addon_after',
             })}

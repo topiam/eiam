@@ -103,11 +103,14 @@ export default () => {
             readonly
             width={100}
             label={intl.formatMessage({
-              id: 'pages.setting.security.basic.session_validtime',
+              id: 'pages.setting.security.basic.session_valid_time',
             })}
             name={'sessionValidTime'}
+            addonWarpStyle={{
+              flexWrap: 'nowrap',
+            }}
             addonAfter={intl.formatMessage({
-              id: 'pages.setting.security.basic.session_validtime.addon_after',
+              id: 'pages.setting.security.basic.session_valid_time.addon_after',
             })}
           />
           <ProFormDigit
@@ -116,6 +119,9 @@ export default () => {
             })}
             width={100}
             name={'rememberMeValidTime'}
+            addonWarpStyle={{
+              flexWrap: 'nowrap',
+            }}
             addonAfter={intl.formatMessage({
               id: 'pages.setting.security.basic.remember_me_validtime.addon_after',
             })}
@@ -132,6 +138,9 @@ export default () => {
             extra={intl.formatMessage({
               id: 'pages.setting.security.basic.verify_code_valid_time.extra',
             })}
+            addonWarpStyle={{
+              flexWrap: 'nowrap',
+            }}
             addonAfter={intl.formatMessage({
               id: 'pages.setting.security.basic.verify_code_valid_time.addon_after',
             })}

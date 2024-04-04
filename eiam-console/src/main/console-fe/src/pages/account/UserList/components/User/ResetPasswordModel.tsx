@@ -124,6 +124,9 @@ export default (props: {
               }),
             },
           ]}
+          addonWarpStyle={{
+            flexWrap: 'nowrap',
+          }}
           addonAfter={
             <Button
               key={'autoGeneration'}

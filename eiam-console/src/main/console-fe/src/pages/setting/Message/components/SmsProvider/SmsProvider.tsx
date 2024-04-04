@@ -181,7 +181,7 @@ export default (props: { visible: boolean }) => {
       align: 'center',
       width: 90,
       editable: false,
-      render: (text: any, row: Record<string, string>) => {
+      render: (_text: any, row: Record<string, string>) => {
         return [
           <a
             key={row.type}
@@ -327,7 +327,7 @@ export default (props: { visible: boolean }) => {
               editorFormRef.current?.resetFields();
             }}
             submitter={{
-              render: (p, dom) => {
+              render: (_p, dom) => {
                 return <FooterToolbar>{dom}</FooterToolbar>;
               },
               submitButtonProps: {

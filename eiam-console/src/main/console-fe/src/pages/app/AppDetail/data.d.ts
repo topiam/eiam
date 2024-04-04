@@ -39,4 +39,3 @@ export type GetApp = {
   remark: string;
   groupIds: string[];
 };
-

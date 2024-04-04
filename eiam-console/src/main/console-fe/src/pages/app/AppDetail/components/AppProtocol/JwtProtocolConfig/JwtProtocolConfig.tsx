@@ -219,6 +219,9 @@ export default (props: { app: GetApp | Record<string, any> }) => {
             label={intl.formatMessage({
               id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.idtoken_time_to_live',
             })}
+            addonWarpStyle={{
+              flexWrap: 'nowrap',
+            }}
             addonAfter={'秒'}
             max={84600}
             min={1}

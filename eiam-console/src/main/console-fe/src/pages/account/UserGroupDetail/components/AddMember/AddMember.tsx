@@ -60,7 +60,7 @@ export default (props: ModalProps) => {
       fixed: 'left',
       filterSearch: true,
       ellipsis: true,
-      render: (dom, record) => (
+      render: (_dom, record) => (
         <Space>
           <Avatar avatar={record.avatar} username={record.username} />
           <Tooltip title={record.username}>
