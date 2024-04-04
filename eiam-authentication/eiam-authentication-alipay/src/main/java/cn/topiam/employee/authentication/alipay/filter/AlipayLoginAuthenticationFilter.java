@@ -49,7 +49,7 @@ import cn.topiam.employee.common.repository.authentication.IdentityProviderRepos
 import cn.topiam.employee.core.help.ServerHelp;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.trace.TraceUtils;
-import cn.topiam.employee.support.util.HttpUrlUtils;
+import cn.topiam.employee.support.util.UrlUtils;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -159,7 +159,7 @@ public class AlipayLoginAuthenticationFilter extends AbstractIdpAuthenticationPr
     public static String getLoginUrl(String providerId) {
         String url = ServerHelp.getPortalPublicBaseUrl() + ALIPAY_OAUTH.getLoginPathPrefix() + "/"
                      + providerId;
-        return HttpUrlUtils.format(url);
+        return UrlUtils.format(url);
     }
 
     public static RequestMatcher getRequestMatcher() {

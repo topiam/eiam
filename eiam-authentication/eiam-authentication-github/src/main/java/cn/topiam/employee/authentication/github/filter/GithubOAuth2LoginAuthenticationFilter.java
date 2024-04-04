@@ -48,7 +48,7 @@ import cn.topiam.employee.common.repository.authentication.IdentityProviderRepos
 import cn.topiam.employee.core.help.ServerHelp;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.trace.TraceUtils;
-import cn.topiam.employee.support.util.HttpUrlUtils;
+import cn.topiam.employee.support.util.UrlUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -174,7 +174,7 @@ public class GithubOAuth2LoginAuthenticationFilter extends
     public static String getLoginUrl(String providerId) {
         String url = ServerHelp.getPortalPublicBaseUrl() + "/" + GITHUB_OAUTH.getLoginPathPrefix()
                      + "/" + providerId;
-        return HttpUrlUtils.format(url);
+        return UrlUtils.format(url);
     }
 
     public static RequestMatcher getRequestMatcher() {

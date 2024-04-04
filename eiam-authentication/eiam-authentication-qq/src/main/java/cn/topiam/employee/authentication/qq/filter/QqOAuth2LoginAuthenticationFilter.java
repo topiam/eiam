@@ -48,7 +48,7 @@ import cn.topiam.employee.core.help.ServerHelp;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.support.util.HttpClientUtils;
-import cn.topiam.employee.support.util.HttpUrlUtils;
+import cn.topiam.employee.support.util.UrlUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -164,7 +164,7 @@ public class QqOAuth2LoginAuthenticationFilter extends AbstractIdpAuthentication
     public static String getLoginUrl(String providerId) {
         String url = ServerHelp.getPortalPublicBaseUrl() + "/" + QQ_OAUTH.getLoginPathPrefix() + "/"
                      + providerId;
-        return HttpUrlUtils.format(url);
+        return UrlUtils.format(url);
     }
 
     public static RequestMatcher getRequestMatcher() {

@@ -50,7 +50,7 @@ import cn.topiam.employee.common.repository.authentication.IdentityProviderRepos
 import cn.topiam.employee.core.help.ServerHelp;
 import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.support.util.HttpClientUtils;
-import cn.topiam.employee.support.util.HttpUrlUtils;
+import cn.topiam.employee.support.util.UrlUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -146,8 +146,7 @@ public class WeChatWorkScanCodeLoginAuthenticationFilter extends
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
         }
         // 返回
-        String userId = StringUtils.defaultString(result.getString("UserId"),
-            result.getString("OpenId"));
+        String userId = Objects.toString(result.getString("UserId"), result.getString("OpenId"));
         IdpUserDetails idpUserDetails = IdpUserDetails.builder().openId(userId)
             .providerType(WECHAT_WORK_QR).providerCode(providerCode).providerId(providerId).build();
         return attemptAuthentication(request, response, idpUserDetails);
@@ -192,7 +191,7 @@ public class WeChatWorkScanCodeLoginAuthenticationFilter extends
     public static String getLoginUrl(String providerId) {
         String url = ServerHelp.getPortalPublicBaseUrl() + WECHAT_WORK_QR.getLoginPathPrefix() + "/"
                      + providerId;
-        return HttpUrlUtils.format(url);
+        return UrlUtils.format(url);
 
     }
 

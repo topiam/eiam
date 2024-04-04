@@ -46,7 +46,7 @@ import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 import cn.topiam.employee.core.help.ServerHelp;
 import cn.topiam.employee.support.util.HttpClientUtils;
-import cn.topiam.employee.support.util.HttpUrlUtils;
+import cn.topiam.employee.support.util.UrlUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -149,7 +149,7 @@ public class FeiShuLoginAuthenticationFilter extends AbstractIdpAuthenticationPr
     public static String getLoginUrl(String providerId) {
         String url = ServerHelp.getPortalPublicBaseUrl() + FEISHU_OAUTH.getLoginPathPrefix() + "/"
                      + providerId;
-        return HttpUrlUtils.format(url);
+        return UrlUtils.format(url);
     }
 
     public static RequestMatcher getRequestMatcher() {
