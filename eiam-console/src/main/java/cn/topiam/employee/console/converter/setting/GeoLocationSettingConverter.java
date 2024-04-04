@@ -19,6 +19,7 @@ package cn.topiam.employee.console.converter.setting;
 
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,27 +116,27 @@ public interface GeoLocationSettingConverter {
      */
     default GeoIpProviderResult entityToGeoLocationProviderConfig(SettingEntity entity) {
         //没有数据，默认未启用
-        if (Objects.isNull(entity)) {
+        if (Objects.isNull(entity) || StringUtils.isBlank(entity.getValue())) {
             return null;
         }
-       try {
-           String value = entity.getValue();
-           ObjectMapper objectMapper = EncryptionModule.deserializerDecrypt();
-           // 指定序列化输入的类型
-           objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
-                   ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
-           // 根据提供商序列化
-           GeoLocationProviderConfig setting = objectMapper.readValue(value, GeoLocationProviderConfig.class);
-           if (MAXMIND.equals(setting.getProvider())) {
-               MaxmindProviderConfig config = (MaxmindProviderConfig) setting.getConfig();
-               //@formatter:off
-               return GeoIpProviderResult.builder()
-                       .provider(setting.getProvider().getProvider())
-                       .config(config)
-                       .enabled(true)
-                       .build();
-           }
-           //@formatter:on
+        try {
+            String value = entity.getValue();
+            ObjectMapper objectMapper = EncryptionModule.deserializerDecrypt();
+            // 指定序列化输入的类型
+            objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
+                    ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+            // 根据提供商序列化
+            GeoLocationProviderConfig setting = objectMapper.readValue(value, GeoLocationProviderConfig.class);
+            if (MAXMIND.equals(setting.getProvider())) {
+                MaxmindProviderConfig config = (MaxmindProviderConfig) setting.getConfig();
+                //@formatter:off
+                return GeoIpProviderResult.builder()
+                        .provider(setting.getProvider().getProvider())
+                        .config(config)
+                        .enabled(true)
+                        .build();
+            }
+            //@formatter:on
             return null;
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
