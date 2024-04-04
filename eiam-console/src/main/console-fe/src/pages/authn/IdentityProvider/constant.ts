@@ -60,6 +60,6 @@ export const DRAWER_FORM_ITEM_LAYOUT = {
     span: 5,
   },
   wrapperCol: {
-    span: 18,
+    span: 19,
   },
 };
