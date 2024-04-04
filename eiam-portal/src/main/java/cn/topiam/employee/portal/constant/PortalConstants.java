@@ -17,8 +17,8 @@
  */
 package cn.topiam.employee.portal.constant;
 
+import static cn.topiam.employee.common.constant.AppConstants.APP_CODE_VARIABLE;
 import static cn.topiam.employee.common.constant.AuthorizeConstants.AUTHORIZE_PATH;
-import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CODE_VARIABLE;
 import static cn.topiam.employee.support.constant.EiamConstants.V1_API_PATH;
 
 /**

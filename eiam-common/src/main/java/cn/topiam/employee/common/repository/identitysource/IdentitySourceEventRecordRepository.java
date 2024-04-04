@@ -17,7 +17,7 @@
  */
 package cn.topiam.employee.common.repository.identitysource;
 
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceEventRecordEntity;
@@ -32,6 +32,6 @@ import cn.topiam.employee.support.repository.LogicDeleteRepository;
 @Repository
 public interface IdentitySourceEventRecordRepository extends
                                                      LogicDeleteRepository<IdentitySourceEventRecordEntity, Long>,
-                                                     QuerydslPredicateExecutor<IdentitySourceEventRecordEntity>,
+                                                     JpaSpecificationExecutor<IdentitySourceEventRecordEntity>,
                                                      IdentitySourceEventRecordRepositoryCustomized {
 }

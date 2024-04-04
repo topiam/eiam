@@ -69,8 +69,8 @@ import static java.util.stream.Collectors.toList;
 
 import static cn.topiam.employee.common.constant.AccountConstants.ROOT_DEPT_ID;
 import static cn.topiam.employee.common.constant.AccountConstants.ROOT_DEPT_NAME;
-import static cn.topiam.employee.common.constant.CommonConstants.PATH_SEPARATOR;
-import static cn.topiam.employee.common.constant.CommonConstants.SYSTEM_DEFAULT_USER_NAME;
+import static cn.topiam.employee.support.constant.EiamConstants.PATH_SEPARATOR;
+import static cn.topiam.employee.support.constant.EiamConstants.SYSTEM_DEFAULT_USER_NAME;
 
 /**
  * 身份源数据 pull post 处理器

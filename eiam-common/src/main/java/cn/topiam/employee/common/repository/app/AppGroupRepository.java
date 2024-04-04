@@ -26,7 +26,6 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -40,7 +39,6 @@ import static cn.topiam.employee.common.constant.AppGroupConstants.APP_GROUP_CAC
 @Repository
 @CacheConfig(cacheNames = { APP_GROUP_CACHE_NAME })
 public interface AppGroupRepository extends LogicDeleteRepository<AppGroupEntity, Long>,
-                                    QuerydslPredicateExecutor<AppGroupEntity>,
                                     AppGroupRepositoryCustomized {
 
     /**

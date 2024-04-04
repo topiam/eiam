@@ -27,7 +27,9 @@ import java.util.concurrent.Executor;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.security.core.session.SessionInformation;
@@ -39,14 +41,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
 
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.common.entity.setting.AdministratorEntity;
-import cn.topiam.employee.common.entity.setting.QAdministratorEntity;
 import cn.topiam.employee.common.enums.CheckValidityType;
 import cn.topiam.employee.common.enums.UserStatus;
 import cn.topiam.employee.common.repository.setting.AdministratorRepository;
@@ -86,12 +85,10 @@ public class AdministratorServiceImpl implements AdministratorService {
     @Override
     public Page<AdministratorListResult> getAdministratorList(PageModel model,
                                                               AdministratorListQuery query) {
-        Predicate predicate = administratorConverter
-            .queryAdministratorListParamConvertToPredicate(query);
-        //分页条件
-        QPageRequest request = QPageRequest.of(model.getCurrent(), model.getPageSize());
+        Specification<AdministratorEntity> specification = administratorConverter
+            .queryAdministratorListParamConvertToSpecification(query);
         org.springframework.data.domain.Page<AdministratorEntity> page = administratorRepository
-            .findAll(predicate, request);
+            .findAll(specification, PageRequest.of(model.getCurrent(), model.getPageSize()));
         return administratorConverter.entityConvertToAdministratorPaginationResult(page);
     }
 
@@ -265,7 +262,6 @@ public class AdministratorServiceImpl implements AdministratorService {
      */
     @Override
     public Boolean administratorParamCheck(CheckValidityType type, String value, Long id) {
-        QAdministratorEntity administrator = QAdministratorEntity.administratorEntity;
         AdministratorEntity entity = new AdministratorEntity();
         boolean result = false;
         // ID存在说明是修改操作，查询一下当前数据
@@ -277,8 +273,8 @@ public class AdministratorServiceImpl implements AdministratorService {
             if (StringUtils.equals(entity.getEmail(), value)) {
                 return true;
             }
-            BooleanExpression eq = administrator.email.eq(value);
-            result = !administratorRepository.exists(eq);
+            result = !administratorRepository
+                .exists(Example.of(new AdministratorEntity().setEmail(value)));
         }
         //手机号
         if (CheckValidityType.PHONE.equals(type)) {
@@ -290,11 +286,9 @@ public class AdministratorServiceImpl implements AdministratorService {
                 }
                 Phonenumber.PhoneNumber phoneNumber = PhoneNumberUtil.getInstance().parse(value,
                     "CN");
-                BooleanExpression eq = administrator.phone
-                    .eq(String.valueOf(phoneNumber.getNationalNumber()))
-                    .and(administrator.phoneAreaCode
-                        .eq(String.valueOf(phoneNumber.getCountryCode())));
-                result = !administratorRepository.exists(eq);
+                result = !administratorRepository.exists(Example.of(new AdministratorEntity()
+                    .setPhone(String.valueOf(phoneNumber.getNationalNumber()))
+                    .setPhoneAreaCode(String.valueOf(phoneNumber.getCountryCode()))));
             } catch (NumberParseException e) {
                 log.error("校验手机号发生异常", e);
                 throw new TopIamException("校验手机号发生异常");
@@ -305,8 +299,8 @@ public class AdministratorServiceImpl implements AdministratorService {
             if (StringUtils.equals(entity.getUsername(), value)) {
                 return true;
             }
-            BooleanExpression eq = administrator.username.eq(value);
-            result = !administratorRepository.exists(eq);
+            result = !administratorRepository
+                .exists(Example.of(new AdministratorEntity().setUsername(value)));
         }
         return result;
     }

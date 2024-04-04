@@ -48,6 +48,7 @@ public class DefaultMailProviderSendImpl implements MailProviderSend {
     public static final String       MAIL_SMTP_SOCKET_FACTORY_CLASS  = "mail.smtp.socketFactory.class";
     public static final String       JAVAX_NET_SSL_SSLSOCKET_FACTORY = "javax.net.ssl.SSLSocketFactory";
     public static final String       MAIL_SMTP_AUTH                  = "mail.smtp.auth";
+    public static final String       MAIL_SMTP_STARTTLS_ENABLE       = "mail.smtp.starttls.enable";
     private final MailProviderConfig mailProvider;
 
     public DefaultMailProviderSendImpl(MailProviderConfig mailProvider, TaskExecutor taskExecutor) {
@@ -73,6 +74,7 @@ public class DefaultMailProviderSendImpl implements MailProviderSend {
             Properties properties = new Properties();
             properties.setProperty(MAIL_SMTP_AUTH, TRUE);
             properties.setProperty(MAIL_SMTP_SOCKET_FACTORY_CLASS, JAVAX_NET_SSL_SSLSOCKET_FACTORY);
+            properties.setProperty(MAIL_SMTP_STARTTLS_ENABLE, TRUE);
             javaMailSender.setJavaMailProperties(properties);
         }
         return javaMailSender;

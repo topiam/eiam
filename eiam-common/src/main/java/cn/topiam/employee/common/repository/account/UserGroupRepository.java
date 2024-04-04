@@ -20,8 +20,8 @@ package cn.topiam.employee.common.repository.account;
 import java.util.Optional;
 
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -38,7 +38,7 @@ import cn.topiam.employee.support.repository.LogicDeleteRepository;
  */
 @Repository
 public interface UserGroupRepository extends LogicDeleteRepository<UserGroupEntity, Long>,
-                                     QuerydslPredicateExecutor<UserGroupEntity> {
+                                     JpaSpecificationExecutor<UserGroupEntity> {
 
     /**
      * findByIdContainsDeleted

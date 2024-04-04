@@ -24,14 +24,12 @@ import java.util.Objects;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.data.jpa.domain.Specification;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
 
 import cn.topiam.employee.authentication.alipay.AlipayIdpOAuth2Config;
 import cn.topiam.employee.authentication.common.IdentityProviderCategory;
@@ -46,7 +44,6 @@ import cn.topiam.employee.authentication.qq.QqIdpOauthConfig;
 import cn.topiam.employee.authentication.wechat.WeChatIdpScanCodeConfig;
 import cn.topiam.employee.authentication.wechatwork.WeChatWorkIdpScanCodeConfig;
 import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
-import cn.topiam.employee.common.entity.authn.QIdentityProviderEntity;
 import cn.topiam.employee.console.pojo.query.authn.IdentityProviderListQuery;
 import cn.topiam.employee.console.pojo.result.authn.IdentityProviderListResult;
 import cn.topiam.employee.console.pojo.result.authn.IdentityProviderResult;
@@ -55,12 +52,14 @@ import cn.topiam.employee.console.pojo.update.authn.IdpUpdateParam;
 import cn.topiam.employee.core.help.ServerHelp;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.repository.page.domain.Page;
-import cn.topiam.employee.support.repository.page.domain.PageModel;
-import cn.topiam.employee.support.repository.page.domain.QueryDslRequest;
 import cn.topiam.employee.support.validation.ValidationUtils;
 
+import jakarta.persistence.criteria.Predicate;
 import jakarta.validation.ConstraintViolationException;
 import static cn.topiam.employee.authentication.common.IdentityProviderType.*;
+import static cn.topiam.employee.common.entity.authn.IdentityProviderEntity.CATEGORY_FIELD_NAME;
+import static cn.topiam.employee.common.entity.authn.IdentityProviderEntity.NAME_FIELD_NAME;
+import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_TIME;
 
 /**
  * 身份提供商转换器
@@ -181,26 +180,22 @@ public interface IdentityProviderConverter {
     /**
      * 查询身份源列表参数转Predicate
      *
-     * @param query     {@link IdentityProviderListQuery}
-     * @param pageModel {@link  PageModel}
-     * @return {@link  QueryDslRequest}
+     * @param listQuery     {@link IdentityProviderListQuery}
+     * @return {@link  Specification}
      */
-    default QueryDslRequest queryIdentityProviderListParamConvertToPredicate(IdentityProviderListQuery query,
-                                                                             PageModel pageModel) {
-        QueryDslRequest request = new QueryDslRequest();
-        QIdentityProviderEntity queryEntity = QIdentityProviderEntity.identityProviderEntity;
-        Predicate predicate = ExpressionUtils.and(queryEntity.isNotNull(),
-            queryEntity.deleted.eq(Boolean.FALSE));
-        //查询条件
-        //@formatter:off
-        predicate = Objects.isNull(query.getCategory()) ? predicate : ExpressionUtils.and(predicate, queryEntity.category.eq(query.getCategory()));
-        predicate = Objects.isNull(query.getName()) ? predicate : ExpressionUtils.and(predicate, queryEntity.name.eq(query.getName()));
-        //@formatter:on
-        request.setPredicate(predicate);
-        //分页条件
-        request.setPageRequest(QPageRequest.of(pageModel.getCurrent(), pageModel.getPageSize(),
-            queryEntity.updateTime.desc()));
-        return request;
+    default Specification<IdentityProviderEntity> queryIdentityProviderListParamConvertToSpecification(IdentityProviderListQuery listQuery) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (!Objects.isNull(listQuery.getCategory())) {
+                predicates.add(cb.equal(root.get(CATEGORY_FIELD_NAME), listQuery.getCategory()));
+            }
+            if (!Objects.isNull(listQuery.getName())) {
+                predicates.add(cb.like(root.get(NAME_FIELD_NAME), "%" + listQuery.getName() + "%"));
+            }
+            query.where(predicates.toArray(new Predicate[0]));
+            query.orderBy(cb.desc(root.get(LAST_MODIFIED_TIME)));
+            return query.getRestriction();
+        };
     }
 
     /**

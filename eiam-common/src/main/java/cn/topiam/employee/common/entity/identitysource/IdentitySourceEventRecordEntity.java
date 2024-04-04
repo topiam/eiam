@@ -56,6 +56,14 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
 @Where(clause = SOFT_DELETE_WHERE)
 public class IdentitySourceEventRecordEntity extends LogicDeleteEntity<Long> {
 
+    public static final String       IDENTITY_SOURCE_ID_FIELD_NAME = "identitySourceId";
+
+    public static final String       ACTION_TYPE_FIELD_NAME        = "actionType";
+
+    public static final String       OBJECT_TYPE_FIELD_NAME        = "objectType";
+
+    public static final String       STATUS_FIELD_NAME             = "status";
+
     /**
      * 身份源ID
      */

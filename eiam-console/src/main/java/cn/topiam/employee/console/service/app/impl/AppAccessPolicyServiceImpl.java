@@ -20,7 +20,7 @@ package cn.topiam.employee.console.service.app.impl;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,7 +67,7 @@ public class AppAccessPolicyServiceImpl implements AppAccessPolicyService {
     public Page<AppAccessPolicyResult> getAppAccessPolicyList(PageModel pageModel,
                                                               AppAccessPolicyQuery query) {
         //分页条件
-        QPageRequest request = QPageRequest.of(pageModel.getCurrent(), pageModel.getPageSize());
+        PageRequest request = PageRequest.of(pageModel.getCurrent(), pageModel.getPageSize());
         //查询映射
         org.springframework.data.domain.Page<AppAccessPolicyPO> list = appAccessPolicyRepository
             .getAppPolicyList(query, request);

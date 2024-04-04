@@ -54,16 +54,21 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
 public class UserGroupEntity extends LogicDeleteEntity<Long> {
 
     @Serial
-    private static final long serialVersionUID = -2619231849746900857L;
+    private static final long  serialVersionUID = -2619231849746900857L;
+
+    public static final String CODE_FIELD_NAME  = "code";
+
+    public static final String NAME_FIELD_NAME  = "name";
+
     /**
      * 用户名
      */
     @Column(name = "name_")
-    private String            name;
+    private String             name;
 
     /**
      * 密码
      */
     @Column(name = "code_")
-    private String            code;
+    private String             code;
 }

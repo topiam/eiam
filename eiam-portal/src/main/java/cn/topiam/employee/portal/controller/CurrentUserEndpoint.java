@@ -18,6 +18,7 @@
 package cn.topiam.employee.portal.controller;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +36,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import static cn.topiam.employee.common.constant.SessionConstants.CURRENT_USER;
-import static cn.topiam.employee.common.util.ImageAvatarUtils.*;
+import static cn.topiam.employee.support.util.ImageAvatarUtils.bufferedImageToBase64;
+import static cn.topiam.employee.support.util.ImageAvatarUtils.generateAvatarImg;
 
 /**
  * 当前用户
@@ -63,8 +65,8 @@ public class CurrentUserEndpoint {
         result.setNickName(user.getNickName());
         //头像
         if (StringUtils.isEmpty(user.getAvatar())) {
-            result.setAvatar(bufferedImageToBase64(generateAvatarImg(
-                StringUtils.defaultString(user.getFullName(), user.getUsername()))));
+            result.setAvatar(bufferedImageToBase64(
+                generateAvatarImg(Objects.toString(user.getFullName(), user.getUsername()))));
         } else {
             result.setAvatar(user.getAvatar());
         }

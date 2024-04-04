@@ -148,8 +148,6 @@ public class PortalAuthenticationSuccessHandler extends
             session.removeAttribute(SecretType.LOGIN.getKey());
             //清理验证码
             session.removeAttribute(CAPTCHA_CODE_SESSION);
-            //清理保存请求
-            session.removeAttribute(SAVED_REQUEST);
             //清理认证异常
             session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
         }

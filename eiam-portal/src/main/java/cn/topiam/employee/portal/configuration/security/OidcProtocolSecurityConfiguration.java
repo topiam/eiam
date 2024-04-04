@@ -102,7 +102,7 @@ public class OidcProtocolSecurityConfiguration extends AbstractSecurityConfigura
                 .cors(withCorsConfigurerDefaults())
                 //会话管理器
                 .sessionManagement(withSessionManagementConfigurerDefaults())
-                .apply(authorizationServerConfigurer);
+                .with(authorizationServerConfigurer,configurer-> {});
         return httpSecurity.build();
         //@formatter:on
     }

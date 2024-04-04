@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +38,6 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
 @Repository
 public interface UserGroupMemberRepository extends
                                            LogicDeleteRepository<UserGroupMemberEntity, Long>,
-                                           QuerydslPredicateExecutor<UserGroupMemberEntity>,
                                            UserGroupMemberRepositoryCustomized {
 
     /**

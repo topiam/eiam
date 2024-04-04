@@ -19,9 +19,10 @@ package cn.topiam.employee.common.entity.identitysource;
 
 import java.io.Serial;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.Where;
+import org.hibernate.type.SqlTypes;
 
 import cn.topiam.employee.common.entity.identitysource.config.JobConfig;
 import cn.topiam.employee.common.entity.identitysource.config.StrategyConfig;
@@ -33,7 +34,6 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -60,6 +60,9 @@ public class IdentitySourceEntity extends LogicDeleteEntity<Long> {
 
     @Serial
     private static final long      serialVersionUID = -7936931011805155568L;
+
+    public static final String     NAME_FIELD_NAME  = "name";
+
     /**
      * 名称
      */
@@ -88,14 +91,14 @@ public class IdentitySourceEntity extends LogicDeleteEntity<Long> {
      * 同步策略JSON串
      */
     @Column(name = "strategy_config")
-    @Type(JsonType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     private StrategyConfig         strategyConfig;
 
     /**
      * 执行计划JSON串
      */
     @Column(name = "job_config")
-    @Type(JsonType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     private JobConfig              jobConfig;
 
     /**

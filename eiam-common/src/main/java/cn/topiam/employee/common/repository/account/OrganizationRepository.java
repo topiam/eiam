@@ -29,7 +29,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +51,6 @@ import static cn.topiam.employee.common.constant.AccountConstants.ORG_CACHE_NAME
 @CacheConfig(cacheNames = { ORG_CACHE_NAME })
 public interface OrganizationRepository extends LogicDeleteRepository<OrganizationEntity, String>,
                                         JpaSpecificationExecutor<OrganizationEntity>,
-                                        QuerydslPredicateExecutor<OrganizationRepository>,
                                         OrganizationRepositoryCustomized {
 
     /**
@@ -287,4 +285,22 @@ public interface OrganizationRepository extends LogicDeleteRepository<Organizati
     @CacheEvict(allEntries = true)
     @Override
     void deleteAllById(@NotNull Iterable<? extends String> ids);
+
+    /**
+     * 查询组织成员数量或id
+     *
+     * @param orgId {@link  String}
+     * @return {@link  List}
+     */
+    @Query(value = """
+                SELECT
+                    user.id
+                FROM
+                    UserEntity user
+                    INNER JOIN OrganizationMemberEntity om ON user.id = om.userId
+                    INNER JOIN OrganizationEntity organization ON organization.id = om.orgId
+                WHERE
+                    organization.id = :orgId OR LOCATE(:orgId, organization.path) > 0
+            """)
+    List<String> getOrgMemberList(@Param("orgId") String orgId);
 }

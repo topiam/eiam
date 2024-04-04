@@ -17,9 +17,10 @@
  */
 package cn.topiam.employee.common.enums;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import cn.topiam.employee.support.enums.BaseEnum;
 import cn.topiam.employee.support.web.converter.EnumConvert;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * <p>

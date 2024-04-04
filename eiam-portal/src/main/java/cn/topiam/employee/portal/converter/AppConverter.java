@@ -34,7 +34,7 @@ import cn.topiam.employee.portal.constant.PortalConstants;
 import cn.topiam.employee.portal.pojo.result.GetAppListResult;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.repository.page.domain.Page;
-import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CODE_VARIABLE;
+import static cn.topiam.employee.common.constant.AppConstants.APP_CODE_VARIABLE;
 import static cn.topiam.employee.common.enums.app.InitLoginType.PORTAL_OR_APP;
 
 /**
@@ -53,7 +53,6 @@ public interface AppConverter {
      */
     default Page<GetAppListResult> entityConvertToAppListResult(org.springframework.data.domain.Page<AppEntity> list) {
        //@formatter:off
-       Page<GetAppListResult> page = new Page<>();
        List<GetAppListResult> results = new ArrayList<>();
        for (AppEntity entity : list) {
            GetAppListResult result = new GetAppListResult();
@@ -85,6 +84,7 @@ public interface AppConverter {
            }
            results.add(result);
        }
+       Page<GetAppListResult> page = new Page<>();
        page.setList(results);
        page.setPagination(Page.Pagination.builder()
                .total(list.getTotalElements())

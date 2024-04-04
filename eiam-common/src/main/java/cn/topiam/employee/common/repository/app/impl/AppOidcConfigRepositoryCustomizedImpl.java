@@ -28,7 +28,7 @@ import cn.topiam.employee.common.repository.app.AppOidcConfigRepositoryCustomize
 import cn.topiam.employee.common.repository.app.impl.mapper.AppOidcConfigPoMapper;
 
 import lombok.AllArgsConstructor;
-import static cn.topiam.employee.common.constant.ProtocolConstants.OIDC_CONFIG_CACHE_NAME;
+import static cn.topiam.employee.common.constant.AppConstants.OIDC_CONFIG_CACHE_NAME;
 
 /**
  *

@@ -20,6 +20,8 @@ package cn.topiam.employee.console.service.authn.impl;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +42,6 @@ import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
-import cn.topiam.employee.support.repository.page.domain.QueryDslRequest;
 import cn.topiam.employee.support.util.BeanUtils;
 
 import lombok.AllArgsConstructor;
@@ -94,10 +95,11 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
     @Override
     public Page<IdentityProviderListResult> getIdentityProviderList(PageModel pageModel,
                                                                     IdentityProviderListQuery query) {
-        QueryDslRequest request = identityProviderConverter
-            .queryIdentityProviderListParamConvertToPredicate(query, pageModel);
+        Specification<IdentityProviderEntity> specification = identityProviderConverter
+            .queryIdentityProviderListParamConvertToSpecification(query);
+        PageRequest request = PageRequest.of(pageModel.getCurrent(), pageModel.getPageSize());
         org.springframework.data.domain.Page<IdentityProviderEntity> list = identityProviderRepository
-            .findAll(request.getPredicate(), request.getPageRequest());
+            .findAll(specification, request);
         return identityProviderConverter.entityConverterToIdentityProviderResult(list);
     }
 

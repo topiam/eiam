@@ -24,9 +24,9 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
@@ -49,7 +49,7 @@ import cn.topiam.employee.support.repository.LogicDeleteRepository;
 @Repository
 @CacheConfig(cacheNames = { AccountConstants.IDS_CACHE_NAME })
 public interface IdentitySourceRepository extends LogicDeleteRepository<IdentitySourceEntity, Long>,
-                                          QuerydslPredicateExecutor<IdentitySourceEntity> {
+                                          JpaSpecificationExecutor<IdentitySourceEntity> {
     /**
      * 根据ID查询
      *

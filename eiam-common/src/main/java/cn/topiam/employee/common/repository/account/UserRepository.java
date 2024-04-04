@@ -28,7 +28,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +50,7 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
 @Repository
 @CacheConfig(cacheNames = { USER_CACHE_NAME })
 public interface UserRepository extends LogicDeleteRepository<UserEntity, Long>,
-                                QuerydslPredicateExecutor<UserEntity>, UserRepositoryCustomized {
+                                UserRepositoryCustomized {
     /**
      * findById
      *
@@ -272,4 +271,12 @@ public interface UserRepository extends LogicDeleteRepository<UserEntity, Long>,
     @Modifying
     @Query(value = "UPDATE user SET auth_total = (IFNULL(auth_total,0) +1),last_auth_ip = ?2,last_auth_time = ?3 WHERE id_ = ?1", nativeQuery = true)
     void updateAuthSucceedInfo(String id, String ip, LocalDateTime loginTime);
+
+    /**
+     * 根据status查询
+     *
+     * @param status {@link UserStatus}
+     * @return {@link List}
+     */
+    List<UserEntity> findAllByStatus(UserStatus status);
 }

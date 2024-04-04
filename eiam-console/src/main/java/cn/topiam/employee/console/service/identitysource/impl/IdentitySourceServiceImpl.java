@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,7 +52,6 @@ import cn.topiam.employee.identitysource.wechatwork.WeChatWorkConfig;
 import cn.topiam.employee.identitysource.wechatwork.WeChatWorkConfigValidator;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
-import cn.topiam.employee.support.repository.page.domain.QueryDslRequest;
 import cn.topiam.employee.support.util.BeanUtils;
 
 import lombok.AllArgsConstructor;
@@ -81,10 +82,11 @@ public class IdentitySourceServiceImpl implements IdentitySourceService {
     @Override
     public cn.topiam.employee.support.repository.page.domain.Page<IdentitySourceListResult> getIdentitySourceList(IdentitySourceListQuery query,
                                                                                                                   PageModel pageModel) {
-        QueryDslRequest request = identitySourceConverter
-            .queryIdentitySourceListParamConvertToPredicate(query, pageModel);
+        Specification<IdentitySourceEntity> specification = identitySourceConverter
+            .queryIdentitySourceListParamConvertToPredicate(query);
         org.springframework.data.domain.Page<IdentitySourceEntity> list = identitySourceRepository
-            .findAll(request.getPredicate(), request.getPageRequest());
+            .findAll(specification,
+                PageRequest.of(pageModel.getCurrent(), pageModel.getPageSize()));
         return identitySourceConverter.entityConverterToIdentitySourceListResult(list);
     }
 

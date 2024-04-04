@@ -32,18 +32,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-
 import cn.topiam.employee.common.entity.account.OrganizationEntity;
-import cn.topiam.employee.common.entity.account.QOrganizationEntity;
-import cn.topiam.employee.common.entity.account.QOrganizationMemberEntity;
-import cn.topiam.employee.common.entity.account.QUserEntity;
 import cn.topiam.employee.common.entity.account.po.OrganizationPO;
 import cn.topiam.employee.common.repository.account.OrganizationRepositoryCustomized;
 import cn.topiam.employee.common.repository.account.impl.mapper.OrganizationPoMapper;
@@ -181,38 +170,9 @@ public class OrganizationRepositoryCustomizedImpl implements OrganizationReposit
         return jdbcTemplate.query(sql, new OrganizationPoMapper());
     }
 
-    @Override
-    public List<Long> getOrgMemberList(String orgId, NumberExpression<Long> expression) {
-        //条件
-        QUserEntity user = QUserEntity.userEntity;
-        QOrganizationEntity qOrganization = QOrganizationEntity.organizationEntity;
-        Predicate predicate = ExpressionUtils.and(user.isNotNull(), user.deleted.eq(Boolean.FALSE));
-        //FIND_IN_SET函数
-        BooleanExpression template = Expressions.booleanTemplate(
-            "FIND_IN_SET({0}, replace({1}, '/', ','))> 0", orgId, qOrganization.path);
-        predicate = ExpressionUtils.and(predicate, qOrganization.id.eq(orgId).or(template));
-        //构造查询
-        JPAQuery<Long> jpaQuery = jpaQueryFactory.selectFrom(user).select(expression)
-            .innerJoin(QOrganizationMemberEntity.organizationMemberEntity)
-            .on(user.id.eq(QOrganizationMemberEntity.organizationMemberEntity.userId)
-                .and(QOrganizationMemberEntity.organizationMemberEntity.deleted.isFalse()))
-            .innerJoin(qOrganization)
-            .on(qOrganization.id.eq(QOrganizationMemberEntity.organizationMemberEntity.orgId)
-                .and(qOrganization.deleted.isFalse()))
-            .where(predicate);
-        return jpaQuery.fetch();
-    }
+    private final JdbcTemplate jdbcTemplate;
 
-    private final JdbcTemplate    jdbcTemplate;
-
-    /**
-     * JPAQueryFactory
-     */
-    private final JPAQueryFactory jpaQueryFactory;
-
-    public OrganizationRepositoryCustomizedImpl(JdbcTemplate jdbcTemplate,
-                                                JPAQueryFactory jpaQueryFactory) {
+    public OrganizationRepositoryCustomizedImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.jpaQueryFactory = jpaQueryFactory;
     }
 }

@@ -25,18 +25,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.domain.Page;
-import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.CollectionUtils;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONWriter;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
 
-import cn.topiam.employee.common.constant.CommonConstants;
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceEntity;
-import cn.topiam.employee.common.entity.identitysource.QIdentitySourceEntity;
 import cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider;
 import cn.topiam.employee.console.pojo.query.identity.IdentitySourceListQuery;
 import cn.topiam.employee.console.pojo.result.identitysource.IdentitySourceConfigGetResult;
@@ -51,11 +47,14 @@ import cn.topiam.employee.identitysource.dingtalk.DingTalkConfig;
 import cn.topiam.employee.identitysource.feishu.FeiShuConfig;
 import cn.topiam.employee.identitysource.wechatwork.WeChatWorkConfig;
 import cn.topiam.employee.support.exception.TopIamException;
-import cn.topiam.employee.support.repository.page.domain.PageModel;
-import cn.topiam.employee.support.repository.page.domain.QueryDslRequest;
 import cn.topiam.employee.support.validation.ValidationUtils;
 
+import jakarta.persistence.criteria.Predicate;
 import jakarta.validation.ConstraintViolationException;
+import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
+
+import static cn.topiam.employee.common.entity.identitysource.IdentitySourceEntity.NAME_FIELD_NAME;
+import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_TIME;
 
 /**
  * 身份源转换器
@@ -65,6 +64,11 @@ import jakarta.validation.ConstraintViolationException;
  */
 @Mapper(componentModel = "spring")
 public interface IdentitySourceConverter {
+
+    /**
+     * 回调地址名称
+     */
+    String       CALLBACK_URL  = "callbackUrl";
 
     ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -231,25 +235,19 @@ public interface IdentitySourceConverter {
     /**
      * 查询身份源列表参数转 Request
      *
-     * @param query     {@link  IdentitySourceListQuery}
-     * @param pageModel {@link  PageModel}
-     * @return {@link QueryDslRequest }
+     * @param listQuery     {@link  IdentitySourceListQuery}
+     * @return {@link Specification }
      */
-    default QueryDslRequest queryIdentitySourceListParamConvertToPredicate(IdentitySourceListQuery query,
-                                                                           PageModel pageModel) {
-        QueryDslRequest request = new QueryDslRequest();
-        QIdentitySourceEntity queryEntity = QIdentitySourceEntity.identitySourceEntity;
-        Predicate predicate = ExpressionUtils.and(queryEntity.isNotNull(),
-            queryEntity.deleted.eq(Boolean.FALSE));
-        //查询条件
-        //@formatter:off
-        predicate = StringUtils.isBlank(query.getName()) ? predicate : ExpressionUtils.and(predicate, queryEntity.name.like("%" + query.getName() + "%"));
-        //@formatter:on
-        request.setPredicate(predicate);
-        //分页条件
-        //@formatter:off
-        request.setPageRequest(QPageRequest.of(pageModel.getCurrent(), pageModel.getPageSize(),queryEntity.updateTime.desc()));
-        return request;
+    default Specification<IdentitySourceEntity> queryIdentitySourceListParamConvertToPredicate(IdentitySourceListQuery listQuery) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (StringUtils.isNotBlank(listQuery.getName())) {
+                predicates.add(cb.like(root.get(NAME_FIELD_NAME), "%" + listQuery.getName() + "%"));
+            }
+            query.where(predicates.toArray(new Predicate[0]));
+            query.orderBy(cb.desc(root.get(LAST_MODIFIED_TIME)));
+            return query.getRestriction();
+        };
     }
 
     /**
@@ -258,22 +256,22 @@ public interface IdentitySourceConverter {
      * @param entity {@link IdentitySourceEntity}
      * @return {@link IdentitySourceConfigGetResult}
      */
-  default   IdentitySourceConfigGetResult entityConverterToIdentitySourceConfigGetResult(IdentitySourceEntity entity){
-      if (entity == null) {
-          return null;
-      }
-      IdentitySourceConfigGetResult identitySourceResult = new IdentitySourceConfigGetResult();
-      if (entity.getId() != null) {
-          identitySourceResult.setId(String.valueOf(entity.getId()));
-      }
-      identitySourceResult.setConfigured(entity.getConfigured());
-      identitySourceResult.setJobConfig(entity.getJobConfig());
-      identitySourceResult.setStrategyConfig(entity.getStrategyConfig());
-      try {
-          JSONObject value = OBJECT_MAPPER.readValue(entity.getBasicConfig(), JSONObject.class);
-          value.remove(CommonConstants.TYPE);
+    default IdentitySourceConfigGetResult entityConverterToIdentitySourceConfigGetResult(IdentitySourceEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+        IdentitySourceConfigGetResult identitySourceResult = new IdentitySourceConfigGetResult();
+        if (entity.getId() != null) {
+            identitySourceResult.setId(String.valueOf(entity.getId()));
+        }
+        identitySourceResult.setConfigured(entity.getConfigured());
+        identitySourceResult.setJobConfig(entity.getJobConfig());
+        identitySourceResult.setStrategyConfig(entity.getStrategyConfig());
+        try {
+            JSONObject value = OBJECT_MAPPER.readValue(entity.getBasicConfig(), JSONObject.class);
+            value.remove(NAME);
           //@formatter:off
-          value.put(CommonConstants.CALLBACK_URL, ServerHelp.getSynchronizerPublicBaseUrl() + "/api/v1/synchronizer/event_receive/" +  entity.getCode());
+          value.put(CALLBACK_URL, ServerHelp.getSynchronizerPublicBaseUrl() + "/api/v1/synchronizer/event_receive/" +  entity.getCode());
           //@formatter:on
             identitySourceResult.setBasicConfig(value);
         } catch (Exception e) {

@@ -56,100 +56,106 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
 public class AdministratorEntity extends LogicDeleteEntity<Long> {
 
     @Serial
-    private static final long serialVersionUID = -2619231849746900857L;
+    private static final long  serialVersionUID    = -2619231849746900857L;
+
+    public static final String USERNAME_FIELD_NAME = "username";
+
+    public static final String PHONE_FIELD_NAME    = "phone";
+
+    public static final String EMAIL_FIELD_NAME    = "email";
 
     /**
      * 用户名
      */
     @Column(name = "username_")
-    private String            username;
+    private String             username;
 
     /**
      * 姓名
      */
     @Column(name = "full_name")
-    private String            fullName;
+    private String             fullName;
 
     /**
      * 昵称
      */
     @Column(name = "nick_name")
-    private String            nickName;
+    private String             nickName;
 
     /**
      * 密码
      */
     @Column(name = "password_")
-    private String            password;
+    private String             password;
 
     /**
      * 邮箱
      */
     @Column(name = "email_")
-    private String            email;
+    private String             email;
 
     /**
      * 手机号
      */
     @Column(name = "phone_")
-    private String            phone;
+    private String             phone;
 
     /**
      * 手机号
      */
     @Column(name = "phone_area_code")
-    private String            phoneAreaCode;
+    private String             phoneAreaCode;
 
     /**
      * 手机有效
      */
     @Column(name = "phone_verified")
-    private Boolean           phoneVerified;
+    private Boolean            phoneVerified;
 
     /**
      * 头像URL
      */
     @Column(name = "avatar_")
-    private String            avatar;
+    private String             avatar;
 
     /**
      * 状态  ENABLE:启用 DISABLE:禁用 LOCKING:锁定
      */
     @Column(name = "status_")
-    private UserStatus        status;
+    private UserStatus         status;
 
     /**
      * 邮箱验证有效
      */
     @Column(name = "email_verified")
-    private Boolean           emailVerified;
+    private Boolean            emailVerified;
 
     /**
      * 认证次数
      */
     @Column(name = "auth_total")
-    private Long              authTotal;
+    private Long               authTotal;
     /**
      * 上次认证IP
      */
     @Column(name = "last_auth_ip")
-    private String            lastAuthIp;
+    private String             lastAuthIp;
 
     /**
      * 上次认证时间
      */
     @Column(name = "last_auth_time")
-    private LocalDateTime     lastAuthTime;
+    private LocalDateTime      lastAuthTime;
 
     /**
      * 最后修改密码时间
      */
     @Column(name = "last_update_password_time")
-    private LocalDateTime     lastUpdatePasswordTime;
+    private LocalDateTime      lastUpdatePasswordTime;
 
     /**
      * 扩展参数
      */
     @Column(name = "expand_")
-    private String            expand;
+    private String             expand;
 }

@@ -17,10 +17,7 @@
  */
 package cn.topiam.employee.console.service.account.impl;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -33,7 +30,6 @@ import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.common.entity.account.OrganizationEntity;
-import cn.topiam.employee.common.entity.account.QUserEntity;
 import cn.topiam.employee.common.enums.DataOrigin;
 import cn.topiam.employee.common.repository.account.OrganizationRepository;
 import cn.topiam.employee.console.converter.account.OrganizationConverter;
@@ -41,7 +37,7 @@ import cn.topiam.employee.console.pojo.result.account.*;
 import cn.topiam.employee.console.pojo.save.account.OrganizationCreateParam;
 import cn.topiam.employee.console.pojo.update.account.OrganizationUpdateParam;
 import cn.topiam.employee.console.service.account.OrganizationService;
-import cn.topiam.employee.support.repository.id.SnowflakeIdGenerator;
+import cn.topiam.employee.support.repository.generator.SnowflakeIdGenerator;
 import cn.topiam.employee.support.util.BeanUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -210,7 +206,7 @@ public class OrganizationServiceImpl implements OrganizationService {
             List<OrganizationEntity> list = organizationRepository.findByParentId(id);
             if (CollectionUtils.isEmpty(list)) {
                 //查询当前机构和当前机构下子机构下是否存在用户，不存在删除，存在抛出异常
-                Long count = getOrgMemberCount(id);
+                Integer count = getOrgMemberCount(id);
                 if (count > 0) {
                     throw new RuntimeException("删除机构失败，当前机构下存在用户");
                 }
@@ -273,11 +269,9 @@ public class OrganizationServiceImpl implements OrganizationService {
                 }
                 entity.setParentId(parentId);
                 //父级路径
-                entity.setPath(
-                    StringUtils.defaultString(parent.getPath()) + SEPARATE + entity.getId());
+                entity.setPath(parent.getPath() + SEPARATE + entity.getId());
                 //父级展示路径
-                entity.setDisplayPath(StringUtils.defaultString(parent.getDisplayPath()) + SEPARATE
-                                      + entity.getName());
+                entity.setDisplayPath(parent.getDisplayPath() + SEPARATE + entity.getName());
             }
             organizationRepository.save(entity);
             // 判断旧的父节点下是否还存在子节点，不存在更改此节点为叶子节点
@@ -410,10 +404,8 @@ public class OrganizationServiceImpl implements OrganizationService {
      * @param orgId {@link  String}
      * @return {@link  Long}
      */
-    @Override
-    public Long getOrgMemberCount(String orgId) {
-        return organizationRepository.getOrgMemberList(orgId, QUserEntity.userEntity.count())
-            .get(0);
+    public Integer getOrgMemberCount(String orgId) {
+        return organizationRepository.getOrgMemberList(orgId).size();
     }
 
     /**

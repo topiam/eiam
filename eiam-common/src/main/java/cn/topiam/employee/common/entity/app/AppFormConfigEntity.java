@@ -20,9 +20,10 @@ package cn.topiam.employee.common.entity.app;
 import java.io.Serializable;
 import java.util.List;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.Where;
+import org.hibernate.type.SqlTypes;
 
 import cn.topiam.employee.common.enums.app.FormEncryptType;
 import cn.topiam.employee.common.enums.app.FormSubmitType;
@@ -34,7 +35,6 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -116,7 +116,7 @@ public class AppFormConfigEntity extends LogicDeleteEntity<Long> {
      * 登录其他信息
      */
     @Column(name = "other_field")
-    @Type(JsonType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     private List<OtherField> otherField;
 
     @Data

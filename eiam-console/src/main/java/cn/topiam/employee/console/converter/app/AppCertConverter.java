@@ -23,14 +23,14 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
-
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 
 import cn.topiam.employee.common.entity.app.AppCertEntity;
-import cn.topiam.employee.common.entity.app.QAppCertEntity;
 import cn.topiam.employee.console.pojo.query.app.AppCertQuery;
 import cn.topiam.employee.console.pojo.result.app.AppCertListResult;
+import static cn.topiam.employee.common.entity.app.AppCertEntity.APP_ID_FIELD_NAME;
+import static cn.topiam.employee.common.entity.app.AppCertEntity.USING_TYPE_FIELD_NAME;
 
 /**
  * 应用证书Converter
@@ -41,20 +41,27 @@ import cn.topiam.employee.console.pojo.result.app.AppCertListResult;
 @Mapper(componentModel = "spring")
 public interface AppCertConverter {
     /**
-     * 查询应用列表参数转换为  Querydsl  Predicate
+     * 查询应用列表参数转换为  Example
      *
      * @param query {@link AppCertQuery} query
-     * @return {@link Predicate}
+     * @return {@link Example}
      */
-    default Predicate queryAppCertListParamConvertToPredicate(AppCertQuery query) {
-        QAppCertEntity cert = QAppCertEntity.appCertEntity;
-        Predicate predicate = ExpressionUtils.and(cert.isNotNull(), cert.deleted.eq(Boolean.FALSE));
+    default Example<AppCertEntity> queryAppCertListParamConvertToExample(AppCertQuery query) {
         //查询条件
-        //@formatter:off
-        predicate = StringUtils.isBlank(query.getAppId()) ? predicate : ExpressionUtils.and(predicate, cert.appId.eq(Long.valueOf(query.getAppId())));
-        predicate = Objects.isNull(query.getUsingType()) ? predicate : ExpressionUtils.and(predicate, cert.usingType.eq(query.getUsingType()));
-        //@formatter:on
-        return predicate;
+        AppCertEntity entity = new AppCertEntity();
+        ExampleMatcher exampleMatcher = ExampleMatcher.matching();
+        if (!StringUtils.isBlank(query.getAppId())) {
+            exampleMatcher.withMatcher(APP_ID_FIELD_NAME,
+                ExampleMatcher.GenericPropertyMatchers.exact());
+            entity.setAppId(Long.valueOf(query.getAppId()));
+
+        }
+        if (!Objects.isNull(query.getUsingType())) {
+            exampleMatcher.withMatcher(USING_TYPE_FIELD_NAME,
+                ExampleMatcher.GenericPropertyMatchers.exact());
+            entity.setUsingType(query.getUsingType());
+        }
+        return Example.of(entity, exampleMatcher);
     }
 
     /**

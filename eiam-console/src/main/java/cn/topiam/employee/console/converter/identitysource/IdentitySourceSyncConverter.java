@@ -24,22 +24,22 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.CollectionUtils;
-
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
 
 import cn.topiam.employee.common.entity.account.UserGroupEntity;
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceSyncHistoryEntity;
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceSyncRecordEntity;
-import cn.topiam.employee.common.entity.identitysource.QIdentitySourceSyncHistoryEntity;
-import cn.topiam.employee.common.entity.identitysource.QIdentitySourceSyncRecordEntity;
 import cn.topiam.employee.console.pojo.query.identity.IdentitySourceSyncHistoryListQuery;
 import cn.topiam.employee.console.pojo.query.identity.IdentitySourceSyncRecordListQuery;
 import cn.topiam.employee.console.pojo.result.account.UserGroupListResult;
 import cn.topiam.employee.console.pojo.result.identitysource.IdentitySourceSyncHistoryListResult;
 import cn.topiam.employee.console.pojo.result.identitysource.IdentitySourceSyncRecordListResult;
 import cn.topiam.employee.support.repository.page.domain.Page;
+
+import jakarta.persistence.criteria.Predicate;
+import static cn.topiam.employee.common.entity.identitysource.IdentitySourceSyncHistoryEntity.*;
+import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_TIME;
 
 /**
  * 身份源转换器
@@ -51,23 +51,34 @@ import cn.topiam.employee.support.repository.page.domain.Page;
 public interface IdentitySourceSyncConverter {
 
     /**
-     * 身份源同步列表参数转换为  Querydsl  Predicate
+     * 身份源同步列表参数转换为  Specification
      *
-     * @param query {@link IdentitySourceSyncHistoryListQuery} query
-     * @return {@link Predicate}
+     * @param listQuery {@link IdentitySourceSyncHistoryListQuery} query
+     * @return {@link Specification}
      */
-    default Predicate queryIdentitySourceSyncHistoryListQueryConvertToPredicate(IdentitySourceSyncHistoryListQuery query) {
-        QIdentitySourceSyncHistoryEntity queryEntity = QIdentitySourceSyncHistoryEntity.identitySourceSyncHistoryEntity;
-        Predicate predicate = ExpressionUtils.and(queryEntity.isNotNull(),
-            queryEntity.deleted.eq(Boolean.FALSE));
-        //查询条件
-        //@formatter:off
-        predicate = StringUtils.isBlank(query.getIdentitySourceId()) ? predicate : ExpressionUtils.and(predicate, queryEntity.identitySourceId.eq(Long.valueOf(query.getIdentitySourceId())));
-        predicate = Objects.isNull(query.getObjectType()) ? predicate : ExpressionUtils.and(predicate, queryEntity.objectType.eq(query.getObjectType()));
-        predicate = Objects.isNull(query.getTriggerType()) ? predicate : ExpressionUtils.and(predicate, queryEntity.triggerType.eq(query.getTriggerType()));
-        predicate = Objects.isNull(query.getStatus()) ? predicate : ExpressionUtils.and(predicate, queryEntity.status.eq(query.getStatus()));
-        //@formatter:on
-        return predicate;
+    default Specification<IdentitySourceSyncHistoryEntity> queryIdentitySourceSyncHistoryListQueryConvertToSpecification(IdentitySourceSyncHistoryListQuery listQuery) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (StringUtils.isNotBlank(listQuery.getIdentitySourceId())) {
+                predicates.add(criteriaBuilder.equal(root.get(IDENTITY_SOURCE_ID_FIELD_NAME),
+                    listQuery.getIdentitySourceId()));
+            }
+            if (Objects.isNull(listQuery.getTriggerType())) {
+                predicates.add(criteriaBuilder.equal(root.get(TRIGGER_TYPE_FIELD_NAME),
+                    listQuery.getTriggerType()));
+            }
+            if (Objects.isNull(listQuery.getStatus())) {
+                predicates
+                    .add(criteriaBuilder.equal(root.get(STATUS_FIELD_NAME), listQuery.getStatus()));
+            }
+            if (Objects.isNull(listQuery.getObjectType())) {
+                predicates.add(criteriaBuilder.equal(root.get(OBJECT_TYPE_FIELD_NAME),
+                    listQuery.getObjectType()));
+            }
+            query.where(predicates.toArray(new Predicate[0]));
+            query.orderBy(criteriaBuilder.desc(root.get(LAST_MODIFIED_TIME)));
+            return query.getRestriction();
+        };
     }
 
     /**
@@ -150,23 +161,33 @@ public interface IdentitySourceSyncConverter {
     }
 
     /**
-     * 查询身份源同步详情列表参数转换为  Querydsl  Predicate
+     * 查询身份源同步详情列表参数转换为 Specification
      *
-     * @param query {@link IdentitySourceSyncRecordListQuery} query
-     * @return {@link Predicate}
+     * @param listQuery {@link IdentitySourceSyncRecordListQuery} query
+     * @return {@link Specification}
      */
-    default Predicate queryIdentitySourceSyncRecordListQueryConvertToPredicate(IdentitySourceSyncRecordListQuery query) {
-        QIdentitySourceSyncRecordEntity entity = QIdentitySourceSyncRecordEntity.identitySourceSyncRecordEntity;
-        Predicate predicate = ExpressionUtils.and(entity.isNotNull(),
-            entity.deleted.eq(Boolean.FALSE));
-        //查询条件
-        //@formatter:off
-        predicate = StringUtils.isBlank(query.getSyncHistoryId()) ? predicate : ExpressionUtils.and(predicate, entity.syncHistoryId.eq(Long.valueOf(query.getSyncHistoryId())));
-        predicate = Objects.isNull(query.getObjectType()) ? predicate : ExpressionUtils.and(predicate, entity.objectType.eq(query.getObjectType()));
-        predicate = Objects.isNull(query.getActionType()) ? predicate : ExpressionUtils.and(predicate, entity.actionType.eq(query.getActionType()));
-        predicate = Objects.isNull(query.getStatus()) ? predicate : ExpressionUtils.and(predicate, entity.status.eq(query.getStatus()));
-        //@formatter:on
-        return predicate;
+    default Specification<IdentitySourceSyncRecordEntity> queryIdentitySourceSyncRecordListQueryConvertToSpecification(IdentitySourceSyncRecordListQuery listQuery) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (Objects.isNull(listQuery.getStatus())) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), listQuery.getStatus()));
+            }
+            if (StringUtils.isNotBlank(listQuery.getSyncHistoryId())) {
+                predicates.add(
+                    criteriaBuilder.equal(root.get("syncHistoryId"), listQuery.getSyncHistoryId()));
+            }
+            if (Objects.isNull(listQuery.getObjectType())) {
+                predicates
+                    .add(criteriaBuilder.equal(root.get("objectType"), listQuery.getObjectType()));
+            }
+            if (Objects.isNull(listQuery.getActionType())) {
+                predicates
+                    .add(criteriaBuilder.equal(root.get("actionType"), listQuery.getActionType()));
+            }
+            query.where(predicates.toArray(new Predicate[0]));
+            query.orderBy(criteriaBuilder.desc(root.get(LAST_MODIFIED_TIME)));
+            return query.getRestriction();
+        };
     }
 
     /**

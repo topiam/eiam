@@ -38,7 +38,6 @@ import org.springframework.security.config.annotation.web.configurers.FormLoginC
 import org.springframework.security.config.annotation.web.configurers.RequestCacheConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -77,15 +76,14 @@ import cn.topiam.employee.core.security.password.task.impl.PasswordExpireLockTas
 import cn.topiam.employee.core.security.password.task.impl.PasswordExpireWarnTask;
 import cn.topiam.employee.core.security.task.UserExpireLockTask;
 import cn.topiam.employee.core.security.task.UserUnlockTask;
-import cn.topiam.employee.portal.security.handler.PortalAuthenticationFailureHandler;
-import cn.topiam.employee.portal.security.handler.PortalAuthenticationSuccessHandler;
-import cn.topiam.employee.portal.security.listener.PortalAuthenticationFailureEventListener;
-import cn.topiam.employee.portal.security.listener.PortalAuthenticationSuccessEventListener;
-import cn.topiam.employee.portal.security.listener.PortalLogoutSuccessEventListener;
+import cn.topiam.employee.portal.authentication.PortalAuthenticationFailureEventListener;
+import cn.topiam.employee.portal.authentication.PortalAuthenticationFailureHandler;
+import cn.topiam.employee.portal.authentication.PortalAuthenticationSuccessEventListener;
+import cn.topiam.employee.portal.authentication.PortalAuthenticationSuccessHandler;
+import cn.topiam.employee.portal.authentication.PortalLogoutSuccessEventListener;
 import cn.topiam.employee.support.geo.GeoLocationService;
 import cn.topiam.employee.support.jackjson.SupportJackson2Module;
 import cn.topiam.employee.support.security.authentication.WebAuthenticationDetailsSource;
-import cn.topiam.employee.support.security.savedredirect.LoginRedirectParameterFilter;
 import static org.springframework.http.HttpMethod.*;
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -158,7 +156,7 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
                 .failureHandler(failureHandler)
                 .authenticationDetailsSource(authenticationDetailsSource);
         requestMatchers.add(qq.getRequestMatcher());
-        httpSecurity.apply(qq);
+        httpSecurity.with(qq,configurer-> {});
 
         //微信扫码
         WeChatScanCodeAuthenticationConfigurer chatScanCode = weChatScanCode(identityProviderRepository, userIdpService)
@@ -166,7 +164,7 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
                 .failureHandler(failureHandler)
                 .authenticationDetailsSource(authenticationDetailsSource);
         requestMatchers.add(chatScanCode.getRequestMatcher());
-        httpSecurity.apply(chatScanCode);
+        httpSecurity.with(chatScanCode,configurer-> {});
 
         //GITHUB
         GithubOauthAuthenticationConfigurer github = github(identityProviderRepository, userIdpService)
@@ -174,7 +172,7 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
                 .failureHandler(failureHandler)
                 .authenticationDetailsSource(authenticationDetailsSource);
         requestMatchers.add(github.getRequestMatcher());
-        httpSecurity.apply(github);
+        httpSecurity.with(github,configurer-> {});
 
         //企业微信
         WeChatWorkScanCodeAuthenticationConfigurer weChatWorkScanCode = weChatWorkScanCode(identityProviderRepository, userIdpService)
@@ -182,7 +180,7 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
                 .failureHandler(failureHandler)
                 .authenticationDetailsSource(authenticationDetailsSource);
         requestMatchers.add(weChatWorkScanCode.getRequestMatcher());
-        httpSecurity.apply(weChatWorkScanCode);
+        httpSecurity.with(weChatWorkScanCode,configurer-> {});
 
         //钉钉OAuth2
         DingtalkOAuth2AuthenticationConfigurer dingtalkOauth2 = dingtalkOAuth2(identityProviderRepository, userIdpService)
@@ -190,7 +188,7 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
                 .failureHandler(failureHandler)
                 .authenticationDetailsSource(authenticationDetailsSource);
         requestMatchers.add(dingtalkOauth2.getRequestMatcher());
-        httpSecurity.apply(dingtalkOauth2);
+        httpSecurity.with(dingtalkOauth2,configurer-> {});
 
         //钉钉扫码
         DingtalkScanCodeAuthenticationConfigurer dingtalkScanCode = dingtalkScanCode(identityProviderRepository, userIdpService)
@@ -198,7 +196,7 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
                 .failureHandler(failureHandler)
                 .authenticationDetailsSource(authenticationDetailsSource);
         requestMatchers.add(dingtalkScanCode.getRequestMatcher());
-        httpSecurity.apply(dingtalkScanCode);
+        httpSecurity.with(dingtalkScanCode,configurer-> {});
 
         //飞书扫码
         FeiShuScanCodeAuthenticationConfigurer feiShuScanCode = feiShuScanCode(identityProviderRepository, userIdpService)
@@ -206,7 +204,7 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
                 .failureHandler(failureHandler)
                 .authenticationDetailsSource(authenticationDetailsSource);
         requestMatchers.add(feiShuScanCode.getRequestMatcher());
-        httpSecurity.apply(feiShuScanCode);
+        httpSecurity.with(feiShuScanCode,configurer-> {});
 
 
         //Gitee
@@ -215,7 +213,7 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
                 .failureHandler(failureHandler)
                 .authenticationDetailsSource(authenticationDetailsSource);
         requestMatchers.add(giteeCode.getRequestMatcher());
-        httpSecurity.apply(giteeCode);
+        httpSecurity.with(giteeCode,configurer-> {});
 
         //支付宝
         AlipayAuthenticationConfigurer alipayOauth = alipayOauth(identityProviderRepository, userIdpService)
@@ -223,7 +221,7 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
                 .failureHandler(failureHandler)
                 .authenticationDetailsSource(authenticationDetailsSource);
         requestMatchers.add(alipayOauth.getRequestMatcher());
-        httpSecurity.apply(alipayOauth);
+        httpSecurity.with(alipayOauth,configurer-> {});
 
         //RequestMatcher
         OrRequestMatcher requestMatcher = new OrRequestMatcher(requestMatchers);
@@ -243,7 +241,6 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
             .cors(withCorsConfigurerDefaults())
             //会话管理器
             .sessionManagement(withSessionManagementConfigurerDefaults());
-        httpSecurity.addFilterBefore(new LoginRedirectParameterFilter(new IdpRedirectParameterMatcher()), OAuth2AuthorizationRequestRedirectFilter.class);
         return httpSecurity.build();
         // @formatter:on
     }
@@ -297,26 +294,19 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
                 .successHandler(successHandler)
                 .failureHandler(failureHandler)
                 .authenticationDetailsSource(authenticationDetailsSource);
-        httpSecurity.apply(mailOtpAuthenticationConfigurer);
+        httpSecurity.with(mailOtpAuthenticationConfigurer,configurer-> {});
         //短信验证码登录认证
         SmsOtpAuthenticationConfigurer smsAuthenticationConfigurer = smsOtp(userRepository, userDetailsService, otpContextHelp)
                 .successHandler(successHandler)
                 .failureHandler(failureHandler)
                 .authenticationDetailsSource(authenticationDetailsSource);
-        httpSecurity.apply(smsAuthenticationConfigurer);
+        httpSecurity.with(smsAuthenticationConfigurer,configurer-> {});
         //IDP 绑定用户
         IdpBindAuthenticationConfigurer idpBindAuthenticationConfigurer = idpBind(userIdpService, passwordEncoder)
                 .successHandler(successHandler)
                 .failureHandler(failureHandler)
                 .authenticationDetailsSource(authenticationDetailsSource);
-        httpSecurity.apply(idpBindAuthenticationConfigurer);
-
-        //Form 、短信/邮件验证码 授权请求重定向参数过滤器
-        httpSecurity.addFilterBefore(new LoginRedirectParameterFilter(
-                new OrRequestMatcher(new AntPathRequestMatcher(FORM_LOGIN),
-                    mailOtpAuthenticationConfigurer.getRequestMatcher(),
-                    smsAuthenticationConfigurer.getRequestMatcher())),
-                    OAuth2AuthorizationRequestRedirectFilter.class);
+        httpSecurity.with(idpBindAuthenticationConfigurer,configurer-> {});
         // @formatter:on
         return httpSecurity.build();
     }

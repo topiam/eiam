@@ -24,9 +24,9 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +42,7 @@ import static cn.topiam.employee.common.constant.SettingConstants.ADMIN_CACHE_NA
 @Repository
 @CacheConfig(cacheNames = { ADMIN_CACHE_NAME })
 public interface AdministratorRepository extends LogicDeleteRepository<AdministratorEntity, Long>,
-                                         QuerydslPredicateExecutor<AdministratorEntity> {
+                                         JpaSpecificationExecutor<AdministratorEntity> {
 
     /**
      * findById

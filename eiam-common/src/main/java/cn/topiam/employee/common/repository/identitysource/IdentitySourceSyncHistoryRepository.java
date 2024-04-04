@@ -17,7 +17,7 @@
  */
 package cn.topiam.employee.common.repository.identitysource;
 
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceSyncHistoryEntity;
@@ -32,5 +32,5 @@ import cn.topiam.employee.support.repository.LogicDeleteRepository;
 @Repository
 public interface IdentitySourceSyncHistoryRepository extends
                                                      LogicDeleteRepository<IdentitySourceSyncHistoryEntity, Long>,
-                                                     QuerydslPredicateExecutor<IdentitySourceSyncHistoryEntity> {
+                                                     JpaSpecificationExecutor<IdentitySourceSyncHistoryEntity> {
 }

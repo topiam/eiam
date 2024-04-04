@@ -40,8 +40,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import static cn.topiam.employee.common.constant.SessionConstants.CURRENT_USER;
-import static cn.topiam.employee.common.util.ImageAvatarUtils.bufferedImageToBase64;
-import static cn.topiam.employee.common.util.ImageAvatarUtils.generateAvatarImg;
+import static cn.topiam.employee.support.util.ImageAvatarUtils.bufferedImageToBase64;
+import static cn.topiam.employee.support.util.ImageAvatarUtils.generateAvatarImg;
 
 /**
  * 当前用户

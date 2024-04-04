@@ -28,7 +28,7 @@ import cn.topiam.employee.common.repository.app.AppFormConfigRepositoryCustomize
 import cn.topiam.employee.common.repository.app.impl.mapper.AppFormConfigPoMapper;
 
 import lombok.AllArgsConstructor;
-import static cn.topiam.employee.common.constant.ProtocolConstants.FORM_CONFIG_CACHE_NAME;
+import static cn.topiam.employee.common.constant.AppConstants.FORM_CONFIG_CACHE_NAME;
 
 /**
  *

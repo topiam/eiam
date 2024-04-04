@@ -54,48 +54,52 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
 public class IdentityProviderEntity extends LogicDeleteEntity<Long> {
 
     @Serial
-    private static final long serialVersionUID = -7936931011805155568L;
+    private static final long  serialVersionUID    = -7936931011805155568L;
+
+    public static final String CATEGORY_FIELD_NAME = "category";
+
+    public static final String NAME_FIELD_NAME     = "name";
 
     /**
      * 名称
      */
     @Column(name = "name_")
-    private String            name;
+    private String             name;
 
     /**
      * 唯一CODE 不可修改
      */
     @Column(name = "code_")
-    private String            code;
+    private String             code;
 
     /**
      * 平台
      */
     @Column(name = "type_")
-    private String            type;
+    private String             type;
 
     /**
      * 分类
      */
     @Column(name = "category_")
-    private String            category;
+    private String             category;
 
     /**
      * 配置JSON串
      */
     @Column(name = "config_")
-    private String            config;
+    private String             config;
 
     /**
      * 是否启用
      */
     @Column(name = "is_enabled")
-    private Boolean           enabled;
+    private Boolean            enabled;
 
     /**
      * 是否展示
      */
     @Column(name = "is_displayed")
-    private Boolean           displayed;
+    private Boolean            displayed;
 
 }

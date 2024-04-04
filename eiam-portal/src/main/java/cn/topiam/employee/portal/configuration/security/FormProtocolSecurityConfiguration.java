@@ -62,8 +62,8 @@ public class FormProtocolSecurityConfiguration extends AbstractSecurityConfigura
         //@formatter:off
         httpSecurity.getSharedObject(AuthenticationManagerBuilder.class).parentAuthenticationManager(null);
         //Form IDP 配置
-        FormAuthorizationServerConfigurer configurer = new FormAuthorizationServerConfigurer();
-        RequestMatcher endpointsMatcher = configurer.getEndpointsMatcher();
+        FormAuthorizationServerConfigurer serverConfigurer = new FormAuthorizationServerConfigurer();
+        RequestMatcher endpointsMatcher = serverConfigurer.getEndpointsMatcher();
         httpSecurity.securityMatcher(endpointsMatcher)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
                 //安全上下文
@@ -76,7 +76,7 @@ public class FormProtocolSecurityConfiguration extends AbstractSecurityConfigura
                 .cors(withCorsConfigurerDefaults())
                 //会话管理器
                 .sessionManagement(withSessionManagementConfigurerDefaults())
-                .apply(configurer);
+                .with(serverConfigurer,configurer-> {});
         return httpSecurity.build();
         //@formatter:on
     }

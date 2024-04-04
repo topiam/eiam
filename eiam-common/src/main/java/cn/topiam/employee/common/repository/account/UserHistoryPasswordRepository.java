@@ -19,7 +19,6 @@ package cn.topiam.employee.common.repository.account;
 
 import java.util.List;
 
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.common.entity.account.UserHistoryPasswordEntity;
@@ -35,8 +34,7 @@ import cn.topiam.employee.support.repository.LogicDeleteRepository;
  */
 @Repository
 public interface UserHistoryPasswordRepository extends
-                                               LogicDeleteRepository<UserHistoryPasswordEntity, Long>,
-                                               QuerydslPredicateExecutor<UserHistoryPasswordEntity> {
+                                               LogicDeleteRepository<UserHistoryPasswordEntity, Long> {
     /**
      * 根据用户ID查询历史密码
      *

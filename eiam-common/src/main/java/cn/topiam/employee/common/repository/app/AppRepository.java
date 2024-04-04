@@ -25,7 +25,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +39,7 @@ import static cn.topiam.employee.common.constant.AppConstants.APP_CACHE_NAME;
 @Repository
 @CacheConfig(cacheNames = { APP_CACHE_NAME })
 public interface AppRepository extends LogicDeleteRepository<AppEntity, Long>,
-                               QuerydslPredicateExecutor<AppEntity>, AppRepositoryCustomized {
+                               AppRepositoryCustomized {
 
     /**
      * 根据应用ID查询已启用应用

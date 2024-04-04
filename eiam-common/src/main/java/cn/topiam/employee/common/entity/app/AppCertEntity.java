@@ -50,81 +50,86 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
 @SQLDelete(sql = "update app_cert set " + SOFT_DELETE_SET + " where id_ = ?")
 @Where(clause = SOFT_DELETE_WHERE)
 public class AppCertEntity extends LogicDeleteEntity<Long> {
+
+    public static final String APP_ID_FIELD_NAME     = "appId";
+
+    public static final String USING_TYPE_FIELD_NAME = "usingType";
+
     /**
      * 应用ID
      */
     @Column(name = "app_id")
-    private Long             appId;
+    private Long               appId;
 
     /**
      * 证书序列号
      */
     @Column(name = "serial_")
-    private BigInteger       serial;
+    private BigInteger         serial;
 
     /**
      * 主题信息
      */
     @Column(name = "subject_")
-    private String           subject;
+    private String             subject;
 
     /**
      * 签发者信息
      */
     @Column(name = "issuer_")
-    private String           issuer;
+    private String             issuer;
 
     /**
      * 开始时间
      */
     @Column(name = "begin_date")
-    private LocalDateTime    beginDate;
+    private LocalDateTime      beginDate;
 
     /**
      * 结束时间
      */
     @Column(name = "end_date")
-    private LocalDateTime    endDate;
+    private LocalDateTime      endDate;
 
     /**
      * 有效天数
      */
     @Column(name = "validity_")
-    private Integer          validity;
+    private Integer            validity;
 
     /**
      * 算法
      */
     @Column(name = "sign_algo")
-    private String           signAlgo;
+    private String             signAlgo;
 
     /**
      * 私钥长度
      */
     @Column(name = "key_long")
-    private Integer          keyLong;
+    private Integer            keyLong;
 
     /**
      * 私钥
      */
     @Column(name = "private_key")
-    private String           privateKey;
+    private String             privateKey;
 
     /**
      * 公钥
      */
     @Column(name = "public_key")
-    private String           publicKey;
+    private String             publicKey;
 
     /**
      * 证书
      */
     @Column(name = "cert_")
-    private String           cert;
+    private String             cert;
 
     /**
      * 使用类型
      */
     @Column(name = "using_type")
-    private AppCertUsingType usingType;
+    private AppCertUsingType   usingType;
 }

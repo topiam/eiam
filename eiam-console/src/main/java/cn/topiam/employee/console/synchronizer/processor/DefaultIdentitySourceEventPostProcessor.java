@@ -68,7 +68,7 @@ import lombok.extern.slf4j.Slf4j;
 import jakarta.persistence.EntityManager;
 import static java.util.stream.Collectors.toSet;
 
-import static cn.topiam.employee.common.constant.CommonConstants.SYSTEM_DEFAULT_USER_NAME;
+import static cn.topiam.employee.support.constant.EiamConstants.SYSTEM_DEFAULT_USER_NAME;
 
 /**
  * 身份源数据 event 处理器

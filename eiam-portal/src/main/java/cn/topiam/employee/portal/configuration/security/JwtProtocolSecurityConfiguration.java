@@ -66,8 +66,8 @@ public class JwtProtocolSecurityConfiguration extends AbstractSecurityConfigurat
         //@formatter:off
         httpSecurity.getSharedObject(AuthenticationManagerBuilder.class).parentAuthenticationManager(null);
         //Jwt IDP 配置
-        JwtAuthorizationServerConfigurer configurer = new JwtAuthorizationServerConfigurer();
-        RequestMatcher endpointsMatcher = configurer.getEndpointsMatcher();
+        JwtAuthorizationServerConfigurer serverConfigurer = new JwtAuthorizationServerConfigurer();
+        RequestMatcher endpointsMatcher = serverConfigurer.getEndpointsMatcher();
         httpSecurity.securityMatcher(endpointsMatcher)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
                 //安全上下文
@@ -80,7 +80,7 @@ public class JwtProtocolSecurityConfiguration extends AbstractSecurityConfigurat
                 .cors(withCorsConfigurerDefaults())
                 //会话管理器
                 .sessionManagement(withSessionManagementConfigurerDefaults())
-                .apply(configurer);
+                .with(serverConfigurer,configurer-> {});
         return httpSecurity.build();
         //@formatter:on
     }

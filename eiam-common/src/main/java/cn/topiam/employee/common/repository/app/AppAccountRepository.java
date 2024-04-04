@@ -25,14 +25,13 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.app.AppAccountEntity;
 import cn.topiam.employee.support.repository.LogicDeleteRepository;
-import static cn.topiam.employee.common.constant.ProtocolConstants.APP_ACCOUNT_CACHE_NAME;
+import static cn.topiam.employee.common.constant.AppConstants.APP_ACCOUNT_CACHE_NAME;
 import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 
 /**
@@ -44,7 +43,6 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
 @Repository
 @CacheConfig(cacheNames = { APP_ACCOUNT_CACHE_NAME })
 public interface AppAccountRepository extends LogicDeleteRepository<AppAccountEntity, Long>,
-                                      QuerydslPredicateExecutor<AppAccountEntity>,
                                       AppAccountRepositoryCustomized {
     /**
      * save

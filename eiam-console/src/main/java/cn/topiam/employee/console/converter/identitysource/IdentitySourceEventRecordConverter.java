@@ -23,19 +23,20 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.CollectionUtils;
-
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
 
 import cn.topiam.employee.common.entity.account.UserGroupEntity;
 import cn.topiam.employee.common.entity.identitysource.IdentitySourceEventRecordEntity;
-import cn.topiam.employee.common.entity.identitysource.QIdentitySourceEventRecordEntity;
 import cn.topiam.employee.console.pojo.query.identity.IdentitySourceEventRecordListQuery;
 import cn.topiam.employee.console.pojo.result.account.UserGroupListResult;
 import cn.topiam.employee.console.pojo.result.identitysource.IdentitySourceEventRecordListResult;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.repository.page.domain.Page;
+
+import jakarta.persistence.criteria.Predicate;
+import static cn.topiam.employee.common.entity.identitysource.IdentitySourceEventRecordEntity.*;
+import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_TIME;
 
 /**
  * 身份源事件记录转换器
@@ -47,23 +48,35 @@ import cn.topiam.employee.support.repository.page.domain.Page;
 public interface IdentitySourceEventRecordConverter {
 
     /**
-     * 身份源事件记录列表参数转换为  Querydsl  Predicate
+     * 身份源事件记录列表参数转换为  Specification
      *
-     * @param query {@link IdentitySourceEventRecordListQuery} query
-     * @return {@link Predicate}
+     * @param listQuery {@link IdentitySourceEventRecordListQuery} listQuery
+     * @return {@link Specification}
      */
-    default Predicate queryIdentitySourceEventRecordListQueryConvertToPredicate(IdentitySourceEventRecordListQuery query) {
-        QIdentitySourceEventRecordEntity queryEntity = QIdentitySourceEventRecordEntity.identitySourceEventRecordEntity;
-        Predicate predicate = ExpressionUtils.and(queryEntity.isNotNull(),
-            queryEntity.deleted.eq(Boolean.FALSE));
+    default Specification<IdentitySourceEventRecordEntity> queryIdentitySourceEventRecordListQueryConvertToSpecification(IdentitySourceEventRecordListQuery listQuery) {
         //查询条件
-        //@formatter:off
-        predicate = StringUtils.isBlank(query.getIdentitySourceId()) ? predicate : ExpressionUtils.and(predicate, queryEntity.identitySourceId.eq(Long.valueOf(query.getIdentitySourceId())));
-        predicate = Objects.isNull(query.getActionType()) ? predicate : ExpressionUtils.and(predicate, queryEntity.actionType.eq(query.getActionType()));
-        predicate = Objects.isNull(query.getObjectType()) ? predicate : ExpressionUtils.and(predicate, queryEntity.objectType.eq(query.getObjectType()));
-        predicate = Objects.isNull(query.getStatus()) ? predicate : ExpressionUtils.and(predicate, queryEntity.status.eq(query.getStatus()));
-        //@formatter:on
-        return predicate;
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (StringUtils.isNotBlank(listQuery.getIdentitySourceId())) {
+                predicates.add(criteriaBuilder.equal(root.get(IDENTITY_SOURCE_ID_FIELD_NAME),
+                    listQuery.getIdentitySourceId()));
+            }
+            if (Objects.isNull(listQuery.getActionType())) {
+                predicates.add(criteriaBuilder.equal(root.get(ACTION_TYPE_FIELD_NAME),
+                    listQuery.getActionType()));
+            }
+            if (Objects.isNull(listQuery.getObjectType())) {
+                predicates.add(criteriaBuilder.equal(root.get(OBJECT_TYPE_FIELD_NAME),
+                    listQuery.getObjectType()));
+            }
+            if (Objects.isNull(listQuery.getStatus())) {
+                predicates
+                    .add(criteriaBuilder.equal(root.get(STATUS_FIELD_NAME), listQuery.getStatus()));
+            }
+            query.where(predicates.toArray(new Predicate[0]));
+            query.orderBy(criteriaBuilder.desc(root.get(LAST_MODIFIED_TIME)));
+            return query.getRestriction();
+        };
     }
 
     /**

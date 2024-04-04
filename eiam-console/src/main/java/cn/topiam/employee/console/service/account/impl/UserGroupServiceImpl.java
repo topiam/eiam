@@ -22,23 +22,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Lists;
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
-import cn.topiam.employee.common.entity.account.*;
-import cn.topiam.employee.common.entity.account.QUserEntity;
-import cn.topiam.employee.common.entity.account.QUserGroupEntity;
-import cn.topiam.employee.common.entity.account.QUserGroupMemberEntity;
+import cn.topiam.employee.common.entity.account.UserGroupEntity;
+import cn.topiam.employee.common.entity.account.UserGroupMemberEntity;
 import cn.topiam.employee.common.entity.account.po.UserPO;
 import cn.topiam.employee.common.entity.account.query.UserGroupMemberListQuery;
 import cn.topiam.employee.common.repository.account.UserGroupMemberRepository;
@@ -80,13 +75,11 @@ public class UserGroupServiceImpl implements UserGroupService {
     @Override
     public Page<UserGroupListResult> getUserGroupList(PageModel page, UserGroupListQuery query) {
         //查询条件
-        Predicate predicate = userGroupConverter.queryUserGroupListParamConvertToPredicate(query);
-        //分页条件
-        QPageRequest request = QPageRequest.of(page.getCurrent(), page.getPageSize(),
-            QUserGroupEntity.userGroupEntity.updateTime.desc());
+        Specification<UserGroupEntity> specification = userGroupConverter
+            .queryUserGroupListParamConvertToSpecification(query);
         //查询映射
         org.springframework.data.domain.Page<UserGroupEntity> list = userGroupRepository
-            .findAll(predicate, request);
+            .findAll(specification, PageRequest.of(page.getCurrent(), page.getPageSize()));
         return userGroupConverter.userGroupEntityConvertToUserGroupResult(list);
     }
 
@@ -251,26 +244,9 @@ public class UserGroupServiceImpl implements UserGroupService {
 
     @Override
     public Long getUserGroupMemberCount(String groupId) {
-        //条件
-        QUserEntity user = QUserEntity.userEntity;
-        QUserGroupEntity qUserGroup = QUserGroupEntity.userGroupEntity;
-        Predicate predicate = ExpressionUtils.and(user.isNotNull(), user.deleted.eq(Boolean.FALSE));
-        predicate = ExpressionUtils.and(predicate, qUserGroup.id.eq(Long.valueOf(groupId)));
-        //构造查询
-        JPAQuery<Long> jpaQuery = jpaQueryFactory.selectFrom(user).select(user.count())
-            .innerJoin(QUserGroupMemberEntity.userGroupMemberEntity)
-            .on(user.id.eq(QUserGroupMemberEntity.userGroupMemberEntity.userId)
-                .and(QUserGroupMemberEntity.userGroupMemberEntity.deleted.eq(Boolean.FALSE)))
-            .innerJoin(qUserGroup)
-            .on(qUserGroup.id.eq(QUserGroupMemberEntity.userGroupMemberEntity.groupId))
-            .where(predicate);
-        return jpaQuery.fetch().get(0);
+        return userGroupMemberRepository
+            .count(Example.of(new UserGroupMemberEntity().setGroupId(Long.valueOf(groupId))));
     }
-
-    /**
-     * JPAQueryFactory
-     */
-    private final JPAQueryFactory           jpaQueryFactory;
 
     /**
      * 用户组数据映射

@@ -90,6 +90,7 @@ public class AliYunOssStorage extends AbstractStorage {
                 inputStream);
             // 上传字符串
             ossClient.putObject(putObjectRequest);
+
             return aliYunConfig.getDomain() + SEPARATOR + aliYunConfig.getBucket() + SEPARATOR
                    + URLEncoder.encode(key, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         } catch (Exception e) {

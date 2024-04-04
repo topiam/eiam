@@ -24,8 +24,9 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,17 +35,16 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
 
 import cn.topiam.employee.audit.context.AuditContext;
-import cn.topiam.employee.audit.entity.QAuditEntity;
+import cn.topiam.employee.audit.entity.AuditEntity;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.audit.repository.AuditRepository;
-import cn.topiam.employee.common.entity.account.*;
-import cn.topiam.employee.common.entity.account.QUserEntity;
+import cn.topiam.employee.common.entity.account.OrganizationMemberEntity;
+import cn.topiam.employee.common.entity.account.UserDetailEntity;
+import cn.topiam.employee.common.entity.account.UserEntity;
+import cn.topiam.employee.common.entity.account.UserHistoryPasswordEntity;
 import cn.topiam.employee.common.entity.account.po.UserPO;
 import cn.topiam.employee.common.entity.account.query.UserListNotInGroupQuery;
 import cn.topiam.employee.common.entity.account.query.UserListQuery;
@@ -76,7 +76,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import static cn.topiam.employee.audit.enums.TargetType.USER;
 import static cn.topiam.employee.audit.enums.TargetType.USER_DETAIL;
-import static cn.topiam.employee.audit.service.converter.AuditDataConverter.SORT_EVENT_TIME;
 import static cn.topiam.employee.core.message.sms.SmsMsgEventPublish.USERNAME;
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
 import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
@@ -424,7 +423,6 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.isEmpty(value)) {
             return true;
         }
-        QUserEntity user = QUserEntity.userEntity;
         UserEntity entity = new UserEntity();
         boolean result = false;
         // ID存在说明是修改操作，查询一下当前数据
@@ -441,10 +439,9 @@ public class UserServiceImpl implements UserService {
                 }
                 Phonenumber.PhoneNumber phoneNumber = PhoneNumberUtil.getInstance().parse(value,
                     "CN");
-                BooleanExpression eq = user.phone
-                    .eq(String.valueOf(phoneNumber.getNationalNumber()))
-                    .and(user.phoneAreaCode.eq(String.valueOf(phoneNumber.getCountryCode())));
-                result = !userRepository.exists(eq);
+                result = !userRepository.exists(Example
+                    .of(new UserEntity().setPhone(String.valueOf(phoneNumber.getNationalNumber()))
+                        .setPhoneAreaCode(String.valueOf(phoneNumber.getCountryCode()))));
             } catch (NumberParseException e) {
                 log.error("校验手机号发生异常", e);
                 throw new TopIamException("校验手机号发生异常");
@@ -455,16 +452,14 @@ public class UserServiceImpl implements UserService {
             if (StringUtils.equals(entity.getEmail(), value)) {
                 return true;
             }
-            BooleanExpression eq = user.email.eq(value);
-            result = !userRepository.exists(eq);
+            result = !userRepository.exists(Example.of(new UserEntity().setEmail(value)));
         }
         //用户名
         if (CheckValidityType.USERNAME.equals(type)) {
             if (StringUtils.equals(entity.getUsername(), value)) {
                 return true;
             }
-            BooleanExpression eq = user.username.eq(value);
-            result = !userRepository.exists(eq);
+            result = !userRepository.exists(Example.of(new UserEntity().setUsername(value)));
         }
         return result;
     }
@@ -479,21 +474,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<UserLoginAuditListResult> findUserLoginAuditList(Long id, PageModel pageModel) {
         //查询入参转查询条件
-        Predicate predicate = userConverter.auditListRequestConvertToNativeQuery(id);
-        // 字段排序
-        OrderSpecifier<LocalDateTime> order = QAuditEntity.auditEntity.eventTime.desc();
-        for (PageModel.Sort sort : pageModel.getSorts()) {
-            if (StringUtils.equals(sort.getSorter(), SORT_EVENT_TIME)) {
-                if (sort.getAsc()) {
-                    order = QAuditEntity.auditEntity.eventTime.asc();
-                }
-            }
-        }
+        Specification<AuditEntity> specification = userConverter
+            .auditListRequestConvertToSpecification(id, pageModel);
         //分页条件
-        QPageRequest request = QPageRequest.of(pageModel.getCurrent(), pageModel.getPageSize(),
-            order);
-        return userConverter
-            .entityConvertToAuditListResult(auditRepository.findAll(predicate, request), pageModel);
+        PageRequest request = PageRequest.of(pageModel.getCurrent(), pageModel.getPageSize());
+        return userConverter.entityConvertToAuditListResult(
+            auditRepository.findAll(specification, request), pageModel);
     }
 
     /**

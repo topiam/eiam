@@ -66,7 +66,7 @@ import cn.topiam.employee.identitysource.wechatwork.WeChatWorkConfig;
 import cn.topiam.employee.identitysource.wechatwork.WeChatWorkIdentitySource;
 import cn.topiam.employee.identitysource.wechatwork.client.WeChatWorkClient;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
-import cn.topiam.employee.support.scheduler.SpringSchedulerRegister;
+import cn.topiam.employee.support.scheduling.SpringSchedulerRegister;
 import cn.topiam.employee.support.trace.TraceUtils;
 
 import lombok.extern.slf4j.Slf4j;

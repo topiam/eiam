@@ -48,8 +48,8 @@ public class AppCertServiceImpl implements AppCertService {
      */
     @Override
     public List<AppCertListResult> getAppCertListResult(AppCertQuery query) {
-        List<AppCertEntity> list = (List<AppCertEntity>) appCertRepository
-            .findAll(appCertConverter.queryAppCertListParamConvertToPredicate(query));
+        List<AppCertEntity> list = appCertRepository
+            .findAll(appCertConverter.queryAppCertListParamConvertToExample(query));
         return appCertConverter.entityConvertToAppCertListResult(list);
     }
 

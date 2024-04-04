@@ -28,7 +28,7 @@ import cn.topiam.employee.common.repository.app.AppJwtConfigRepositoryCustomized
 import cn.topiam.employee.common.repository.app.impl.mapper.AppJwtConfigPoMapper;
 
 import lombok.AllArgsConstructor;
-import static cn.topiam.employee.common.constant.ProtocolConstants.JWT_CONFIG_CACHE_NAME;
+import static cn.topiam.employee.common.constant.AppConstants.JWT_CONFIG_CACHE_NAME;
 
 /**
  *

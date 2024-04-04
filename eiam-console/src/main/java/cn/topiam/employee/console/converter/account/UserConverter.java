@@ -19,23 +19,21 @@ package cn.topiam.employee.console.converter.account;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
-
 import cn.topiam.employee.audit.entity.AuditEntity;
 import cn.topiam.employee.audit.entity.GeoLocation;
-import cn.topiam.employee.audit.entity.QAuditEntity;
 import cn.topiam.employee.audit.entity.UserAgent;
 import cn.topiam.employee.audit.event.type.PortalEventType;
-import cn.topiam.employee.common.constant.CommonConstants;
 import cn.topiam.employee.common.entity.account.UserDetailEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.entity.account.po.UserPO;
@@ -50,11 +48,15 @@ import cn.topiam.employee.console.pojo.update.account.UserUpdateParam;
 import cn.topiam.employee.support.context.ApplicationContextHelp;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
+
+import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Predicate;
+import static cn.topiam.employee.audit.entity.AuditEntity.*;
 import static cn.topiam.employee.audit.enums.TargetType.PORTAL;
 import static cn.topiam.employee.audit.event.type.EventType.APP_SSO;
 import static cn.topiam.employee.audit.event.type.EventType.LOGIN_PORTAL;
-import static cn.topiam.employee.common.util.ImageAvatarUtils.bufferedImageToBase64;
-import static cn.topiam.employee.common.util.ImageAvatarUtils.generateAvatarImg;
+import static cn.topiam.employee.audit.service.converter.AuditDataConverter.SORT_EVENT_TIME;
+import static cn.topiam.employee.support.util.ImageAvatarUtils.*;
 import static cn.topiam.employee.support.util.PhoneNumberUtils.getPhoneAreaCode;
 import static cn.topiam.employee.support.util.PhoneNumberUtils.getPhoneNumber;
 
@@ -80,9 +82,8 @@ public interface UserConverter {
             for (UserPO user : page.getContent()) {
                 UserListResult userListResult = userPoConvertToUserListResult(user);
                 if (org.apache.commons.lang3.StringUtils.isEmpty(userListResult.getAvatar())) {
-                    userListResult.setAvatar(bufferedImageToBase64(
-                        generateAvatarImg(org.apache.commons.lang3.StringUtils.defaultString(
-                            userListResult.getFullName(), userListResult.getUsername()))));
+                    userListResult.setAvatar(bufferedImageToBase64(generateAvatarImg(Objects
+                        .toString(userListResult.getFullName(), userListResult.getUsername()))));
                 } else {
                     userListResult.setAvatar(userListResult.getAvatar());
                 }
@@ -133,7 +134,7 @@ public interface UserConverter {
         userEntity.setNickName(param.getNickName());
         userEntity.setLastUpdatePasswordTime(LocalDateTime.now());
         userEntity.setStatus(cn.topiam.employee.common.enums.UserStatus.ENABLE);
-        userEntity.setAvatar(CommonConstants.getRandomAvatar());
+        userEntity.setAvatar(getRandomAvatar());
         userEntity.setDataOrigin(cn.topiam.employee.common.enums.DataOrigin.INPUT);
         userEntity.setExpireDate(
             java.util.Objects.isNull(param.getExpireDate()) ? java.time.LocalDate.of(2116, 12, 31)
@@ -248,11 +249,29 @@ public interface UserConverter {
      * @param id   {@link Long}
      * @return {@link NativeQuery}
      */
-    default Predicate auditListRequestConvertToNativeQuery(Long id) {
-        QAuditEntity auditEntity = QAuditEntity.auditEntity;
-        return ExpressionUtils.and(auditEntity.isNotNull(),
-            auditEntity.deleted.eq(Boolean.FALSE).and(auditEntity.actorId.eq(id.toString()))
-                .and(auditEntity.eventType.in(LOGIN_PORTAL, APP_SSO)));
+    default Specification<AuditEntity> auditListRequestConvertToSpecification(Long id,
+                                                                              PageModel pageModel) {
+        //@formatter:off
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            List<Order> orders = new ArrayList<>();
+            predicates.add(cb.in(root.get(EVENT_TYPE_FIELD_NAME)).value(Arrays.asList(LOGIN_PORTAL, APP_SSO)));
+            cb.equal(root.get(ACTOR_ID_FIELD_NAME), id);
+            //默认降序
+            orders.add(cb.desc(root.get(EVENT_TIME_FIELD_NAME)));
+            for (PageModel.Sort sort : pageModel.getSorts()) {
+                if (org.apache.commons.lang3.StringUtils.equals(sort.getSorter(),
+                    SORT_EVENT_TIME)) {
+                    if (sort.getAsc()) {
+                        orders.add(cb.asc(root.get(EVENT_TIME_FIELD_NAME)));
+                    }
+                }
+            }
+            query.where(cb.and(predicates.toArray(new Predicate[0])));
+            query.orderBy(orders);
+            return query.getRestriction();
+        };
+        //@formatter:on
     }
 
     /**

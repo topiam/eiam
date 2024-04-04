@@ -41,12 +41,12 @@ import cn.topiam.employee.common.enums.DataOrigin;
 import cn.topiam.employee.common.enums.MailType;
 import cn.topiam.employee.common.enums.SmsType;
 import cn.topiam.employee.common.enums.UserStatus;
+import cn.topiam.employee.common.enums.ViewContentType;
 import cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider;
 import cn.topiam.employee.common.repository.identitysource.IdentitySourceRepository;
 import cn.topiam.employee.common.repository.identitysource.IdentitySourceSyncHistoryRepository;
 import cn.topiam.employee.common.repository.identitysource.IdentitySourceSyncRecordRepository;
 import cn.topiam.employee.common.storage.Storage;
-import cn.topiam.employee.common.util.ViewContentType;
 import cn.topiam.employee.core.message.MsgVariable;
 import cn.topiam.employee.core.message.mail.MailMsgEventPublish;
 import cn.topiam.employee.core.message.sms.SmsMsgEventPublish;
@@ -60,11 +60,11 @@ import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.persistence.EntityManager;
-import static cn.topiam.employee.common.constant.CommonConstants.SYSTEM_DEFAULT_USER_NAME;
 import static cn.topiam.employee.common.enums.UserStatus.DISABLE;
 import static cn.topiam.employee.common.enums.UserStatus.ENABLE;
 import static cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider.*;
 import static cn.topiam.employee.core.message.sms.SmsMsgEventPublish.USERNAME;
+import static cn.topiam.employee.support.constant.EiamConstants.SYSTEM_DEFAULT_USER_NAME;
 
 /**
  *
@@ -144,7 +144,7 @@ public class AbstractIdentitySourcePostProcessor {
         String defaultPassword = null;
         if (!Objects.isNull(strategyConfig)) {
             enabled = Boolean.TRUE.equals(strategyConfig.getEnabled());
-            defaultPassword = StringUtils.defaultString(strategyConfig.getDefaultPassword());
+            defaultPassword = Objects.toString(strategyConfig.getDefaultPassword());
         }
         if (StringUtils.isBlank(defaultPassword)) {
             defaultPassword = passwordGenerator.generatePassword();

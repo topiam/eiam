@@ -20,6 +20,8 @@ package cn.topiam.employee.common.entity.app;
 import java.util.Set;
 
 import org.hibernate.annotations.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
 
@@ -28,7 +30,6 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -61,42 +62,42 @@ public class AppOidcConfigEntity extends LogicDeleteEntity<Long> {
      * 客户端认证方式
      */
     @Column(name = "client_auth_methods")
-    @Type(JsonType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     private Set<String> clientAuthMethods;
 
     /**
      * 授权类型
      */
     @Column(name = "auth_grant_types")
-    @Type(JsonType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     private Set<String> authGrantTypes;
 
     /**
      * 响应类型
      */
     @Column(name = "response_types")
-    @Type(JsonType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     private Set<String> responseTypes;
 
     /**
      * 重定向URIs
      */
     @Column(name = "redirect_uris")
-    @Type(JsonType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     private Set<String> redirectUris;
 
     /**
      * 登出重定向URIs
      */
     @Column(name = "post_logout_redirect_uris")
-    @Type(JsonType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     private Set<String> postLogoutRedirectUris;
 
     /**
      * scopes
      */
     @Column(name = "grant_scopes")
-    @Type(JsonType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     private Set<String> grantScopes;
 
     /**

@@ -21,7 +21,6 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +39,6 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
 @Repository
 public interface AppAccessPolicyRepository extends
                                            LogicDeleteRepository<AppAccessPolicyEntity, Long>,
-                                           QuerydslPredicateExecutor<AppAccessPolicyEntity>,
                                            AppAccessPolicyRepositoryCustomized {
     /**
      * 根据应用ID删除所有数据

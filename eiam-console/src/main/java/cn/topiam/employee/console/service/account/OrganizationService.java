@@ -137,14 +137,6 @@ public interface OrganizationService {
     OrganizationEntity getOrganizationByExternalId(String id, Long identitySourceId);
 
     /**
-     * 查询组织成员数量
-     *
-     * @param orgId {@link  String}
-     * @return {@link  Long}
-     */
-    Long getOrgMemberCount(String orgId);
-
-    /**
      * 批量获取组织
      *
      * @param ids {@link List}
