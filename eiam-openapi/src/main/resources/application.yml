@@ -89,19 +89,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-    show-sql: true
-    properties:
-      hibernate:
-        show_sql: true
-        format_sql: true
-        use_sql_comments: true
-        jdbc:
-          batch_size: 500
-          batch_versioned_data: true
-        order_inserts: true
-        types:
-          print:
-            banner: false
+    open-in-view: true
   main:
     banner-mode: off
 #日志配置
