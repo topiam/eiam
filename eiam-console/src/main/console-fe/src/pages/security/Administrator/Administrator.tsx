@@ -57,7 +57,7 @@ export const Administrator = () => {
       ellipsis: true,
       width: 130,
       fixed: 'left',
-      renderText: (dom, record) => (
+      renderText: (_dom, record) => (
         <Space>
           <Avatar avatar={record.avatar} username={record.username} />
           {record.username}
