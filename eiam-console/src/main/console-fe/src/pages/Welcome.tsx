@@ -135,7 +135,7 @@ const Welcome: React.FC = () => {
               width: '65%',
             }}
           >
-            TopIAM 数字身份管控平台（Employee Identity and Access
+            TOPIAM 数字身份管控平台（Employee Identity and Access
             Management）用于管理企业内员工的账号、权限、身份认证、应用访问，帮助整合部署在本地或云端的内部办公系统、业务系统及三方
             SaaS 系统的所有身份，实现一个账号打通所有应用的服务。
           </p>
