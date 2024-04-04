@@ -22,12 +22,10 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
-import cn.topiam.employee.common.util.X509Utils;
 import cn.topiam.employee.protocol.jwt.exception.IdTokenGenerateException;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import static cn.topiam.employee.protocol.jwt.constant.JwtProtocolConstants.S_ID;
+import static cn.topiam.employee.support.util.CertUtils.readPrivateKey;
 
 /**
  *
@@ -43,15 +41,14 @@ public class JwtIdTokenGenerator implements IdTokenGenerator {
             Instant issuedAt = Instant.now();
             Instant expiresAt=issuedAt.plus(context.getIdTokenTimeToLive(),ChronoUnit.SECONDS);
             // 生成私钥
-            PrivateKey rsaPrivateKey = X509Utils.readPrivateKey(context.getPrivateKey(), "");
+            PrivateKey rsaPrivateKey = readPrivateKey(context.getPrivateKey(), "");
             // 生成 JWT 令牌
-            String tokenValue = Jwts.builder().setIssuer(context.getIssuer())
-                    .setIssuedAt(new Date(issuedAt.toEpochMilli()))
-                    .setSubject(context.getSubject())
-                    .setAudience(context.getAudience())
-                    .setExpiration(new Date(expiresAt.toEpochMilli()))
-                    .signWith(rsaPrivateKey, SignatureAlgorithm.RS256)
-                    .claim(S_ID,context.getSessionId())
+            String tokenValue = Jwts.builder().issuer(context.getIssuer())
+                    .issuedAt(new Date(issuedAt.toEpochMilli()))
+                    .subject(context.getSubject())
+                    .audience().add(context.getAudience()).and()
+                    .expiration(new Date(expiresAt.toEpochMilli()))
+                    .signWith(rsaPrivateKey, Jwts.SIG.RS256)
                     .compact();
             return IdToken.builder().tokenValue(tokenValue)
                     .issuedAt(issuedAt)
