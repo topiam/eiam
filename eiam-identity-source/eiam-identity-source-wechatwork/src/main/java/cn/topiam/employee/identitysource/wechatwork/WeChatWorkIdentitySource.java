@@ -23,21 +23,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.alibaba.fastjson2.JSON;
 
 import cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider;
-import cn.topiam.employee.common.util.RequestUtils;
 import cn.topiam.employee.identitysource.core.AbstractDefaultIdentitySource;
 import cn.topiam.employee.identitysource.core.client.IdentitySourceClient;
 import cn.topiam.employee.identitysource.core.enums.IdentitySourceEventReceiveType;
@@ -49,11 +40,20 @@ import cn.topiam.employee.identitysource.wechatwork.enums.WeChatWorkEventType;
 import cn.topiam.employee.identitysource.wechatwork.util.AesException;
 import cn.topiam.employee.identitysource.wechatwork.util.WxBizMsgCrypt;
 import cn.topiam.employee.support.exception.BadParamsException;
+import cn.topiam.employee.support.util.HttpRequestUtils;
+import cn.topiam.employee.support.util.XmlUtils;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
  * 企业微信
@@ -79,12 +79,12 @@ public class WeChatWorkIdentitySource extends AbstractDefaultIdentitySource<WeCh
     @Override
     public Object event(HttpServletRequest request, String body) {
         LocalDateTime eventTime = LocalDateTime.now();
-        Map<String, Object> params = RequestUtils.getParams(request);
+        Map<String, String> params = HttpRequestUtils.getRequestParameters(request);
         WeChatWorkRequest weWorkResult = null;
         try {
             if (RequestMethod.POST.name().equals(request.getMethod())) {
                 try {
-                    weWorkResult = RequestUtils.getXml(body, WeChatWorkRequest.class);
+                    weWorkResult = XmlUtils.getXml(body, WeChatWorkRequest.class);
                 } catch (JAXBException e) {
                     log.error("企业微信身份源 [{}] 事件回调入参转换异常: {}", getId(), e.getMessage());
                     throw new BadParamsException("企业微信事件回调数据转换异常: " + e.getMessage());
@@ -108,14 +108,14 @@ public class WeChatWorkIdentitySource extends AbstractDefaultIdentitySource<WeCh
      * @param params {@link Map}
      * @return 返回第三方平台结果
      */
-    private String eventCallBack(LocalDateTime eventTime, Map<String, Object> params,
+    private String eventCallBack(LocalDateTime eventTime, Map<String, String> params,
                                  WeChatWorkRequest weWorkResult) throws IllegalArgumentException {
         try {
-            String msgSignature = (String) params.get(MSG_SIGNATURE);
-            String timeStamp = (String) params.get(TIMESTAMP);
-            String nonce = (String) params.get(NONCE);
+            String msgSignature = params.get(MSG_SIGNATURE);
+            String timeStamp = params.get(TIMESTAMP);
+            String nonce = params.get(NONCE);
             if (params.containsKey(ECHOSTR)) {
-                String echoStr = (String) params.get(ECHOSTR);
+                String echoStr = params.get(ECHOSTR);
                 return verifyUrl(msgSignature, timeStamp, nonce, echoStr);
             } else {
                 EventParameter callBackDTO = processMessage(msgSignature, timeStamp, nonce,
