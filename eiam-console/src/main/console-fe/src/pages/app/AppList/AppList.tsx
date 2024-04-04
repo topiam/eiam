@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { getAllAppGroupList, getAppList, removeApp } from '@/services/app';
-import { PlusOutlined, QuestionCircleOutlined, GroupOutlined } from '@ant-design/icons';
+import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import type { ActionType } from '@ant-design/pro-components';
 import { PageContainer, ProList } from '@ant-design/pro-components';
 import { App, Avatar, Button, Popconfirm, Space, Tag } from 'antd';
@@ -92,15 +92,6 @@ export default () => {
               <PlusOutlined />
               {intl.formatMessage({ id: 'pages.app.list.tool_bar_render.add_app' })}
             </Button>,
-            <Button
-              key="app-group"
-              icon={<GroupOutlined />}
-              onClick={() => {
-                history.push('/app/group');
-              }}
-            >
-              分组管理
-            </Button>,
           ]}
           metas={{
             title: {
@@ -122,17 +113,17 @@ export default () => {
             },
             avatar: {
               search: false,
-              render: (text, row) => {
+              render: (_text, row) => {
                 return <Avatar key={row.id} shape="square" size={45} src={row.icon} />;
               },
             },
             description: { search: false, dataIndex: 'remark' },
             content: {
               search: false,
-              render: (text, row) => [<ListContent key="context" {...row} />],
+              render: (_text, row) => [<ListContent key="context" {...row} />],
             },
             actions: {
-              render: (text, row) => [
+              render: (_text, row) => [
                 row.enabled ? (
                   <Popconfirm
                     title={intl.formatMessage({

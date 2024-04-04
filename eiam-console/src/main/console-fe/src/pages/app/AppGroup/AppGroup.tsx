@@ -23,7 +23,7 @@ import { useRef, useState } from 'react';
 import CreateModal from './components/CreateModal';
 import UpdateModal from './components/UpdateModal';
 import { createAppGroup, removeAppGroup, updateAppGroup } from './service';
-import { history, useIntl } from '@@/exports';
+import { useIntl } from '@@/exports';
 import { getAppGroupList } from '@/services/app';
 
 export default () => {
@@ -101,7 +101,7 @@ export default () => {
       key: 'option',
       width: 100,
       align: 'center',
-      render: (text, record) => [
+      render: (_text, record) => [
         <a
           key="editable"
           onClick={() => {
@@ -157,12 +157,7 @@ export default () => {
   ];
 
   return (
-    <PageContainer
-      content={intl.formatMessage({ id: 'pages.app_group.list.desc' })}
-      onBack={() => {
-        history.push('/app');
-      }}
-    >
+    <PageContainer content={intl.formatMessage({ id: 'pages.app_group.list.desc' })}>
       <ProTable<AppAPI.AppGroupList>
         columns={columns}
         actionRef={actionRef}

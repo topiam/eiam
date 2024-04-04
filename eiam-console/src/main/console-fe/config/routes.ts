@@ -145,28 +145,37 @@ export default [
     name: 'app',
     icon: 'AppstoreOutlined',
     path: '/app',
-    component: './app/AppList',
-  },
-  //创建应用
-  {
-    name: 'app.create',
-    path: '/app/create',
-    hideInMenu: true,
-    component: './app/AppCreate',
-  },
-  //应用详情
-  {
-    name: 'app.detail',
-    path: '/app/detail',
-    hideInMenu: true,
-    component: './app/AppDetail',
-  },
-  //应用分组
-  {
-    name: 'app.group',
-    path: '/app/group',
-    hideInMenu: true,
-    component: './app/AppGroup',
+    routes: [
+      {
+        path: '/app',
+        redirect: '/app/list',
+      },
+      //创建应用
+      {
+        name: 'create',
+        path: '/app/create',
+        component: './app/AppCreate',
+      },
+      //应用列表
+      {
+        name: 'list',
+        path: '/app/list',
+        component: './app/AppList',
+      },
+      //应用详情
+      {
+        name: 'detail',
+        path: '/app/list/detail',
+        hideInMenu: true,
+        component: './app/AppDetail',
+      },
+      //应用分组
+      {
+        name: 'group',
+        path: '/app/group',
+        component: './app/AppGroup',
+      },
+    ],
   },
   //行为审计
   {
