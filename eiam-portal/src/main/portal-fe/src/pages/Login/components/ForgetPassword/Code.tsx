@@ -75,7 +75,7 @@ const Code = (props: ProFormProps) => {
             },
             {
               validateTrigger: ['onBlur'],
-              validator: async (rule, value) => {
+              validator: async (_rule, value) => {
                 if (!value) {
                   return Promise.resolve();
                 }

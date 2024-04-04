@@ -95,7 +95,7 @@ export default (props: { onGetCaptcha?: () => void; onRef?: any }) => {
           },
           {
             validateTrigger: ['onBlur'],
-            validator: async (rule, value) => {
+            validator: async (_rule, value) => {
               if (!value) {
                 return Promise.resolve();
               }

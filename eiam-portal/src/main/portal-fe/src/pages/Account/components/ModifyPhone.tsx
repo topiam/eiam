@@ -142,7 +142,7 @@ export default (props: {
               message: <FormattedMessage id={'page.account.common.form.phone.rule.0'} />,
             },
             {
-              validator: async (rule, value) => {
+              validator: async (_rule, value) => {
                 if (!value) {
                   return Promise.resolve();
                 }
