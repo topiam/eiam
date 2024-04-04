@@ -17,19 +17,18 @@
  */
 import { Container } from '@/components/Container';
 import { GEO_IP_PROVIDER } from '@/constant';
-import { disableGeoIp, getGeoIpConfig, saveGeoIpConfig } from './service';
-import { WarningOutlined } from '@ant-design/icons';
+import { getGeoIpConfig, saveGeoIpConfig } from './service';
 
 import {
   PageContainer,
   ProCard,
   ProForm,
-  ProFormSelect,
-  ProFormSwitch,
+  ProFormDependency,
+  ProFormSegmented,
 } from '@ant-design/pro-components';
 import { useAsyncEffect } from 'ahooks';
 import { App, Form, Space, Spin } from 'antd';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import MaxMind from './components/MaxMind';
 import { useIntl } from '@umijs/max';
 
@@ -62,28 +61,21 @@ const tailFormItemLayout = {
     },
   },
 };
-const defaultProvider = GEO_IP_PROVIDER.MAXMIND;
 
 const GeoIP = () => {
   const [form] = Form.useForm();
   const intl = useIntl();
-  const { message, modal } = App.useApp();
+  const { message } = App.useApp();
   const [loading, setLoading] = useState<boolean>(false);
-  const [enabled, setEnabled] = useState<boolean>(false);
-  const [provider, setProvider] = useState<string>(defaultProvider);
 
   useAsyncEffect(async () => {
     form.resetFields();
     setLoading(true);
     const { success, result } = await getGeoIpConfig();
     if (success && result && result.enabled) {
-      setEnabled(result.enabled);
-      setProvider(result.provider);
       form.setFieldsValue({
         ...result,
       });
-    } else {
-      form.setFieldsValue({ provider: provider });
     }
     setLoading(false);
   }, []);
@@ -97,50 +89,7 @@ const GeoIP = () => {
           })}
           headerBordered
           bordered={false}
-          collapsed={!enabled}
           style={{ marginBottom: '24px' }}
-          extra={
-            <ProFormSwitch
-              noStyle
-              labelAlign={'right'}
-              fieldProps={{
-                checked: enabled,
-                onChange: async (checked: boolean) => {
-                  if (!checked) {
-                    modal.confirm({
-                      title: intl.formatMessage({ id: 'app.warn' }),
-                      icon: <WarningOutlined />,
-                      content: intl.formatMessage({
-                        id: 'pages.setting.geoip.form.content',
-                      }),
-                      okText: intl.formatMessage({ id: 'app.confirm' }),
-                      okType: 'danger',
-                      cancelText: intl.formatMessage({ id: 'app.cancel' }),
-                      centered: true,
-                      onOk: async () => {
-                        setLoading(true);
-                        const { success } = await disableGeoIp().finally(() => {
-                          setLoading(false);
-                        });
-                        if (success) {
-                          setEnabled(checked);
-                          message.success(intl.formatMessage({ id: 'app.operation_success' }));
-                          setProvider(defaultProvider);
-                          form.resetFields();
-                          form.setFieldsValue({
-                            provider: defaultProvider,
-                          });
-                          return;
-                        }
-                      },
-                    });
-                  } else {
-                    setEnabled(checked);
-                  }
-                },
-              }}
-            />
-          }
         >
           <Container>
             <ProForm
@@ -149,31 +98,17 @@ const GeoIP = () => {
               layout={'horizontal'}
               labelAlign={'right'}
               {...layout}
-              initialValues={{ provider: defaultProvider }}
+              initialValues={{ provider: GEO_IP_PROVIDER.DEFAULT }}
               onReset={() => {
                 form.resetFields();
-                form.setFieldsValue({ enabled, provider });
               }}
               submitter={{
-                render: (p, dom) => {
+                render: (_p, dom) => {
                   return (
                     <Form.Item {...tailFormItemLayout}>
                       <Space>{dom}</Space>
                     </Form.Item>
                   );
-                },
-                submitButtonProps: {
-                  style: {
-                    // 隐藏重置按钮
-                    display: enabled ? '' : 'none',
-                  },
-                },
-                // 配置按钮的属性
-                resetButtonProps: {
-                  style: {
-                    // 隐藏重置按钮
-                    display: enabled ? '' : 'none',
-                  },
                 },
               }}
               onFinish={async (values) => {
@@ -194,44 +129,52 @@ const GeoIP = () => {
                 }
               }}
             >
-              {enabled && (
-                <>
-                  <ProFormSelect
-                    name="provider"
-                    label={intl.formatMessage({
-                      id: 'pages.setting.geoip.form_select',
-                    })}
-                    rules={[{ required: true }]}
-                    fieldProps={{
-                      onChange: async (value: string) => {
-                        setLoading(true);
-                        setProvider(value);
-                        form.resetFields();
+              <>
+                <ProFormSegmented
+                  name="provider"
+                  label={intl.formatMessage({
+                    id: 'pages.setting.geoip.form_select',
+                  })}
+                  rules={[{ required: true }]}
+                  fieldProps={{
+                    onChange: async (value) => {
+                      setLoading(true);
+                      form.resetFields();
+                      form.setFieldsValue({
+                        provider: value,
+                      });
+                      const { success, result } = await getGeoIpConfig();
+                      if (success && result && result.enabled && value === result.provider) {
                         form.setFieldsValue({
-                          provider: value,
+                          ...result,
                         });
-                        const { success, result } = await getGeoIpConfig();
-                        if (success && result && result.enabled && value === result.provider) {
-                          setEnabled(result.enabled);
-                          form.setFieldsValue({
-                            ...result,
-                          });
-                        }
-                        setLoading(false);
+                      }
+                      setLoading(false);
+                    },
+                  }}
+                  request={async () => {
+                    return [
+                      {
+                        value: GEO_IP_PROVIDER.DEFAULT,
+                        label: intl.formatMessage({
+                          id: 'pages.setting.geoip.form_select.option.default',
+                        }),
                       },
-                    }}
-                    options={[
                       {
                         value: GEO_IP_PROVIDER.MAXMIND,
                         label: intl.formatMessage({
                           id: 'pages.setting.geoip.form_select.option.maxmind',
                         }),
                       },
-                    ]}
-                  />
-                  {provider === GEO_IP_PROVIDER.MAXMIND && <MaxMind />}
-                </>
-              )}
+                    ];
+                  }}
+                />
+                <ProFormDependency name={['provider']}>
+                  {({ provider }) => {
+                    return provider === GEO_IP_PROVIDER.MAXMIND && <MaxMind />;
+                  }}
+                </ProFormDependency>
+              </>
             </ProForm>
           </Container>
         </ProCard>
@@ -239,6 +182,5 @@ const GeoIP = () => {
     </PageContainer>
   );
 };
-export default () => {
-  return <GeoIP />;
-};
+
+export default GeoIP;
