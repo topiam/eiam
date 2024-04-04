@@ -108,7 +108,7 @@ const CreateApp = (props: {
               onOk: () => {
                 successModal.destroy();
                 history.push(
-                  `/app/detail?id=${result.id}&name=${values.name}&protocol=${protocol}`,
+                  `/app/list/detail?id=${result.id}&name=${values.name}&protocol=${protocol}`,
                 );
               },
             });

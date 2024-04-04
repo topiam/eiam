@@ -102,7 +102,7 @@ export default () => {
                   <span
                     onClick={() => {
                       history.push(
-                        `/app/detail?id=${row.id}&protocol=${row.protocol}&name=${row.name}`,
+                        `/app/list/detail?id=${row.id}&protocol=${row.protocol}&name=${row.name}`,
                       );
                     }}
                   >
@@ -176,7 +176,7 @@ export default () => {
                 <a
                   key="details"
                   onClick={() => {
-                    history.push(`/app/detail?id=${row.id}`);
+                    history.push(`/app/list/detail?id=${row.id}`);
                   }}
                 >
                   {intl.formatMessage({ id: 'pages.app.list.actions.detail' })}

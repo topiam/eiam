@@ -116,7 +116,7 @@ const AppBasic = (props: { app: GetApp }) => {
             if (success) {
               useApp.message.success(intl.formatMessage({ id: 'app.operation_success' }));
               history.replace(
-                `/app/detail?id=${query.id}&name=${params.name}&protocol=${query.protocol}&type=${query.type}`,
+                `/app/list/detail?id=${query.id}&name=${params.name}&protocol=${query.protocol}&type=${query.type}`,
               );
               return Promise.resolve(true);
             }
