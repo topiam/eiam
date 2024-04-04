@@ -144,7 +144,7 @@ export default () => {
       width: 60,
       align: 'center',
       fixed: 'right',
-      render: (text: any, row: SessionList) => {
+      render: (_text: any, row: SessionList) => {
         return [
           <Popconfirm
             title={intl.formatMessage({ id: 'pages.other.session.delete.confirm' })}

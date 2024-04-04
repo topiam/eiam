@@ -266,7 +266,7 @@ export default (props: { appId: string }) => {
       width: 80,
       align: 'center',
       fixed: 'right',
-      render: (text, record) => [
+      render: (_text, record) => [
         <Popconfirm
           title={intl.formatMessage({
             id: 'pages.app.config.detail.items.login_access.access_policy.columns.option.popconfirm.title',

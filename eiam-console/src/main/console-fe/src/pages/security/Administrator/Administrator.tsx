@@ -202,7 +202,7 @@ export const Administrator = () => {
       valueType: 'option',
       width: 140,
       fixed: 'right',
-      render: (text, row) => {
+      render: (_text, row) => {
         return [
           <a
             target="_blank"

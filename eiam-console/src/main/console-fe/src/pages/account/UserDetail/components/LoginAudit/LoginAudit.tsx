@@ -86,7 +86,7 @@ export default (props: { userId: string }) => {
       dataIndex: 'eventStatus',
       search: false,
       align: 'center',
-      render: (text: any, row: any) => (
+      render: (_text: any, row: any) => (
         <Space>
           {row.eventStatus === EventStatus.success && (
             <Tag color="#87d068">{intl.formatMessage({ id: 'app.success' })}</Tag>

@@ -95,7 +95,7 @@ export default (props: { visible: boolean }) => {
             dataSource={dataSource}
             metas={{
               title: {
-                render: (text, row) => [
+                render: (_text, row) => [
                   <p
                     key={row.name}
                     onClick={() => {
@@ -109,7 +109,7 @@ export default (props: { visible: boolean }) => {
               },
               description: {},
               subTitle: {
-                render: (text, row) => {
+                render: (_text, row) => {
                   return (
                     <Space size={0}>
                       {row.custom && (
@@ -124,7 +124,7 @@ export default (props: { visible: boolean }) => {
                 },
               },
               actions: {
-                render: (text, row) => {
+                render: (_text, row) => {
                   return [
                     <a
                       key="config"

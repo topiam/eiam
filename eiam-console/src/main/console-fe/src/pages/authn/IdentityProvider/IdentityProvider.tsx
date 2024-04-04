@@ -204,7 +204,7 @@ const List = (props: { category: IdentityProviderCategory }) => {
           },
           avatar: {
             search: false,
-            render: (text, row) => {
+            render: (_text, row) => {
               return <Avatar key={row.id} shape="square" size={50} src={ICON_LIST[row.type]} />;
             },
           },
@@ -216,10 +216,10 @@ const List = (props: { category: IdentityProviderCategory }) => {
           },
           content: {
             search: false,
-            render: (text, row) => <ListContent key="context" {...row} />,
+            render: (_text, row) => <ListContent key="context" {...row} />,
           },
           actions: {
-            render: (text, row) => [
+            render: (_text, row) => [
               <Fragment key={'status'}>
                 {row.enabled ? (
                   <Popconfirm

@@ -69,7 +69,7 @@ export default (props: { id: string }) => {
       width: 80,
       align: 'center',
       fixed: 'right',
-      render: (text, record) => [
+      render: (_text, record) => [
         <Popconfirm
           title={intl.formatMessage({
             id: 'pages.account.user_detail.app_account.columns.option.popconfirm.title',
