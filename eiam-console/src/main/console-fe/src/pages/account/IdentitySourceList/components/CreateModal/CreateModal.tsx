@@ -15,12 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ModalForm, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
-import type { FormInstance } from 'antd';
+import { Avatar, FormInstance, Space } from 'antd';
 import { Spin } from 'antd';
 import { useIntl } from '@umijs/max';
 import { IdentitySourceProvider } from '@/constant';
+import { ICON_LIST } from '@/components/IconFont/constant';
 
 type CreateModelProps = {
   visible: boolean;
@@ -65,6 +66,14 @@ export default (props: CreateModelProps) => {
               placeholder: intl.formatMessage({
                 id: 'pages.account.identity_source_list.create_modal.provider.placeholder',
               }),
+              optionRender: ({ data }) => {
+                return (
+                  <Space>
+                    <Avatar shape={'square'} src={data?.icon} />
+                    {data.label}
+                  </Space>
+                );
+              },
             }}
             options={[
               {
@@ -72,18 +81,21 @@ export default (props: CreateModelProps) => {
                 label: intl.formatMessage({
                   id: 'pages.account.identity_source_list.create_modal.provider.placeholder.options.dingtalk',
                 }),
-              },
-              {
-                value: IdentitySourceProvider.wework,
-                label: intl.formatMessage({
-                  id: 'pages.account.identity_source_list.create_modal.provider.placeholder.options.wework',
-                }),
+                icon: ICON_LIST[IdentitySourceProvider.dingtalk],
               },
               {
                 value: IdentitySourceProvider.feishu,
                 label: intl.formatMessage({
                   id: 'pages.account.identity_source_list.create_modal.provider.placeholder.options.feishu',
                 }),
+                icon: ICON_LIST[IdentitySourceProvider.feishu],
+              },
+              {
+                value: IdentitySourceProvider.wework,
+                label: intl.formatMessage({
+                  id: 'pages.account.identity_source_list.create_modal.provider.placeholder.options.wework',
+                }),
+                icon: ICON_LIST[IdentitySourceProvider.wework],
               },
             ]}
             rules={[
