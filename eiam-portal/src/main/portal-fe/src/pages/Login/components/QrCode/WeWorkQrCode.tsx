@@ -23,7 +23,7 @@ const WeWorkOrCode = (props: { code: string }) => {
   const { code } = props;
   const query = queryString.parse(history.location.search);
   const { redirect_uri } = query as { redirect_uri: string };
-  let path = `/api/v1/authorization/wechatwork_qr/${code}`;
+  let path = `/api/v1/authorization/wechatwork_oauth/${code}`;
   if (redirect_uri) {
     path = `${path}?redirect_uri=${redirect_uri}`;
   }
