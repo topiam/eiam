@@ -52,13 +52,13 @@ public interface MailTemplateRepository extends LogicDeleteRepository<MailTempla
     /**
      * 根据模块类型删除模块
      *
-     * @param type {@link MailType}
+     * @param type {@link String}
      */
     @Modifying
     @Transactional(rollbackFor = Exception.class)
     @Query(value = "UPDATE mail_template SET " + SOFT_DELETE_SET
                    + " WHERE type_ = :type", nativeQuery = true)
-    void deleteByType(@Param("type") MailType type);
+    void deleteByType(@Param("type") String type);
 
     /**
      * findByIdContainsDeleted
