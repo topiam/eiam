@@ -83,6 +83,9 @@
             </column>
         </createTable>
         <!-- 添加字段 -->
+        <addColumn tableName="user">
+            <column name="lock_expired_time" remarks="锁定时间" type="datetime"/>
+        </addColumn>
         <addColumn tableName="organization_member">
             <column name="primary_" remarks="主组织" type="TINYINT(1)">
                 <constraints nullable="true"/>
