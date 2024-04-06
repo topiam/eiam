@@ -19,7 +19,7 @@ package cn.topiam.employee.portal.service.impl;
 
 import java.util.List;
 
-import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import cn.topiam.employee.common.entity.app.AppEntity;
@@ -56,7 +56,7 @@ public class AppServiceImpl implements AppService {
     public Page<GetAppListResult> getAppList(GetAppListQuery query, PageModel pageModel) {
         Long userId = Long.valueOf(SecurityUtils.getCurrentUserId());
         org.springframework.data.domain.Page<AppEntity> list = appRepository.getAppList(userId,
-            query, QPageRequest.of(pageModel.getCurrent(), pageModel.getPageSize()));
+            query, PageRequest.of(pageModel.getCurrent(), pageModel.getPageSize()));
         return appConverter.entityConvertToAppListResult(list);
     }
 
