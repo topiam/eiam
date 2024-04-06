@@ -51,6 +51,15 @@ export enum GEO_IP_PROVIDER {
   DEFAULT = 'default',
 }
 
+
+export enum EMAIL_PROVIDER {
+  CUSTOMIZE = 'customize',
+  ALIYUN = 'aliyun',
+  TENCENT = 'tencent',
+  NET_EASE = 'netease',
+}
+
+
 /**
  * 应用类型
  */
@@ -65,12 +74,9 @@ export enum AppType {
  * App Protocol
  */
 export enum AppProtocolType {
-  saml2 = 'saml2',
   oidc = 'oidc',
-  cas = 'cas',
   jwt = 'jwt',
   form = 'form',
-  oauth2 = 'oauth2',
 }
 
 export enum PolicyEffectType {

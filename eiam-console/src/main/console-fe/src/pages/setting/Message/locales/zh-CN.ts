@@ -78,6 +78,23 @@ export default {
     '请输入阿里云短信签名',
   'pages.setting.message.sms_provider.provider.aliyun.sign_name.rule.0.message':
     '阿里云短信签名为必填项',
+  'pages.setting.storage_provider.provider.s3': 'S3',
+  'pages.setting.storage_provider.provider.s3.endpoint': 'S3域名',
+  'pages.setting.storage_provider.provider.s3.endpoint.placeholder': '请输入 S3域名',
+  'pages.setting.storage_provider.provider.s3.endpoint.rule.0.message': 'S3域名为必填项',
+  'pages.setting.storage_provider.provider.s3.domain': '外链域名',
+  'pages.setting.storage_provider.provider.s3.domain.placeholder': '请输入S3 外链域名',
+  'pages.setting.storage_provider.provider.s3.domain.rule.0.message': 'S3 外链域名为必填项',
+  'pages.setting.storage_provider.provider.s3.access_key_id.placeholder': '请输入S3 AccessKeyId',
+  'pages.setting.storage_provider.provider.s3.access_key_id.rule.0.message':
+    'S3 AccessKeyId为必填项',
+  'pages.setting.storage_provider.provider.s3.secret_access_key.placeholder':
+    '请输入S3 SecretAccessKey',
+  'pages.setting.storage_provider.provider.s3.secret_access_key.rule.0.message':
+    'S3 SecretAccessKey为必填项',
+  'pages.setting.storage_provider.provider.s3.region.placeholder': '请输入S3 Region',
+  'pages.setting.storage_provider.provider.s3.bucket.placeholder': '请输入S3 Bucket',
+  'pages.setting.storage_provider.provider.s3.bucket.rule.0.message': 'S3 Bucket为必填项',
   'pages.setting.message.sms_provider.provider.tencent': '腾讯云',
   'pages.setting.message.sms_provider.provider.tencent.region': '地域',
   'pages.setting.message.sms_provider.provider.tencent.region.placeholder': '请选择地域配置',

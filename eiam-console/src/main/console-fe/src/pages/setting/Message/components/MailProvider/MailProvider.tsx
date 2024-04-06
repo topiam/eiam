@@ -16,16 +16,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { Container } from '@/components/Container';
-import { SMS_PROVIDER } from '@/constant';
+import { EMAIL_PROVIDER } from '@/constant';
 import { disableMailProvider, getMailProviderConfig, saveMailProvider } from '../../service';
 import { EyeInvisibleOutlined, EyeTwoTone, WarningOutlined } from '@ant-design/icons';
 
 import {
   ProCard,
   ProForm,
+  ProFormDependency,
   ProFormDigit,
   ProFormRadio,
-  ProFormSelect,
+  ProFormSegmented,
   ProFormSwitch,
   ProFormText,
 } from '@ant-design/pro-components';
@@ -63,12 +64,11 @@ const tailFormItemLayout = {
     },
   },
 };
-const defaultProvider = 'customize';
+
 export default (props: { visible: boolean }) => {
   const [form] = Form.useForm();
   const { message, modal } = App.useApp();
   const { visible } = props;
-  const [provider, setProvider] = useState<string>(defaultProvider);
   const [loading, setLoading] = useState<boolean>(false);
   const [enabled, setEnabled] = useState<boolean>(false);
   const intl = useIntl();
@@ -79,12 +79,9 @@ export default (props: { visible: boolean }) => {
       const { success, result } = await getMailProviderConfig();
       if (success && result && result.enabled) {
         setEnabled(result.enabled);
-        setProvider(result.provider);
         form.setFieldsValue({
           ...result,
         });
-      } else {
-        form.setFieldsValue({ provider: provider });
       }
       setLoading(false);
       return;
@@ -126,11 +123,7 @@ export default (props: { visible: boolean }) => {
                       if (success) {
                         setEnabled(checked);
                         message.success(intl.formatMessage({ id: 'app.operation_success' }));
-                        setProvider(defaultProvider);
                         form.resetFields();
-                        form.setFieldsValue({
-                          provider: defaultProvider,
-                        });
                         return;
                       }
                     },
@@ -148,16 +141,15 @@ export default (props: { visible: boolean }) => {
           <ProForm
             form={form}
             scrollToFirstError
-            initialValues={{ safetyType: 'ssl', provider: defaultProvider }}
+            initialValues={{ safetyType: 'ssl', provider: 'customize' }}
             onReset={() => {
               form.resetFields();
-              form.setFieldsValue({ provider });
             }}
             {...layout}
             layout={'horizontal'}
             labelAlign={'right'}
             submitter={{
-              render: (p, dom) => {
+              render: (_p, dom) => {
                 return (
                   <Form.Item {...tailFormItemLayout}>
                     <Space>{dom}</Space>
@@ -194,14 +186,41 @@ export default (props: { visible: boolean }) => {
               }
             }}
           >
-            <ProFormSelect
+            <ProFormSegmented
               name="provider"
               label={intl.formatMessage({ id: 'pages.setting.message.mail_provider.provider' })}
               rules={[{ required: true }]}
+              request={async () => {
+                return [
+                  {
+                    value: EMAIL_PROVIDER.CUSTOMIZE,
+                    label: intl.formatMessage({
+                      id: 'pages.setting.message.mail_provider.provider.customize',
+                    }),
+                  },
+                  {
+                    value: EMAIL_PROVIDER.ALIYUN,
+                    label: intl.formatMessage({
+                      id: 'pages.setting.message.mail_provider.provider.aliyun',
+                    }),
+                  },
+                  {
+                    value: EMAIL_PROVIDER.TENCENT,
+                    label: intl.formatMessage({
+                      id: 'pages.setting.message.mail_provider.provider.tencent',
+                    }),
+                  },
+                  {
+                    value: EMAIL_PROVIDER.NET_EASE,
+                    label: intl.formatMessage({
+                      id: 'pages.setting.message.mail_provider.provider.net_ease',
+                    }),
+                  },
+                ];
+              }}
               fieldProps={{
-                onChange: async (value: string) => {
+                onChange: async (value) => {
                   setLoading(true);
-                  setProvider(value);
                   form.resetFields();
                   form.setFieldsValue({
                     provider: value,
@@ -216,138 +235,120 @@ export default (props: { visible: boolean }) => {
                   setLoading(false);
                 },
               }}
-              options={[
-                {
-                  value: 'customize',
-                  label: intl.formatMessage({
-                    id: 'pages.setting.message.mail_provider.provider.customize',
-                  }),
-                },
-                {
-                  value: SMS_PROVIDER.ALIYUN,
-                  label: intl.formatMessage({
-                    id: 'pages.setting.message.mail_provider.provider.aliyun',
-                  }),
-                },
-                {
-                  value: SMS_PROVIDER.TENCENT,
-                  label: intl.formatMessage({
-                    id: 'pages.setting.message.mail_provider.provider.tencent',
-                  }),
-                },
-                {
-                  value: SMS_PROVIDER.NET_EASE,
-                  label: intl.formatMessage({
-                    id: 'pages.setting.message.mail_provider.provider.net_ease',
-                  }),
-                },
-              ]}
             />
-            {provider === 'customize' && (
-              <>
-                <ProFormText
-                  name="smtpUrl"
-                  label={intl.formatMessage({
-                    id: 'pages.setting.message.mail_provider.provider.customize.smtp_url',
-                  })}
-                  placeholder={intl.formatMessage({
-                    id: 'pages.setting.message.mail_provider.provider.customize.smtp_url.placeholder',
-                  })}
-                  rules={[
-                    {
-                      required: true,
-                      message: intl.formatMessage({
-                        id: 'pages.setting.message.mail_provider.provider.customize.smtp_url.placeholder',
-                      }),
-                    },
-                  ]}
-                  fieldProps={{ autoComplete: 'off' }}
-                />
-                <ProFormDigit
-                  label={intl.formatMessage({
-                    id: 'pages.setting.message.mail_provider.provider.customize.port',
-                  })}
-                  name="port"
-                  rules={[
-                    {
-                      required: true,
-                      message: intl.formatMessage({
-                        id: 'pages.setting.message.mail_provider.provider.customize.port_rule_0.placeholder',
-                      }),
-                    },
-                  ]}
-                  fieldProps={{ autoComplete: 'off' }}
-                  min={0}
-                  placeholder={intl.formatMessage({
-                    id: 'pages.setting.message.mail_provider.provider.customize.port_rule_0.placeholder',
-                  })}
-                />
-                <ProFormRadio.Group
-                  name="safetyType"
-                  label={intl.formatMessage({
-                    id: 'pages.setting.message.mail_provider.provider.customize.safety_type',
-                  })}
-                  rules={[{ required: true }]}
-                  options={[
-                    {
-                      label: 'None',
-                      value: 'none',
-                    },
-                    {
-                      label: 'SSL',
-                      value: 'ssl',
-                    },
-                  ]}
-                />
-              </>
-            )}
-            <ProFormText
-              name="username"
-              label={
-                provider === defaultProvider
-                  ? intl.formatMessage({
-                      id: 'pages.setting.message.mail_provider.provider.username',
-                    })
-                  : intl.formatMessage({
-                      id: 'pages.setting.message.mail_provider.provider.sender_mailbox',
-                    })
-              }
-              placeholder={
-                provider === defaultProvider
-                  ? intl.formatMessage({
-                      id: 'pages.setting.message.mail_provider.provider.username.placeholder',
-                    })
-                  : intl.formatMessage({
-                      id: 'pages.setting.message.mail_provider.provider.sender_mailbox.placeholder',
-                    })
-              }
-              rules={
-                provider === defaultProvider
-                  ? [
-                      {
-                        required: true,
-                        message: intl.formatMessage({
-                          id: 'pages.setting.message.mail_provider.provider.username.placeholder',
-                        }),
-                      },
-                    ]
-                  : [
-                      {
-                        required: true,
-                        message: intl.formatMessage({
-                          id: 'pages.setting.message.mail_provider.provider.sender_mailbox.placeholder',
-                        }),
-                      },
-                      {
-                        type: 'email',
-                        message: intl.formatMessage({
-                          id: 'pages.setting.message.mail_provider.provider.sender_mailbox.rule.rule.0.message',
-                        }),
-                      },
-                    ]
-              }
-              fieldProps={{ autoComplete: 'off' }}
-            />
+            <ProFormDependency name={['provider']}>
+              {({ provider }) => {
+                return (
+                  <>
+                    {provider === EMAIL_PROVIDER.CUSTOMIZE && (
+                      <>
+                        <ProFormText
+                          name="smtpUrl"
+                          label={intl.formatMessage({
+                            id: 'pages.setting.message.mail_provider.provider.customize.smtp_url',
+                          })}
+                          placeholder={intl.formatMessage({
+                            id: 'pages.setting.message.mail_provider.provider.customize.smtp_url.placeholder',
+                          })}
+                          rules={[
+                            {
+                              required: true,
+                              message: intl.formatMessage({
+                                id: 'pages.setting.message.mail_provider.provider.customize.smtp_url.placeholder',
+                              }),
+                            },
+                          ]}
+                          fieldProps={{ autoComplete: 'off' }}
+                        />
+                        <ProFormDigit
+                          label={intl.formatMessage({
+                            id: 'pages.setting.message.mail_provider.provider.customize.port',
+                          })}
+                          name="port"
+                          rules={[
+                            {
+                              required: true,
+                              message: intl.formatMessage({
+                                id: 'pages.setting.message.mail_provider.provider.customize.port_rule_0.placeholder',
+                              }),
+                            },
+                          ]}
+                          fieldProps={{ autoComplete: 'off' }}
+                          min={0}
+                          placeholder={intl.formatMessage({
+                            id: 'pages.setting.message.mail_provider.provider.customize.port_rule_0.placeholder',
+                          })}
+                        />
+                        <ProFormRadio.Group
+                          name="safetyType"
+                          label={intl.formatMessage({
+                            id: 'pages.setting.message.mail_provider.provider.customize.safety_type',
+                          })}
+                          rules={[{ required: true }]}
+                          options={[
+                            {
+                              label: 'None',
+                              value: 'none',
+                            },
+                            {
+                              label: 'SSL',
+                              value: 'ssl',
+                            },
+                          ]}
+                        />
+                      </>
+                    )}
+                    <ProFormText
+                      name="username"
+                      label={
+                        provider === EMAIL_PROVIDER.CUSTOMIZE
+                          ? intl.formatMessage({
+                              id: 'pages.setting.message.mail_provider.provider.username',
+                            })
+                          : intl.formatMessage({
+                              id: 'pages.setting.message.mail_provider.provider.sender_mailbox',
+                            })
+                      }
+                      placeholder={
+                        provider === EMAIL_PROVIDER.CUSTOMIZE
+                          ? intl.formatMessage({
+                              id: 'pages.setting.message.mail_provider.provider.username.placeholder',
+                            })
+                          : intl.formatMessage({
+                              id: 'pages.setting.message.mail_provider.provider.sender_mailbox.placeholder',
+                            })
+                      }
+                      rules={
+                        provider === EMAIL_PROVIDER.CUSTOMIZE
+                          ? [
+                              {
+                                required: true,
+                                message: intl.formatMessage({
+                                  id: 'pages.setting.message.mail_provider.provider.username.placeholder',
+                                }),
+                              },
+                            ]
+                          : [
+                              {
+                                required: true,
+                                message: intl.formatMessage({
+                                  id: 'pages.setting.message.mail_provider.provider.sender_mailbox.placeholder',
+                                }),
+                              },
+                              {
+                                type: 'email',
+                                message: intl.formatMessage({
+                                  id: 'pages.setting.message.mail_provider.provider.sender_mailbox.rule.rule.0.message',
+                                }),
+                              },
+                            ]
+                      }
+                      fieldProps={{ autoComplete: 'off' }}
+                    />
+                  </>
+                );
+              }}
+            </ProFormDependency>
             <ProFormText.Password
               name="secret"
               label={intl.formatMessage({

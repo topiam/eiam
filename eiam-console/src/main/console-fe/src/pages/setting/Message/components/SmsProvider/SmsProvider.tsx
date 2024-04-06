@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { SMS_PROVIDER } from '@/constant';
-import { Language } from '../../constant';
+import { Language } from '@/pages/setting/Storage/constant';
 import {
   disableSmsProvider,
   getSmsProviderConfig,
@@ -33,7 +33,7 @@ import {
   ModalForm,
   ProCard,
   ProForm,
-  ProFormSelect,
+  ProFormSegmented,
   ProFormSwitch,
   ProFormText,
 } from '@ant-design/pro-components';
@@ -84,7 +84,7 @@ const TestModal = (props: {
       modalProps={{ onCancel: onCancel, destroyOnClose: true }}
       labelAlign={'left'}
       labelCol={{ span: 4 }}
-      wrapperCol={{ span: 19 }}
+      wrapperCol={{ span: 20 }}
       key={data.type}
       title={intl.formatMessage({ id: 'pages.setting.message.sms_provider.send_scene.modal.from' })}
       initialValues={{ type: data.type, name: data.name, content: data.content }}
@@ -376,14 +376,14 @@ export default (props: { visible: boolean }) => {
               }
             }}
           >
-            <ProFormSelect
+            <ProFormSegmented
               name="provider"
               label={intl.formatMessage({ id: 'pages.setting.message.sms_provider.provider' })}
               rules={[{ required: true }]}
               fieldProps={{
-                onChange: async (value: string) => {
+                onChange: async (value) => {
                   setLoading(true);
-                  setProvider(value);
+                  setProvider(value as string);
                   //清理
                   form.resetFields();
                   form.setFieldsValue({ provider: value });
@@ -394,7 +394,7 @@ export default (props: { visible: boolean }) => {
                     form.setFieldsValue({ ...result.config });
                     setLanguage(result.language);
                     //获取模板
-                    await fetchSmsTemplateList(result.language, value);
+                    await fetchSmsTemplateList(result.language, value as string);
                     result.templates?.forEach((i: { type: any; code: any }) => {
                       editorFormRef.current?.setFieldsValue({ [i.type]: { code: i.code } });
                     });
@@ -402,31 +402,33 @@ export default (props: { visible: boolean }) => {
                   //已配置和选中配置不一致，走初始化流程
                   if (success && result && result.provider !== value) {
                     setLanguage(Language.ZH);
-                    await fetchSmsTemplateList(Language.ZH, value);
+                    await fetchSmsTemplateList(Language.ZH, value as string);
                   }
                   setLoading(false);
                 },
               }}
-              options={[
-                {
-                  value: SMS_PROVIDER.ALIYUN,
-                  label: intl.formatMessage({
-                    id: 'pages.setting.message.sms_provider.provider.aliyun',
-                  }),
-                },
-                {
-                  value: SMS_PROVIDER.TENCENT,
-                  label: intl.formatMessage({
-                    id: 'pages.setting.message.sms_provider.provider.tencent',
-                  }),
-                },
-                {
-                  value: SMS_PROVIDER.QI_NIU,
-                  label: intl.formatMessage({
-                    id: 'pages.setting.message.sms_provider.provider.qi_niu',
-                  }),
-                },
-              ]}
+              request={async () => {
+                return [
+                  {
+                    value: SMS_PROVIDER.ALIYUN,
+                    label: intl.formatMessage({
+                      id: 'pages.setting.message.sms_provider.provider.aliyun',
+                    }),
+                  },
+                  {
+                    value: SMS_PROVIDER.TENCENT,
+                    label: intl.formatMessage({
+                      id: 'pages.setting.message.sms_provider.provider.tencent',
+                    }),
+                  },
+                  {
+                    value: SMS_PROVIDER.QI_NIU,
+                    label: intl.formatMessage({
+                      id: 'pages.setting.message.sms_provider.provider.qi_niu',
+                    }),
+                  },
+                ];
+              }}
             />
             {provider === SMS_PROVIDER.ALIYUN && <AliCloud />}
             {provider === SMS_PROVIDER.TENCENT && <Tencent />}
