@@ -82,7 +82,13 @@ const List = (props: { category: IdentityProviderCategory }) => {
                     id: 'pages.authn.identity_provider.add-success-content',
                   })}
                   <Paragraph copyable={{ text: sourceResult.result.redirectUri }}>
-                    <a href="javascript:void(0);">{sourceResult.result.redirectUri}</a>
+                    <a
+                      onClick={(e) => {
+                        e.preventDefault();
+                      }}
+                    >
+                      {sourceResult.result.redirectUri}
+                    </a>
                   </Paragraph>
                 </>
               ),
