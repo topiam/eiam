@@ -139,7 +139,7 @@ public final class PasswordPolicySettingConstants {
         //最大长度
         PASSWORD_POLICY_DEFAULT_SETTINGS.put(PASSWORD_POLICY_BIGGEST_LENGTH, "20");
         //最小长度
-        PASSWORD_POLICY_DEFAULT_SETTINGS.put(PASSWORD_POLICY_LEAST_LENGTH, "8");
+        PASSWORD_POLICY_DEFAULT_SETTINGS.put(PASSWORD_POLICY_LEAST_LENGTH, "6");
         //复杂度
         PASSWORD_POLICY_DEFAULT_SETTINGS.put(PASSWORD_POLICY_COMPLEXITY,
             PasswordComplexityRule.NONE.getCode());
@@ -156,7 +156,7 @@ public final class PasswordPolicySettingConstants {
         //历史密码检查次数范围
         PASSWORD_POLICY_DEFAULT_SETTINGS.put(PASSWORD_POLICY_HISTORY_PASSWORD_CHECK_COUNT, "5");
         //非法序列检查
-        PASSWORD_POLICY_DEFAULT_SETTINGS.put(PASSWORD_POLICY_ILLEGAL_SEQUENCE_CHECK, "true");
+        PASSWORD_POLICY_DEFAULT_SETTINGS.put(PASSWORD_POLICY_ILLEGAL_SEQUENCE_CHECK, "false");
         //密码过期天数
         PASSWORD_POLICY_DEFAULT_SETTINGS.put(PASSWORD_POLICY_VALID_DAYS, "120");
         //密码过期提醒时间
