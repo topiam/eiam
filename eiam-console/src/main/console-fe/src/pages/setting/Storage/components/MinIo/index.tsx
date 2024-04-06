@@ -27,13 +27,13 @@ export default () => {
         name={['config', 'accessKey']}
         label="AccessKey"
         placeholder={intl.formatMessage({
-          id: 'pages.setting.storage_provider.minio.access_key.placeholder',
+          id: 'pages.setting.storage_provider.provider.minio.access_key.placeholder',
         })}
         rules={[
           {
             required: true,
             message: intl.formatMessage({
-              id: 'pages.setting.storage_provider.minio.access_key.rule.0.message',
+              id: 'pages.setting.storage_provider.provider.minio.access_key.rule.0.message',
             }),
           },
         ]}
@@ -46,12 +46,12 @@ export default () => {
           {
             required: true,
             message: intl.formatMessage({
-              id: 'pages.setting.storage_provider.minio.secret_key.rule.0.message',
+              id: 'pages.setting.storage_provider.provider.minio.secret_key.rule.0.message',
             }),
           },
         ]}
         placeholder={intl.formatMessage({
-          id: 'pages.setting.storage_provider.minio.secret_key.placeholder',
+          id: 'pages.setting.storage_provider.provider.minio.secret_key.placeholder',
         })}
         fieldProps={{
           autoComplete: 'new-password',
@@ -62,15 +62,17 @@ export default () => {
       />
       <ProFormText
         name={['config', 'domain']}
-        label="Domain"
+        label={intl.formatMessage({
+          id: `pages.setting.storage_provider.provider.minio.domain`,
+        })}
         placeholder={intl.formatMessage({
-          id: 'pages.setting.storage_provider.minio.domain.placeholder',
+          id: 'pages.setting.storage_provider.provider.minio.domain.placeholder',
         })}
         rules={[
           {
             required: true,
             message: intl.formatMessage({
-              id: 'pages.setting.storage_provider.minio.domain.rule.0.message',
+              id: 'pages.setting.storage_provider.provider.minio.domain.rule.0.message',
             }),
           },
         ]}
@@ -80,15 +82,17 @@ export default () => {
       />
       <ProFormText
         name={['config', 'endpoint']}
-        label="Endpoint"
+        label={intl.formatMessage({
+          id: `pages.setting.storage_provider.provider.minio.endpoint`,
+        })}
         placeholder={intl.formatMessage({
-          id: 'pages.setting.storage_provider.minio.endpoint.placeholder',
+          id: 'pages.setting.storage_provider.provider.minio.endpoint.placeholder',
         })}
         rules={[
           {
             required: true,
             message: intl.formatMessage({
-              id: 'pages.setting.storage_provider.minio.endpoint.rule.0.message',
+              id: 'pages.setting.storage_provider.provider.minio.endpoint.rule.0.message',
             }),
           },
         ]}
@@ -100,13 +104,13 @@ export default () => {
         name={['config', 'bucket']}
         label={'Bucket'}
         placeholder={intl.formatMessage({
-          id: 'pages.setting.storage_provider.minio.bucket.placeholder',
+          id: 'pages.setting.storage_provider.provider.minio.bucket.placeholder',
         })}
         rules={[
           {
             required: true,
             message: intl.formatMessage({
-              id: 'pages.setting.storage_provider.minio.bucket.rule.0.message',
+              id: 'pages.setting.storage_provider.provider.minio.bucket.rule.0.message',
             }),
           },
         ]}

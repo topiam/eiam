@@ -22,7 +22,7 @@ import {
   PageContainer,
   ProCard,
   ProForm,
-  ProFormSelect,
+  ProFormSegmented,
   ProFormSwitch,
 } from '@ant-design/pro-components';
 import { useAsyncEffect } from 'ahooks';
@@ -159,7 +159,7 @@ const Storage = () => {
                 form.setFieldsValue({ enabled, provider });
               }}
               submitter={{
-                render: (p, dom) => {
+                render: (_p, dom) => {
                   return (
                     <Form.Item {...tailFormItemLayout}>
                       <Space>{dom}</Space>
@@ -191,16 +191,16 @@ const Storage = () => {
             >
               {enabled && (
                 <>
-                  <ProFormSelect
+                  <ProFormSegmented
                     name="provider"
                     label={intl.formatMessage({
                       id: 'pages.setting.storage_provider.provider',
                     })}
                     rules={[{ required: true }]}
                     fieldProps={{
-                      onChange: async (value: string) => {
+                      onChange: async (value) => {
                         setLoading(true);
-                        setProvider(value);
+                        setProvider(value as string);
                         form.resetFields();
                         form.setFieldsValue({
                           provider: value,
@@ -215,38 +215,40 @@ const Storage = () => {
                         setLoading(false);
                       },
                     }}
-                    options={[
-                      {
-                        value: OssProvider.ALIYUN_OSS,
-                        label: intl.formatMessage({
-                          id: 'pages.setting.storage_provider.provider.aliyun_oss',
-                        }),
-                      },
-                      {
-                        value: OssProvider.TENCENT_COS,
-                        label: intl.formatMessage({
-                          id: 'pages.setting.storage_provider.provider.tencent_cos',
-                        }),
-                      },
-                      {
-                        value: OssProvider.QINIU_KODO,
-                        label: intl.formatMessage({
-                          id: 'pages.setting.storage_provider.provider.qiniu_kodo',
-                        }),
-                      },
-                      {
-                        value: OssProvider.MINIO,
-                        label: intl.formatMessage({
-                          id: 'pages.setting.storage_provider.provider.minio',
-                        }),
-                      },
-                      {
-                        value: OssProvider.S3,
-                        label: intl.formatMessage({
-                          id: 'pages.setting.storage_provider.provider.s3',
-                        }),
-                      },
-                    ]}
+                    request={async () => {
+                      return [
+                        {
+                          value: OssProvider.ALIYUN_OSS,
+                          label: intl.formatMessage({
+                            id: 'pages.setting.storage_provider.provider.aliyun_oss',
+                          }),
+                        },
+                        {
+                          value: OssProvider.TENCENT_COS,
+                          label: intl.formatMessage({
+                            id: 'pages.setting.storage_provider.provider.tencent_cos',
+                          }),
+                        },
+                        {
+                          value: OssProvider.QINIU_KODO,
+                          label: intl.formatMessage({
+                            id: 'pages.setting.storage_provider.provider.qiniu_kodo',
+                          }),
+                        },
+                        {
+                          value: OssProvider.MINIO,
+                          label: intl.formatMessage({
+                            id: 'pages.setting.storage_provider.provider.minio',
+                          }),
+                        },
+                        {
+                          value: OssProvider.S3,
+                          label: intl.formatMessage({
+                            id: 'pages.setting.storage_provider.provider.s3',
+                          }),
+                        },
+                      ];
+                    }}
                   />
                   {provider === OssProvider.ALIYUN_OSS && <AliCloudOss />}
                   {provider === OssProvider.TENCENT_COS && <TencentCos />}

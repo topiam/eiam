@@ -80,13 +80,13 @@ export default () => {
         name={['config', 'secretKey']}
         label="SecretKey"
         placeholder={intl.formatMessage({
-          id: 'pages.setting.storage_provider.provider.tencent_cos.secret_Key.placeholder',
+          id: 'pages.setting.storage_provider.provider.tencent_cos.secret_key.placeholder',
         })}
         rules={[
           {
             required: true,
             message: intl.formatMessage({
-              id: 'pages.setting.storage_provider.provider.tencent_cos.secret_Key.rule.0.message',
+              id: 'pages.setting.storage_provider.provider.tencent_cos.secret_key.rule.0.message',
             }),
           },
         ]}

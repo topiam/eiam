@@ -80,7 +80,9 @@ export default () => {
       />
       <ProFormText
         name={['config', 'endpoint']}
-        label="Endpoint"
+        label={intl.formatMessage({
+          id: `pages.setting.storage_provider.provider.aliyun_oss.endpoint`,
+        })}
         placeholder={intl.formatMessage({
           id: 'pages.setting.storage_provider.provider.aliyun_oss.endpoint.placeholder',
         })}
