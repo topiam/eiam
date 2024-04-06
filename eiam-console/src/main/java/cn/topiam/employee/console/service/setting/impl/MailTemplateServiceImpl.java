@@ -151,7 +151,7 @@ public class MailTemplateServiceImpl extends SettingServiceImpl implements MailT
     @Override
     @CacheEvict(key = "#type.code")
     public void disableCustomEmailTemplate(MailType type) {
-        mailTemplateRepository.deleteByType(type);
+        mailTemplateRepository.deleteByType(type.getCode());
     }
 
     /**
