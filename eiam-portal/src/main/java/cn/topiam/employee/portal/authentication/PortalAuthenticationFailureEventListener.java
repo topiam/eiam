@@ -17,10 +17,14 @@
  */
 package cn.topiam.employee.portal.authentication;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RAtomicLong;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
@@ -97,19 +101,31 @@ public class PortalAuthenticationFailureEventListener implements
      *
      * @param user {@link UserEntity}
      */
+    /**
+     * 更新登录失败计数
+     *
+     * @param user {@link UserEntity}
+     */
     private void updateLoginFailCount(UserEntity user) {
-        //当前时间
-        LocalDateTime nowTime = LocalDateTime.now();
-        //根据当前时间减去登录失败持续时间
-        LocalDateTime beforeTime = nowTime.minusMinutes(getLoginFailureDuration());
         Integer count = SettingHelp.getLoginFailureCount();
         UserRepository userRepository = getUserRepository();
         //统计用户登录失败次数
-        Integer loginFailCount = getAuditRepository().countLoginFailByUserId(beforeTime, nowTime,
-            user.getId());
-        if (loginFailCount > count) {
-            user.setStatus(UserStatus.LOCKED);
-            userRepository.save(user);
+        RAtomicLong rAtomicLong = getRedissonClient().getAtomicLong(String.valueOf(user.getId()));
+        //如果存在该key
+        if (rAtomicLong.isExists()) {
+            long loginFailCount = rAtomicLong.incrementAndGet();
+            if (loginFailCount > count) {
+                user.setStatus(UserStatus.LOCKED);
+                user.setLockExpiredTime(LocalDateTime.now());
+                userRepository.save(user);
+                rAtomicLong.deleteAsync();
+            }
+        }
+        //如果不存在该key，并且用户未被锁定
+        if (!rAtomicLong.isExists() && !user.getStatus().equals(UserStatus.LOCKED)) {
+            rAtomicLong.incrementAndGet();
+            Instant expireTime = Instant.now().plus(getLoginFailureDuration(), ChronoUnit.MINUTES);
+            rAtomicLong.expire(expireTime);
         }
     }
 
@@ -117,8 +133,8 @@ public class PortalAuthenticationFailureEventListener implements
         return ApplicationContextHelp.getBean(UserRepository.class);
     }
 
-    private AuditRepository getAuditRepository() {
-        return ApplicationContextHelp.getBean(AuditRepository.class);
+    private RedissonClient getRedissonClient() {
+        return ApplicationContextHelp.getBean(RedissonClient.class);
     }
 
 }

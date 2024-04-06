@@ -160,6 +160,12 @@ public class UserEntity extends LogicDeleteEntity<Long> {
     private LocalDateTime     lastAuthTime;
 
     /**
+     * 锁定时间
+     */
+    @Column(name = "lock_expired_time")
+    private LocalDateTime     lockExpiredTime;
+
+    /**
      * 扩展参数
      */
     @Column(name = "expand_")
