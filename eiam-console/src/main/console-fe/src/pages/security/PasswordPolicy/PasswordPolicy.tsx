@@ -80,7 +80,7 @@ export default () => {
               }
             }}
             submitter={{
-              render: (p, dom) => {
+              render: (_p, dom) => {
                 return <FooterToolbar>{dom}</FooterToolbar>;
               },
               resetButtonProps: {
@@ -108,7 +108,7 @@ export default () => {
                       name={['passwordLeastLength']}
                       rules={[{ required: true }]}
                     >
-                      <InputNumber min={8} max={10} />
+                      <InputNumber min={6} max={30} />
                     </Form.Item>
                   </Col>
                   <Col xs={10} sm={10} md={8} lg={8} xl={6}>
