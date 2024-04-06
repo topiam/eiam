@@ -227,23 +227,6 @@ public class UserController {
     }
 
     /**
-     * 用户离职
-     *
-     * @param id {@link String}
-     * @return {@link Boolean}
-     */
-    @Lock
-    @Preview
-    @Operation(summary = "用户离职")
-    @Audit(type = EventType.USER_RESIGN)
-    @DeleteMapping(value = "/resign/{id}")
-    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
-    public ApiRestResult<Boolean> userResign(@PathVariable(value = "id") String id) {
-        return ApiRestResult.<Boolean> builder()
-            .result(userService.changeUserStatus(Long.valueOf(id), UserStatus.LOCKED)).build();
-    }
-
-    /**
      * 重置用户密码
      *
      * @param param {@link ResetPasswordParam}
@@ -258,6 +241,23 @@ public class UserController {
     public ApiRestResult<Boolean> resetUserPassword(@Validated @RequestBody ResetPasswordParam param) {
         return ApiRestResult.<Boolean> builder().result(userService.resetUserPassword(param))
             .build();
+    }
+
+    /**
+     * 解锁用户
+     *
+     * @param id {@link String}
+     * @return {@link Boolean}
+     */
+    @Lock
+    @Preview
+    @Operation(summary = "解锁用户")
+    @Audit(type = EventType.UNLOCK_USER)
+    @PutMapping(value = "/unlock/{id}")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
+    public ApiRestResult<Boolean> unlockUser(@PathVariable(value = "id") String id) {
+        Boolean result = userService.changeUserStatus(Long.valueOf(id), UserStatus.ENABLE);
+        return ApiRestResult.<Boolean> builder().result(result).build();
     }
 
     /**

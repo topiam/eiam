@@ -108,6 +108,11 @@ public class AccountEventType {
         "eiam:event:account:update_password", "修改密码", ORG_ACCOUNT_RESOURCE, List.of(ADMIN));
 
     /**
+     * 解锁用户
+     */
+    public static Type UNLOCK_USER                           = new Type(
+        "eiam:event:account:unlock_user", "解锁用户", ORG_ACCOUNT_RESOURCE, List.of(ADMIN));
+    /**
      * 创建用户组
      */
     public static Type CREATE_USER_GROUP                     = new Type(

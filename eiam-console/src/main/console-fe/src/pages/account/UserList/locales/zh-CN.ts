@@ -47,6 +47,9 @@ export default {
     '删除后该用户无法使用，确定删除此用户？',
   'pages.account.user_list.user.columns.option.reset_password': '重置密码',
   'pages.account.user_list.user.table_alert_option_render': '您确定要批量删除选中用户吗？',
+  'pages.account.user_list.user.columns.option.unlock': '解锁',
+  'pages.account.user_list.user.columns.option.unlock_title': '确定解锁该用户吗？',
+  'pages.account.user_list.user.columns.option.unlock_content': '解锁后用户将恢复正常使用',
   'pages.account.user_list.user.toolbar.tooltip.title':
     '若不勾选，则只会搜索当前直属节点的账户，不包含下级节点账户。',
   'pages.account.user_list.user.toolbar.tooltip.text': '包含节点下全部账户',

@@ -247,13 +247,14 @@ export default (props: UserListProps) => {
     {
       title: intl.formatMessage({ id: 'pages.account.user_list.user.columns.option' }),
       valueType: 'option',
-      width: 110,
+      width: 120,
       align: 'center',
       fixed: 'right',
       render: (_text: any, row: AccountAPI.ListUser) => {
-        return [
-          ...[
-            (row.status === 'locked' ||
+        return (
+          <Space>
+            {/*锁定*/}
+            {(row.status === 'locked' ||
               row.status === 'expired_locked' ||
               row.status === 'password_expired_locked') && (
               <a
@@ -285,8 +286,9 @@ export default (props: UserListProps) => {
               >
                 {intl.formatMessage({ id: 'pages.account.user_list.user.columns.option.unlock' })}
               </a>
-            ),
-            row.status === 'enabled' ? (
+            )}
+            {/*启用*/}
+            {row.status === 'enabled' && (
               <Popconfirm
                 title={intl.formatMessage({
                   id: 'pages.account.user_list.user.columns.option.disable.popconfirm',
@@ -315,7 +317,9 @@ export default (props: UserListProps) => {
                   {intl.formatMessage({ id: 'app.disable' })}
                 </a>
               </Popconfirm>
-            ) : (
+            )}
+            {/*禁用*/}
+            {row.status === 'disabled' && (
               <Popconfirm
                 title={intl.formatMessage({
                   id: 'pages.account.user_list.user.columns.option.enable.popconfirm',
@@ -336,70 +340,72 @@ export default (props: UserListProps) => {
               >
                 <a key="enabled">{intl.formatMessage({ id: 'app.enable' })}</a>
               </Popconfirm>
-            ),
-          ],
-          <a
-            key={'update'}
-            onClick={() => {
-              setId(row.id);
-              setUpdateUserVisible(true);
-            }}
-          >
-            {intl.formatMessage({ id: 'app.update' })}
-          </a>,
-          <TableDropdown
-            key={'dropdown'}
-            onSelect={(key) => {
-              if (key === 'reset-password') {
+            )}
+            {/*更新*/}
+            <a
+              key={'update'}
+              onClick={() => {
                 setId(row.id);
-                setResetPasswordVisible(true);
-              }
-            }}
-            menus={[
-              {
-                key: 'delete',
-                name: (
-                  <Popconfirm
-                    title={intl.formatMessage({
-                      id: 'pages.account.user_list.user.columns.option.delete.popconfirm',
-                    })}
-                    placement="bottomRight"
-                    icon={
-                      <QuestionCircleOutlined
-                        style={{
-                          color: 'red',
-                        }}
-                      />
-                    }
-                    onConfirm={async () => {
-                      const { success } = await removeUser(row.id);
-                      if (success) {
-                        message.success(intl.formatMessage({ id: 'app.operation_success' }));
-                        actionRef.current?.reload();
-                        return;
-                      }
-                    }}
-                    okText={intl.formatMessage({ id: 'app.yes' })}
-                    cancelText={intl.formatMessage({ id: 'app.no' })}
-                    key="delete"
-                  >
-                    <a target="_blank" key="remove" style={{ color: 'red' }}>
-                      {intl.formatMessage({
-                        id: 'pages.account.user_list.user.columns.option.delete',
+                setUpdateUserVisible(true);
+              }}
+            >
+              {intl.formatMessage({ id: 'app.update' })}
+            </a>
+            {/*更多*/}
+            <TableDropdown
+              key={'dropdown'}
+              onSelect={(key) => {
+                if (key === 'reset-password') {
+                  setId(row.id);
+                  setResetPasswordVisible(true);
+                }
+              }}
+              menus={[
+                {
+                  key: 'delete',
+                  name: (
+                    <Popconfirm
+                      title={intl.formatMessage({
+                        id: 'pages.account.user_list.user.columns.option.delete.popconfirm',
                       })}
-                    </a>
-                  </Popconfirm>
-                ),
-              },
-              {
-                key: 'reset-password',
-                name: intl.formatMessage({
-                  id: 'pages.account.user_list.user.columns.option.reset_password',
-                }),
-              },
-            ]}
-          />,
-        ];
+                      placement="bottomRight"
+                      icon={
+                        <QuestionCircleOutlined
+                          style={{
+                            color: 'red',
+                          }}
+                        />
+                      }
+                      onConfirm={async () => {
+                        const { success } = await removeUser(row.id);
+                        if (success) {
+                          message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                          actionRef.current?.reload();
+                          return;
+                        }
+                      }}
+                      okText={intl.formatMessage({ id: 'app.yes' })}
+                      cancelText={intl.formatMessage({ id: 'app.no' })}
+                      key="delete"
+                    >
+                      <a target="_blank" key="remove" style={{ color: 'red' }}>
+                        {intl.formatMessage({
+                          id: 'pages.account.user_list.user.columns.option.delete',
+                        })}
+                      </a>
+                    </Popconfirm>
+                  ),
+                },
+                {
+                  key: 'reset-password',
+                  name: intl.formatMessage({
+                    id: 'pages.account.user_list.user.columns.option.reset_password',
+                  }),
+                },
+              ]}
+            />
+          </Space>
+        );
       },
     },
   ];

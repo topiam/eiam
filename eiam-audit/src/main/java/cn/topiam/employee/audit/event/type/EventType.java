@@ -114,7 +114,10 @@ public enum EventType {
                         * 修改密码
                         */
                        MODIFY_USER_PASSWORD(AccountEventType.MODIFY_USER_PASSWORD),
-
+                       /**
+                        * 解锁用户
+                        */
+                       UNLOCK_USER(AccountEventType.UNLOCK_USER),
                        /**
                         * 修改账户信息
                         */
