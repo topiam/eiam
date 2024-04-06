@@ -99,7 +99,7 @@
     "@umijs/max": "^4.1.8",
     "cross-env": "^7.0.3",
     "cross-port-killer": "^1.4.0",
-    "eslint": "^9.0.0",
+    "eslint": "^8.57.0",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
