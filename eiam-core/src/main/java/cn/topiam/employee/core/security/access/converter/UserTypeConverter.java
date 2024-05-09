@@ -28,7 +28,7 @@ import static cn.topiam.employee.support.security.userdetails.UserType.*;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/10 23:02
+ * Created by support@topiam.cn on 2021/11/10 23:02
  */
 @Converter(autoApply = true)
 public class UserTypeConverter implements AttributeConverter<UserType, String> {
@@ -69,12 +69,6 @@ public class UserTypeConverter implements AttributeConverter<UserType, String> {
         }
         if (dbData.equals(USER.getType())) {
             return USER;
-        }
-        if (dbData.equals(DEVELOPER.getType())) {
-            return DEVELOPER;
-        }
-        if (dbData.equals(UNKNOWN.getType())) {
-            return UNKNOWN;
         }
         throw new TopIamException("未知用户类型");
     }

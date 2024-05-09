@@ -19,6 +19,9 @@ package cn.topiam.employee.console.pojo.result.identitysource;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider;
 
@@ -26,6 +29,7 @@ import lombok.Data;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIME_FORMATTER_PATTERN;
 
 /**
  * 身份源源详情
@@ -42,11 +46,26 @@ public class IdentitySourceGetResult implements Serializable {
      */
     @Parameter(description = "ID")
     private String                 id;
+
     /**
      * 名称
      */
     @Parameter(description = "名称")
     private String                 name;
+
+    /**
+     * 编码
+     */
+    @Parameter(description = "编码")
+    private String                 code;
+
+    /**
+     * 创建时间
+     */
+    @DateTimeFormat(pattern = DEFAULT_DATE_TIME_FORMATTER_PATTERN)
+    @Parameter(description = "创建时间")
+    private LocalDateTime          createTime;
+
     /**
      * 平台
      */

@@ -17,51 +17,43 @@
  */
 package cn.topiam.employee.console.service.analysis.impl;
 
-import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
-import org.jetbrains.annotations.NotNull;
-import org.springframework.data.elasticsearch.client.elc.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import com.google.common.collect.Lists;
 
 import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.audit.repository.AuditRepository;
 import cn.topiam.employee.audit.repository.result.AuditStatisticsResult;
 import cn.topiam.employee.audit.repository.result.AuthnQuantityResult;
 import cn.topiam.employee.audit.repository.result.AuthnZoneResult;
+import cn.topiam.employee.authentication.common.IdentityProviderType;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.common.repository.app.AppRepository;
 import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 import cn.topiam.employee.console.pojo.query.analysis.AnalysisQuery;
-import cn.topiam.employee.console.pojo.result.analysis.*;
+import cn.topiam.employee.console.pojo.result.analysis.AppVisitRankResult;
+import cn.topiam.employee.console.pojo.result.analysis.AuthnHotProviderResult;
+import cn.topiam.employee.console.pojo.result.analysis.OverviewResult;
 import cn.topiam.employee.console.service.analysis.AnalysisService;
-import cn.topiam.employee.support.autoconfiguration.SupportProperties;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
-import co.elastic.clients.json.JsonData;
-import static cn.topiam.employee.audit.entity.Event.*;
-import static cn.topiam.employee.console.converter.authn.IdentityProviderConverter.getIdentityProviderType;
-import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIME_FORMATTER_PATTERN;
-
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2022/11/22 22:25
+ * Created by support@topiam.cn on 2022/11/22 22:25
  */
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class AnalysisServiceImpl implements AnalysisService {
-
-    public static final String COUNT = "count";
-
     /**
      * 概述
      *
@@ -70,12 +62,12 @@ public class AnalysisServiceImpl implements AnalysisService {
     @Override
     public OverviewResult overview() {
         OverviewResult result = new OverviewResult();
-        result.setAppCount(appRepository.count());
-        result.setUserCount(userRepository.count());
-        result.setIdpCount(identityProviderRepository.count());
+        result.setAppCount(String.valueOf(appRepository.count()));
+        result.setUserCount(String.valueOf(userRepository.count()));
+        result.setIdpCount(String.valueOf(identityProviderRepository.count()));
         // 查询今日认证量条件
-        result.setTodayAuthnCount(auditRepository.countByTypeAndTime(
-            EventType.LOGIN_PORTAL.getCode(), LocalDateTime.MIN, LocalDateTime.MAX));
+        result.setTodayAuthnCount(String.valueOf(auditRepository
+            .countByTypeAndTime(EventType.LOGIN_PORTAL, LocalDateTime.MIN, LocalDateTime.MAX)));
         return result;
     }
 
@@ -90,7 +82,8 @@ public class AnalysisServiceImpl implements AnalysisService {
         LocalDateTime min = params.getStartTime();
         LocalDateTime max = params.getEndTime();
         AnalysisQuery.Interval timeInterval = params.getTimeInterval();
-        return auditRepository.authnQuantity(EventType.LOGIN_PORTAL, min, max,
+        return auditRepository.authnQuantity(
+            Lists.newArrayList(EventType.LOGIN_PORTAL, EventType.APP_SSO), min, max,
             timeInterval.getFormat());
     }
 
@@ -114,22 +107,6 @@ public class AnalysisServiceImpl implements AnalysisService {
     }
 
     /**
-     * 时间查询条件
-     *
-     * @param params {@link AnalysisQuery}
-     * @return {@link Query}
-     */
-    private Query getRangeQueryBuilder(AnalysisQuery params) {
-        String min = params.getStartTime()
-            .format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMATTER_PATTERN));
-        String max = params.getEndTime()
-            .format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMATTER_PATTERN));
-        // 查询条件
-        return QueryBuilders.range(range -> range.field(EVENT_TIME).timeZone(ZONE_ID)
-            .format(DEFAULT_DATE_TIME_FORMATTER_PATTERN).gt(JsonData.of(min)).lt(JsonData.of(max)));
-    }
-
-    /**
      * 热门认证方式
      * @param params {@link AnalysisQuery}
      * @return {@link List<AuthnQuantityResult>}
@@ -137,12 +114,14 @@ public class AnalysisServiceImpl implements AnalysisService {
     @Override
     public List<AuthnHotProviderResult> authnHotProvider(AnalysisQuery params) {
         List<AuthnHotProviderResult> authTypeList = new ArrayList<>();
-        List<AuditStatisticsResult> auditRankResults = auditRepository
-            .authnHotProvider(EventType.LOGIN_PORTAL, params.getStartTime(), params.getEndTime());
+        List<AuditStatisticsResult> auditRankResults = auditRepository.authnHotProvider(
+            Lists.newArrayList(EventType.LOGIN_PORTAL, EventType.APP_SSO), params.getStartTime(),
+            params.getEndTime());
         for (AuditStatisticsResult auditRankResult : auditRankResults) {
             // 授权类型
             if (Objects.nonNull(auditRankResult.getKey())) {
-                String name = getIdentityProviderType(auditRankResult.getKey()).name();
+                String name = IdentityProviderType.getIdentityProviderType(auditRankResult.getKey())
+                    .name();
                 authTypeList.add(new AuthnHotProviderResult(name, auditRankResult.getCount()));
             }
         }
@@ -157,8 +136,9 @@ public class AnalysisServiceImpl implements AnalysisService {
      */
     @Override
     public List<AuthnZoneResult> authnZone(AnalysisQuery params) {
-        List<AuditStatisticsResult> auditStatisticsResults = auditRepository
-            .authnZone(EventType.LOGIN_PORTAL, params.getStartTime(), params.getEndTime());
+        List<AuditStatisticsResult> auditStatisticsResults = auditRepository.authnZone(
+            Lists.newArrayList(EventType.LOGIN_PORTAL, EventType.APP_SSO), params.getStartTime(),
+            params.getEndTime());
         return auditStatisticsResults.stream()
             .map(auditStatisticsResult -> new AuthnZoneResult(auditStatisticsResult.getKey(),
                 auditStatisticsResult.getCount()))
@@ -175,45 +155,9 @@ public class AnalysisServiceImpl implements AnalysisService {
         if (!StringUtils.hasText(targetId)) {
             return null;
         }
-        AppEntity app = appRepository.findById(Long.valueOf(targetId)).orElse(new AppEntity());
+        AppEntity app = appRepository.findById(targetId).orElse(new AppEntity());
         return app.getName();
     }
-
-    /**
-     * 拼装查询条件
-     *
-     * @param query {@link Query}
-     * @param eventType {@link EventType}
-     * @return {@link BoolQuery.Builder}
-     */
-    @NotNull
-    private BoolQuery.Builder getQueryBuilder(Query query, EventType eventType) {
-        // 查询条件
-        BoolQuery.Builder queryBuilder = QueryBuilders.bool();
-        // 事件类型
-        queryBuilder.must(Queries.termQueryAsQuery(EVENT_TYPE, eventType.getCode()));
-        // 日期条件
-        queryBuilder.filter(query);
-        return queryBuilder;
-    }
-
-    /**
-     * 拼装查询条件
-     *
-     * @param query {@link Query}
-     * @param eventType {@link EventType}
-     * @return {@link Query}
-     */
-    @NotNull
-    private Query getQuery(Query query, EventType eventType) {
-        return getQueryBuilder(query, eventType).build()._toQuery();
-    }
-
-    private final String                     ZONE_ID = ZoneId.systemDefault().getId();
-
-    private final SupportProperties          supportProperties;
-
-    //    private final ElasticsearchTemplate      elasticsearchTemplate;
 
     private final AuditRepository            auditRepository;
 

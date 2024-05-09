@@ -31,14 +31,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cn.topiam.employee.common.enums.MailType;
 import cn.topiam.employee.common.enums.MessageCategory;
 import cn.topiam.employee.common.message.mail.MailProviderConfig;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.context.ApplicationContextService;
 import cn.topiam.employee.support.exception.TopIamException;
 
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import static cn.topiam.employee.core.help.SettingHelp.getCodeValidTime;
-import static cn.topiam.employee.core.help.SettingHelp.getMailProviderConfig;
+import static cn.topiam.employee.core.context.ContextService.getCodeValidTime;
+import static cn.topiam.employee.core.context.ContextService.getMailProviderConfig;
 import static cn.topiam.employee.core.message.MsgVariable.*;
 import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIME_FORMATTER;
 
@@ -46,7 +46,7 @@ import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIM
  * 邮件消息发送
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/25 22:07
+ * Created by support@topiam.cn on 2021/9/25 22:07
  */
 @Component
 @Slf4j
@@ -100,7 +100,7 @@ public class MailMsgEventPublish {
         // 收件人
         parameter.put(USER_EMAIL, receiver);
         // publish event
-        ObjectMapper objectMapper = ApplicationContextHelp.getBean(ObjectMapper.class);
+        ObjectMapper objectMapper = ApplicationContextService.getBean(ObjectMapper.class);
         applicationEventPublisher.publishEvent(new MailMsgEvent(type, receiver, parameter));
 
     }

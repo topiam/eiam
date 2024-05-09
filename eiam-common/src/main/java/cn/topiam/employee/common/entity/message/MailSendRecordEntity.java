@@ -19,12 +19,12 @@ package cn.topiam.employee.common.entity.message;
 
 import java.time.LocalDateTime;
 
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SoftDelete;
 
 import cn.topiam.employee.common.enums.MailType;
 import cn.topiam.employee.common.message.enums.MailProvider;
-import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
+import cn.topiam.employee.support.repository.SoftDeleteConverter;
+import cn.topiam.employee.support.repository.base.BaseEntity;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -34,24 +34,22 @@ import lombok.experimental.Accessors;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
+import static cn.topiam.employee.support.repository.base.BaseEntity.IS_DELETED_COLUMN;
 
 /**
  * 邮件发送记录
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/8/1 21:41
+ * Created by support@topiam.cn on 2021/8/1 21:41
  */
 @Entity
 @Accessors(chain = true)
 @Getter
 @Setter
 @ToString
-@Table(name = "mail_send_record")
-@SQLDelete(sql = "update mail_send_record set " + SOFT_DELETE_SET + " where id_ = ?")
-@Where(clause = SOFT_DELETE_WHERE)
-public class MailSendRecordEntity extends LogicDeleteEntity<Long> {
+@Table(name = "eiam_mail_send_record")
+@SoftDelete(columnName = IS_DELETED_COLUMN, converter = SoftDeleteConverter.class)
+public class MailSendRecordEntity extends BaseEntity {
     /**
      * subject
      */

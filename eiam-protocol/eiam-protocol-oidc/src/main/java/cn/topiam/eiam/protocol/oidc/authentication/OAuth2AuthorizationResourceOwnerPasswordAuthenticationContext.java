@@ -26,7 +26,7 @@ import org.springframework.util.Assert;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2022/11/9 22:44
+ * Created by support@topiam.cn on 2022/11/9 22:44
  */
 @SuppressWarnings("AlibabaClassNamingShouldBeCamel")
 public final class OAuth2AuthorizationResourceOwnerPasswordAuthenticationContext implements

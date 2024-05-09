@@ -30,7 +30,7 @@ import cn.topiam.employee.support.repository.page.domain.PageModel;
  * AppService
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/7/6 22:35
+ * Created by support@topiam.cn on 2022/7/6 22:35
  */
 public interface AppService {
     /**

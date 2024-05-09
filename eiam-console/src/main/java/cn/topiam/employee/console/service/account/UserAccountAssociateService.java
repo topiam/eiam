@@ -19,7 +19,7 @@ package cn.topiam.employee.console.service.account;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2020/12/29 22:46
+ * Created by support@topiam.cn on 2020/12/29 22:46
  */
 public interface UserAccountAssociateService {
 

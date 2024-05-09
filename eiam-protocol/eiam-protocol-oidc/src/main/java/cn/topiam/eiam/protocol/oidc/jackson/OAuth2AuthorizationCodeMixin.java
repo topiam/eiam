@@ -28,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  * OAuth2AuthorizationCodeMixin
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/30 21:08
+ * Created by support@topiam.cn on 2023/6/30 21:08
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE)

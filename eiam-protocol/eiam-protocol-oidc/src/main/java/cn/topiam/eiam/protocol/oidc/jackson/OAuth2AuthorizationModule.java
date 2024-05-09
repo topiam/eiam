@@ -32,7 +32,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
  * OAuth2AuthorizationModule
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/30 21:07
+ * Created by support@topiam.cn on 2023/6/30 21:07
  */
 @SuppressWarnings("AlibabaClassNamingShouldBeCamel")
 public class OAuth2AuthorizationModule extends SimpleModule {

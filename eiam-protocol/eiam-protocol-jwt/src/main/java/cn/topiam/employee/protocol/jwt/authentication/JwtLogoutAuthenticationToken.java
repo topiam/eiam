@@ -23,6 +23,8 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
+import cn.topiam.employee.application.jwt.model.JwtProtocolConfig;
+
 import lombok.Getter;
 
 /**
@@ -32,17 +34,22 @@ import lombok.Getter;
  */
 public class JwtLogoutAuthenticationToken extends AbstractAuthenticationToken {
 
-    private final Authentication principal;
+    private final Authentication    principal;
 
     @Getter
-    private final String         sessionId;
+    private final JwtProtocolConfig config;
 
-    private final String         postLogoutRedirectUri;
+    @Getter
+    private final String            sessionId;
 
-    public JwtLogoutAuthenticationToken(Authentication principal, String sessionId,
-                                        String postLogoutRedirectUri) {
+    @Getter
+    private final String            postLogoutRedirectUri;
+
+    public JwtLogoutAuthenticationToken(Authentication principal, JwtProtocolConfig config,
+                                        String postLogoutRedirectUri, String sessionId) {
         super(new ArrayList<>());
         this.principal = principal;
+        this.config = config;
         this.sessionId = sessionId;
         this.postLogoutRedirectUri = postLogoutRedirectUri;
     }
@@ -85,9 +92,5 @@ public class JwtLogoutAuthenticationToken extends AbstractAuthenticationToken {
     public boolean isPrincipalAuthenticated() {
         return !AnonymousAuthenticationToken.class.isAssignableFrom(this.principal.getClass())
                && this.principal.isAuthenticated();
-    }
-
-    public String getPostLogoutRedirectUri() {
-        return postLogoutRedirectUri;
     }
 }

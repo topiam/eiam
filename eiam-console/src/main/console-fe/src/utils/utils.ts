@@ -256,6 +256,11 @@ export const LOGIN_PATH = '/login';
 export const SESSION_EXPIRED_PATH = '/session-expired';
 
 /**
+ * 重置密码
+ */
+export const RESET_PASSWORD = '/user/reset-password';
+
+/**
  * 是否是会话过期路径
  */
 export const isSessionExpiredPath = () => {
@@ -274,6 +279,18 @@ export const isLoginPath = () => {
   return matchPath(
     {
       path: LOGIN_PATH,
+    },
+    history.location.pathname,
+  );
+};
+
+/**
+ * 是否是重置密码
+ */
+export const isResetPasswordPath = () => {
+  return matchPath(
+    {
+      path: RESET_PASSWORD,
     },
     history.location.pathname,
   );

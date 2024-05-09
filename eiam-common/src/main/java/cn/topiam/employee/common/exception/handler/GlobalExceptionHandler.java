@@ -94,9 +94,11 @@ public class GlobalExceptionHandler {
      * @return {@link ModelAndView}
      */
     @ExceptionHandler(value = ConstraintViolationException.class)
-    public ModelAndView constraintViolationException(WebRequest request) {
+    public ModelAndView constraintViolationException(WebRequest request,
+                                                     ConstraintViolationException e) {
         request.setAttribute(WebUtils.ERROR_STATUS_CODE_ATTRIBUTE, HttpStatus.BAD_REQUEST.value(),
             WebRequest.SCOPE_REQUEST);
+        logger.error("Global exception catch", e);
         return new ModelAndView(serverProperties.getError().getPath());
     }
 

@@ -18,11 +18,15 @@
 package cn.topiam.employee.protocol.form.endpoint;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import org.apache.commons.compress.utils.CharsetNames;
 import org.apache.http.entity.ContentType;
 import org.springframework.core.log.LogMessage;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.lang.NonNull;
@@ -42,27 +46,28 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import cn.topiam.employee.application.form.model.FormProtocolConfig;
 import cn.topiam.employee.common.entity.app.AppFormConfigEntity;
-import cn.topiam.employee.protocol.code.exception.TemplateNotExistException;
 import cn.topiam.employee.protocol.form.authentication.FormAuthenticationToken;
-import cn.topiam.employee.protocol.form.authentication.FormRequestAuthenticationToken;
-import cn.topiam.employee.protocol.form.authorization.FormAuthorizationService;
 import cn.topiam.employee.protocol.form.endpoint.authentication.FormAuthenticationTokenConverter;
+import cn.topiam.employee.protocol.form.endpoint.response.http.converter.FormErrorHttpMessageConverter;
 import cn.topiam.employee.protocol.form.exception.FormAuthenticationException;
 import cn.topiam.employee.protocol.form.exception.FormError;
-import cn.topiam.employee.protocol.form.http.converter.FormErrorHttpMessageConverter;
+import cn.topiam.employee.support.exception.TemplateNotExistException;
 
 import freemarker.cache.ClassTemplateLoader;
-import freemarker.template.*;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import static cn.topiam.employee.protocol.form.constant.FormProtocolConstants.*;
 import static cn.topiam.employee.protocol.form.exception.FormErrorCodes.SERVER_ERROR;
+import static cn.topiam.employee.support.context.ServletContextService.isHtmlRequest;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/8 00:14
+ * Created by support@topiam.cn on 2023/7/8 00:14
  */
 public final class FormAuthenticationEndpointFilter extends OncePerRequestFilter {
     /**
@@ -79,11 +84,6 @@ public final class FormAuthenticationEndpointFilter extends OncePerRequestFilter
      * 认证管理器
      */
     private final AuthenticationManager                        authenticationManager;
-
-    /**
-     * FormAuthorizationService
-     */
-    private final FormAuthorizationService                     authorizationService;
 
     /**
      * 错误响应处理器
@@ -145,14 +145,11 @@ public final class FormAuthenticationEndpointFilter extends OncePerRequestFilter
     }
 
     public FormAuthenticationEndpointFilter(RequestMatcher requestMatcher,
-                                            AuthenticationManager authenticationManager,
-                                            FormAuthorizationService authorizationService) {
+                                            AuthenticationManager authenticationManager) {
         Assert.notNull(authenticationManager, "authenticationManager cannot be null");
         Assert.notNull(requestMatcher, "requestMatcher cannot be empty");
-        Assert.notNull(authorizationService, "authorizationService cannot be empty");
         this.authenticationManager = authenticationManager;
         this.authorizationEndpointMatcher = requestMatcher;
-        this.authorizationService = authorizationService;
         this.authenticationConverter = new FormAuthenticationTokenConverter();
 
         configFreemarkerTemplate();
@@ -195,13 +192,6 @@ public final class FormAuthenticationEndpointFilter extends OncePerRequestFilter
                     LogMessage.format("Authorization request failed: %s", ex.getError()), ex);
             }
             this.authenticationFailureHandler.onAuthenticationFailure(request, response, ex);
-        } catch (Exception ex) {
-            FormError error = new FormError(SERVER_ERROR, ex.getMessage(), FORM_ERROR_URI);
-            if (this.logger.isTraceEnabled()) {
-                this.logger.trace(error, ex);
-            }
-            this.authenticationFailureHandler.onAuthenticationFailure(request, response,
-                new FormAuthenticationException(error));
         }
     }
 
@@ -214,13 +204,9 @@ public final class FormAuthenticationEndpointFilter extends OncePerRequestFilter
      */
     private void sendAuthorizationResponse(HttpServletRequest request, HttpServletResponse response,
                                            Authentication authentication) {
+        FormAuthenticationToken authenticationToken = (FormAuthenticationToken) authentication;
+        FormProtocolConfig config = authenticationToken.getConfig();
         try {
-            FormAuthenticationToken authenticationToken = (FormAuthenticationToken) authentication;
-
-            FormRequestAuthenticationToken requestAuthenticationToken = (FormRequestAuthenticationToken) authenticationToken
-                .getPrincipal();
-            FormProtocolConfig config = requestAuthenticationToken.getConfig();
-
             response.setCharacterEncoding(CharsetNames.UTF_8);
             response.setContentType(ContentType.TEXT_HTML.getMimeType());
             Template template = freemarkerTemplateConfiguration.getTemplate("form_redirect.ftlh");
@@ -236,6 +222,7 @@ public final class FormAuthenticationEndpointFilter extends OncePerRequestFilter
             data.put(OTHER_FIELDS, otherField);
             template.process(data, response.getWriter());
         } catch (TemplateException | IOException e) {
+            logger.error("Template processing failed", e);
             FormError error = new FormError(SERVER_ERROR, e.getMessage(), FORM_ERROR_URI);
             throw new FormAuthenticationException(error);
         }
@@ -252,8 +239,15 @@ public final class FormAuthenticationEndpointFilter extends OncePerRequestFilter
                                    AuthenticationException exception) throws IOException {
         if (exception instanceof FormAuthenticationException) {
             FormError error = ((FormAuthenticationException) exception).getError();
-            ServletServerHttpResponse httpResponse = new ServletServerHttpResponse(response);
-            errorHttpResponseConverter.write(error, null, httpResponse);
+            boolean isHtmlRequest = isHtmlRequest(request);
+            //JSON
+            if (!isHtmlRequest) {
+                ServletServerHttpResponse httpResponse = new ServletServerHttpResponse(response);
+                errorHttpResponseConverter.write(error, null, httpResponse);
+                return;
+            }
+            //Html
+            response.sendError(HttpStatus.BAD_REQUEST.value(), error.toString());
         }
     }
 

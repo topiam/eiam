@@ -21,15 +21,15 @@ import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.Module;
 
 import cn.topiam.employee.authentication.common.IdentityProviderType;
-import cn.topiam.employee.authentication.common.authentication.IdpAuthentication;
-import cn.topiam.employee.authentication.common.authentication.IdpNotBindAuthentication;
-import cn.topiam.employee.authentication.common.authentication.IdpUserDetails;
+import cn.topiam.employee.authentication.common.authentication.IdentityProviderAuthentication;
+import cn.topiam.employee.authentication.common.authentication.IdentityProviderNotBindAuthentication;
+import cn.topiam.employee.authentication.common.authentication.IdentityProviderUserDetails;
 import cn.topiam.employee.authentication.common.authentication.OtpAuthentication;
 
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2023/7/14 21:45
+ * Created by support@topiam.cn  on  2023/7/14 21:45
  */
 public class AuthenticationJacksonModule extends Module {
 
@@ -55,10 +55,10 @@ public class AuthenticationJacksonModule extends Module {
     @Override
     public void setupModule(SetupContext context) {
         //@formatter:off
-        context.setMixInAnnotations(IdpAuthentication.class, IdpAuthenticationTokenMixin.class);
-        context.setMixInAnnotations(IdpNotBindAuthentication.class, IdpNotBindAuthenticationTokenMixin.class);
+        context.setMixInAnnotations(IdentityProviderAuthentication.class, IdentityProviderAuthenticationTokenMixin.class);
+        context.setMixInAnnotations(IdentityProviderNotBindAuthentication.class, IdentityProviderNotBindAuthenticationTokenMixin.class);
         context.setMixInAnnotations(OtpAuthentication.class, OtpAuthenticationTokenMixin.class);
-        context.setMixInAnnotations(IdpUserDetails.class, IdpUserDetailsMixin.class);
+        context.setMixInAnnotations(IdentityProviderUserDetails.class, IdentityProviderUserDetailsMixin.class);
         context.setMixInAnnotations(IdentityProviderType.class, IdentityProviderTypeMixin.class);
         //@formatter:on
     }

@@ -24,7 +24,6 @@ import cn.topiam.employee.common.enums.account.OrganizationType;
 
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
@@ -41,40 +40,41 @@ public class OrganizationResult implements Serializable {
     /**
      * 主键ID
      */
-    @Parameter(description = "ID")
+    @Schema(description = "ID")
     private String            id;
     /**
      * key
      */
-    @Parameter(description = "名称")
+    @Schema(description = "名称")
     private String            name;
 
     /**
      * 显示路径
      */
-    @Parameter(description = "显示路径")
+    @Schema(description = "显示路径")
     private String            displayPath;
     /**
      * 编码
      */
-    @Parameter(description = "编码")
+    @Schema(description = "编码")
     private String            code;
 
     /**
      * 排序
      */
-    @Parameter(description = "排序")
+    @Schema(description = "排序")
     private String            order;
 
     /**
      * 组织机构类型
      */
-    @Parameter(description = "机构类型")
+    @Schema(description = "机构类型")
     private OrganizationType  type;
 
     /**
      * 备注
      */
-    @Parameter(description = "备注")
+    @Schema(description = "备注")
     private String            remark;
+
 }

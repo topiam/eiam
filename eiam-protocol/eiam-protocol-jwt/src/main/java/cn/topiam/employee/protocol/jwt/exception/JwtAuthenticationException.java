@@ -20,38 +20,30 @@ package cn.topiam.employee.protocol.jwt.exception;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.util.Assert;
 
+import lombok.Getter;
+
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/8 00:27
+ * Created by support@topiam.cn on 2023/7/8 00:27
  */
+@Getter
 public class JwtAuthenticationException extends AuthenticationException {
 
     private final JwtError error;
 
-    public JwtAuthenticationException(String errorCode) {
-        this(new JwtError(errorCode));
-    }
-
     public JwtAuthenticationException(JwtError error) {
-        this(error, error.getDescription());
+        super(error.getDescription());
+        this.error = error;
     }
 
     public JwtAuthenticationException(JwtError error, Throwable cause) {
-        this(error, cause.getMessage(), cause);
-    }
-
-    public JwtAuthenticationException(JwtError error, String message) {
-        this(error, message, null);
+        this(error, error.getDescription(), cause);
     }
 
     public JwtAuthenticationException(JwtError error, String message, Throwable cause) {
         super(message, cause);
         Assert.notNull(error, "error cannot be null");
         this.error = error;
-    }
-
-    public JwtError getError() {
-        return this.error;
     }
 }

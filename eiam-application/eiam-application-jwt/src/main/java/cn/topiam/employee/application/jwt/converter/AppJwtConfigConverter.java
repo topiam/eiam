@@ -17,21 +17,21 @@
  */
 package cn.topiam.employee.application.jwt.converter;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.text.StringSubstitutor;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 import cn.topiam.employee.application.jwt.pojo.AppJwtConfigGetResult;
 import cn.topiam.employee.application.jwt.pojo.AppJwtProtocolEndpoint;
 import cn.topiam.employee.application.jwt.pojo.AppJwtSaveConfigParam;
 import cn.topiam.employee.common.entity.app.AppJwtConfigEntity;
 import cn.topiam.employee.common.entity.app.po.AppJwtConfigPO;
-import cn.topiam.employee.core.help.ServerHelp;
-import static cn.topiam.employee.common.constant.AppConstants.APP_CODE;
-import static cn.topiam.employee.common.constant.ProtocolConstants.JwtEndpointConstants.JWT_SLO_PATH;
+import cn.topiam.employee.core.context.ContextService;
+import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CODE;
 import static cn.topiam.employee.common.constant.ProtocolConstants.JwtEndpointConstants.JWT_SSO_PATH;
 
 /**
@@ -49,15 +49,19 @@ public interface AppJwtConfigConverter {
      * @param config {@link AppJwtSaveConfigParam}
      * @return {@link AppJwtConfigEntity}
      */
-    @Mapping(target = "deleted", ignore = true)
-    @Mapping(target = "updateTime", ignore = true)
-    @Mapping(target = "updateBy", ignore = true)
-    @Mapping(target = "remark", ignore = true)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createTime", ignore = true)
-    @Mapping(target = "createBy", ignore = true)
-    @Mapping(target = "appId", ignore = true)
-    AppJwtConfigEntity appJwtSaveConfigParamToEntity(AppJwtSaveConfigParam config);
+    default AppJwtConfigEntity appJwtSaveConfigParamToEntity(AppJwtSaveConfigParam config) {
+        if (config == null) {
+            return null;
+        }
+
+        AppJwtConfigEntity entity = new AppJwtConfigEntity();
+        entity.setRedirectUrl(config.getRedirectUrl());
+        entity.setTargetLinkUrl(config.getTargetLinkUrl());
+        entity.setBindingType(config.getBindingType());
+        entity.setIdTokenSubjectType(config.getIdTokenSubjectType());
+        entity.setIdTokenTimeToLive(Duration.ofSeconds(config.getIdTokenTimeToLive()));
+        return entity;
+    }
 
     /**
      * po 转 result
@@ -71,16 +75,14 @@ public interface AppJwtConfigConverter {
         }
         AppJwtConfigGetResult result = new AppJwtConfigGetResult();
         if (po.getAppId() != null) {
-            result.setAppId(String.valueOf(po.getAppId()));
+            result.setAppId(po.getAppId());
         }
-        result.setInitLoginType(po.getInitLoginType());
         result.setInitLoginUrl(po.getInitLoginUrl());
-        result.setAuthorizationType(po.getAuthorizationType());
         result.setRedirectUrl(po.getRedirectUrl());
         result.setTargetLinkUrl(po.getTargetLinkUrl());
         result.setBindingType(po.getBindingType());
         result.setIdTokenSubjectType(po.getIdTokenSubjectType());
-        result.setIdTokenTimeToLive(po.getIdTokenTimeToLive());
+        result.setIdTokenTimeToLive(Objects.toString(po.getIdTokenTimeToLive().toSeconds(), ""));
         result.setProtocolEndpoint(getProtocolEndpointDomain(po.getAppCode()));
         return result;
     }
@@ -98,9 +100,7 @@ public interface AppJwtConfigConverter {
         variables.put(APP_CODE,appCode);
         StringSubstitutor sub = new StringSubstitutor(variables, "{", "}");
         //IDP SSO 端点
-        domain.setIdpSsoEndpoint(sub.replace(ServerHelp.getPortalPublicBaseUrl()+JWT_SSO_PATH));
-        //IDP SLO 端点
-        domain.setIdpSloEndpoint(sub.replace(ServerHelp.getPortalPublicBaseUrl()+JWT_SLO_PATH));
+        domain.setIdpSsoEndpoint(sub.replace(ContextService.getPortalPublicBaseUrl()+JWT_SSO_PATH));
         return domain;
         //@formatter:on
     }

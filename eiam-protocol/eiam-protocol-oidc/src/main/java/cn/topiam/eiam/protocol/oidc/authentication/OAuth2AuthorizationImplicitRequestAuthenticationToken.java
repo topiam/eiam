@@ -30,7 +30,7 @@ import org.springframework.util.Assert;
  * used in the Authorization Code Grant.
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/26 21:07
+ * Created by support@topiam.cn on 2023/6/26 21:07
  */
 @SuppressWarnings("AlibabaClassNamingShouldBeCamel")
 public class OAuth2AuthorizationImplicitRequestAuthenticationToken extends
@@ -47,6 +47,7 @@ public class OAuth2AuthorizationImplicitRequestAuthenticationToken extends
     private final Set<String>         scopes;
 
     private final Set<String>         responseTypes;
+    private final String              responseMode;
     private final Map<String, Object> additionalParameters;
 
     /**
@@ -59,6 +60,7 @@ public class OAuth2AuthorizationImplicitRequestAuthenticationToken extends
      * @param state                the state
      * @param scopes               the requested scope(s)
      * @param responseTypes        the response type(s)
+     * @param responseMode         the response mode
      * @param additionalParameters the additional parameters
      */
     public OAuth2AuthorizationImplicitRequestAuthenticationToken(String authorizationUri,
@@ -68,6 +70,7 @@ public class OAuth2AuthorizationImplicitRequestAuthenticationToken extends
                                                                  @Nullable String state,
                                                                  @Nullable Set<String> scopes,
                                                                  Set<String> responseTypes,
+                                                                 String responseMode,
                                                                  @Nullable Map<String, Object> additionalParameters) {
         super(Collections.emptyList());
         Assert.hasText(authorizationUri, "authorizationUri cannot be empty");
@@ -82,6 +85,7 @@ public class OAuth2AuthorizationImplicitRequestAuthenticationToken extends
             .unmodifiableSet(scopes != null ? new HashSet<>(scopes) : Collections.emptySet());
         this.responseTypes = Collections.unmodifiableSet(
             scopes != null ? new HashSet<>(responseTypes) : Collections.emptySet());
+        this.responseMode = responseMode;
         this.additionalParameters = Collections
             .unmodifiableMap(additionalParameters != null ? new HashMap<>(additionalParameters)
                 : Collections.emptyMap());
@@ -104,7 +108,8 @@ public class OAuth2AuthorizationImplicitRequestAuthenticationToken extends
                                                                  @Nullable String redirectUri,
                                                                  @Nullable String state,
                                                                  @Nullable Set<String> scopes,
-                                                                 Set<String> responseTypes) {
+                                                                 Set<String> responseTypes,
+                                                                 String responseMode) {
         super(Collections.emptyList());
         Assert.hasText(authorizationUri, "authorizationUri cannot be empty");
         Assert.hasText(clientId, "clientId cannot be empty");
@@ -118,6 +123,7 @@ public class OAuth2AuthorizationImplicitRequestAuthenticationToken extends
             .unmodifiableSet(scopes != null ? new HashSet<>(scopes) : Collections.emptySet());
         this.responseTypes = Collections.unmodifiableSet(
             scopes != null ? new HashSet<>(responseTypes) : Collections.emptySet());
+        this.responseMode = responseMode;
         this.additionalParameters = Collections.emptyMap();
         setAuthenticated(true);
     }
@@ -195,5 +201,9 @@ public class OAuth2AuthorizationImplicitRequestAuthenticationToken extends
      */
     public Set<String> getResponseTypes() {
         return responseTypes;
+    }
+
+    public String getResponseMode() {
+        return responseMode;
     }
 }

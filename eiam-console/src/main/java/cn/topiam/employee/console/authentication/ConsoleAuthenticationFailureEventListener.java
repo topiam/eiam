@@ -32,10 +32,10 @@ import cn.topiam.employee.audit.event.AuditEventPublish;
 import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.common.entity.setting.AdministratorEntity;
 import cn.topiam.employee.common.repository.setting.AdministratorRepository;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.context.ApplicationContextService;
+import cn.topiam.employee.support.security.userdetails.UserDetails;
 import cn.topiam.employee.support.security.userdetails.UserType;
 import static cn.topiam.employee.core.security.util.SecurityUtils.getFailureMessage;
-import static cn.topiam.employee.support.security.util.SecurityUtils.getPrincipal;
 
 /**
  * 认证失败
@@ -56,9 +56,9 @@ public class ConsoleAuthenticationFailureEventListener implements
     @Override
     public void onApplicationEvent(@NonNull AbstractAuthenticationFailureEvent event) {
         //@formatter:off
-        AuditEventPublish publish = ApplicationContextHelp.getBean(AuditEventPublish.class);
+        AuditEventPublish publish = ApplicationContextService.getBean(AuditEventPublish.class);
         String content = getFailureMessage(event);
-        logger.error("认证失败 [{}]",content);
+        logger.error("Administrator account authentication failed :{}", event.getException().getMessage());
         String principal = getPrincipal(event);
         if (StringUtils.isNotBlank(principal)){
             Optional<AdministratorEntity> optional = getAdministratorRepository().findByUsername(principal);
@@ -71,18 +71,31 @@ public class ConsoleAuthenticationFailureEventListener implements
                 }
             }
             if (optional.isEmpty()) {
-                logger.error("ADMIN账户不存在:[{}]", principal);
+                logger.error("The administrator account does not exist: [{}]", principal);
                 return;
             }
             AdministratorEntity administrator = optional.get();
-            Actor actor = Actor.builder().id(administrator.getId().toString()).type(UserType.ADMIN).build();
+            Actor actor = Actor.builder().id(administrator.getId()).type(UserType.ADMIN).build();
             publish.publish(EventType.LOGIN_CONSOLE,content+"："+administrator.getUsername(), actor,EventStatus.FAIL);
         }
         //@formatter:on
     }
 
+    private static String getPrincipal(AbstractAuthenticationFailureEvent event) {
+        String principal = (String) event.getAuthentication().getPrincipal();
+        if (event.getAuthentication().getPrincipal() instanceof String) {
+            principal = (String) event.getAuthentication().getPrincipal();
+        }
+        if (event.getAuthentication().getPrincipal() instanceof UserDetails || event
+            .getAuthentication()
+            .getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails) {
+            principal = ((UserDetails) event.getAuthentication().getPrincipal()).getUsername();
+        }
+        return principal;
+    }
+
     private AdministratorRepository getAdministratorRepository() {
-        return ApplicationContextHelp.getBean(AdministratorRepository.class);
+        return ApplicationContextService.getBean(AdministratorRepository.class);
     }
 
 }

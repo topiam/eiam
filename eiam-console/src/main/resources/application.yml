@@ -19,7 +19,7 @@
 # spring
 spring:
   application:
-    name: TopIAM 企业数字身份管控平台管理端
+    name: TOPIAM 企业数字身份管控平台管理端
   jackson:
     #日期格式化
     date-format: "yyyy-MM-dd HH:mm:ss"
@@ -92,34 +92,6 @@ spring:
     open-in-view: true
   main:
     banner-mode: off
-  quartz:
-    #相关属性配置
-    properties:
-      org:
-        quartz:
-          scheduler:
-            instanceId: AUTO #默认主机名和时间戳生成实例ID,可以是任何字符串，但对于所有调度程序来说，必须是唯一的 对应 QRTZ_SCHEDULER_STATE INSTANCE_NAME字段
-          jobStore:
-            class: org.springframework.scheduling.quartz.LocalDataSourceJobStore #持久化配置
-            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate #我们仅为数据库制作了特定于数据库的代理
-            tablePrefix: QRTZ_ #数据库表前缀
-            misfireThreshold: 60000 #在被认为“失火”之前，调度程序将“容忍”一个Triggers将其下一个启动时间通过的毫秒数。默认值（如果您在配置中未输入此属性）为60000（60秒）。
-            clusterCheckinInterval: 5000 #设置此实例“检入”*与群集的其他实例的频率（以毫秒为单位）。影响检测失败实例的速度。
-            isClustered: true #打开群集功能
-            acquireTriggersWithinLock: true
-            useProperties: false
-          threadPool:
-            class: org.springframework.scheduling.quartz.SimpleThreadPoolTaskExecutor
-            threadCount: 10
-            threadPriority: 5
-            threadsInheritContextClassLoaderOfInitializingThread: true
-    job-store-type: jdbc
-    # 程序结束时会等待quartz相关的内容结束
-    wait-for-jobs-to-complete-on-shutdown: true
-    # QuartzScheduler启动时更新己存在的Job,这样就不用每次修改targetObject后删除qrtz_job_details表对应记录
-    overwrite-existing-jobs: true
-    jdbc:
-      initialize-schema: never
 #日志配置
 logging:
   config: classpath:config/logback-spring.xml
@@ -144,7 +116,7 @@ server:
   error:
     include-stacktrace: never
     include-exception: false
-    include-message: never
+    include-message: always
     include-binding-errors: never
   # undertow
   undertow:

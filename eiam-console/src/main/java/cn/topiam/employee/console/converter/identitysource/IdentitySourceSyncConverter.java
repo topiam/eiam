@@ -45,7 +45,7 @@ import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIE
  * 身份源转换器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/13 21:37
+ * Created by support@topiam.cn on 2022/2/13 21:37
  */
 @Mapper(componentModel = "spring")
 public interface IdentitySourceSyncConverter {
@@ -59,19 +59,17 @@ public interface IdentitySourceSyncConverter {
     default Specification<IdentitySourceSyncHistoryEntity> queryIdentitySourceSyncHistoryListQueryConvertToSpecification(IdentitySourceSyncHistoryListQuery listQuery) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (StringUtils.isNotBlank(listQuery.getIdentitySourceId())) {
-                predicates.add(criteriaBuilder.equal(root.get(IDENTITY_SOURCE_ID_FIELD_NAME),
-                    listQuery.getIdentitySourceId()));
-            }
-            if (Objects.isNull(listQuery.getTriggerType())) {
+            predicates.add(criteriaBuilder.equal(root.get(IDENTITY_SOURCE_ID_FIELD_NAME),
+                listQuery.getIdentitySourceId()));
+            if (Objects.nonNull(listQuery.getTriggerType())) {
                 predicates.add(criteriaBuilder.equal(root.get(TRIGGER_TYPE_FIELD_NAME),
                     listQuery.getTriggerType()));
             }
-            if (Objects.isNull(listQuery.getStatus())) {
+            if (Objects.nonNull(listQuery.getStatus())) {
                 predicates
                     .add(criteriaBuilder.equal(root.get(STATUS_FIELD_NAME), listQuery.getStatus()));
             }
-            if (Objects.isNull(listQuery.getObjectType())) {
+            if (Objects.nonNull(listQuery.getObjectType())) {
                 predicates.add(criteriaBuilder.equal(root.get(OBJECT_TYPE_FIELD_NAME),
                     listQuery.getObjectType()));
             }
@@ -169,18 +167,18 @@ public interface IdentitySourceSyncConverter {
     default Specification<IdentitySourceSyncRecordEntity> queryIdentitySourceSyncRecordListQueryConvertToSpecification(IdentitySourceSyncRecordListQuery listQuery) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (Objects.isNull(listQuery.getStatus())) {
+            if (Objects.nonNull(listQuery.getStatus())) {
                 predicates.add(criteriaBuilder.equal(root.get("status"), listQuery.getStatus()));
             }
             if (StringUtils.isNotBlank(listQuery.getSyncHistoryId())) {
                 predicates.add(
                     criteriaBuilder.equal(root.get("syncHistoryId"), listQuery.getSyncHistoryId()));
             }
-            if (Objects.isNull(listQuery.getObjectType())) {
+            if (Objects.nonNull(listQuery.getObjectType())) {
                 predicates
                     .add(criteriaBuilder.equal(root.get("objectType"), listQuery.getObjectType()));
             }
-            if (Objects.isNull(listQuery.getActionType())) {
+            if (Objects.nonNull(listQuery.getActionType())) {
                 predicates
                     .add(criteriaBuilder.equal(root.get("actionType"), listQuery.getActionType()));
             }

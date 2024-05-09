@@ -24,7 +24,7 @@ import cn.topiam.employee.console.pojo.save.setting.SecurityDefensePolicyParam;
  * 安全策略
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023-03-09
+ * Created by support@topiam.cn on 2023-03-09
  */
 public interface SecurityDefensePolicyService {
 

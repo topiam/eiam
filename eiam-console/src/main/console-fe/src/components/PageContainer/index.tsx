@@ -15,53 +15,40 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { ArrowLeftOutlined, BulbTwoTone } from '@ant-design/icons';
-import type { PageContainerProps } from '@ant-design/pro-components';
-import { PageContainer as Container, RouteContext } from '@ant-design/pro-components';
-import { Alert } from 'antd';
+import { App, Image } from 'antd';
 import React from 'react';
-import styles from './styles.less';
+import { useAsyncEffect } from 'ahooks';
 
 type IProps = {
-  description?: React.ReactNode | string;
-} & PageContainerProps;
+  children: React.JSX.Element;
+};
 
 const PageContainer: React.FC<IProps> = (props) => {
-  const { description, content, children, title = false } = props;
-  return (
-    <RouteContext.Consumer>
-      {() => {
-        return (
-          <Container
-            header={{
-              backIcon: (
-                <div className={styles.back}>
-                  <ArrowLeftOutlined className={styles.backIcon} />
-                </div>
-              ),
-            }}
-            title={title}
-            content={
-              description ? (
-                <Alert
-                  banner
-                  icon={<BulbTwoTone />}
-                  showIcon
-                  type="info"
-                  message={false}
-                  description={description}
-                />
-              ) : (
-                content
-              )
-            }
-            {...props}
-          >
-            {children}
-          </Container>
-        );
-      }}
-    </RouteContext.Consumer>
-  );
+  const { notification } = App.useApp();
+
+  useAsyncEffect(async () => {
+    notification.open({
+      key: 'notification',
+      message: '提示',
+      duration: null,
+      placement: 'bottomRight',
+      description: (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Image src={'/ade5b70f.jpg'} width={180} preview={false} />
+          <div>
+            <span style={{ color: '#1890FF', textAlign: 'center', display: 'block' }}>
+              扫码关注微信公众号，获取最新资讯。
+            </span>
+          </div>
+        </div>
+      ),
+      style: {
+        width: 220,
+        marginBottom: 0,
+        padding: 15,
+      },
+    });
+  }, []);
+  return <>{props.children}</>;
 };
 export default PageContainer;

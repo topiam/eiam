@@ -17,12 +17,17 @@
  */
 package cn.topiam.employee.protocol.jwt.token;
 
-import lombok.*;
+import java.time.Duration;
+
+import lombok.Builder;
+import lombok.Data;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/10 22:43
+ * Created by support@topiam.cn on 2023/7/10 22:43
  */
 @Data
 @Builder
@@ -30,23 +35,23 @@ import lombok.*;
 public class IdTokenContext {
 
     @NonNull
-    private String  issuer;
+    private String   issuer;
 
     @NonNull
-    private String  subject;
+    private String   subject;
 
     @NonNull
-    private String  audience;
+    private String   audience;
 
     @NonNull
-    private String  sessionId;
+    private String   sessionId;
 
     /**
      * Token 过期时间（秒）
      */
     @NonNull
-    private Integer idTokenTimeToLive;
+    private Duration idTokenTimeToLive;
 
     @NonNull
-    private String  privateKey;
+    private String   privateKey;
 }

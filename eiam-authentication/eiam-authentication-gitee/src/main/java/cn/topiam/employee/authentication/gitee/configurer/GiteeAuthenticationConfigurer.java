@@ -27,10 +27,10 @@ import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
 
-import cn.topiam.employee.authentication.common.service.UserIdpService;
+import cn.topiam.employee.authentication.common.IdentityProviderAuthenticationService;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClientRepository;
 import cn.topiam.employee.authentication.gitee.filter.GiteeAuthorizationRequestRedirectFilter;
 import cn.topiam.employee.authentication.gitee.filter.GiteeLoginAuthenticationFilter;
-import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 
 import lombok.NonNull;
 import lombok.Setter;
@@ -40,22 +40,23 @@ import static cn.topiam.employee.support.security.util.HttpSecurityFilterOrderRe
  * 认证配置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/10 22:58
+ * Created by support@topiam.cn on 2021/9/10 22:58
  */
 public final class GiteeAuthenticationConfigurer extends
                                                  AbstractAuthenticationFilterConfigurer<HttpSecurity, GiteeAuthenticationConfigurer, GiteeLoginAuthenticationFilter> {
     @Setter
     @NonNull
-    private String                           loginProcessingUrl = GiteeLoginAuthenticationFilter.DEFAULT_FILTER_PROCESSES_URI;
-    private final IdentityProviderRepository identityProviderRepository;
-    private final UserIdpService             userIdpService;
+    private String                                           loginProcessingUrl = GiteeLoginAuthenticationFilter.DEFAULT_FILTER_PROCESSES_URI;
+    private final RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository;
+    private final IdentityProviderAuthenticationService      identityProviderAuthenticationService;
 
-    GiteeAuthenticationConfigurer(IdentityProviderRepository identityProviderRepository,
-                                  UserIdpService userIdpService) {
-        Assert.notNull(identityProviderRepository, "identityProviderRepository must not be null");
-        Assert.notNull(userIdpService, "userIdpService must not be null");
-        this.identityProviderRepository = identityProviderRepository;
-        this.userIdpService = userIdpService;
+    GiteeAuthenticationConfigurer(RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository,
+                                  IdentityProviderAuthenticationService identityProviderAuthenticationService) {
+        Assert.notNull(registeredIdentityProviderClientRepository,
+            "registeredIdentityProviderClientRepository must not be null");
+        Assert.notNull(identityProviderAuthenticationService, "userIdpService must not be null");
+        this.registeredIdentityProviderClientRepository = registeredIdentityProviderClientRepository;
+        this.identityProviderAuthenticationService = identityProviderAuthenticationService;
     }
 
     /**
@@ -73,14 +74,14 @@ public final class GiteeAuthenticationConfigurer extends
     @Override
     public void init(HttpSecurity http) throws Exception {
         //Gitee登录认证
-        this.setAuthenticationFilter(
-            new GiteeLoginAuthenticationFilter(identityProviderRepository, userIdpService));
+        this.setAuthenticationFilter(new GiteeLoginAuthenticationFilter(
+            registeredIdentityProviderClientRepository, identityProviderAuthenticationService));
         putFilterBefore(http, this.getAuthenticationFilter(),
             OAuth2LoginAuthenticationFilter.class);
 
         //Gitee扫码请求重定向
         http.addFilterBefore(
-            new GiteeAuthorizationRequestRedirectFilter(identityProviderRepository),
+            new GiteeAuthorizationRequestRedirectFilter(registeredIdentityProviderClientRepository),
             OAuth2AuthorizationRequestRedirectFilter.class);
 
         //登录处理地址
@@ -93,8 +94,9 @@ public final class GiteeAuthenticationConfigurer extends
             GiteeLoginAuthenticationFilter.getRequestMatcher());
     }
 
-    public static GiteeAuthenticationConfigurer giteeOauth(IdentityProviderRepository identityProviderRepository,
-                                                           UserIdpService userIdpService) {
-        return new GiteeAuthenticationConfigurer(identityProviderRepository, userIdpService);
+    public static GiteeAuthenticationConfigurer giteeOauth(RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository,
+                                                           IdentityProviderAuthenticationService identityProviderAuthenticationService) {
+        return new GiteeAuthenticationConfigurer(registeredIdentityProviderClientRepository,
+            identityProviderAuthenticationService);
     }
 }

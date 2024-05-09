@@ -25,6 +25,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -32,18 +33,22 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import cn.topiam.employee.application.ApplicationServiceLoader;
 import cn.topiam.employee.audit.event.AuditEventPublish;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
+import cn.topiam.employee.protocol.jwt.JwtAuthorizationService;
+import cn.topiam.employee.protocol.jwt.RedisJwtAuthorizationService;
 import cn.topiam.employee.protocol.jwt.authentication.JwtAuthenticationFailureEventListener;
 import cn.topiam.employee.protocol.jwt.authentication.JwtAuthenticationSuccessEventListener;
-import cn.topiam.employee.protocol.jwt.authorization.RedisJwtAuthorizationService;
 import cn.topiam.employee.protocol.jwt.configurers.JwtAuthorizationServerConfigurer;
+import static org.springframework.security.config.http.SessionCreationPolicy.NEVER;
+
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.JWT_PROTOCOL_SECURITY_FILTER_CHAIN;
 
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/3 21:16
+ * Created by support@topiam.cn on 2023/7/3 21:16
  */
 @AutoConfigureBefore(PortalSecurityConfiguration.class)
 @Configuration(proxyBeanMethods = false)
@@ -79,7 +84,7 @@ public class JwtProtocolSecurityConfiguration extends AbstractSecurityConfigurat
                 //cors
                 .cors(withCorsConfigurerDefaults())
                 //会话管理器
-                .sessionManagement(withSessionManagementConfigurerDefaults())
+                .sessionManagement(configurer -> configurer.sessionCreationPolicy(NEVER))
                 .with(serverConfigurer,configurer-> {});
         return httpSecurity.build();
         //@formatter:on
@@ -108,11 +113,14 @@ public class JwtProtocolSecurityConfiguration extends AbstractSecurityConfigurat
     }
 
     @Bean
-    public RedisJwtAuthorizationService redisJwtAuthorizationService(RedisConnectionFactory redisConnectionFactory,
-                                                                     CacheProperties cacheProperties,
-                                                                     AutowireCapableBeanFactory beanFactory) {
-        return new RedisJwtAuthorizationService(
-            getRedisTemplate(redisConnectionFactory, cacheProperties), beanFactory);
+    public JwtAuthorizationService jwtAuthorizationService(RedisConnectionFactory redisConnectionFactory,
+                                                           CacheProperties cacheProperties,
+                                                           AutowireCapableBeanFactory beanFactory,
+                                                           ApplicationServiceLoader applicationServiceLoader) {
+        RedisTemplate<String, String> redisTemplate = getStringRedisTemplate(redisConnectionFactory,
+            cacheProperties);
+        return new RedisJwtAuthorizationService(redisTemplate, beanFactory,
+            applicationServiceLoader);
     }
 
 }

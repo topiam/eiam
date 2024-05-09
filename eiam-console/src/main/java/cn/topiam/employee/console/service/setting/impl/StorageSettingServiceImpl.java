@@ -35,17 +35,17 @@ import cn.topiam.employee.console.converter.setting.StorageSettingConverter;
 import cn.topiam.employee.console.pojo.result.setting.StorageProviderConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.StorageConfigSaveParam;
 import cn.topiam.employee.console.service.setting.StorageSettingService;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.context.ApplicationContextService;
 import cn.topiam.employee.support.exception.TopIamException;
-import static cn.topiam.employee.core.help.SettingHelp.addImgSrcHostContentSecurityPolicy;
-import static cn.topiam.employee.core.setting.constant.StorageProviderSettingConstants.STORAGE_BEAN_NAME;
-import static cn.topiam.employee.core.setting.constant.StorageProviderSettingConstants.STORAGE_PROVIDER_KEY;
+import static cn.topiam.employee.core.context.ContextService.addImgSrcHostContentSecurityPolicy;
+import static cn.topiam.employee.core.setting.StorageProviderSettingConstants.STORAGE_BEAN_NAME;
+import static cn.topiam.employee.core.setting.StorageProviderSettingConstants.STORAGE_PROVIDER_KEY;
 
 /**
  * 存储设置接口
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/1 21:43
+ * Created by support@topiam.cn on 2021/11/1 21:43
  */
 @Service
 public class StorageSettingServiceImpl extends SettingServiceImpl implements StorageSettingService {
@@ -61,7 +61,7 @@ public class StorageSettingServiceImpl extends SettingServiceImpl implements Sto
     public Boolean disableStorage() {
         removeSetting(STORAGE_PROVIDER_KEY);
         // refresh
-        ApplicationContextHelp.refresh(STORAGE_BEAN_NAME);
+        ApplicationContextService.refresh(STORAGE_BEAN_NAME);
         return Boolean.TRUE;
     }
 
@@ -77,7 +77,7 @@ public class StorageSettingServiceImpl extends SettingServiceImpl implements Sto
         try {
             SettingEntity entity = storageSettingsConverter.storageConfigSaveParamToEntity(param);
             Boolean setting = saveSetting(entity);
-            ApplicationContextHelp.refresh(STORAGE_BEAN_NAME);
+            ApplicationContextService.refresh(STORAGE_BEAN_NAME);
 
             //操作内容安全策略
             ObjectMapper objectMapper = EncryptionModule.deserializerEncrypt();

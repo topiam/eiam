@@ -179,16 +179,30 @@ public class OrganizationController {
     }
 
     /**
-     * 查询子组织
+     * 搜索组织
      *
      * @return {@link List}
      */
-    @GetMapping(value = "/filter_tree")
-    @Operation(summary = "获取下级组织")
+    @GetMapping(value = "/search")
+    @Operation(summary = "搜索组织")
     @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
-    public ApiRestResult<List<OrganizationTreeResult>> filterOrganizationTree(@RequestParam(value = "keyWord") String keyWord) {
-        List<OrganizationTreeResult> list = organizationService.filterOrganizationTree(keyWord);
-        return ApiRestResult.<List<OrganizationTreeResult>> builder().result(list).build();
+    public ApiRestResult<List<SearchOrganizationResult>> searchOrganization(@RequestParam(value = "keyWord") String keyWord) {
+        List<SearchOrganizationResult> list = organizationService.searchOrganization(keyWord);
+        return ApiRestResult.<List<SearchOrganizationResult>> builder().result(list).build();
+    }
+
+    /**
+     * 搜索组织树结构
+     *
+     * @return {@link List}
+     */
+    @GetMapping(value = "/search/tree")
+    @Operation(summary = "搜索组织-树结构")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
+    public ApiRestResult<List<SearchOrganizationTreeResult>> filterOrganizationTree(@RequestParam(value = "keyWord") String keyWord) {
+        List<SearchOrganizationTreeResult> list = organizationService
+            .searchOrganizationTree(keyWord);
+        return ApiRestResult.<List<SearchOrganizationTreeResult>> builder().result(list).build();
     }
 
     /**
@@ -233,5 +247,4 @@ public class OrganizationController {
     public OrganizationController(OrganizationService organizationService) {
         this.organizationService = organizationService;
     }
-
 }

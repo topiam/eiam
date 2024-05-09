@@ -35,13 +35,12 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import cn.topiam.employee.authentication.alipay.AlipayIdpOAuth2Config;
-import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
-import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
+import cn.topiam.employee.authentication.alipay.AlipayIdentityProviderOAuth2Config;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClient;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClientRepository;
 import cn.topiam.employee.support.trace.TraceUtils;
 
 import jakarta.servlet.FilterChain;
@@ -58,7 +57,7 @@ import static cn.topiam.employee.authentication.common.constant.AuthenticationCo
  * 支付宝 登录请求重定向过滤器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/8/19 17:56
+ * Created by support@topiam.cn on 2023/8/19 17:56
  */
 @SuppressWarnings("DuplicatedCode")
 public class AlipayAuthorizationRequestRedirectFilter extends OncePerRequestFilter {
@@ -74,10 +73,10 @@ public class AlipayAuthorizationRequestRedirectFilter extends OncePerRequestFilt
 
     private static final StringKeyGenerator                                  DEFAULT_STATE_GENERATOR        = new Base64StringKeyGenerator(
         Base64.getUrlEncoder());
-    private final IdentityProviderRepository                                 identityProviderRepository;
+    private final RegisteredIdentityProviderClientRepository                 registeredIdentityProviderClientRepository;
 
-    public AlipayAuthorizationRequestRedirectFilter(IdentityProviderRepository identityProviderRepository) {
-        this.identityProviderRepository = identityProviderRepository;
+    public AlipayAuthorizationRequestRedirectFilter(RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository) {
+        this.registeredIdentityProviderClientRepository = registeredIdentityProviderClientRepository;
     }
 
     /**
@@ -100,14 +99,14 @@ public class AlipayAuthorizationRequestRedirectFilter extends OncePerRequestFilt
         TraceUtils.put(UUID.randomUUID().toString());
         Map<String, String> variables = matcher.getVariables();
         String providerCode = variables.get(PROVIDER_CODE);
-        Optional<IdentityProviderEntity> optional = identityProviderRepository
-            .findByCodeAndEnabledIsTrue(providerCode);
+        Optional<RegisteredIdentityProviderClient<AlipayIdentityProviderOAuth2Config>> optional = registeredIdentityProviderClientRepository
+            .findByCode(providerCode);
         if (optional.isEmpty()) {
             throw new NullPointerException("未查询到身份提供商信息");
         }
-        IdentityProviderEntity entity = optional.get();
-        AlipayIdpOAuth2Config config = JSONObject.parseObject(entity.getConfig(),
-            AlipayIdpOAuth2Config.class);
+        RegisteredIdentityProviderClient<AlipayIdentityProviderOAuth2Config> entity = optional
+            .get();
+        AlipayIdentityProviderOAuth2Config config = entity.getConfig();
         Assert.notNull(config, "支付宝登录配置不能为空");
         //构建授权请求
         //@formatter:off

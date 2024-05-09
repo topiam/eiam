@@ -26,9 +26,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.http.converter.json.SpringHandlerInstantiator;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationCode;
@@ -36,14 +34,13 @@ import org.springframework.security.oauth2.server.authorization.OAuth2Authorizat
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.jackson2.OAuth2AuthorizationServerJackson2Module;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cn.topiam.eiam.protocol.oidc.jackson.OAuth2AuthorizationModule;
+import cn.topiam.eiam.protocol.oidc.jackson.OidcProtocolJackson2Module;
 import cn.topiam.employee.support.jackjson.SupportJackson2Module;
 
 import lombok.Setter;
@@ -54,7 +51,7 @@ import static cn.topiam.eiam.protocol.oidc.constant.OidcProtocolConstants.OIDC_P
  * RedisOAuth2AuthorizationService
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/10/31 21:41
+ * Created by support@topiam.cn on 2022/10/31 21:41
  */
 @SuppressWarnings({ "AlibabaServiceOrDaoClassShouldEndWithImpl",
                     "AlibabaClassNamingShouldBeCamel" })
@@ -97,17 +94,14 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
     }
 
     public RedisOAuth2AuthorizationService(RedisOperations<String, String> redisOperations,
-                                           RegisteredClientRepository clientRepository,
-                                           AutowireCapableBeanFactory beanFactory) {
+                                           RegisteredClientRepository clientRepository) {
         Assert.notNull(redisOperations, "redisOperations mut not be null");
         this.redisOperations = redisOperations;
         this.clientRepository = clientRepository;
 
         ClassLoader classLoader = this.getClass().getClassLoader();
         objectMapper.registerModules(SupportJackson2Module.getModules(classLoader));
-        objectMapper.registerModule(new OAuth2AuthorizationServerJackson2Module());
-        objectMapper.registerModule(new OAuth2AuthorizationModule());
-        objectMapper.setHandlerInstantiator(new SpringHandlerInstantiator(beanFactory));
+        objectMapper.registerModules(OidcProtocolJackson2Module.getModules());
     }
 
     @Override
@@ -123,7 +117,7 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
         // TODO 等 spring-authorization-server 授权服务器支持后更改
         Duration idTokenTtl = Duration.of(30, ChronoUnit.MINUTES);
         Duration max = authorization.getRefreshToken() == null ? accessTokenTtl
-            : Collections.max(Arrays.asList(accessTokenTtl, refreshTokenTtl, idTokenTtl));
+            : Collections.max(Arrays.asList(accessTokenTtl, refreshTokenTtl));
 
         final String authorizationId = authorization.getId();
         final String idToAuthorizationKey = getIdToAuthorizationKey(authorizationId);
@@ -266,8 +260,8 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
         return prefix + REFRESH_TO_AUTHORIZATION + generateKey(refreshToken);
     }
 
-    private String getIdTokenToAuthorization(String idToken) {
-        return prefix + UID_TO_AUTHORIZATIONS + generateKey(idToken);
+    private String getIdTokenToAuthorization(String refreshToken) {
+        return prefix + UID_TO_AUTHORIZATIONS + generateKey(refreshToken);
     }
 
     private String getIdToCorrelations(String authorizationId) {

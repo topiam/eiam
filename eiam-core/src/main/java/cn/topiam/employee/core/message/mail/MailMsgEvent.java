@@ -29,7 +29,7 @@ import lombok.Getter;
  * 消息事件
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/25 21:07
+ * Created by support@topiam.cn on 2021/9/25 21:07
  */
 @Getter
 public class MailMsgEvent extends ApplicationEvent {

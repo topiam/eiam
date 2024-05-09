@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.*;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2022/12/31 21:18
+ * Created by support@topiam.cn on 2022/12/31 21:18
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE)

@@ -55,7 +55,7 @@ const useStyle = createStyles(({ prefixCls }) => {
   };
 });
 const UpdateUser = (props: UpdateFormProps) => {
-  const { visible, onCancel, onFinish, id } = props;
+  const { visible, onCancel, onFinish, id, afterClose } = props;
   const [form] = useForm();
   const [submitLoading, setSubmitLoading] = useState(false);
   const [getUserLoading, setGetUserLoading] = useState(false);
@@ -151,6 +151,11 @@ const UpdateUser = (props: UpdateFormProps) => {
         </Space>
       }
       destroyOnClose
+      afterOpenChange={(open) => {
+        if (!open) {
+          afterClose();
+        }
+      }}
     >
       <Spin spinning={submitLoading || getUserLoading}>
         <Form
@@ -207,16 +212,29 @@ const UpdateUser = (props: UpdateFormProps) => {
                   extra={intl.formatMessage({
                     id: 'pages.account.user_list.user.form.phone.extra',
                   })}
+                  validateFirst={true}
                   rules={[
+                    {
+                      pattern: new RegExp('^[0-9]*$'),
+                      message: intl.formatMessage({
+                        id: 'pages.account.user_list.user.form.phone.rule.0.message',
+                      }),
+                    },
                     {
                       validator: async (_, value) => {
                         if (!value || !phoneChanged) {
                           return Promise.resolve();
                         }
+                        setSubmitLoading(true);
                         //校验手机号格式
-                        const isValidNumber = await phoneIsValidNumber(value, phoneAreaCode);
+                        const isValidNumber = await phoneIsValidNumber(
+                          value,
+                          phoneAreaCode,
+                        ).finally(() => {
+                          setSubmitLoading(false);
+                        });
                         if (!isValidNumber) {
-                          return Promise.reject<any>(
+                          return Promise.reject<Error>(
                             new Error(
                               intl.formatMessage({
                                 id: 'pages.account.user_list.user.form.phone.rule.0.message',
@@ -224,16 +242,19 @@ const UpdateUser = (props: UpdateFormProps) => {
                             ),
                           );
                         }
+                        setSubmitLoading(true);
                         const { success, result } = await userParamCheck(
                           ParamCheckType.PHONE,
                           `${phoneAreaCode}${value}`,
                           id,
-                        );
+                        ).finally(() => {
+                          setSubmitLoading(false);
+                        });
                         if (!success) {
-                          return Promise.reject<any>();
+                          return Promise.reject<Error>();
                         }
                         if (!result) {
-                          return Promise.reject<any>(
+                          return Promise.reject<Error>(
                             new Error(
                               intl.formatMessage({
                                 id: 'pages.account.user_list.user.form.phone.rule.1.message',
@@ -283,13 +304,16 @@ const UpdateUser = (props: UpdateFormProps) => {
                   if (!value) {
                     return Promise.resolve();
                   }
+                  setSubmitLoading(true);
                   const { success, result } = await userParamCheck(
                     ParamCheckType.EMAIL,
                     value,
                     form.getFieldValue('id'),
-                  );
+                  ).finally(() => {
+                    setSubmitLoading(false);
+                  });
                   if (success && !result) {
-                    return Promise.reject<any>(
+                    return Promise.reject<Error>(
                       new Error(
                         intl.formatMessage({
                           id: 'pages.account.user_list.user.form.email.rule.2.message',

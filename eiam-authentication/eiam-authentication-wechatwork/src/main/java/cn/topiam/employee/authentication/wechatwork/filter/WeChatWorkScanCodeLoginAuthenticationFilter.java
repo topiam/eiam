@@ -37,38 +37,38 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 
-import cn.topiam.employee.authentication.common.authentication.IdpUserDetails;
-import cn.topiam.employee.authentication.common.filter.AbstractIdpAuthenticationProcessingFilter;
-import cn.topiam.employee.authentication.common.service.UserIdpService;
-import cn.topiam.employee.authentication.wechatwork.WeChatWorkIdpScanCodeConfig;
+import cn.topiam.employee.authentication.common.IdentityProviderAuthenticationService;
+import cn.topiam.employee.authentication.common.authentication.IdentityProviderUserDetails;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClient;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClientRepository;
+import cn.topiam.employee.authentication.common.filter.AbstractIdentityProviderAuthenticationProcessingFilter;
+import cn.topiam.employee.authentication.wechatwork.WeChatWorkIdentityProviderOAuth2Config;
 import cn.topiam.employee.authentication.wechatwork.constant.WeChatWorkAuthenticationConstants;
-import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
-import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
-import cn.topiam.employee.core.help.ServerHelp;
+import cn.topiam.employee.core.context.ContextService;
 import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.support.util.HttpClientUtils;
 import cn.topiam.employee.support.util.UrlUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import static cn.topiam.employee.authentication.common.IdentityProviderType.WECHAT_WORK_QR;
+import static cn.topiam.employee.authentication.common.IdentityProviderType.WECHAT_WORK_OAUTH;
 import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.*;
 
 /**
  * 企业微信扫码登录
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/12/8 21:11
+ * Created by support@topiam.cn on 2021/12/8 21:11
  */
 @SuppressWarnings("DuplicatedCode")
 public class WeChatWorkScanCodeLoginAuthenticationFilter extends
-                                                         AbstractIdpAuthenticationProcessingFilter {
+                                                         AbstractIdentityProviderAuthenticationProcessingFilter {
     final String                              ERROR_CODE                   = "errcode";
     final String                              SUCCESS                      = "0";
-    public final static String                DEFAULT_FILTER_PROCESSES_URI = WECHAT_WORK_QR
+    public final static String                DEFAULT_FILTER_PROCESSES_URI = WECHAT_WORK_OAUTH
         .getLoginPathPrefix() + "/" + "{" + PROVIDER_CODE + "}";
     public static final AntPathRequestMatcher REQUEST_MATCHER              = new AntPathRequestMatcher(
         DEFAULT_FILTER_PROCESSES_URI, HttpMethod.GET.name());
@@ -76,12 +76,13 @@ public class WeChatWorkScanCodeLoginAuthenticationFilter extends
     /**
      * Creates a new instance
      *
-     * @param identityProviderRepository the {@link IdentityProviderRepository}
-     * @param userIdpService  {@link  UserIdpService}
+     * @param registeredIdentityProviderClientRepository the {@link RegisteredIdentityProviderClientRepository}
+     * @param identityProviderAuthenticationService  {@link  IdentityProviderAuthenticationService}
      */
-    public WeChatWorkScanCodeLoginAuthenticationFilter(IdentityProviderRepository identityProviderRepository,
-                                                       UserIdpService userIdpService) {
-        super(REQUEST_MATCHER, userIdpService, identityProviderRepository);
+    public WeChatWorkScanCodeLoginAuthenticationFilter(RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository,
+                                                       IdentityProviderAuthenticationService identityProviderAuthenticationService) {
+        super(REQUEST_MATCHER, identityProviderAuthenticationService,
+            registeredIdentityProviderClientRepository);
     }
 
     /**
@@ -123,14 +124,14 @@ public class WeChatWorkScanCodeLoginAuthenticationFilter extends
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
         }
         //获取身份提供商
-        IdentityProviderEntity provider = getIdentityProviderEntity(providerCode);
-        WeChatWorkIdpScanCodeConfig config = JSONObject.parseObject(provider.getConfig(),
-            WeChatWorkIdpScanCodeConfig.class);
+        RegisteredIdentityProviderClient<WeChatWorkIdentityProviderOAuth2Config> provider = getRegisteredIdentityProviderClient(
+            providerCode);
+        WeChatWorkIdentityProviderOAuth2Config config = provider.getConfig();
         if (Objects.isNull(config)) {
             logger.error("未查询到企业微信扫码登录配置");
             //无效身份提供商
             OAuth2Error oauth2Error = new OAuth2Error(
-                AbstractIdpAuthenticationProcessingFilter.INVALID_IDP_CONFIG);
+                AbstractIdentityProviderAuthenticationProcessingFilter.INVALID_IDP_CONFIG);
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
         }
         HashMap<String, String> param = new HashMap<>(16);
@@ -142,23 +143,24 @@ public class WeChatWorkScanCodeLoginAuthenticationFilter extends
         if (!Objects.equals(result.getString(ERROR_CODE), SUCCESS)) {
             logger.error("获取企业微信用户个人信息失败: {}" + result.toJSONString());
             OAuth2Error oauth2Error = new OAuth2Error(
-                AbstractIdpAuthenticationProcessingFilter.GET_USERINFO_ERROR_CODE);
+                AbstractIdentityProviderAuthenticationProcessingFilter.GET_USERINFO_ERROR_CODE);
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
         }
         // 返回
         String userId = Objects.toString(result.getString("UserId"), result.getString("OpenId"));
-        IdpUserDetails idpUserDetails = IdpUserDetails.builder().openId(userId)
-            .providerType(WECHAT_WORK_QR).providerCode(providerCode).providerId(providerId).build();
-        return attemptAuthentication(request, response, idpUserDetails);
+        IdentityProviderUserDetails identityProviderUserDetails = IdentityProviderUserDetails
+            .builder().openId(userId).providerType(WECHAT_WORK_OAUTH).providerCode(providerCode)
+            .providerId(providerId).build();
+        return attemptAuthentication(request, response, identityProviderUserDetails);
     }
 
     /**
      * 获取token
      *
-     * @param config {@link WeChatWorkIdpScanCodeConfig}
+     * @param config {@link WeChatWorkIdentityProviderOAuth2Config}
      * @return {@link String}
      */
-    public String getToken(WeChatWorkIdpScanCodeConfig config) {
+    public String getToken(WeChatWorkIdentityProviderOAuth2Config config) {
         if (!Objects.isNull(cache)) {
             cache.getIfPresent(OAuth2ParameterNames.ACCESS_TOKEN);
         }
@@ -174,8 +176,7 @@ public class WeChatWorkScanCodeLoginAuthenticationFilter extends
                 "获取access_token发生错误:  " + result.toJSONString());
         }
         //放入缓存
-        cache = CacheBuilder.newBuilder()
-            .concurrencyLevel(Runtime.getRuntime().availableProcessors())
+        cache = Caffeine.newBuilder()
             .expireAfterWrite(result.getInteger(OAuth2ParameterNames.EXPIRES_IN), TimeUnit.SECONDS)
             .build();
         cache.put(OAuth2ParameterNames.ACCESS_TOKEN,
@@ -189,8 +190,8 @@ public class WeChatWorkScanCodeLoginAuthenticationFilter extends
     private Cache<String, String> cache;
 
     public static String getLoginUrl(String providerId) {
-        String url = ServerHelp.getPortalPublicBaseUrl() + WECHAT_WORK_QR.getLoginPathPrefix() + "/"
-                     + providerId;
+        String url = ContextService.getPortalPublicBaseUrl()
+                     + WECHAT_WORK_OAUTH.getLoginPathPrefix() + "/" + providerId;
         return UrlUtils.format(url);
 
     }

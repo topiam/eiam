@@ -20,6 +20,7 @@ import { Form, Spin } from 'antd';
 import React, { useState } from 'react';
 import { useIntl } from '@@/exports';
 import { random } from '@/utils/utils';
+import { useAsyncEffect } from 'ahooks';
 
 export default (props: {
   open: boolean;
@@ -30,6 +31,12 @@ export default (props: {
   const [form] = Form.useForm();
   const intl = useIntl();
   const [loading, setLoading] = useState<boolean>(false);
+
+  useAsyncEffect(async () => {
+    if (open) {
+      form.setFieldsValue({ code: random(9) });
+    }
+  }, [open]);
 
   return (
     <ModalForm
@@ -43,11 +50,6 @@ export default (props: {
       labelAlign={'right'}
       preserve={false}
       autoFocusFirstInput
-      onOpenChange={(visible) => {
-        if (visible) {
-          form.setFieldsValue({ code: random(9) });
-        }
-      }}
       modalProps={{
         maskClosable: true,
         destroyOnClose: true,

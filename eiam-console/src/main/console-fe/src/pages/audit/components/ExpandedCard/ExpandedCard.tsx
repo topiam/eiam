@@ -17,11 +17,11 @@
  */
 import { Collapse, Typography } from 'antd';
 import Paragraph from 'antd/es/typography/Paragraph';
-import moment from 'moment';
 import type { UserType } from '../../data.d';
 import { AuditList, EventStatus } from '../../data.d';
 import useStyles from './style';
 import { useIntl } from '@umijs/max';
+import dayjs from 'dayjs';
 
 const { Text } = Typography;
 
@@ -145,7 +145,7 @@ const ExpandedCard = (props: ExpandedCardProps) => {
           </span>
           <span className={styles.expandedCardContent}>
             <Text style={{ maxWidth: '100%' }} ellipsis={true}>
-              {moment(record.eventTime).format('YYYY.MM.DD HH:mm:ss')}
+              {dayjs(record.eventTime).format('YYYY-MM-DD HH:mm:ss')}
             </Text>
           </span>
         </div>

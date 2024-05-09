@@ -35,7 +35,7 @@ import cn.topiam.employee.common.repository.identitysource.IdentitySourceSyncRec
  * 身份源同步记录
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/3/15 21:35
+ * Created by support@topiam.cn on 2022/3/15 21:35
  */
 @Repository
 public class IdentitySourceSyncRecordRepositoryCustomizedImpl implements
@@ -44,14 +44,14 @@ public class IdentitySourceSyncRecordRepositoryCustomizedImpl implements
     @Override
     public void batchSave(List<IdentitySourceSyncRecordEntity> list) {
         jdbcTemplate.batchUpdate(
-            "INSERT INTO identity_source_sync_record (id_, sync_history_id, action_type, object_id, object_name, object_type, status_,desc_,create_by,create_time,update_by,update_time,remark_,is_deleted) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            "INSERT INTO eiam_identity_source_sync_record (id_, sync_history_id, action_type, object_id, object_name, object_type, status_,desc_,create_by,create_time,update_by,update_time,remark_,is_deleted) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(@NotNull PreparedStatement ps, int i) throws SQLException {
             //@formatter:off
                     IdentitySourceSyncRecordEntity entity = list.get(i);
-                    ps.setLong(1, entity.getId());
-                    ps.setLong(2, entity.getSyncHistoryId());
+                    ps.setString(1, entity.getId());
+                    ps.setString(2, entity.getSyncHistoryId());
                     ps.setString(3, Objects.isNull(entity.getActionType()) ? null : entity.getActionType().getCode());
                     ps.setString(4, entity.getObjectId());
                     ps.setString(5, entity.getObjectName());

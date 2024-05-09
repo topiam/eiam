@@ -20,18 +20,11 @@
  */
 export enum IdentitySourceProvider {
   dingtalk = 'dingtalk',
-  wework = 'wechat_work',
   feishu = 'feishu',
-  ldap = 'ldap',
-  ad = 'windows_ad',
 }
 export enum RESULT_STATE {
   //数字签名错误
   EX900005 = 'EX900005',
-  //验证码错误
-  EX000102 = 'EX000102',
-  //系统未初始化
-  EX000202 = 'EX000202',
   //成功
   SUCCESS = '200',
 }
@@ -43,14 +36,12 @@ export enum SMS_PROVIDER {
   ALIYUN = 'aliyun',
   QI_NIU = 'qiniu',
   TENCENT = 'tencent',
-  NET_EASE = 'netease',
 }
 
 export enum GEO_IP_PROVIDER {
   MAXMIND = 'maxmind',
   DEFAULT = 'default',
 }
-
 
 export enum EMAIL_PROVIDER {
   CUSTOMIZE = 'customize',
@@ -59,24 +50,13 @@ export enum EMAIL_PROVIDER {
   NET_EASE = 'netease',
 }
 
-
-/**
- * 应用类型
- */
-export enum AppType {
-  //标准协议
-  STANDARD = 'standard',
-  //定制模板
-  CUSTOM_MADE = 'custom_made',
-}
-
 /**
  * App Protocol
  */
 export enum AppProtocolType {
-  oidc = 'oidc',
-  jwt = 'jwt',
-  form = 'form',
+  oidc = 'OIDC',
+  jwt = 'JWT',
+  form = 'FORM',
 }
 
 export enum PolicyEffectType {
@@ -98,4 +78,8 @@ export enum ParamCheckType {
   USERNAME = 'USERNAME',
   EMAIL = 'EMAIL',
   CODE = 'CODE',
+}
+
+export enum SESSION_STATUS {
+  REQUIRE_RESET_PASSWORD = 'require_reset_password',
 }

@@ -17,20 +17,18 @@
  */
 package cn.topiam.employee.audit.service.impl;
 
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import cn.topiam.employee.audit.controller.pojo.AuditListQuery;
-import cn.topiam.employee.audit.controller.pojo.AuditListResult;
-import cn.topiam.employee.audit.controller.pojo.DictResult;
+import cn.topiam.employee.audit.endpoint.pojo.AuditListQuery;
+import cn.topiam.employee.audit.endpoint.pojo.AuditListResult;
+import cn.topiam.employee.audit.endpoint.pojo.DictResult;
 import cn.topiam.employee.audit.entity.AuditEntity;
 import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.audit.repository.AuditRepository;
@@ -49,7 +47,7 @@ import static cn.topiam.employee.support.security.userdetails.UserType.USER;
  * 审计 service impl
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/10 23:06
+ * Created by support@topiam.cn on 2021/9/10 23:06
  */
 @Service
 @RequiredArgsConstructor
@@ -71,9 +69,18 @@ public class AuditServiceImpl implements AuditService {
         //查询入参转查询条件
         Specification<AuditEntity> specification = auditDataConverter
             .auditListRequestConvertToSpecification(query, page);
-
+        if (Objects.isNull(specification)) {
+            return new Page<>();
+        }
+        // 排序
+        List<Sort.Order> orders = new ArrayList<>();
+        for (PageModel.Sort sort : page.getSorts()) {
+            orders.add(new Sort.Order((sort.getAsc() ? Sort.Direction.ASC : Sort.Direction.DESC),
+                sort.getSorter()));
+        }
         //分页条件
-        PageRequest request = PageRequest.of(page.getCurrent(), page.getPageSize());
+        PageRequest request = PageRequest.of(page.getCurrent(), page.getPageSize(),
+            Sort.by(orders));
         //查询列表
         return auditDataConverter
             .entityConvertToAuditListResult(auditRepository.findAll(specification, request), page);

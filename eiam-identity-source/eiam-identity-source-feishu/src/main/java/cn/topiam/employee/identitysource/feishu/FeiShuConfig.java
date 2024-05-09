@@ -19,10 +19,10 @@ package cn.topiam.employee.identitysource.feishu;
 
 import java.io.Serial;
 
+import cn.topiam.employee.common.jackjson.encrypt.JsonPropertyEncrypt;
 import cn.topiam.employee.identitysource.core.IdentitySourceConfig;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import jakarta.validation.constraints.NotEmpty;
@@ -31,11 +31,10 @@ import jakarta.validation.constraints.NotEmpty;
  * 飞书配置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/28 23:17
+ * Created by support@topiam.cn on 2022/2/28 23:17
  */
 @Getter
 @Setter
-@RequiredArgsConstructor
 public class FeiShuConfig extends IdentitySourceConfig {
 
     @Serial
@@ -44,18 +43,24 @@ public class FeiShuConfig extends IdentitySourceConfig {
      * 应用App key
      */
     @NotEmpty(message = "AppId不能为空")
-    private final String      appId;
+    private String            appId;
+
     /**
      * 应用AppSecret
      */
+    @JsonPropertyEncrypt
     @NotEmpty(message = "AppSecret不能为空")
-    private final String      appSecret;
+    private String            appSecret;
+
     /**
      * encryptKey
      */
-    private final String      encryptKey;
+    @JsonPropertyEncrypt
+    private String            encryptKey;
+
     /**
      * verificationToken
      */
-    private final String      verificationToken;
+    @JsonPropertyEncrypt
+    private String            verificationToken;
 }

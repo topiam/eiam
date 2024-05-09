@@ -45,3 +45,13 @@ export async function outLogin() {
 export async function getEncryptSecret(): Promise<API.ApiResult<API.EncryptSecret>> {
   return request(`/api/v1/public_secret?type=encrypt`);
 }
+
+
+/**
+ * 获取当前session状态
+ */
+export async function getCurrentStatus(): Promise<API.ApiResult<API.CurrentStatus>> {
+  return request<API.ApiResult<API.CurrentStatus>>('/api/v1/session/current_status', {
+    skipErrorHandler: true,
+  });
+}

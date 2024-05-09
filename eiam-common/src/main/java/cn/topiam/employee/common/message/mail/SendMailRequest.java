@@ -24,7 +24,7 @@ import lombok.experimental.Accessors;
  * 发送邮件参数
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/27 21:08
+ * Created by support@topiam.cn on 2021/9/27 21:08
  */
 @Data
 @Accessors(chain = true)

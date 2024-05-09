@@ -34,10 +34,11 @@ export type CreateDrawerProps = {
   visible?: boolean;
   id: string;
   onCancel: () => void;
-  onFinish: (values: Record<string, string>) => Promise<boolean | void>;
+  afterClose: () => void;
+  onFinish: (values: Record<string, string>) => Promise<void>;
 };
 export default (props: CreateDrawerProps) => {
-  const { visible, id, onCancel, onFinish } = props;
+  const { visible, id, onCancel, onFinish, afterClose } = props;
   const [form] = useForm();
   const [loading, setLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState<boolean>(false);
@@ -69,6 +70,11 @@ export default (props: CreateDrawerProps) => {
           form?.resetFields();
         },
         destroyOnClose: true,
+        afterClose: () => {
+          if (afterClose) {
+            afterClose();
+          }
+        },
       }}
       form={form}
       scrollToFirstError

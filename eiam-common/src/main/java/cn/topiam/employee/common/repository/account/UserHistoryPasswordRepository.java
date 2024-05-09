@@ -17,12 +17,10 @@
  */
 package cn.topiam.employee.common.repository.account;
 
-import java.util.List;
-
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.common.entity.account.UserHistoryPasswordEntity;
-import cn.topiam.employee.support.repository.LogicDeleteRepository;
 
 /**
  * <p>
@@ -30,16 +28,9 @@ import cn.topiam.employee.support.repository.LogicDeleteRepository;
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-07-31
+ * Created by support@topiam.cn on 2020-07-31
  */
 @Repository
 public interface UserHistoryPasswordRepository extends
-                                               LogicDeleteRepository<UserHistoryPasswordEntity, Long> {
-    /**
-     * 根据用户ID查询历史密码
-     *
-     * @param userId {@link String} 用户ID
-     * @return {@link List }
-     */
-    List<UserHistoryPasswordEntity> findByUserId(String userId);
+                                               JpaRepository<UserHistoryPasswordEntity, String> {
 }

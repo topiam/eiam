@@ -30,7 +30,7 @@ import jakarta.validation.constraints.NotNull;
  * MaxmindProviderSetting
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/10/1 21:10
+ * Created by support@topiam.cn on 2021/10/1 21:10
  */
 @Data
 public class GeoLocationProviderConfig {

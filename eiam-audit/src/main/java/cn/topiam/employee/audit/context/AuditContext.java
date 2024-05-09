@@ -17,15 +17,13 @@
  */
 package cn.topiam.employee.audit.context;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.util.CollectionUtils;
 
 import com.alibaba.ttl.TransmittableThreadLocal;
+import com.google.common.collect.Lists;
 
 import cn.topiam.employee.audit.entity.Target;
 
@@ -33,7 +31,7 @@ import cn.topiam.employee.audit.entity.Target;
  * AuditContext
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/23 22:39
+ * Created by support@topiam.cn on 2021/11/23 22:39
  */
 public class AuditContext {
 
@@ -155,7 +153,7 @@ public class AuditContext {
      */
     public static void setTarget(Target... target) {
         if (!Objects.isNull(target)) {
-            TARGET_LIST.set(List.of(target));
+            TARGET_LIST.set(Lists.newArrayList(target));
         }
     }
 
@@ -165,6 +163,20 @@ public class AuditContext {
     public static void setTarget(List<Target> targets) {
         if (!CollectionUtils.isEmpty(targets)) {
             TARGET_LIST.set(targets);
+        }
+    }
+
+    /**
+     * Add Target
+     */
+    public static void addTarget(Target target) {
+        if (!Objects.isNull(target)) {
+            List<Target> targetList = getTarget();
+            if (Objects.isNull(targetList)) {
+                targetList = new ArrayList<>();
+            }
+            targetList.add(target);
+            TARGET_LIST.set(targetList);
         }
     }
 

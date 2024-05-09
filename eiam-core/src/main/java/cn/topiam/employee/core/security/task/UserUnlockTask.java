@@ -31,13 +31,13 @@ import cn.topiam.employee.support.lock.Lock;
 import cn.topiam.employee.support.trace.Trace;
 
 import lombok.RequiredArgsConstructor;
-import static cn.topiam.employee.core.help.SettingHelp.getAutoUnlockTime;
+import static cn.topiam.employee.core.context.ContextService.getAutoUnlockTime;
 
 /**
  * 用户锁定自动解锁任务
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/4/17 21:22
+ * Created by support@topiam.cn on 2022/4/17 21:22
  */
 @RequiredArgsConstructor
 public class UserUnlockTask {
@@ -59,7 +59,7 @@ public class UserUnlockTask {
             LocalDateTime updateTime = entity.getUpdateTime();
             Integer unlockTime = getAutoUnlockTime();
             if (updateTime.plusMinutes(unlockTime).isBefore(LocalDateTime.now())) {
-                entity.setStatus(UserStatus.ENABLE);
+                entity.setStatus(UserStatus.ENABLED);
                 userRepository.save(entity);
                 logger.info("成功解锁用户: {}", entity.getUsername());
             }

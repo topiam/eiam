@@ -66,8 +66,7 @@
 
 ## 技术架构
 
-- **后端
-  **：[Spring Boot](https://spring.io/projects/spring-boot/) 、[Spring Security](https://spring.io/projects/spring-security/)
+- **后端**：[Spring Boot](https://spring.io/projects/spring-boot/) 、[Spring Security](https://spring.io/projects/spring-security/)
 - **前端**：[React.js](https://react.dev/) 、[Ant Design](https://ant.design)
 - **中间件**：[MySQL](https://www.mysql.com/) 、[Redis](https://redis.io/)
 - **基础设施**：[Docker](https://www.docker.com/)

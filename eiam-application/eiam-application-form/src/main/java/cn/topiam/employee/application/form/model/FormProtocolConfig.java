@@ -20,6 +20,8 @@ package cn.topiam.employee.application.form.model;
 import java.io.Serial;
 import java.util.List;
 
+import org.springframework.util.CollectionUtils;
+
 import cn.topiam.employee.application.AbstractProtocolConfig;
 import cn.topiam.employee.common.entity.app.AppFormConfigEntity;
 import cn.topiam.employee.common.enums.app.FormEncryptType;
@@ -28,18 +30,16 @@ import cn.topiam.employee.common.enums.app.FormSubmitType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
-import lombok.extern.jackson.Jacksonized;
 
 /**
  * Form 协议配置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/8/28 21:43
+ * Created by support@topiam.cn on 2022/8/28 21:43
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
 @SuperBuilder
-@Jacksonized
 public class FormProtocolConfig extends AbstractProtocolConfig {
 
     @Serial
@@ -89,4 +89,13 @@ public class FormProtocolConfig extends AbstractProtocolConfig {
      * 登录其他信息
      */
     private List<AppFormConfigEntity.OtherField> otherField;
+
+    /**
+     * 是否配置
+     */
+    private Boolean                              configured;
+
+    public List<AppFormConfigEntity.OtherField> getOtherField() {
+        return CollectionUtils.isEmpty(otherField) ? List.of() : otherField;
+    }
 }

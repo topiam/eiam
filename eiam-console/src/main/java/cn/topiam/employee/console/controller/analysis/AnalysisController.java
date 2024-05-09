@@ -28,23 +28,24 @@ import org.springframework.web.bind.annotation.RestController;
 import cn.topiam.employee.audit.repository.result.AuthnQuantityResult;
 import cn.topiam.employee.audit.repository.result.AuthnZoneResult;
 import cn.topiam.employee.console.pojo.query.analysis.AnalysisQuery;
-import cn.topiam.employee.console.pojo.result.analysis.*;
+import cn.topiam.employee.console.pojo.result.analysis.AppVisitRankResult;
+import cn.topiam.employee.console.pojo.result.analysis.AuthnHotProviderResult;
+import cn.topiam.employee.console.pojo.result.analysis.OverviewResult;
 import cn.topiam.employee.console.service.analysis.AnalysisService;
 import cn.topiam.employee.support.result.ApiRestResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import static cn.topiam.employee.common.constant.AnalysisConstants.ANALYSIS_GROUP_NAME;
 import static cn.topiam.employee.common.constant.AnalysisConstants.ANALYSIS_PATH;
 
 /**
  * 统计分析
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/10/13 22:00
+ * Created by support@topiam.cn on 2022/10/13 22:00
  */
 @Validated
-@Tag(name = ANALYSIS_GROUP_NAME)
+@Tag(name = "统计分析")
 @RestController
 @RequestMapping(ANALYSIS_PATH)
 public class AnalysisController {

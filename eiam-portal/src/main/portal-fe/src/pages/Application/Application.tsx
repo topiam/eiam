@@ -15,23 +15,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import type { ActionType } from '@ant-design/pro-components';
-import {
-  PageContainer,
-  ProCard,
-  ProFormText,
-  ProList,
-  QueryFilter,
-} from '@ant-design/pro-components';
-import { App, Avatar, Badge, Card, Typography } from 'antd';
-import React, { useRef, useState } from 'react';
-import { AppGroupList, AppList, InitLoginType } from './data.d';
-import { getAppGroupList, queryAppList } from './service';
+import type {ActionType} from '@ant-design/pro-components';
+import {PageContainer, ProCard, ProFormText, ProList, QueryFilter,} from '@ant-design/pro-components';
+import {Avatar, Badge, Card, Typography} from 'antd';
+import React, {useRef, useState} from 'react';
+import {AppGroupList, AppList} from './data.d';
+import {getAppGroupList, queryAppList} from './service';
 import useStyle from './style';
 import classnames from 'classnames';
-import { useAsyncEffect } from 'ahooks';
-import { SpinProps } from 'antd/es/spin';
-import { useIntl } from '@umijs/max';
+import {useAsyncEffect} from 'ahooks';
+import {SpinProps} from 'antd/es/spin';
+import {useIntl} from '@umijs/max';
 
 const { Paragraph } = Typography;
 const prefixCls = 'topiam-app-list';
@@ -55,14 +49,13 @@ const CardList = () => {
   const { styles } = useStyle(prefixCls);
   // 当前组
   const [currentGroup, setCurrentGroup] = useState<React.Key>();
-  const { message } = App.useApp();
   const actionRef = useRef<ActionType>();
   const [searchParams, setSearchParams] = useState<Record<string, any>>();
   const [appGroupList, setAppGroupList] = useState<AppGroupList[]>([]);
   const [loading, setLoading] = useState<boolean | SpinProps | undefined>(false);
 
   const getItems = () => {
-    let data: { key: string; label: React.JSX.Element }[] = [
+    let data: { key: string; label: React.React.JSX.Element }[] = [
       {
         key: all,
         label: (
@@ -169,16 +162,8 @@ const CardList = () => {
                   hoverable
                   bordered={false}
                   onClick={async () => {
-                    if (
-                      item.initLoginType === InitLoginType.portal_or_app_init_sso &&
-                      item?.initLoginUrl
-                    ) {
-                      initSso(item?.initLoginUrl);
-                      return;
-                    }
-                    message.warning(
-                      `${item.name}${intl.formatMessage({ id: 'pages.application.init.warning' })}`,
-                    );
+                    initSso(item.initLoginUrl);
+                    return;
                   }}
                 >
                   <div className={`${prefixCls}-item-content-wrapper`} key={item.id}>

@@ -23,7 +23,7 @@ import org.springframework.util.Assert;
 
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.context.ApplicationContextService;
 import cn.topiam.employee.support.util.AesUtils;
 
 import lombok.AccessLevel;
@@ -34,7 +34,7 @@ import static cn.topiam.employee.common.constant.SettingConstants.AES_SECRET;
  * EncryptContextHelp
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/12/22 21:53
+ * Created by support@topiam.cn on 2022/12/22 21:53
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EncryptContextHelp {
@@ -63,6 +63,6 @@ public class EncryptContextHelp {
     }
 
     private static SettingRepository getSettingRepository() {
-        return ApplicationContextHelp.getBean(SettingRepository.class);
+        return ApplicationContextService.getBean(SettingRepository.class);
     }
 }

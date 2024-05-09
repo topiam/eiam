@@ -28,7 +28,7 @@ import cn.topiam.employee.common.entity.app.query.AppGroupQuery;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2023/9/8 19:20
+ * Created by support@topiam.cn on 2023/9/8 19:20
  */
 public interface AppGroupRepositoryCustomized {
 
@@ -44,25 +44,18 @@ public interface AppGroupRepositoryCustomized {
     /**
      * 查询应用组列表
      *
-     * @return {@link List}
-     */
-    List<AppGroupPO> getAppGroupList(AppGroupQuery query);
-
-    /**
-     * 查询应用组列表
-     *
-     * @param userId  {@link Long}
+     * @param subjectIds  {@link List}
      * @param query {@link AppGroupQuery}
      * @return {@link List}
      */
-    List<AppGroupPO> getAppGroupList(Long userId, AppGroupQuery query);
+    List<AppGroupPO> getAppGroupList(List<String> subjectIds, AppGroupQuery query);
 
     /**
      * 根据当前用户和分组获取应用数量
      *
-     * @param groupId {@link Long}
-     * @param userId {@link Long}
+     * @param groupId {@link String}
+     * @param subjectIds {@link List}
      * @return {@link Long}
      */
-    Long getAppCount(String groupId, Long userId);
+    Long getAppCount(List<String> subjectIds, String groupId);
 }

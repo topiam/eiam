@@ -62,9 +62,10 @@ const useStyles = createStyles(({ prefixCls, css }) => {
 export default (props: {
   id: string;
   visible: boolean;
+  afterClose: () => void;
   onCancel?: (e?: React.MouseEvent<HTMLElement>) => void;
 }) => {
-  const { visible, onCancel, id } = props;
+  const { visible, onCancel, id, afterClose } = props;
   const [loading, setLoading] = useState<boolean>(false);
   const [form] = Form.useForm();
   const intl = useIntl();
@@ -91,6 +92,11 @@ export default (props: {
       modalProps={{
         destroyOnClose: true,
         onCancel: onCancel,
+        afterClose: () => {
+          if (afterClose) {
+            afterClose();
+          }
+        },
       }}
       onFinish={async (formData: { password: string }) => {
         const password = Base64.encode(formData.password, true);
@@ -212,7 +218,7 @@ export default (props: {
           onClick={async () => {
             const password = form.getFieldValue('password');
             const success = await copy(
-              `TopIAM 账户进行了密码修改\n账户名：admin\n新密码：${password || ''}`,
+              `TOPIAM 账户进行了密码修改\n账户名：admin\n新密码：${password || ''}`,
             );
             if (success) {
               message.success('复制成功');

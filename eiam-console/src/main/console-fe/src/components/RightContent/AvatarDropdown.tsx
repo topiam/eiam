@@ -18,7 +18,6 @@
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { history, useIntl, useModel } from '@umijs/max';
 import { Spin } from 'antd';
-import type { MenuInfo } from 'rc-menu/lib/interface';
 import React, { useCallback } from 'react';
 import { flushSync } from 'react-dom';
 import HeaderDropdown from '../HeaderDropdown';
@@ -82,7 +81,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ children }) =
   const { initialState, setInitialState } = useModel('@@initialState');
 
   const onMenuClick = useCallback(
-    async (event: MenuInfo) => {
+    async (event: { key: string }) => {
       const { key } = event;
       if (key === 'logout' && initialState) {
         flushSync(() => {

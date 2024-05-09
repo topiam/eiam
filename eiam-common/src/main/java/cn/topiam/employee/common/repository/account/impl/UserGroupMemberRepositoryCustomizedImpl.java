@@ -17,26 +17,27 @@
  */
 package cn.topiam.employee.common.repository.account.impl;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.common.entity.account.po.UserPO;
 import cn.topiam.employee.common.entity.account.query.UserGroupMemberListQuery;
 import cn.topiam.employee.common.repository.account.UserGroupMemberRepositoryCustomized;
-import cn.topiam.employee.common.repository.account.impl.mapper.UserPoMapper;
 
 import lombok.AllArgsConstructor;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/13 21:27
+ * Created by support@topiam.cn on 2022/2/13 21:27
  */
 @Repository
 @AllArgsConstructor
@@ -49,28 +50,46 @@ public class UserGroupMemberRepositoryCustomizedImpl implements
      * @param pageable {@link Pageable}
      * @return {@link Page}
      */
-    @SuppressWarnings("DuplicatedCode")
     @Override
     public Page<UserPO> getUserGroupMemberList(UserGroupMemberListQuery query, Pageable pageable) {
+        Map<String, Object> args = new HashMap<>();
         //@formatter:off
-        StringBuilder builder = new StringBuilder("SELECT `u`.id_, `u`.username_, `u`.password_, `u`.email_, `u`.phone_, `u`.phone_area_code, `u`.full_name, `u`.nick_name, `u`.avatar_, `u`.status_, `u`.data_origin, `u`.email_verified, `u`.phone_verified, `u`.auth_total, `u`.last_auth_ip, `u`.last_auth_time, `u`.expand_, `u`.external_id, `u`.expire_date, `u`.create_by, `u`.create_time, `u`.update_by, `u`.update_time, `u`.remark_, group_concat( IF( organization_member.primary_ = TRUE, organization_.display_path, NULL) ) AS primary_org_display_path, group_concat( IF ( organization_member.primary_ IS NULL, organization_.display_path, NULL ) ) AS org_display_path FROM user_group_member ugm LEFT JOIN user u ON ugm.user_id = u.id_ LEFT JOIN user_group ug ON ug.id_ = ugm.group_id LEFT JOIN organization_member ON ( u.id_ = organization_member.user_id) LEFT JOIN organization organization_ ON ( organization_.id_ = organization_member.org_id) WHERE ugm.is_deleted = '0' AND u.is_deleted = '0' AND ug.is_deleted = '0' AND organization_.is_deleted = '0' AND organization_member.is_deleted = '0' AND ugm.group_id = '%s' AND ug.id_ = '%s'".formatted(query.getId(), query.getId()));
+        String sql = """
+                SELECT
+                	%s
+                FROM
+                	UserGroupMemberEntity ugm
+                	INNER JOIN UserEntity u ON ugm.userId = u.id
+                	INNER JOIN UserGroupEntity ug ON ug.id = ugm.groupId
+                	LEFT  JOIN OrganizationMemberEntity om ON u.id = om.userId
+                    LEFT  JOIN OrganizationEntity o ON o.id = om.orgId
+                """;
+        args.put("userGroupMemberId", query.getId());
+        StringBuilder whereSql = new StringBuilder("""
+                WHERE
+                	ugm.groupId = :userGroupMemberId
+                	AND ug.id = :userGroupMemberId
+                """);
         //用户名
         if (StringUtils.isNoneBlank(query.getFullName())) {
-            builder.append(" AND full_name like '%").append(query.getFullName()).append("%'");
+            whereSql.append(" AND u.fullName LIKE :fullName ");
+            args.put("fullName", "%" + query.getFullName() + "%");
         }
-        builder.append("GROUP BY `u`.id_");
         //@formatter:on
-        String sql = builder.toString();
-        List<UserPO> list = jdbcTemplate.query(
-            builder.append(" LIMIT ").append(pageable.getPageNumber() * pageable.getPageSize())
-                .append(",").append(pageable.getPageSize()).toString(),
-            new UserPoMapper());
-        //@formatter:off
-        String countSql = "SELECT count(*) FROM (" + sql + ") user_";
-        //@formatter:on
-        Integer count = jdbcTemplate.queryForObject(countSql, Integer.class);
-        return new PageImpl<>(list, pageable, Objects.requireNonNull(count).longValue());
+        String listSql = sql.formatted("""
+                NEW cn.topiam.employee.common.entity.account.po.UserPO(u,
+                LISTAGG(o.displayPath , ',' ))
+                """);
+        TypedQuery<UserPO> listQuery = entityManager
+            .createQuery(listSql + whereSql + " GROUP BY u.id ", UserPO.class);
+        args.forEach(listQuery::setParameter);
+        listQuery.setFirstResult((int) pageable.getOffset());
+        listQuery.setMaxResults(pageable.getPageSize());
+        String countSql = sql.formatted("COUNT(DISTINCT u.id)");
+        TypedQuery<Long> countQuery = entityManager.createQuery(countSql + whereSql, Long.class);
+        args.forEach(countQuery::setParameter);
+        return new PageImpl<>(listQuery.getResultList(), pageable, countQuery.getSingleResult());
     }
 
-    private final JdbcTemplate jdbcTemplate;
+    private final EntityManager entityManager;
 }

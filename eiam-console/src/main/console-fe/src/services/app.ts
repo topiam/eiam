@@ -42,56 +42,11 @@ export async function getAppList(
 }
 
 /**
- * Update Application
- */
-export async function updateApp(params: Record<string, string>): Promise<API.ApiResult<boolean>> {
-  return request<API.ApiResult<boolean>>(`/api/v1/app/update`, {
-    method: 'PUT',
-    data: params,
-    requestType: 'json',
-  });
-}
-
-/**
- * Get  Config
- */
-export async function getAppConfig(id: string): Promise<API.ApiResult<Record<string, any>>> {
-  return request<API.ApiResult<Record<string, string>>>(`/api/v1/app/get/config/${id}`, {
-    method: 'GET',
-  });
-}
-
-/**
  * Remove Application
  */
 export async function removeApp(id: string): Promise<API.ApiResult<boolean>> {
   return request<API.ApiResult<boolean>>(`/api/v1/app/delete/${id}`, {
     method: 'DELETE',
-  });
-}
-
-/**
- * Save App Config
- */
-export async function saveAppConfig(
-  values: Record<string, any>,
-): Promise<API.ApiResult<Record<string, string>>> {
-  return request<API.ApiResult<Record<string, string>>>(`/api/v1/app/save/config`, {
-    method: 'PUT',
-    data: values,
-  });
-}
-
-/**
- * Get Cert List
- */
-export async function getCertList(
-  appId: string,
-  usingType?: string,
-): Promise<API.ApiResult<Record<string, string>>> {
-  return request<API.ApiResult<Record<string, string>>>(`/api/v1/app/cert/list`, {
-    method: 'GET',
-    params: { appId, usingType },
   });
 }
 
@@ -116,28 +71,6 @@ export async function getAppAccountList(
 }
 
 /**
- * create Account
- */
-export async function createAccount(
-  params: Record<string, string>,
-): Promise<API.ApiResult<boolean>> {
-  return request<API.ApiResult<boolean>>('/api/v1/app/account/create', {
-    method: 'POST',
-    requestType: 'json',
-    data: params,
-  });
-}
-
-/**
- * remove Account
- */
-export async function removeAccount(id: string): Promise<API.ApiResult<boolean>> {
-  return request<API.ApiResult<boolean>>(`/api/v1/app/account/delete/${id}`, {
-    method: 'DELETE',
-  });
-}
-
-/**
  * 获取应用访问权限策略列表
  */
 export async function getAppAccessPolicyList(
@@ -154,19 +87,6 @@ export async function getAppAccessPolicyList(
       total: result?.result?.pagination ? result?.result?.pagination.total : 0,
     };
     return Promise.resolve(data);
-  });
-}
-
-/**
- * create App AccessPolicy
- */
-export async function createAppAccessPolicy(
-  params: Record<string, string>,
-): Promise<API.ApiResult<boolean>> {
-  return request<API.ApiResult<boolean>>('/api/v1/app/access_policy/create', {
-    method: 'POST',
-    requestType: 'json',
-    data: params,
   });
 }
 

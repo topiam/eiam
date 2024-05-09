@@ -78,7 +78,6 @@ const SecurityView = () => {
     }
   }, [refresh]);
 
-
   const getData = () => [
     {
       title: '账户密码',

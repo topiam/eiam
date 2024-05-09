@@ -15,26 +15,34 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { getAllAppGroupList, getAppList, removeApp } from '@/services/app';
-import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import type { ActionType } from '@ant-design/pro-components';
+import { disableApp, enableApp } from './service';
+import { ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons';
+import {
+  ActionType,
+  ProCard,
+  ProFormSelect,
+  ProFormText,
+  QueryFilter,
+} from '@ant-design/pro-components';
 import { PageContainer, ProList } from '@ant-design/pro-components';
-import { App, Avatar, Button, Popconfirm, Space, Tag } from 'antd';
-import { useRef } from 'react';
+import { App, Avatar, Button, Space, Tag } from 'antd';
+import { useRef, useState } from 'react';
 import { history, useIntl } from '@umijs/max';
 import useStyle from './style';
 import classnames from 'classnames';
-import { AppList } from './data.d';
-import { disableApp, enableApp } from './service';
+import { getAppList, removeApp } from '@/services/app';
+import * as React from 'react';
+import { AppProtocolType } from '@/constant';
 
 const prefixCls = 'app-list';
 
-export default () => {
+const AppList = () => {
   const actionRef = useRef<ActionType>();
   const { styles: className } = useStyle(prefixCls);
   const intl = useIntl();
-  const { message } = App.useApp();
-  const ListContent = (data: AppList) => (
+  const { message, modal } = App.useApp();
+  const [searchParams, setSearchParams] = useState<Record<string, any>>();
+  const ListContent = (data: AppAPI.AppList) => (
     <div className={classnames(`${prefixCls}-content`)}>
       <div className={classnames(`${prefixCls}-item-content`)}>
         <Space size={0} key={data.id}>
@@ -61,13 +69,48 @@ export default () => {
           </>
         }
       >
-        <ProList<AppList>
-          search={{}}
+        <ProCard bodyStyle={{ padding: 0 }}>
+          <QueryFilter
+            layout="horizontal"
+            onFinish={(values) => {
+              setSearchParams({ ...values });
+              actionRef.current?.reset?.();
+              return Promise.resolve();
+            }}
+          >
+            <ProFormText
+              name="name"
+              label={intl.formatMessage({ id: 'pages.app.list.metas.title' })}
+            />
+            <ProFormSelect
+              name="protocol"
+              label={intl.formatMessage({ id: 'pages.app.list.metas.protocol' })}
+              options={[
+                {
+                  label: intl.formatMessage({ id: 'pages.app.list.metas.protocol.oidc' }),
+                  value: AppProtocolType.oidc,
+                },
+                {
+                  label: intl.formatMessage({ id: 'pages.app.list.metas.protocol.jwt' }),
+                  value: AppProtocolType.jwt,
+                },
+                {
+                  label: intl.formatMessage({ id: 'pages.app.list.metas.protocol.form' }),
+                  value: AppProtocolType.form,
+                },
+              ]}
+            />
+          </QueryFilter>
+        </ProCard>
+        <br />
+        <ProList<AppAPI.AppList>
+          search={false}
+          params={{ ...searchParams }}
           actionRef={actionRef}
           rowKey="id"
           split
           showActions="always"
-          pagination={{ defaultPageSize: 5, size: 'small' }}
+          pagination={{ defaultPageSize: 20, size: 'small' }}
           request={getAppList}
           headerTitle={intl.formatMessage({ id: 'pages.app.list.title' })}
           form={{
@@ -101,9 +144,7 @@ export default () => {
                 return (
                   <span
                     onClick={() => {
-                      history.push(
-                        `/app/list/detail?id=${row.id}&protocol=${row.protocol}&name=${row.name}`,
-                      );
+                      history.push(`/app/list/detail?id=${row.id}`);
                     }}
                   >
                     {text}
@@ -125,107 +166,106 @@ export default () => {
             actions: {
               render: (_text, row) => [
                 row.enabled ? (
-                  <Popconfirm
-                    title={intl.formatMessage({
-                      id: 'pages.app.list.actions.popconfirm.disable_app',
-                    })}
-                    placement="bottomRight"
-                    icon={
-                      <QuestionCircleOutlined
-                        style={{
-                          color: 'red',
-                        }}
-                      />
-                    }
-                    onConfirm={async () => {
-                      const { success, result } = await disableApp(row.id);
-                      if (success && result) {
-                        message.success(intl.formatMessage({ id: 'app.operation_success' }));
-                        await actionRef.current?.reload();
-                        return;
-                      }
-                    }}
-                    okText={intl.formatMessage({ id: 'app.yes' })}
-                    cancelText={intl.formatMessage({ id: 'app.no' })}
+                  <a
                     key="disabled"
+                    onClick={() => {
+                      const confirmed = modal.warning({
+                        centered: true,
+                        title: intl.formatMessage({
+                          id: 'pages.app.list.actions.disable_app',
+                        }),
+                        content: intl.formatMessage({
+                          id: 'pages.app.list.actions.disable_app.confirm_content',
+                        }),
+                        okText: intl.formatMessage({ id: 'app.confirm' }),
+                        okType: 'primary',
+                        okCancel: true,
+                        cancelText: intl.formatMessage({ id: 'app.cancel' }),
+                        onOk: async () => {
+                          const { success } = await disableApp(row.id);
+                          if (success) {
+                            message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                            confirmed.destroy();
+                            actionRef.current?.reload();
+                          }
+                        },
+                      });
+                    }}
                   >
-                    <a key="disabled">{intl.formatMessage({ id: 'app.disable' })}</a>
-                  </Popconfirm>
+                    {intl.formatMessage({ id: 'app.disable' })}
+                  </a>
                 ) : (
-                  <Popconfirm
-                    title={intl.formatMessage({
-                      id: 'pages.app.list.actions.popconfirm.enable_app',
-                    })}
-                    placement="bottomRight"
-                    icon={<QuestionCircleOutlined />}
-                    onConfirm={async () => {
-                      const { success, result } = await enableApp(row.id);
-                      if (success && result) {
-                        message.success(intl.formatMessage({ id: 'app.operation_success' })).then();
-                        await actionRef.current?.reload();
-                        return;
-                      }
+                  <a
+                    key="enabled"
+                    onClick={async () => {
+                      const confirmed = modal.warning({
+                        centered: true,
+                        title: intl.formatMessage({
+                          id: 'pages.app.list.actions.enable_app',
+                        }),
+                        content: intl.formatMessage({
+                          id: 'pages.app.list.actions.enable_app.confirm_content',
+                        }),
+                        okText: intl.formatMessage({ id: 'app.confirm' }),
+                        okType: 'primary',
+                        okCancel: true,
+                        cancelText: intl.formatMessage({ id: 'app.cancel' }),
+                        onOk: async () => {
+                          const { success } = await enableApp(row.id);
+                          if (success) {
+                            message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                            confirmed.destroy();
+                            actionRef.current?.reload();
+                          }
+                        },
+                      });
                     }}
-                    okText={intl.formatMessage({ id: 'app.yes' })}
-                    cancelText={intl.formatMessage({ id: 'app.no' })}
-                    key="disabled"
                   >
-                    <a key="enabled">{intl.formatMessage({ id: 'app.enable' })}</a>
-                  </Popconfirm>
+                    {intl.formatMessage({ id: 'app.enable' })}
+                  </a>
                 ),
                 <a
-                  key="details"
+                  key="config"
                   onClick={() => {
-                    history.push(`/app/list/detail?id=${row.id}`);
+                    history.push(
+                      `/app/list/detail?id=${row.id}&protocol=${row.protocol}&name=${row.name}`,
+                    );
                   }}
                 >
-                  {intl.formatMessage({ id: 'pages.app.list.actions.detail' })}
+                  {intl.formatMessage({ id: 'app.manage' })}
                 </a>,
-                <Popconfirm
-                  title={intl.formatMessage({
-                    id: 'pages.app.list.actions.popconfirm.delete_app',
-                  })}
-                  placement="bottomRight"
-                  icon={
-                    <QuestionCircleOutlined
-                      style={{
-                        color: 'red',
-                      }}
-                    />
-                  }
-                  onConfirm={async () => {
-                    const { success } = await removeApp(row.id);
-                    if (success) {
-                      message.success(intl.formatMessage({ id: 'app.operation_success' }));
-                      actionRef.current?.reload();
-                      return;
-                    }
+                <a
+                  target="_blank"
+                  key="remove"
+                  style={{ color: 'red' }}
+                  onClick={() => {
+                    const confirmed = modal.error({
+                      centered: true,
+                      title: intl.formatMessage({
+                        id: 'pages.app.list.actions.delete.confirm_title',
+                      }),
+                      icon: <ExclamationCircleFilled />,
+                      content: intl.formatMessage({
+                        id: 'pages.app.list.actions.delete.confirm_content',
+                      }),
+                      okText: intl.formatMessage({ id: 'app.confirm' }),
+                      okType: 'primary',
+                      okCancel: true,
+                      cancelText: intl.formatMessage({ id: 'app.cancel' }),
+                      onOk: async () => {
+                        const { success } = await removeApp(row.id);
+                        if (success) {
+                          message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                          confirmed.destroy();
+                          actionRef.current?.reload();
+                        }
+                      },
+                    });
                   }}
-                  okText={intl.formatMessage({ id: 'app.yes' })}
-                  cancelText={intl.formatMessage({ id: 'app.no' })}
-                  key="delete"
                 >
-                  <a target="_blank" key="remove" style={{ color: 'red' }}>
-                    {intl.formatMessage({ id: 'app.delete' })}
-                  </a>
-                </Popconfirm>,
+                  {intl.formatMessage({ id: 'app.delete' })}
+                </a>,
               ],
-            },
-            groupId: {
-              // 自己扩展的字段，主要用于筛选，不在列表中显示
-              title: intl.formatMessage({
-                id: 'pages.app.list.metas.group',
-              }),
-              valueType: 'select',
-              request: async () => {
-                const { success, data } = await getAllAppGroupList({}, {}, {});
-                if (success && data) {
-                  return data.map((i) => {
-                    return { label: i.name, value: i.id };
-                  });
-                }
-                return [];
-              },
             },
           }}
         />
@@ -233,3 +273,5 @@ export default () => {
     </div>
   );
 };
+
+export default AppList;

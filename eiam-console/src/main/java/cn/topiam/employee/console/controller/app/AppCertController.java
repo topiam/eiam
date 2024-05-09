@@ -41,7 +41,7 @@ import static cn.topiam.employee.common.constant.AppConstants.APP_PATH;
  * 应用证书
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/5/31 21:38
+ * Created by support@topiam.cn on 2022/5/31 21:38
  */
 @Validated
 @Tag(name = "应用证书")

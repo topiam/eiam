@@ -22,13 +22,15 @@ import java.util.List;
 import cn.topiam.employee.audit.repository.result.AuthnQuantityResult;
 import cn.topiam.employee.audit.repository.result.AuthnZoneResult;
 import cn.topiam.employee.console.pojo.query.analysis.AnalysisQuery;
-import cn.topiam.employee.console.pojo.result.analysis.*;
+import cn.topiam.employee.console.pojo.result.analysis.AppVisitRankResult;
+import cn.topiam.employee.console.pojo.result.analysis.AuthnHotProviderResult;
+import cn.topiam.employee.console.pojo.result.analysis.OverviewResult;
 
 /**
  * 统计 service
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/11/22 22:25
+ * Created by support@topiam.cn on 2022/11/22 22:25
  */
 public interface AnalysisService {
 

@@ -24,7 +24,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.OAuth2Error;
-import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationResponseType;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
@@ -40,14 +39,17 @@ import cn.topiam.eiam.protocol.oidc.authentication.OAuth2AuthorizationImplicitRe
 import jakarta.servlet.http.HttpServletRequest;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.security.oauth2.core.OAuth2ErrorCodes.INVALID_REQUEST;
+import static org.springframework.security.oauth2.core.OAuth2ErrorCodes.UNSUPPORTED_RESPONSE_TYPE;
 
+import static cn.topiam.eiam.protocol.oidc.endpoint.OAuth2ParameterNames.RESPONSE_MODE;
 import static cn.topiam.employee.support.util.HttpRequestUtils.*;
 
 /**
  * OAuth2 授权简化模式请求身份验证转换器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/26 22:47
+ * Created by support@topiam.cn on 2023/6/26 22:47
  */
 @SuppressWarnings("AlibabaClassNamingShouldBeCamel")
 public final class OAuth2AuthorizationImplicitRequestAuthenticationConverter implements
@@ -71,13 +73,12 @@ public final class OAuth2AuthorizationImplicitRequestAuthenticationConverter imp
         MultiValueMap<String, String> parameters = GET.name().equals(request.getMethod())
             ? getQueryParameters(request)
             : getFormParameters(request);
-
         // response_type (必填)
         Set<String> responseTypes = null;
         String responseType = request.getParameter(OAuth2ParameterNames.RESPONSE_TYPE);
         if (!StringUtils.hasText(responseType)
             || parameters.get(OAuth2ParameterNames.RESPONSE_TYPE).size() != 1) {
-            throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.RESPONSE_TYPE);
+            throwError(INVALID_REQUEST, OAuth2ParameterNames.RESPONSE_TYPE);
         }
         if (StringUtils.hasText(responseType)) {
             responseTypes = new HashSet<>(
@@ -85,8 +86,7 @@ public final class OAuth2AuthorizationImplicitRequestAuthenticationConverter imp
             // 响应类型不是 token、id_token 模式抛出异常
             if (!responseTypes.contains(TOKEN.getValue())
                 && !responseTypes.contains(ID_TOKEN.getValue())) {
-                throwError(OAuth2ErrorCodes.UNSUPPORTED_RESPONSE_TYPE,
-                    OAuth2ParameterNames.RESPONSE_TYPE);
+                throwError(UNSUPPORTED_RESPONSE_TYPE, OAuth2ParameterNames.RESPONSE_TYPE);
             }
         }
 
@@ -96,7 +96,7 @@ public final class OAuth2AuthorizationImplicitRequestAuthenticationConverter imp
         String clientId = parameters.getFirst(OAuth2ParameterNames.CLIENT_ID);
         if (!StringUtils.hasText(clientId)
             || parameters.get(OAuth2ParameterNames.CLIENT_ID).size() != 1) {
-            throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.CLIENT_ID);
+            throwError(INVALID_REQUEST, OAuth2ParameterNames.CLIENT_ID);
         }
 
         Authentication principal = SecurityContextHolder.getContext().getAuthentication();
@@ -108,14 +108,14 @@ public final class OAuth2AuthorizationImplicitRequestAuthenticationConverter imp
         String redirectUri = parameters.getFirst(OAuth2ParameterNames.REDIRECT_URI);
         if (!StringUtils.hasText(redirectUri)
             || parameters.get(OAuth2ParameterNames.REDIRECT_URI).size() != 1) {
-            throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.REDIRECT_URI);
+            throwError(INVALID_REQUEST, OAuth2ParameterNames.REDIRECT_URI);
         }
 
         // scope (自选)
         Set<String> scopes = null;
         String scope = parameters.getFirst(OAuth2ParameterNames.SCOPE);
         if (StringUtils.hasText(scope) && parameters.get(OAuth2ParameterNames.SCOPE).size() != 1) {
-            throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.SCOPE);
+            throwError(INVALID_REQUEST, OAuth2ParameterNames.SCOPE);
         }
         if (StringUtils.hasText(scope)) {
             scopes = new HashSet<>(
@@ -125,7 +125,13 @@ public final class OAuth2AuthorizationImplicitRequestAuthenticationConverter imp
         // state (推荐)
         String state = parameters.getFirst(OAuth2ParameterNames.STATE);
         if (StringUtils.hasText(state) && parameters.get(OAuth2ParameterNames.STATE).size() != 1) {
-            throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.STATE);
+            throwError(INVALID_REQUEST, OAuth2ParameterNames.STATE);
+        }
+
+        // response_mode (可选，fragment)
+        String responseMode = parameters.getFirst(RESPONSE_MODE);
+        if (StringUtils.hasText(responseMode) && parameters.get(RESPONSE_MODE).size() != 1) {
+            throwError(INVALID_REQUEST, RESPONSE_MODE);
         }
 
         Map<String, Object> additionalParameters = new HashMap<>(16);
@@ -133,14 +139,15 @@ public final class OAuth2AuthorizationImplicitRequestAuthenticationConverter imp
             if (!key.equals(OAuth2ParameterNames.RESPONSE_TYPE)
                 && !key.equals(OAuth2ParameterNames.CLIENT_ID)
                 && !key.equals(OAuth2ParameterNames.REDIRECT_URI)
-                && !key.equals(OAuth2ParameterNames.SCOPE)
+                && !key.equals(OAuth2ParameterNames.SCOPE) && !key.equals(RESPONSE_MODE)
                 && !key.equals(OAuth2ParameterNames.STATE)) {
                 additionalParameters.put(key,
                     (value.size() == 1) ? value.get(0) : value.toArray(new String[0]));
             }
         });
         return new OAuth2AuthorizationImplicitRequestAuthenticationToken(authorizationUri, clientId,
-            principal, redirectUri, state, scopes, responseTypes, additionalParameters);
+            principal, redirectUri, state, scopes, responseTypes, responseMode,
+            additionalParameters);
     }
 
     private static RequestMatcher createOidcRequestMatcher() {

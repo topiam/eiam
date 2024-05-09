@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Redirect - TopIAM</title>
+    <title>Redirect - TOPIAM</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="robots" content="noindex, nofollow, nocache, noarchive"/>
     <meta

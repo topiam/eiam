@@ -285,12 +285,24 @@ declare namespace AccountAPI {
    * 子节点
    */
   export type ChildOrganization = BaseOrganization;
+
   /**
-   * 子节点
+   * 搜索组织树结构
    */
-  export type FilterOrganizationTree = BaseOrganization & {
+  export type SearchOrganizationTree = {
+    /** id */
+    id: string;
+    /** 名称 */
+    name: string;
+    parent: string;
+    type: string;
+    externalId: string;
+    desc: string;
+    sort: string;
     isLeaf: boolean;
+    children: ChildOrganization[];
   };
+
   /**
    * 组织架构详情
    */
@@ -402,6 +414,7 @@ declare namespace AppAPI {
     appProtocol: string;
     account: string;
     createTime: Date;
+    defaulted: boolean;
   };
 
   /**
@@ -417,9 +430,11 @@ declare namespace AppAPI {
     subjectType: string;
     //应用类型
     appType: string;
+    appIcon: string;
+    appName: string;
     appProtocol: string;
-    //Effect
-    effect: string;
+    //是否启用
+    enabled: boolean;
   };
 
   /**

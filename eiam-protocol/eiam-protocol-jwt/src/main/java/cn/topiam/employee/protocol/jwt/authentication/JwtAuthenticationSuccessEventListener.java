@@ -36,7 +36,7 @@ import static cn.topiam.employee.audit.event.type.EventType.APP_SSO;
  * 监听登录成功事件
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020/9/3
+ * Created by support@topiam.cn on 2020/9/3
  */
 public class JwtAuthenticationSuccessEventListener implements
                                                    ApplicationListener<AuthenticationSuccessEvent> {
@@ -51,7 +51,7 @@ public class JwtAuthenticationSuccessEventListener implements
         //@formatter:off
         if (event.getAuthentication() instanceof JwtAuthenticationToken authentication){
             JwtProtocolConfig config = authentication.getConfig();
-            auditEventPublish.publish(APP_SSO, (Authentication) ((Authentication) authentication.getPrincipal()).getPrincipal(),EventStatus.SUCCESS,Lists.newArrayList(Target.builder().id(config.getAppId()).type(TargetType.APPLICATION).build()));
+            auditEventPublish.publish(APP_SSO, (Authentication) authentication.getPrincipal(),EventStatus.SUCCESS,Lists.newArrayList(Target.builder().id(config.getAppId()).type(TargetType.APPLICATION).name(config.getAppName()).build()));
         }
         //@formatter:on
     }

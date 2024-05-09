@@ -21,7 +21,7 @@ package cn.topiam.employee.common.constant;
  * 配置Bean名称常量
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/3/23 22:53
+ * Created by support@topiam.cn on 2022/3/23 22:53
  */
 public final class ConfigBeanNameConstants {
     /**

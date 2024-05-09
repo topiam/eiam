@@ -51,7 +51,7 @@ import static cn.topiam.employee.common.constant.SettingConstants.SETTING_PATH;
  * 管理员
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/13 22:09
+ * Created by support@topiam.cn on 2021/11/13 22:09
  */
 @Validated
 @Tag(name = "系统管理员")
@@ -140,7 +140,7 @@ public class AdministratorController {
     @PutMapping(value = "/enable/{id}")
     @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> enableAdministrator(@PathVariable(value = "id") String id) {
-        Boolean result = administratorService.updateAdministratorStatus(id, UserStatus.ENABLE);
+        Boolean result = administratorService.updateAdministratorStatus(id, UserStatus.ENABLED);
         return ApiRestResult.<Boolean> builder().result(result).build();
     }
 
@@ -157,7 +157,7 @@ public class AdministratorController {
     @PutMapping(value = "/disable/{id}")
     @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> disableAdministrator(@PathVariable(value = "id") String id) {
-        Boolean result = administratorService.updateAdministratorStatus(id, UserStatus.DISABLE);
+        Boolean result = administratorService.updateAdministratorStatus(id, UserStatus.DISABLED);
         return ApiRestResult.<Boolean> builder().result(result).build();
     }
 
@@ -205,7 +205,7 @@ public class AdministratorController {
     @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> administratorParamCheck(@Parameter(description = "验证类型") @NotNull(message = "验证类型不能为空") CheckValidityType type,
                                                           @Parameter(description = "值") @NotEmpty(message = "验证值不能为空") String value,
-                                                          @Parameter(description = "ID") Long id) {
+                                                          @Parameter(description = "ID") String id) {
         Boolean result = administratorService.administratorParamCheck(type, value, id);
         //返回
         return ApiRestResult.<Boolean> builder().result(result).build();

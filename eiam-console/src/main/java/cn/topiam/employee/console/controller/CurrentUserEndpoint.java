@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 import cn.topiam.employee.common.entity.setting.AdministratorEntity;
 import cn.topiam.employee.common.exception.UserNotFoundException;
 import cn.topiam.employee.common.repository.setting.AdministratorRepository;
-import cn.topiam.employee.core.security.util.SecurityUtils;
 import cn.topiam.employee.support.result.ApiRestResult;
 import cn.topiam.employee.support.security.userdetails.UserDetails;
 import cn.topiam.employee.support.util.DesensitizationUtil;
@@ -47,7 +46,7 @@ import static cn.topiam.employee.support.util.ImageAvatarUtils.generateAvatarImg
  * 当前用户
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020/12/23 21:49
+ * Created by support@topiam.cn on 2020/12/23 21:49
  */
 @Slf4j
 @RestController
@@ -60,7 +59,7 @@ public class CurrentUserEndpoint {
         UserDetails userDetails = cn.topiam.employee.support.security.util.SecurityUtils
             .getCurrentUser();
         Optional<AdministratorEntity> optional = administratorRepository
-            .findById(Long.valueOf(userDetails.getId()));
+            .findById(userDetails.getId());
         if (optional.isEmpty()) {
             SecurityContextHolder.clearContext();
             throw new UserNotFoundException();

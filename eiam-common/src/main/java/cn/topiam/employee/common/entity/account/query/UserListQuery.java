@@ -22,7 +22,6 @@ import java.io.Serializable;
 
 import org.springdoc.core.annotations.ParameterObject;
 
-import cn.topiam.employee.common.enums.DataOrigin;
 import cn.topiam.employee.common.enums.UserStatus;
 
 import lombok.Data;
@@ -89,5 +88,5 @@ public class UserListQuery implements Serializable {
      * 数据来源
      */
     @Parameter(description = "数据来源")
-    private DataOrigin        dataOrigin;
+    private String            dataOrigin;
 }

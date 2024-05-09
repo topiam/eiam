@@ -18,7 +18,7 @@
 package cn.topiam.employee.authentication.otp.mail.filter;
 
 import java.io.IOException;
-import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -41,14 +41,14 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import static cn.topiam.employee.common.constant.AuthorizeConstants.LOGIN_PATH;
 import static cn.topiam.employee.common.enums.MessageNoticeChannel.MAIL;
+import static cn.topiam.employee.support.security.constant.SecurityConstants.LOGIN_PATH;
 
 /**
  * 发送OTP
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/1/1 22:01
+ * Created by support@topiam.cn on 2023/1/1 22:01
  */
 public class SendMailOtpFilter extends OncePerRequestFilter {
 
@@ -90,8 +90,8 @@ public class SendMailOtpFilter extends OncePerRequestFilter {
 
     public boolean sendOtp(String recipient) {
         //判断是否存在用户
-        UserEntity user = userRepository.findByEmail(recipient);
-        if (!Objects.isNull(user)) {
+        Optional<UserEntity> user = userRepository.findByEmail(recipient);
+        if (user.isPresent()) {
             otpContextHelp.sendOtp(recipient, MailType.LOGIN.getCode(), MAIL);
             return true;
         }

@@ -27,7 +27,7 @@ import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.console.pojo.result.setting.GeoIpProviderResult;
 import cn.topiam.employee.console.pojo.save.setting.GeoIpProviderSaveParam;
 import cn.topiam.employee.console.service.setting.GeoLocationSettingService;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.context.ApplicationContextService;
 import cn.topiam.employee.support.geo.GeoLocation;
 import cn.topiam.employee.support.lock.Lock;
 import cn.topiam.employee.support.preview.Preview;
@@ -40,13 +40,13 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.GEO_LOCATION;
 import static cn.topiam.employee.common.constant.SettingConstants.SETTING_PATH;
-import static cn.topiam.employee.core.setting.constant.GeoIpProviderConstants.IPADDRESS_SETTING_NAME;
+import static cn.topiam.employee.core.setting.GeoIpProviderConstants.IPADDRESS_SETTING_NAME;
 
 /**
  * IP地址库
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/13 22:09
+ * Created by support@topiam.cn on 2021/11/13 22:09
  */
 @Validated
 @Tag(name = "IP地址库")
@@ -98,7 +98,7 @@ public class GeoIpLibraryController {
     public ApiRestResult<Boolean> disableGeoIpLibrary() {
         Boolean setting = geoLocationSettingService.removeSetting(IPADDRESS_SETTING_NAME);
         // refresh
-        ApplicationContextHelp.refresh(GEO_LOCATION);
+        ApplicationContextService.refresh(GEO_LOCATION);
         return ApiRestResult.<Boolean> builder().result(setting).build();
     }
 

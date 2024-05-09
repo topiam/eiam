@@ -29,7 +29,7 @@ import com.google.common.collect.Lists;
  * 短信OPT认证
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020/12/16 21:34
+ * Created by support@topiam.cn on 2020/12/16 21:34
  */
 public class OtpAuthentication extends AbstractAuthenticationToken implements java.io.Serializable {
 

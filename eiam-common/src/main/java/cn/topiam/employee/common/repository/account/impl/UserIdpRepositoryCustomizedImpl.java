@@ -17,33 +17,57 @@
  */
 package cn.topiam.employee.common.repository.account.impl;
 
-import java.util.Objects;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.common.entity.account.po.UserIdpBindPO;
 import cn.topiam.employee.common.repository.account.UserIdpRepositoryCustomized;
-import cn.topiam.employee.common.repository.account.impl.mapper.UserIdpBindPoMapper;
+import cn.topiam.employee.support.repository.aspect.query.QuerySingleResult;
 import cn.topiam.employee.support.repository.page.domain.Page;
 
 import lombok.AllArgsConstructor;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import static cn.topiam.employee.common.constant.AccountConstants.USER_CACHE_NAME;
 
 /**
  * UserIdp Repository Customized
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020/12/29 21:27
+ * Created by support@topiam.cn on 2020/12/29 21:27
  */
 @Repository
 @CacheConfig(cacheNames = { USER_CACHE_NAME })
 @AllArgsConstructor
 public class UserIdpRepositoryCustomizedImpl implements UserIdpRepositoryCustomized {
+
+    /**
+     * 根据ID查询
+     *
+     * @param id {@link  String}
+     * @return {@link Optional}
+     */
+    @Override
+    @QuerySingleResult
+    public Optional<UserIdpBindPO> selectById(String id) {
+        String hql = """
+                SELECT
+                    NEW cn.topiam.employee.common.entity.account.po.UserIdpBindPO(uib.id,user.id,user.username,user.nickName,user.email,user.phone,user.phoneAreaCode,user.avatar,tpu.openId,tpu.unionId,idp.id,idp.name,idp.type,uib.bindTime)
+                FROM
+                    UserIdpBindEntity uib
+                    LEFT JOIN UserEntity user ON uib.userId = user.id
+                    LEFT JOIN ThirdPartyUserEntity tpu ON uib.thirdPartyUser.id = tpu.id
+                    LEFT JOIN IdentityProviderEntity idp ON tpu.idpId = idp.id
+                WHERE
+                    uib.id =:id
+                """;
+        TypedQuery<UserIdpBindPO> query = entityManager.createQuery(hql, UserIdpBindPO.class);
+        query.setParameter("id", id);
+        return Optional.of(query.getSingleResult());
+    }
 
     /**
      * 根据身份源ID和openId查询
@@ -53,26 +77,24 @@ public class UserIdpRepositoryCustomizedImpl implements UserIdpRepositoryCustomi
      * @return {@link Optional}
      */
     @Override
+    @QuerySingleResult
     public Optional<UserIdpBindPO> findByIdpIdAndOpenId(String idpId, String openId) {
-        //@formatter:off
-        StringBuilder builder = new StringBuilder("SELECT uidp.*,`user`.username_,idp.name_ as idp_name FROM user_idp_bind uidp LEFT JOIN `user` ON uidp.user_id = `user`.id_ AND `user`.is_deleted = '0' LEFT JOIN identity_provider idp ON uidp.idp_id = idp.id_ AND idp.is_deleted = '0' WHERE uidp.is_deleted = '0' ");
-        //身份提供商ID
-        if (StringUtils.isNoneBlank(idpId)) {
-            builder.append(" AND uidp.idp_id = '").append(idpId).append("'");
-        }
-        //OPEN ID
-        if (StringUtils.isNoneBlank(openId)) {
-            builder.append(" AND uidp.open_id = '").append(openId).append("'");
-        }
-        //@formatter:on
-        String sql = builder.toString();
-        try {
-            UserIdpBindPO userIdpBindPo = jdbcTemplate.queryForObject(sql,
-                new UserIdpBindPoMapper());
-            return Optional.ofNullable(userIdpBindPo);
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
-        }
+        String hql = """
+                SELECT
+                    NEW cn.topiam.employee.common.entity.account.po.UserIdpBindPO(uib.id,user.id,user.username,user.nickName,user.email,user.phone,user.phoneAreaCode,user.avatar,tpu.openId,tpu.unionId,idp.id,idp.name,idp.type,uib.bindTime)
+                FROM
+                    UserIdpBindEntity uib
+                    LEFT JOIN UserEntity user ON uib.userId = user.id
+                    LEFT JOIN ThirdPartyUserEntity tpu ON uib.thirdPartyUser.id = tpu.id
+                    LEFT JOIN IdentityProviderEntity idp ON tpu.idpId = idp.id
+                WHERE
+                    tpu.idpId =:idpId
+                    AND tpu.openId =:openId
+                """;
+        TypedQuery<UserIdpBindPO> query = entityManager.createQuery(hql, UserIdpBindPO.class);
+        query.setParameter("idpId", idpId);
+        query.setParameter("openId", openId);
+        return Optional.of(query.getSingleResult());
     }
 
     /**
@@ -83,49 +105,51 @@ public class UserIdpRepositoryCustomizedImpl implements UserIdpRepositoryCustomi
      * @return {@link Optional}
      */
     @Override
-    public Optional<UserIdpBindPO> findByIdpIdAndUserId(String idpId, Long userId) {
-        //@formatter:off
-        StringBuilder builder = new StringBuilder("SELECT uidp.*,`user`.username_,idp.name_ as idp_name FROM user_idp_bind uidp LEFT JOIN `user` ON uidp.user_id = `user`.id_ AND `user`.is_deleted = '0' LEFT JOIN identity_provider idp ON uidp.idp_id = idp.id_ AND idp.is_deleted = '0' WHERE uidp.is_deleted = '0' ");
-        //身份提供商ID
-        if (StringUtils.isNoneBlank(idpId)) {
-            builder.append(" AND uidp.idp_id = '").append(idpId).append("'");
-        }
-        //用户ID
-        if (Objects.nonNull(userId)) {
-            builder.append(" AND uidp.user_id = '").append(userId).append("'");
-        }
-        //@formatter:on
-        String sql = builder.toString();
-        try {
-            UserIdpBindPO userIdpBindPo = jdbcTemplate.queryForObject(sql,
-                new UserIdpBindPoMapper());
-            return Optional.ofNullable(userIdpBindPo);
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
-        }
+    @QuerySingleResult
+    public Optional<UserIdpBindPO> findByIdpIdAndUserId(String idpId, String userId) {
+        String hql = """
+                SELECT
+                    NEW cn.topiam.employee.common.entity.account.po.UserIdpBindPO(uib.id,user.id,user.username,user.nickName,user.email,user.phone,user.phoneAreaCode,user.avatar,tpu.openId,tpu.unionId,idp.id,idp.name,idp.type,uib.bindTime)
+                FROM
+                    UserIdpBindEntity uib
+                    LEFT JOIN UserEntity user ON uib.userId = user.id
+                    LEFT JOIN ThirdPartyUserEntity tpu ON uib.thirdPartyUser.id = tpu.id
+                    LEFT JOIN IdentityProviderEntity idp ON tpu.idpId = idp.id
+                WHERE
+                     uib.userId =:userId
+                     AND tpu.idpId =:idpId
+                """;
+        TypedQuery<UserIdpBindPO> query = entityManager.createQuery(hql, UserIdpBindPO.class);
+        query.setParameter("userId", userId);
+        query.setParameter("idpId", idpId);
+        return Optional.of(query.getSingleResult());
     }
 
     /**
      * 查询用户身份提供商绑定
      *
-     * @param userId {@link  Long}
+     * @param userId {@link  String}
      * @return {@link Page}
      */
     @Override
-    public Iterable<UserIdpBindPO> getUserIdpBindList(Long userId) {
-        //@formatter:off
-        StringBuilder builder = new StringBuilder("SELECT uidp.*,idp.name_ as idp_name FROM user_idp_bind uidp LEFT JOIN identity_provider idp ON uidp.idp_id = idp.id_ AND idp.is_deleted = '0' WHERE uidp.is_deleted = '0' ");
-        //用户ID
-        if (Objects.nonNull(userId)) {
-            builder.append(" AND uidp.user_id = '").append(userId).append("'");
-        }
-        //@formatter:on
-        String sql = builder.toString();
-        return jdbcTemplate.query(sql, new UserIdpBindPoMapper());
+    public Iterable<UserIdpBindPO> getUserIdpBindList(String userId) {
+        String hql = """
+                SELECT
+                    NEW cn.topiam.employee.common.entity.account.po.UserIdpBindPO(uib.id,user.id,user.username,user.nickName,user.email,user.phone,user.phoneAreaCode,user.avatar,uib.thirdPartyUser.openId,uib.thirdPartyUser.unionId,idp.id,idp.name,idp.type,uib.bindTime)
+                FROM
+                    UserIdpBindEntity uib
+                    LEFT JOIN UserEntity user ON uib.userId = user.id
+                    LEFT JOIN IdentityProviderEntity idp ON uib.thirdPartyUser.idpId = idp.id
+                WHERE
+                    uib.userId =:userId
+                """;
+        TypedQuery<UserIdpBindPO> query = entityManager.createQuery(hql, UserIdpBindPO.class);
+        query.setParameter("userId", userId);
+        return query.getResultList();
     }
 
     /**
-     * JdbcTemplate
+     * EntityManager
      */
-    private final JdbcTemplate jdbcTemplate;
+    private final EntityManager entityManager;
 }

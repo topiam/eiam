@@ -26,7 +26,7 @@ import cn.topiam.employee.common.entity.account.UserDetailEntity;
  * User Detail Repository Customized
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020/12/29 21:27
+ * Created by support@topiam.cn on 2020/12/29 21:27
  */
 public interface UserDetailRepositoryCustomized {
     /**

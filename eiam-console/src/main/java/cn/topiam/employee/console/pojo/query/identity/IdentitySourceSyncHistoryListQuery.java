@@ -36,7 +36,7 @@ import jakarta.validation.constraints.NotBlank;
  * 查询身份源列表入参
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/14 01:29
+ * Created by support@topiam.cn on 2022/2/14 01:29
  */
 @Data
 @Schema(description = "查询身份源同步历史列表入参")

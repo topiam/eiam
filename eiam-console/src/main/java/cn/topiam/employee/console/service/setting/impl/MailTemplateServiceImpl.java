@@ -42,10 +42,11 @@ import cn.topiam.employee.console.pojo.result.setting.EmailTemplateListResult;
 import cn.topiam.employee.console.pojo.result.setting.EmailTemplateResult;
 import cn.topiam.employee.console.pojo.save.setting.EmailCustomTemplateSaveParam;
 import cn.topiam.employee.console.service.setting.MailTemplateService;
+import cn.topiam.employee.support.context.ApplicationContextService;
 import cn.topiam.employee.support.util.BeanUtils;
-import static cn.topiam.employee.core.setting.constant.MessageSettingConstants.SETTING_EMAIL_TEMPLATE_CACHE_NAME;
-import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
-import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
+import static cn.topiam.employee.core.setting.MessageSettingConstants.SETTING_EMAIL_TEMPLATE_CACHE_NAME;
+import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_BY;
+import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_TIME;
 
 /**
  * <p>
@@ -53,7 +54,7 @@ import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIF
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-08-13
+ * Created by support@topiam.cn on 2020-08-13
  */
 @Service
 @CacheConfig(cacheNames = SETTING_EMAIL_TEMPLATE_CACHE_NAME)
@@ -71,7 +72,7 @@ public class MailTemplateServiceImpl extends SettingServiceImpl implements MailT
      * @return SettingMailTemplateEntity
      */
     @Override
-    @Cacheable(key = "#result.type.code", unless = "#result == null")
+    @Cacheable(key = "#type.code", unless = "#result == null")
     public MailTemplateEntity getEmailTemplateByType(MailType type) {
         return mailTemplateRepository.findByType(type);
     }
@@ -92,14 +93,14 @@ public class MailTemplateServiceImpl extends SettingServiceImpl implements MailT
             .emailTemplateConfigSaveParamConvertToEntity(param);
         entity.setType(type);
         //查询数据库
-        MailTemplateEntity template = getEmailTemplateByType(type);
+        MailTemplateEntity template = getSelf().getEmailTemplateByType(type);
         if (!Objects.isNull(template)) {
             BeanUtils.merge(entity, template, LAST_MODIFIED_BY, LAST_MODIFIED_TIME);
             return mailTemplateRepository.save(template);
         }
         entity = mailTemplateRepository.save(entity);
-        AuditContext.setTarget(
-            Target.builder().id(entity.getId().toString()).type(TargetType.MAIL_TEMPLATE).build());
+        AuditContext.setTarget(Target.builder().id(entity.getId()).name(entity.getType().getName())
+            .type(TargetType.MAIL_TEMPLATE).build());
         return entity;
     }
 
@@ -113,7 +114,7 @@ public class MailTemplateServiceImpl extends SettingServiceImpl implements MailT
     public EmailTemplateResult getEmailTemplate(MailType templateType) {
         //构建查询条件
         //查询
-        MailTemplateEntity template = getEmailTemplateByType(templateType);
+        MailTemplateEntity template = getSelf().getEmailTemplateByType(templateType);
         //如果数据库为空，查找默认模板
         EmailTemplateResult result;
         if (Objects.isNull(template)) {
@@ -151,7 +152,11 @@ public class MailTemplateServiceImpl extends SettingServiceImpl implements MailT
     @Override
     @CacheEvict(key = "#type.code")
     public void disableCustomEmailTemplate(MailType type) {
-        mailTemplateRepository.deleteByType(type.getCode());
+        mailTemplateRepository.deleteByType(type);
+    }
+
+    private MailTemplateService getSelf() {
+        return ApplicationContextService.getBean(MailTemplateService.class);
     }
 
     /**

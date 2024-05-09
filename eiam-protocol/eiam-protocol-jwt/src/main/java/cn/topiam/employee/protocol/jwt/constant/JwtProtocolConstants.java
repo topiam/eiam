@@ -24,7 +24,7 @@ import static cn.topiam.employee.support.constant.EiamConstants.COLON;
  * 协议常量
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/12/8 21:29
+ * Created by support@topiam.cn on 2021/12/8 21:29
  */
 public class JwtProtocolConstants {
 
@@ -42,6 +42,6 @@ public class JwtProtocolConstants {
 
     public static final String JWT_ERROR_URI             = "https://eiam.topiam.cn";
 
-    public static final String S_ID                      = "sid";
+    public static final String POST_LOGOUT_REDIRECT_URI  = "post_logout_redirect_uri";
 
 }

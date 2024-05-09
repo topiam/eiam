@@ -36,7 +36,7 @@ import cn.topiam.employee.common.repository.account.UserDetailRepositoryCustomiz
  * User Detail Repository Customized
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020/12/29 21:27
+ * Created by support@topiam.cn on 2020/12/29 21:27
  */
 @Repository
 public class UserDetailRepositoryCustomizedImpl implements UserDetailRepositoryCustomized {
@@ -49,14 +49,14 @@ public class UserDetailRepositoryCustomizedImpl implements UserDetailRepositoryC
     @Override
     public void batchSave(List<UserDetailEntity> data) {
         jdbcTemplate.batchUpdate(
-            "INSERT INTO user_detail (id_, user_id, id_type, id_card, website_,address_,create_by,create_time,update_by,update_time,remark_,is_deleted) values (?,?,?,?,?,?,?,?,?,?,?,?)",
+            "INSERT INTO eiam_user_detail (id_, user_id, id_type, id_card, website_,address_,create_by,create_time,update_by,update_time,remark_,is_deleted) values (?,?,?,?,?,?,?,?,?,?,?,?)",
             new BatchPreparedStatementSetter() {
 
                 @Override
                 public void setValues(@NotNull PreparedStatement ps, int i) throws SQLException {
                     UserDetailEntity entity = data.get(i);
-                    ps.setLong(1, entity.getId());
-                    ps.setLong(2, entity.getUserId());
+                    ps.setString(1, entity.getId());
+                    ps.setString(2, entity.getUserId());
                     ps.setString(3,
                         Objects.isNull(entity.getIdType()) ? null : entity.getIdType().getCode());
                     ps.setString(4, entity.getIdCard());
@@ -85,13 +85,13 @@ public class UserDetailRepositoryCustomizedImpl implements UserDetailRepositoryC
     @Override
     public void batchUpdate(ArrayList<UserDetailEntity> list) {
         jdbcTemplate.batchUpdate(
-            "UPDATE  user_detail SET user_id=?,id_type=?, id_card=?, website_=? ,address_=?,create_by=?,create_time=?,update_by=?,update_time=?,remark_=? WHERE id_=?",
+            "UPDATE  eiam_user_detail SET user_id=?,id_type=?, id_card=?, website_=? ,address_=?,create_by=?,create_time=?,update_by=?,update_time=?,remark_=? WHERE id_=?",
             new BatchPreparedStatementSetter() {
 
                 @Override
                 public void setValues(@NotNull PreparedStatement ps, int i) throws SQLException {
                     UserDetailEntity entity = list.get(i);
-                    ps.setLong(1, entity.getUserId());
+                    ps.setString(1, entity.getUserId());
                     ps.setString(2,
                         Objects.isNull(entity.getIdType()) ? null : entity.getIdType().getCode());
                     ps.setString(3, entity.getIdCard());
@@ -102,7 +102,7 @@ public class UserDetailRepositoryCustomizedImpl implements UserDetailRepositoryC
                     ps.setString(8, entity.getUpdateBy());
                     ps.setTimestamp(9, Timestamp.valueOf(entity.getUpdateTime()));
                     ps.setString(10, entity.getRemark());
-                    ps.setLong(11, entity.getId());
+                    ps.setString(11, entity.getId());
                 }
 
                 @Override

@@ -26,7 +26,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import cn.topiam.employee.console.authentication.AuthenticationTrustResolverImpl;
 import cn.topiam.employee.support.result.ApiRestResult;
+import cn.topiam.employee.support.security.password.authentication.NeedChangePasswordAuthenticationToken;
 
 import lombok.Builder;
 import lombok.Data;
@@ -34,18 +36,19 @@ import lombok.extern.slf4j.Slf4j;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import static cn.topiam.employee.common.constant.SessionConstants.CURRENT_STATUS;
+import static cn.topiam.employee.support.security.constant.SecurityConstants.REQUIRE_RESET_PASSWORD;
 
 /**
  * 会话状态
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/7/30 21:09
+ * Created by support@topiam.cn on 2022/7/30 21:09
  */
 @Slf4j
 @RestController
 @RequestMapping
 public class CurrentSessionStatusEndpoint {
-    private final AuthenticationTrustResolver delegate = new org.springframework.security.authentication.AuthenticationTrustResolverImpl();
+    private final AuthenticationTrustResolver delegate = new AuthenticationTrustResolverImpl();
 
     /**
      * 获取当前登录状态
@@ -56,12 +59,13 @@ public class CurrentSessionStatusEndpoint {
     public ApiRestResult<CurrentStatusResult> getCurrentStatus() {
         CurrentStatusResult.CurrentStatusResultBuilder builder = CurrentStatusResult.builder();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // 是否认证
         builder.authenticated(authentication.isAuthenticated());
         if (delegate.isAnonymous(authentication)) {
             builder.authenticated(false);
         }
-        //其他信息
+        if (authentication instanceof NeedChangePasswordAuthenticationToken) {
+            builder.status(REQUIRE_RESET_PASSWORD);
+        }
         return ApiRestResult.ok(builder.build());
     }
 
@@ -79,5 +83,10 @@ public class CurrentSessionStatusEndpoint {
          * 是否认证
          */
         private Boolean authenticated;
+
+        /**
+         * status
+         */
+        private String  status;
     }
 }

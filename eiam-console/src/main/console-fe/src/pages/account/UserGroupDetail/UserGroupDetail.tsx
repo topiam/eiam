@@ -27,7 +27,7 @@ import { UserGroupDetailTabs } from './constant';
 import queryString from 'query-string';
 import { useIntl, useLocation } from '@umijs/max';
 import useStyles from './style';
-import AppAccess from './components/AppAccess';
+import AccessStrategy from './components/AccessStrategy';
 import { ExclamationCircleFilled } from '@ant-design/icons';
 
 /**
@@ -91,10 +91,10 @@ export default () => {
         ) : (
           <ProDescriptions<Record<string, string>>
             size="small"
-            column={isMobile ? 1 : 3}
+            column={isMobile ? 1 : 2}
             //只有具有修改权限才可以修改该信息
             editable={{
-              onSave: async (key, record) => {
+              onSave: async (_key, record) => {
                 let success: boolean;
                 const result = await updateUserGroup({ ...record });
                 success = result.success;
@@ -116,7 +116,15 @@ export default () => {
               fieldProps={{
                 maxLength: 8,
               }}
-              copyable
+            />
+            <ProDescriptions.Item
+              label={intl.formatMessage({
+                id: 'pages.account.user_group_detail.descriptions.remark',
+              })}
+              className={styles.descriptionRemark}
+              dataIndex="remark"
+              valueType={'textarea'}
+              fieldProps={{ rows: 2, maxLength: 20 }}
             />
             <ProDescriptions.Item
               dataIndex="code"
@@ -127,13 +135,11 @@ export default () => {
               editable={false}
             />
             <ProDescriptions.Item
+              dataIndex="createTime"
+              editable={false}
               label={intl.formatMessage({
-                id: 'pages.account.user_group_detail.descriptions.remark',
+                id: 'pages.account.user_group_detail.descriptions.create_time',
               })}
-              className={styles.descriptionRemark}
-              dataIndex="remark"
-              valueType={'textarea'}
-              fieldProps={{ rows: 2, maxLength: 20 }}
             />
           </ProDescriptions>
         )
@@ -182,7 +188,9 @@ export default () => {
               okCancel: true,
               cancelText: intl.formatMessage({ id: 'app.cancel' }),
               onOk: async () => {
-                const { success } = await removeUserGroup(id);
+                const { success } = await removeUserGroup(id).catch(({ response: { data } }) => {
+                  return data;
+                });
                 if (success) {
                   message.success(intl.formatMessage({ id: 'app.operation_success' }));
                   confirmed.destroy();
@@ -207,7 +215,7 @@ export default () => {
       {/*成员信息*/}
       {type === UserGroupDetailTabs.member && <MemberList id={id} />}
       {/*授权应用*/}
-      {type === UserGroupDetailTabs.app_access && <AppAccess userGroupId={id} />}
+      {type === UserGroupDetailTabs.app_access && <AccessStrategy userGroupId={id} />}
     </PageContainer>
   );
 };

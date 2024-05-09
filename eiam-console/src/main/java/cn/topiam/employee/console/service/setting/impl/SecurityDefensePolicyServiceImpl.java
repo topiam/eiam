@@ -29,17 +29,17 @@ import cn.topiam.employee.console.pojo.result.setting.EmailProviderConfigResult;
 import cn.topiam.employee.console.pojo.result.setting.SecurityDefensePolicyConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.SecurityDefensePolicyParam;
 import cn.topiam.employee.console.service.setting.SecurityDefensePolicyService;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.context.ApplicationContextService;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.security.util.ContentSecurityPolicyUtils;
 
 import lombok.extern.slf4j.Slf4j;
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.DEFAULT_SECURITY_FILTER_CHAIN;
-import static cn.topiam.employee.core.setting.constant.SecuritySettingConstants.SECURITY_DEFENSE_POLICY_KEY;
+import static cn.topiam.employee.core.setting.SecuritySettingConstants.SECURITY_DEFENSE_POLICY_KEY;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2023-03-09
+ * Created by support@topiam.cn on 2023-03-09
  */
 @Slf4j
 @Service
@@ -69,7 +69,7 @@ public class SecurityDefensePolicyServiceImpl extends SettingServiceImpl
         List<SettingEntity> list = securityDefensePolicyConverter
             .securityDefensePolicyParamToEntity(param);
         Boolean save = settingRepository.save(list);
-        ApplicationContextHelp.refresh(DEFAULT_SECURITY_FILTER_CHAIN);
+        ApplicationContextService.refresh(DEFAULT_SECURITY_FILTER_CHAIN);
         return save;
     }
 

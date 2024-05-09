@@ -19,13 +19,14 @@ package cn.topiam.employee.protocol.code.configurer;
 
 import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.util.matcher.RequestMatcher;
+
+import cn.topiam.employee.protocol.code.EndpointMatcher;
 
 /**
  * Base configurer
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/27 21:06
+ * Created by support@topiam.cn on 2023/6/27 21:06
  */
 @SuppressWarnings("AlibabaClassNamingShouldBeCamel")
 public abstract class AbstractConfigurer {
@@ -52,9 +53,9 @@ public abstract class AbstractConfigurer {
     /**
      * 获取请求匹配器
      *
-     * @return {@link RequestMatcher}
+     * @return {@link EndpointMatcher}
      */
-    public abstract RequestMatcher getRequestMatcher();
+    public abstract EndpointMatcher getEndpointMatcher();
 
     public final <T> T postProcess(T object) {
         return (T) this.objectPostProcessor.postProcess(object);

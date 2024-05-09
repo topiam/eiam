@@ -18,12 +18,8 @@
 export default {
   'menu.welcome': '欢迎',
   'menu.login': '登录',
-  'menu.register': '注册',
-  'menu.register.result': '注册结果',
-  'menu.dashboard': 'Dashboard',
-  'menu.dashboard.analysis': '分析页',
-  'menu.dashboard.monitor': '监控页',
-  'menu.dashboard.workplace': '工作台',
+  'menu.reset-password': '重置密码',
+  'menu.dashboard': '总览',
   'menu.exception.403': '403',
   'menu.exception.404': '404',
   'menu.exception.500': '500',
@@ -75,7 +71,7 @@ export default {
   'menu.setting.message': '消息设置',
   'menu.setting.geoip': 'IP地理库',
   'menu.setting.storage': '存储配置',
+  'menu.session-expired': '会话过期',
   'menu.monitor': '系统监控',
   'menu.monitor.session': '会话管理',
-  'menu.session-expired': '会话过期',
 };

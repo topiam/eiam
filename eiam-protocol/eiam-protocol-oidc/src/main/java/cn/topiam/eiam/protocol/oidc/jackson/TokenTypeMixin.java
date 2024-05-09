@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  * TokenTypeMixin
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/30 21:10
+ * Created by support@topiam.cn on 2023/6/30 21:10
  */
 @SuppressWarnings("AlibabaAbstractClassShouldStartWithAbstractNaming")
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)

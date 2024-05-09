@@ -22,14 +22,13 @@ import java.io.Serializable;
 
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
 * 协议端点域
 *
 * @author TopIAM
-* Created by support@topiam.cn on  2022/6/4 23:37
+* Created by support@topiam.cn on 2022/6/4 23:37
 */
 @Data
 @Schema(description = "协议端点")
@@ -41,6 +40,6 @@ public class AppFormProtocolEndpoint implements Serializable {
     /**
      * IDP SSO 端点
      */
-    @Parameter(description = "IDP SSO 端点")
+    @Schema(description = "IDP SSO 端点")
     private String            idpSsoEndpoint;
 }

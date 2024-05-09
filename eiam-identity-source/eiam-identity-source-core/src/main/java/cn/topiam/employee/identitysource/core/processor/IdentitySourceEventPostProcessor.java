@@ -23,7 +23,7 @@ import cn.topiam.employee.identitysource.core.processor.modal.IdentitySourceEven
  * 身份源数据 event 处理器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/3/1 22:04
+ * Created by support@topiam.cn on 2022/3/1 22:04
  */
 public interface IdentitySourceEventPostProcessor {
     /**

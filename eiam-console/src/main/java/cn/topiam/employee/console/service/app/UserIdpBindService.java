@@ -25,7 +25,7 @@ import cn.topiam.employee.console.pojo.result.app.UserIdpBindListResult;
  * 用户身份提供商绑定
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/12/11 21:10
+ * Created by support@topiam.cn on 2021/12/11 21:10
  */
 public interface UserIdpBindService {
     /**

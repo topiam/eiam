@@ -19,11 +19,15 @@ package cn.topiam.employee.console.pojo.result.account;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.Data;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIME_FORMATTER_PATTERN;
 
 /**
  * 查询用户分组详情
@@ -41,6 +45,7 @@ public class UserGroupResult implements Serializable {
      */
     @Parameter(description = "用户组ID")
     private String            id;
+
     /**
      * 用户组名称
      */
@@ -58,4 +63,11 @@ public class UserGroupResult implements Serializable {
      */
     @Parameter(description = "备注")
     private String            remark;
+
+    /**
+     * 创建时间
+     */
+    @DateTimeFormat(pattern = DEFAULT_DATE_TIME_FORMATTER_PATTERN)
+    @Parameter(description = "创建时间")
+    private LocalDateTime     createTime;
 }

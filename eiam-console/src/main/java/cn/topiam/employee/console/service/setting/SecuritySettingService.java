@@ -26,7 +26,7 @@ import cn.topiam.employee.console.pojo.save.setting.SecurityBasicSaveParam;
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-10-01
+ * Created by support@topiam.cn on 2020-10-01
  */
 public interface SecuritySettingService extends SettingService {
 

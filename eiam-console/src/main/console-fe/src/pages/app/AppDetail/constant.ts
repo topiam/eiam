@@ -32,16 +32,6 @@ export enum ConfigTabs {
 }
 
 /**
- * SSO 发起方
- */
-export enum SsoInitiator {
-  //应用
-  APP = 'only_app_init_sso',
-  //应用门户同时发起
-  PORTAL_OR_APP = 'portal_or_app_init_sso',
-}
-
-/**
  * SSO 授权范围
  */
 export enum SsoScope {

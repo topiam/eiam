@@ -28,7 +28,7 @@ import jakarta.servlet.http.HttpServletRequest;
  * 身份源Provider
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/28 22:35
+ * Created by support@topiam.cn on 2022/2/28 22:35
  */
 public interface IdentitySource<T extends IdentitySourceConfig> {
     /**

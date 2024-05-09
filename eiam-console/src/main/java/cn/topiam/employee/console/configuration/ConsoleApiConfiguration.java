@@ -17,26 +17,18 @@
  */
 package cn.topiam.employee.console.configuration;
 
-import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 import cn.topiam.employee.EiamConsoleApplication;
-import cn.topiam.employee.common.constant.AuthnConstants;
 import cn.topiam.employee.support.util.AppVersionUtils;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
-import static cn.topiam.employee.common.constant.AccountConstants.ACCOUNT_API_DOC_GROUP_NAME;
-import static cn.topiam.employee.common.constant.AccountConstants.ACCOUNT_API_PATHS;
-import static cn.topiam.employee.common.constant.AnalysisConstants.ANALYSIS_GROUP_NAME;
-import static cn.topiam.employee.common.constant.AnalysisConstants.ANALYSIS_PATH;
-import static cn.topiam.employee.common.constant.AppConstants.*;
-import static cn.topiam.employee.common.constant.AuthnConstants.AUTHN_PATH;
-import static cn.topiam.employee.common.constant.SettingConstants.SETTING_GROUP_NAME;
-import static cn.topiam.employee.common.constant.SettingConstants.SETTING_PATH;
 
 /**
  * ApiConfiguration
@@ -47,65 +39,6 @@ import static cn.topiam.employee.common.constant.SettingConstants.SETTING_PATH;
 @Configuration
 public class ConsoleApiConfiguration {
 
-    public ConsoleApiConfiguration(Environment environment) {
-        this.environment = environment;
-    }
-
-    /**
-     * 账户 RestAPI
-     *
-     * @return {@link GroupedOpenApi}
-     */
-    @Bean
-    public GroupedOpenApi accountRestApi() {
-        return GroupedOpenApi.builder().group(ACCOUNT_API_DOC_GROUP_NAME)
-            .pathsToMatch(ACCOUNT_API_PATHS).build();
-    }
-
-    /**
-     * 应用管理 RestAPI
-     *
-     * @return {@link GroupedOpenApi}
-     */
-    @Bean
-    public GroupedOpenApi applicationRestApi() {
-        return GroupedOpenApi.builder().group(APP_GROUP_NAME).pathsToMatch(APP_PATH + "/**")
-            .build();
-    }
-
-    /**
-     * 系统认证 RestAPI
-     *
-     * @return {@link GroupedOpenApi}
-     */
-    @Bean
-    public GroupedOpenApi authenticationRestApi() {
-        return GroupedOpenApi.builder().group(AuthnConstants.AUTHENTICATION_GROUP_NAME)
-            .pathsToMatch(AUTHN_PATH + "/**").build();
-    }
-
-    /**
-     * 分析 RestAPI
-     *
-     * @return {@link GroupedOpenApi}
-     */
-    @Bean
-    public GroupedOpenApi analysisRestApi() {
-        return GroupedOpenApi.builder().group(ANALYSIS_GROUP_NAME)
-            .pathsToMatch(ANALYSIS_PATH + "/**").build();
-    }
-
-    /**
-     * 系统设置 RestAPI
-     *
-     * @return {@link GroupedOpenApi}
-     */
-    @Bean
-    public GroupedOpenApi settingRestApi() {
-        return GroupedOpenApi.builder().group(SETTING_GROUP_NAME).pathsToMatch(SETTING_PATH + "/**")
-            .build();
-    }
-
     /**
      * API INFO
      *
@@ -114,13 +47,13 @@ public class ConsoleApiConfiguration {
     private Info info() {
         Contact contact = new Contact();
         contact.setEmail("support@topiam.cn");
-        contact.setName("TopIAM");
+        contact.setName("TOPIAM");
         contact.setUrl("https://eiam.topiam.cn");
         return new Info()
             //title
             .title(environment.getProperty("spring.application.name"))
             //描述
-            .description("REST API 文档")
+            .description("TOPIAM 控制台 REST API 文档")
             //服务条款网址
             .termsOfService("https://eiam.topiam.cn")
             //内容
@@ -129,11 +62,24 @@ public class ConsoleApiConfiguration {
             .version(AppVersionUtils.getVersion(EiamConsoleApplication.class));
     }
 
+    /**
+     * 定义openapi
+     *
+     * @return {@link OpenAPI}
+     */
     @Bean
     public OpenAPI openApi() {
-        return new OpenAPI().info(info());
+        OpenAPI openApi = new OpenAPI();
+        openApi.setComponents(new Components());
+        openApi.setPaths(new Paths());
+        openApi.setInfo(info());
+        return openApi;
     }
 
     private final Environment environment;
+
+    public ConsoleApiConfiguration(Environment environment) {
+        this.environment = environment;
+    }
 
 }

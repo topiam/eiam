@@ -30,7 +30,7 @@ import jakarta.validation.constraints.NotEmpty;
  * 忘记密码入参
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/02/27 21:15
+ * Created by support@topiam.cn on 2023/02/27 21:15
  */
 @Data
 @Schema(description = "忘记密码入参")

@@ -15,15 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { App, Avatar, Button, List, Popconfirm, Skeleton } from 'antd';
+import { App, Avatar, Button, List, Skeleton } from 'antd';
 import React, { Fragment, useState } from 'react';
-import { useIntl } from '@@/exports';
+import { history, useIntl } from '@@/exports';
 import { useAsyncEffect } from 'ahooks';
 import { getBoundIdpList, unbindIdp } from '@/pages/Account/service';
 import { GetBoundIdpList } from '@/pages/Account/data.d';
 import { ICON_LIST } from '@/components/IconFont/constant';
-import { QuestionCircleOutlined } from '@ant-design/icons';
 import { createStyles } from 'antd-style';
+import { openPopup } from '@/utils/popup';
+import queryString from 'query-string';
 
 const useStyle = createStyles(({ prefixCls }) => {
   const antCls = `.${prefixCls}`;
@@ -48,14 +49,9 @@ const useStyle = createStyles(({ prefixCls }) => {
 const BindingView: React.FC = () => {
   const { styles } = useStyle();
   const intl = useIntl();
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   const [loading, setLoading] = useState<boolean>(false);
   const [boundIdpList, setBoundIdpList] = useState<GetBoundIdpList[]>([]);
-
-  useAsyncEffect(async () => {
-    setLoading(true);
-    await getBindList();
-  }, []);
 
   async function getBindList() {
     const { result, success } = await getBoundIdpList().finally(() => {
@@ -66,6 +62,11 @@ const BindingView: React.FC = () => {
     }
   }
 
+  useAsyncEffect(async () => {
+    setLoading(true);
+    await getBindList();
+  }, []);
+
   const getData = () => {
     return boundIdpList?.map((idp) => {
       return {
@@ -73,33 +74,61 @@ const BindingView: React.FC = () => {
         description: idp.bound ? `已绑定${idp.name}账号` : `未绑定${idp.name}账号`,
         actions: [
           idp.bound ? (
-            <Popconfirm
-              title={intl.formatMessage({ id: 'pages.account.unbind.confirm' })}
-              placement="bottomRight"
-              icon={
-                <QuestionCircleOutlined
-                  style={{
-                    color: 'red',
-                  }}
-                />
-              }
-              onConfirm={async () => {
-                const { success } = await unbindIdp(idp.idpId);
-                if (success) {
-                  message.success(intl.formatMessage({ id: 'app.operation_success' }));
-                  await getBindList();
-                }
+            <Button
+              type="link"
+              danger
+              key="unbind"
+              onClick={(event) => {
+                event.stopPropagation();
+                modal.warning({
+                  closable: false,
+                  maskClosable: false,
+                  title: '系统通知',
+                  content: intl.formatMessage({ id: 'page.account.unbind_confirm_content' }),
+                  okText: intl.formatMessage({ id: 'app.confirm' }),
+                  okType: 'primary',
+                  centered: true,
+                  okCancel: true,
+                  cancelText: intl.formatMessage({ id: 'app.cancel' }),
+                  onOk: async () => {
+                    const { success } = await unbindIdp(idp.id);
+                    if (success) {
+                      message.success('解绑成功');
+                      await getBindList();
+                    }
+                  },
+                });
               }}
-              okText={intl.formatMessage({ id: 'app.yes' })}
-              cancelText={intl.formatMessage({ id: 'app.no' })}
-              key="offline"
             >
-              <Button type="link" danger key="unbind">
-                {intl.formatMessage({ id: 'page.account.unbind' })}
-              </Button>
-            </Popconfirm>
+              {intl.formatMessage({ id: 'page.account.unbind' })}
+            </Button>
           ) : (
-            <Button type="link" key="bind" disabled>
+            <Button
+              type="link"
+              key="bind"
+              onClick={() => {
+                const query = queryString.parse(history.location.search);
+                const { redirect_uri } = query as { redirect_uri: string };
+                let path = idp.authorizationUri;
+                if (redirect_uri) {
+                  path = `${path}?redirect_uri=${redirect_uri}`;
+                }
+                openPopup(path, async (event, popup) => {
+                  if (event.source !== popup) {
+                    return;
+                  }
+                  const result = JSON.parse(event.data);
+                  if (result.success) {
+                    // 查询数据
+                    message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                    setLoading(true);
+                    await getBindList();
+                  } else {
+                    message.error(result.message);
+                  }
+                });
+              }}
+            >
               {intl.formatMessage({ id: 'page.account.bind' })}
             </Button>
           ),

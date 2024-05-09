@@ -90,7 +90,7 @@ public interface AppGroupConverter {
      * @return {@link AppGroupEntity}
      */
     @Mapping(target = "type", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
+
     @Mapping(target = "updateTime", ignore = true)
     @Mapping(target = "updateBy", ignore = true)
     @Mapping(target = "createTime", ignore = true)
@@ -104,7 +104,7 @@ public interface AppGroupConverter {
      * @return {@link AppAccountEntity}
      */
     @Mapping(target = "type", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "updateTime", ignore = true)
     @Mapping(target = "updateBy", ignore = true)

@@ -39,13 +39,13 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.google.common.collect.Lists;
 
-import cn.topiam.employee.authentication.common.authentication.IdpUserDetails;
-import cn.topiam.employee.authentication.common.filter.AbstractIdpAuthenticationProcessingFilter;
-import cn.topiam.employee.authentication.common.service.UserIdpService;
-import cn.topiam.employee.authentication.github.GithubIdpOauthConfig;
-import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
-import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
-import cn.topiam.employee.core.help.ServerHelp;
+import cn.topiam.employee.authentication.common.IdentityProviderAuthenticationService;
+import cn.topiam.employee.authentication.common.authentication.IdentityProviderUserDetails;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClient;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClientRepository;
+import cn.topiam.employee.authentication.common.filter.AbstractIdentityProviderAuthenticationProcessingFilter;
+import cn.topiam.employee.authentication.github.GithubIdentityProviderOAuth2Config;
+import cn.topiam.employee.core.context.ContextService;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.support.util.UrlUtils;
@@ -54,17 +54,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import static cn.topiam.employee.authentication.common.IdentityProviderType.GITHUB_OAUTH;
 import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.*;
-import static cn.topiam.employee.authentication.github.constant.GithubAuthenticationConstants.*;
+import static cn.topiam.employee.authentication.github.constant.GithubAuthenticationConstants.URL_GET_ACCESS_TOKEN;
+import static cn.topiam.employee.authentication.github.constant.GithubAuthenticationConstants.URL_GET_USER_INFO;
 
 /**
  * GITHUB登录
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/12/8 21:11
+ * Created by support@topiam.cn on 2021/12/8 21:11
  */
 @SuppressWarnings({ "AlibabaClassNamingShouldBeCamel", "DuplicatedCode" })
 public class GithubOAuth2LoginAuthenticationFilter extends
-                                                   AbstractIdpAuthenticationProcessingFilter {
+                                                   AbstractIdentityProviderAuthenticationProcessingFilter {
     final String                              ERROR_CODE                   = "error";
     public final static String                DEFAULT_FILTER_PROCESSES_URI = GITHUB_OAUTH
         .getLoginPathPrefix() + "/" + "{" + PROVIDER_CODE + "}";
@@ -74,12 +75,13 @@ public class GithubOAuth2LoginAuthenticationFilter extends
     /**
      * Creates a new instance
      *
-     * @param identityProviderRepository the {@link IdentityProviderRepository}
-     * @param userIdpService  {@link  UserIdpService}
+     * @param registeredIdentityProviderClientRepository the {@link RegisteredIdentityProviderClientRepository}
+     * @param identityProviderAuthenticationService  {@link  IdentityProviderAuthenticationService}
      */
-    public GithubOAuth2LoginAuthenticationFilter(IdentityProviderRepository identityProviderRepository,
-                                                 UserIdpService userIdpService) {
-        super(REQUEST_MATCHER, userIdpService, identityProviderRepository);
+    public GithubOAuth2LoginAuthenticationFilter(RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository,
+                                                 IdentityProviderAuthenticationService identityProviderAuthenticationService) {
+        super(REQUEST_MATCHER, identityProviderAuthenticationService,
+            registeredIdentityProviderClientRepository);
     }
 
     /**
@@ -118,9 +120,9 @@ public class GithubOAuth2LoginAuthenticationFilter extends
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
         }
         //获取身份提供商
-        IdentityProviderEntity provider = getIdentityProviderEntity(providerCode);
-        GithubIdpOauthConfig config = JSONObject.parseObject(provider.getConfig(),
-            GithubIdpOauthConfig.class);
+        RegisteredIdentityProviderClient<GithubIdentityProviderOAuth2Config> provider = getRegisteredIdentityProviderClient(
+            providerCode);
+        GithubIdentityProviderOAuth2Config config = provider.getConfig();
         if (Objects.isNull(config)) {
             logger.error("未查询到GITHUB登录配置");
             //无效身份提供商
@@ -150,9 +152,11 @@ public class GithubOAuth2LoginAuthenticationFilter extends
         }
         // 返回
         String id = result.getString("id");
-        IdpUserDetails idpUserDetails = IdpUserDetails.builder().openId(id)
+        IdentityProviderUserDetails identityProviderUserDetails = IdentityProviderUserDetails
+            .builder().openId(id).nickName(result.getString("name"))
+            .email(result.getString("email")).avatarUrl(result.getString("avatar_url"))
             .providerType(GITHUB_OAUTH).providerCode(providerCode).providerId(providerId).build();
-        return attemptAuthentication(request, response, idpUserDetails);
+        return attemptAuthentication(request, response, identityProviderUserDetails);
 
     }
 
@@ -172,8 +176,8 @@ public class GithubOAuth2LoginAuthenticationFilter extends
     }
 
     public static String getLoginUrl(String providerId) {
-        String url = ServerHelp.getPortalPublicBaseUrl() + "/" + GITHUB_OAUTH.getLoginPathPrefix()
-                     + "/" + providerId;
+        String url = ContextService.getPortalPublicBaseUrl() + "/"
+                     + GITHUB_OAUTH.getLoginPathPrefix() + "/" + providerId;
         return UrlUtils.format(url);
     }
 

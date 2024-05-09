@@ -24,15 +24,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 
-import cn.topiam.employee.core.help.ServerHelp;
+import cn.topiam.employee.core.context.ContextService;
 import cn.topiam.employee.support.result.ApiRestResult;
 import cn.topiam.employee.support.util.HttpResponseUtils;
 import cn.topiam.employee.support.util.UrlUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import static cn.topiam.employee.common.constant.AuthorizeConstants.FE_LOGIN;
-import static cn.topiam.employee.support.context.ServletContextHelp.isHtmlRequest;
+import static cn.topiam.employee.support.context.ServletContextService.isHtmlRequest;
 import static cn.topiam.employee.support.result.ApiRestResult.SUCCESS;
 
 /**
@@ -61,7 +60,7 @@ public class PortalLogoutSuccessHandler implements
                     ApiRestResult.builder().status(SUCCESS).build());
             return;
         }
-        response.sendRedirect(UrlUtils.format(ServerHelp.getPortalPublicBaseUrl() + FE_LOGIN));
+        response.sendRedirect(UrlUtils.format(ContextService.getPortalLoginUrl()));
         //@formatter:on
     }
 }

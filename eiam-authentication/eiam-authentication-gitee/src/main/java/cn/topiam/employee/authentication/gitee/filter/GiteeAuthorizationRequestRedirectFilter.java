@@ -37,13 +37,12 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import cn.topiam.employee.authentication.gitee.GiteeIdpOAuth2Config;
-import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
-import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClient;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClientRepository;
+import cn.topiam.employee.authentication.gitee.GiteeIdentityProviderOAuth2Config;
 import cn.topiam.employee.support.trace.TraceUtils;
 
 import jakarta.servlet.FilterChain;
@@ -59,7 +58,7 @@ import static cn.topiam.employee.authentication.gitee.constant.GiteeAuthenticati
  * Gitee 登录请求重定向过滤器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/20 21:22
+ * Created by support@topiam.cn on 2022/6/20 21:22
  */
 @SuppressWarnings("DuplicatedCode")
 public class GiteeAuthorizationRequestRedirectFilter extends OncePerRequestFilter {
@@ -86,10 +85,10 @@ public class GiteeAuthorizationRequestRedirectFilter extends OncePerRequestFilte
 
     private static final StringKeyGenerator                                  DEFAULT_STATE_GENERATOR        = new Base64StringKeyGenerator(
         Base64.getUrlEncoder());
-    private final IdentityProviderRepository                                 identityProviderRepository;
+    private final RegisteredIdentityProviderClientRepository                 registeredIdentityProviderClientRepository;
 
-    public GiteeAuthorizationRequestRedirectFilter(IdentityProviderRepository identityProviderRepository) {
-        this.identityProviderRepository = identityProviderRepository;
+    public GiteeAuthorizationRequestRedirectFilter(RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository) {
+        this.registeredIdentityProviderClientRepository = registeredIdentityProviderClientRepository;
     }
 
     @Override
@@ -105,14 +104,13 @@ public class GiteeAuthorizationRequestRedirectFilter extends OncePerRequestFilte
         TraceUtils.put(UUID.randomUUID().toString());
         Map<String, String> variables = matcher.getVariables();
         String providerCode = variables.get(PROVIDER_CODE);
-        Optional<IdentityProviderEntity> optional = identityProviderRepository
-            .findByCodeAndEnabledIsTrue(providerCode);
+        Optional<RegisteredIdentityProviderClient<GiteeIdentityProviderOAuth2Config>> optional = registeredIdentityProviderClientRepository
+            .findByCode(providerCode);
         if (optional.isEmpty()) {
             throw new NullPointerException("未查询到身份提供商信息");
         }
-        IdentityProviderEntity entity = optional.get();
-        GiteeIdpOAuth2Config config = JSONObject.parseObject(entity.getConfig(),
-            GiteeIdpOAuth2Config.class);
+        RegisteredIdentityProviderClient<GiteeIdentityProviderOAuth2Config> entity = optional.get();
+        GiteeIdentityProviderOAuth2Config config = entity.getConfig();
         Assert.notNull(config, "Gitee 登录配置不能为空");
         //构建授权请求
         //@formatter:off

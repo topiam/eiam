@@ -25,7 +25,7 @@ import org.springframework.security.oauth2.core.OAuth2Error;
  * OAuth2 简化模式授权请求身份验证异常
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/26 22:54
+ * Created by support@topiam.cn on 2023/6/26 22:54
  */
 @SuppressWarnings("AlibabaClassNamingShouldBeCamel")
 public class OAuth2AuthorizationImplicitRequestAuthenticationException extends

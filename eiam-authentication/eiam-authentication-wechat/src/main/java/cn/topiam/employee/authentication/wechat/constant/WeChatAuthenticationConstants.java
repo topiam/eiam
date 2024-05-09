@@ -21,7 +21,7 @@ package cn.topiam.employee.authentication.wechat.constant;
  * 微信认证常量
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/12/9 22:19
+ * Created by support@topiam.cn on 2021/12/9 22:19
  */
 public final class WeChatAuthenticationConstants {
     /**
@@ -32,6 +32,10 @@ public final class WeChatAuthenticationConstants {
         public static final String QR_CONNECT_AUTHORIZATION_REQUEST = "https://open.weixin.qq.com/connect/qrconnect";
         public static final String ACCESS_TOKEN                     = "https://api.weixin.qq.com/sns/oauth2/access_token";
         public static final String USER_INFO                        = "https://api.weixin.qq.com/sns/userinfo";
+        public static final String HEADIMGURL                       = "headimgurl";
+        public static final String NICK_NAME                        = "nickname";
+        public static final String UNION_ID                         = "unionid";
+        public static final String LANG                             = "lang";
         public static final String APP_ID                           = "appId";
         public static final String SNSAPI_LOGIN                     = "snsapi_login";
         public static final String ERROR_CODE                       = "errcode";

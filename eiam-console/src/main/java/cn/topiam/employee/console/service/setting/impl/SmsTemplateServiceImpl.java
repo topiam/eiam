@@ -37,7 +37,7 @@ import cn.topiam.employee.console.service.setting.SmsTemplateService;
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-08-13
+ * Created by support@topiam.cn on 2020-08-13
  */
 @Service
 public class SmsTemplateServiceImpl extends SettingServiceImpl implements SmsTemplateService {

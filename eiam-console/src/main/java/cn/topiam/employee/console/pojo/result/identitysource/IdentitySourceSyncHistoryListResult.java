@@ -35,7 +35,7 @@ import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIM
  * 身份源同步记录详情列表
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/25 23:05
+ * Created by support@topiam.cn on 2022/2/25 23:05
  */
 @Data
 @Schema(description = "身份源同步历史列表")

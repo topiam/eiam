@@ -21,7 +21,7 @@ package cn.topiam.employee.application.context;
  * ApplicationContextHolder
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/10/29 22:37
+ * Created by support@topiam.cn on 2022/10/29 22:37
  */
 public final class ApplicationContextHolder {
     private static final ThreadLocal<ApplicationContext> HOLDER = new ThreadLocal<>();

@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/14 21:36
+ * Created by support@topiam.cn on 2021/11/14 21:36
  */
 @Data
 @Schema(description = "管理员列表查询")

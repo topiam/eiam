@@ -17,16 +17,11 @@
  */
 package cn.topiam.employee.common.repository.account;
 
-import java.util.Optional;
-
-import org.jetbrains.annotations.NotNull;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.common.entity.account.UserGroupEntity;
-import cn.topiam.employee.support.repository.LogicDeleteRepository;
 
 /**
  * <p>
@@ -34,19 +29,10 @@ import cn.topiam.employee.support.repository.LogicDeleteRepository;
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-07-31
+ * Created by support@topiam.cn on 2020-07-31
  */
 @Repository
-public interface UserGroupRepository extends LogicDeleteRepository<UserGroupEntity, Long>,
+public interface UserGroupRepository extends JpaRepository<UserGroupEntity, String>,
                                      JpaSpecificationExecutor<UserGroupEntity> {
 
-    /**
-     * findByIdContainsDeleted
-     *
-     * @param id must not be {@literal null}.
-     * @return {@link UserGroupEntity}
-     */
-    @NotNull
-    @Query(value = "SELECT * FROM user_group WHERE id_ = :id", nativeQuery = true)
-    Optional<UserGroupEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") Long id);
 }

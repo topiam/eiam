@@ -24,21 +24,19 @@
     <parent>
         <groupId>cn.topiam</groupId>
         <artifactId>eiam</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.1.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>eiam-identity-source</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.1.0</version>
     <packaging>pom</packaging>
 
     <modules>
         <module>eiam-identity-source-core</module>
         <module>eiam-identity-source-all</module>
         <module>eiam-identity-source-dingtalk</module>
-        <module>eiam-identity-source-wechatwork</module>
         <module>eiam-identity-source-feishu</module>
-        <module>eiam-identity-source-excel</module>
     </modules>
 
     <dependencies>

@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  * ForwardController
  *
  * @author TopIAM
- * Created by support@topiam.cn on   2022/12/4 22:16
+ * Created by support@topiam.cn on  2022/12/4 22:16
  */
 @Controller
 public class FrontendForwardController {

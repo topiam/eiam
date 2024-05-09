@@ -31,20 +31,20 @@ import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.repository.account.UserHistoryPasswordRepository;
 import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
-import cn.topiam.employee.core.setting.constant.PasswordPolicySettingConstants;
+import cn.topiam.employee.core.setting.PasswordPolicySettingConstants;
 import cn.topiam.employee.support.security.password.PasswordPolicyManager;
 import cn.topiam.employee.support.security.password.PasswordValidator;
 import cn.topiam.employee.support.security.password.enums.PasswordComplexityRule;
 import cn.topiam.employee.support.security.password.validator.*;
 import cn.topiam.employee.support.security.password.weak.PasswordWeakLib;
-import static cn.topiam.employee.core.setting.constant.PasswordPolicySettingConstants.*;
+import static cn.topiam.employee.core.setting.PasswordPolicySettingConstants.*;
 import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_TIME;
 
 /**
  * 密码策略管理器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/4/17 22:21
+ * Created by support@topiam.cn on 2022/4/17 22:21
  */
 public class DefaultPasswordPolicyManager implements PasswordPolicyManager<UserEntity> {
 
@@ -91,7 +91,7 @@ public class DefaultPasswordPolicyManager implements PasswordPolicyManager<UserE
      *
      * @return {@link PasswordIncludeUserInfoValidator }
      */
-    private PasswordIncludeUserInfoValidator getPasswordIncludeUserInfoValidator(Long userId) {
+    private PasswordIncludeUserInfoValidator getPasswordIncludeUserInfoValidator(String userId) {
         SettingEntity setting = settingRepository
             .findByName(PasswordPolicySettingConstants.PASSWORD_POLICY_ACCOUNT_CHECK);
         boolean enabled = Objects.isNull(setting)

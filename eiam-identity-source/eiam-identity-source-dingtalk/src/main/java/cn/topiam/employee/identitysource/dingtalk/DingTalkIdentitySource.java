@@ -54,7 +54,7 @@ import jakarta.servlet.http.HttpServletRequest;
  * 钉钉
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/9/21 21:59
+ * Created by support@topiam.cn on 2022/9/21 21:59
  */
 @Slf4j
 public class DingTalkIdentitySource extends AbstractDefaultIdentitySource<DingTalkConfig> {
@@ -186,7 +186,7 @@ public class DingTalkIdentitySource extends AbstractDefaultIdentitySource<DingTa
      * 钉钉回调请求
      *
      * @author TopIAM
-     * Created by support@topiam.cn on  2022/2/28 22:56
+     * Created by support@topiam.cn on 2022/2/28 22:56
      */
     @Data
     public static class DingTalkEventRequest implements Serializable {

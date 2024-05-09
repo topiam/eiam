@@ -25,7 +25,7 @@ import org.springframework.util.Assert;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/8 00:28
+ * Created by support@topiam.cn on 2023/7/8 00:28
  */
 public class JwtError implements Serializable {
 

@@ -22,6 +22,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.http.converter.json.JsonbHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -33,7 +34,8 @@ import org.springframework.util.ClassUtils;
  */
 public final class HttpMessageConverters {
 
-    private static final boolean JACKSON2_PRESENT;
+    private static final boolean JACKSON2_JSON_PRESENT;
+    private static final boolean JACKSON2_XML_PRESENT;
 
     private static final boolean GSON_PRESENT;
 
@@ -41,10 +43,14 @@ public final class HttpMessageConverters {
 
     static {
         ClassLoader classLoader = HttpMessageConverters.class.getClassLoader();
-        JACKSON2_PRESENT = ClassUtils
+        JACKSON2_JSON_PRESENT = ClassUtils
             .isPresent("com.fasterxml.jackson.databind.ObjectMapper", classLoader)
-                           && ClassUtils.isPresent("com.fasterxml.jackson.core.JsonGenerator",
-                               classLoader);
+                                && ClassUtils.isPresent("com.fasterxml.jackson.core.JsonGenerator",
+                                    classLoader);
+
+        JACKSON2_XML_PRESENT = ClassUtils
+            .isPresent("com.fasterxml.jackson.dataformat.xml.XmlMapper", classLoader);
+
         GSON_PRESENT = ClassUtils.isPresent("com.google.gson.Gson", classLoader);
         JSONB_PRESENT = ClassUtils.isPresent("jakarta.json.bind.Jsonb", classLoader);
     }
@@ -53,7 +59,7 @@ public final class HttpMessageConverters {
     }
 
     public static GenericHttpMessageConverter<Object> getJsonMessageConverter() {
-        if (JACKSON2_PRESENT) {
+        if (JACKSON2_JSON_PRESENT) {
             return new MappingJackson2HttpMessageConverter();
         }
         if (GSON_PRESENT) {
@@ -61,6 +67,13 @@ public final class HttpMessageConverters {
         }
         if (JSONB_PRESENT) {
             return new JsonbHttpMessageConverter();
+        }
+        return null;
+    }
+
+    public static GenericHttpMessageConverter<Object> getXmlMessageConverter() {
+        if (JACKSON2_XML_PRESENT) {
+            return new MappingJackson2XmlHttpMessageConverter();
         }
         return null;
     }

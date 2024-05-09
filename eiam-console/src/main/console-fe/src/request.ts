@@ -17,15 +17,19 @@
  */
 import type { RequestOptions } from '@@/plugin-request/request';
 import type { RequestConfig } from '@umijs/max';
-import { notification, message as Msg } from 'antd';
+import { message as Msg, notification } from 'antd';
 import { parse, stringify } from 'querystring';
 import { history } from '@@/core/history';
 
-import { isLoginPath, isSessionExpiredPath, SESSION_EXPIRED_PATH } from './utils/utils';
+import {
+  isLoginPath,
+  isResetPasswordPath,
+  isSessionExpiredPath,
+  SESSION_EXPIRED_PATH,
+} from './utils/utils';
 
 /**
  * @name 错误处理
- * pro 自带的错误处理， 可以在这里做自己的改动
  * @doc https://umijs.org/docs/max/request#配置
  */
 export const requestConfig: RequestConfig = {
@@ -42,7 +46,7 @@ export const requestConfig: RequestConfig = {
         // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
         if (error.response.status === 401) {
           // 排除 登录、登录回调
-          if (isLoginPath() || isSessionExpiredPath()) {
+          if (isLoginPath() || isSessionExpiredPath() || isResetPasswordPath()) {
             return;
           }
           const query = parse(history.location.search);

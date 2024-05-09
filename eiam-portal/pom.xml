@@ -24,7 +24,7 @@
     <parent>
         <groupId>cn.topiam</groupId>
         <artifactId>eiam</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.1.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -131,7 +131,59 @@
                                 <phase>generate-resources</phase>
                                 <configuration>
                                     <nodeVersion>v20.10.0</nodeVersion>
-                                    <pnpmVersion>v8.15.6</pnpmVersion>
+                                    <pnpmVersion>v9.1.0</pnpmVersion>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>pnpm install</id>
+                                <goals>
+                                    <goal>pnpm</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <arguments>install</arguments>
+                                    <pnpmRegistryURL>https://registry.npmmirror.com</pnpmRegistryURL>
+                                    <pnpmInheritsProxyConfigFromMaven>true</pnpmInheritsProxyConfigFromMaven>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>pnpm run build</id>
+                                <goals>
+                                    <goal>pnpm</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <arguments>run build:dev</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>preview</id>
+            <build>
+                <plugins>
+                    <!--编译打包前端项目-->
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <version>${frontend-maven-plugin.version}</version>
+                        <configuration>
+                            <installDirectory>target</installDirectory>
+                            <workingDirectory>src/main/portal-fe</workingDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>install node and pnpm</id>
+                                <goals>
+                                    <goal>install-node-and-pnpm</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <nodeVersion>v20.10.0</nodeVersion>
+                                    <pnpmVersion>v9.1.0</pnpmVersion>
                                 </configuration>
                             </execution>
                             <execution>
@@ -183,7 +235,7 @@
                                 <phase>generate-resources</phase>
                                 <configuration>
                                     <nodeVersion>v20.10.0</nodeVersion>
-                                    <pnpmVersion>v8.15.6</pnpmVersion>
+                                    <pnpmVersion>v9.1.0</pnpmVersion>
                                 </configuration>
                             </execution>
                             <execution>

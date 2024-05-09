@@ -124,8 +124,7 @@ public class AppGroupController {
     @DeleteMapping(value = "/delete/{id}")
     @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> deleteAppGroup(@PathVariable(value = "id") String id) {
-        return ApiRestResult.<Boolean> builder()
-            .result(appGroupService.deleteAppGroup(Long.valueOf(id))).build();
+        return ApiRestResult.<Boolean> builder().result(appGroupService.deleteAppGroup(id)).build();
     }
 
     /**
@@ -138,7 +137,7 @@ public class AppGroupController {
     @GetMapping(value = "/get/{id}")
     @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<AppGroupGetResult> getAppGroup(@PathVariable(value = "id") String id) {
-        AppGroupGetResult result = appGroupService.getAppGroup(Long.valueOf(id));
+        AppGroupGetResult result = appGroupService.getAppGroup(id);
         return ApiRestResult.<AppGroupGetResult> builder().result(result).build();
     }
 

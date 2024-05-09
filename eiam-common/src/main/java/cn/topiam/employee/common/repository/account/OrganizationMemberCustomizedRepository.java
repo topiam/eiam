@@ -25,7 +25,7 @@ import cn.topiam.employee.common.entity.account.OrganizationMemberEntity;
  * 组织成员
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/10/2 02:53
+ * Created by support@topiam.cn on 2022/10/2 02:53
  */
 public interface OrganizationMemberCustomizedRepository {
 

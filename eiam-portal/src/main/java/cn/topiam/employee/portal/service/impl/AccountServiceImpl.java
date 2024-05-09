@@ -45,7 +45,6 @@ import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
 import cn.topiam.employee.common.enums.MailType;
 import cn.topiam.employee.common.enums.MessageNoticeChannel;
 import cn.topiam.employee.common.enums.SmsType;
-import cn.topiam.employee.common.exception.PasswordValidatedFailException;
 import cn.topiam.employee.common.exception.UserNotFoundException;
 import cn.topiam.employee.common.repository.account.UserDetailRepository;
 import cn.topiam.employee.common.repository.account.UserIdpRepository;
@@ -57,11 +56,13 @@ import cn.topiam.employee.portal.converter.AccountConverter;
 import cn.topiam.employee.portal.pojo.request.*;
 import cn.topiam.employee.portal.pojo.result.BoundIdpListResult;
 import cn.topiam.employee.portal.service.AccountService;
-import cn.topiam.employee.support.context.ServletContextHelp;
+import cn.topiam.employee.support.context.ServletContextService;
 import cn.topiam.employee.support.exception.BadParamsException;
 import cn.topiam.employee.support.exception.InfoValidityFailException;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.security.password.PasswordPolicyManager;
+import cn.topiam.employee.support.security.password.exception.PasswordValidatedFailException;
+import cn.topiam.employee.support.security.userdetails.UserDetails;
 import cn.topiam.employee.support.security.util.SecurityUtils;
 import cn.topiam.employee.support.util.BeanUtils;
 import cn.topiam.employee.support.util.PhoneNumberUtils;
@@ -73,14 +74,14 @@ import static cn.topiam.employee.audit.enums.TargetType.*;
 import static cn.topiam.employee.core.message.sms.SmsMsgEventPublish.USERNAME;
 import static cn.topiam.employee.support.constant.EiamConstants.FORGET_PASSWORD_TOKEN_ID;
 import static cn.topiam.employee.support.exception.enums.ExceptionStatus.EX000102;
-import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
-import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
+import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_BY;
+import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_TIME;
 import static cn.topiam.employee.support.util.EmailUtils.isEmailValidate;
 import static cn.topiam.employee.support.util.PhoneNumberUtils.isPhoneValidate;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2022/4/3 22:20
+ * Created by support@topiam.cn on 2022/4/3 22:20
  */
 @Slf4j
 @Service
@@ -93,13 +94,13 @@ public class AccountServiceImpl implements AccountService {
     public Boolean changeInfo(UpdateUserInfoRequest param) {
         //用户信息
         UserEntity toUserEntity = accountConverter.userUpdateParamConvertToUserEntity(param);
-        UserEntity user = userRepository
-            .findById(Long.valueOf(SecurityUtils.getCurrentUser().getId())).orElseThrow();
+        UserEntity user = userRepository.findById(SecurityUtils.getCurrentUser().getId())
+            .orElseThrow();
         BeanUtils.merge(toUserEntity, user, LAST_MODIFIED_BY, LAST_MODIFIED_TIME);
         userRepository.save(user);
         //用户详情
         String currentUserId = SecurityUtils.getCurrentUserId();
-        UserDetailEntity detail = userDetailsRepository.findByUserId(Long.valueOf(currentUserId))
+        UserDetailEntity detail = userDetailsRepository.findByUserId(currentUserId)
             .orElse(new UserDetailEntity().setUserId(user.getId()));
         UserDetailEntity toUserDetailsEntity = accountConverter
             .userUpdateParamConvertToUserDetailsEntity(param);
@@ -126,7 +127,7 @@ public class AccountServiceImpl implements AccountService {
         // 校验密码
         passwordPolicyManager.validate(user, param.getNewPassword());
         //修改密码
-        userRepository.updateUserPassword(Long.valueOf(SecurityUtils.getCurrentUser().getId()),
+        userRepository.updatePassword(SecurityUtils.getCurrentUser().getId(),
             passwordEncoder.encode(param.getNewPassword()), LocalDateTime.now());
         logger.info("用户ID: [{}] 用户名: [{}] 修改密码成功", user.getId(), user.getUsername());
         //异步下线所有用户
@@ -171,12 +172,12 @@ public class AccountServiceImpl implements AccountService {
             throw new InfoValidityFailException(EX000102.getMessage());
         }
         // 校验是否已经存在
-        UserEntity byEmail = userRepository.findByPhone(param.getPhone());
-        if (Objects.nonNull(byEmail) && !user.getId().equals(byEmail.getId())) {
+        Optional<UserEntity> optional = userRepository.findByPhone(param.getPhone());
+        if (optional.isPresent() && !user.getId().equals(optional.get().getId())) {
             throw new TopIamException("系统中已存在[" + param.getPhone() + "]手机号, 请先解绑");
         }
-        Long id = Long.valueOf(SecurityUtils.getCurrentUser().getId());
-        userRepository.updateUserPhone(id, param.getPhone());
+        String id = SecurityUtils.getCurrentUser().getId();
+        userRepository.updateByIdAndPhone(id, param.getPhone());
         // 修改手机号成功发送短信
         LinkedHashMap<String, String> parameter = Maps.newLinkedHashMap();
         parameter.put(USERNAME, user.getUsername());
@@ -226,12 +227,11 @@ public class AccountServiceImpl implements AccountService {
             throw new InfoValidityFailException(EX000102.getMessage());
         }
         // 校验是否已经存在
-        UserEntity byEmail = userRepository.findByEmail(param.getEmail());
-        if (Objects.nonNull(byEmail) && !user.getId().equals(byEmail.getId())) {
+        Optional<UserEntity> optional = userRepository.findByEmail(param.getEmail());
+        if (optional.isPresent() && !user.getId().equals(optional.get().getId())) {
             throw new TopIamException("系统中已存在[" + param.getEmail() + "]邮箱, 请先解绑");
         }
-        userRepository.updateUserEmail(Long.valueOf(SecurityUtils.getCurrentUser().getId()),
-            param.getEmail());
+        userRepository.updateByIdAndEmail(SecurityUtils.getCurrentUser().getId(), param.getEmail());
         return true;
     }
 
@@ -253,8 +253,7 @@ public class AccountServiceImpl implements AccountService {
     public Boolean forgetPasswordCode(String recipient) {
         if (isEmailValidate(recipient)) {
             // 验证在库中是否有邮箱
-            Optional<UserEntity> byEmail = Optional
-                .ofNullable(userRepository.findByEmail(recipient));
+            Optional<UserEntity> byEmail = userRepository.findByEmail(recipient);
             if (byEmail.isPresent()) {
                 otpContextHelp.sendOtp(recipient, MailType.FORGET_PASSWORD.getCode(),
                     MessageNoticeChannel.MAIL);
@@ -263,9 +262,9 @@ public class AccountServiceImpl implements AccountService {
             log.warn("忘记密码: : 邮箱: [{}] 不存在", recipient);
         } else if (isPhoneValidate(recipient)) {
             // 验证在库中是否有手机号
-            Optional<UserEntity> byPhone = Optional
-                .ofNullable(userRepository.findByPhone(PhoneNumberUtils.getPhoneNumber(recipient)));
-            if (byPhone.isPresent()) {
+            Optional<UserEntity> optional = userRepository
+                .findByPhone(PhoneNumberUtils.getPhoneNumber(recipient));
+            if (optional.isPresent()) {
                 otpContextHelp.sendOtp(recipient, SmsType.FORGET_PASSWORD.getCode(),
                     MessageNoticeChannel.SMS);
                 return true;
@@ -280,17 +279,16 @@ public class AccountServiceImpl implements AccountService {
     public Boolean prepareForgetPassword(String recipient, String code) {
         // 校验验证码
         Boolean checkOtp = false;
-        Optional<UserEntity> user = Optional.empty();
+        Optional<UserEntity> optional = Optional.empty();
         if (isEmailValidate(recipient)) {
-            user = Optional.ofNullable(userRepository.findByEmail(recipient));
-            if (user.isPresent()) {
+            optional = userRepository.findByEmail(recipient);
+            if (optional.isPresent()) {
                 checkOtp = otpContextHelp.checkOtp(MailType.FORGET_PASSWORD.getCode(),
                     MessageNoticeChannel.MAIL, recipient, code);
             }
         } else if (isPhoneValidate(recipient)) {
-            user = Optional
-                .ofNullable(userRepository.findByPhone(PhoneNumberUtils.getPhoneNumber(recipient)));
-            if (user.isPresent()) {
+            optional = userRepository.findByPhone(PhoneNumberUtils.getPhoneNumber(recipient));
+            if (optional.isPresent()) {
                 checkOtp = otpContextHelp.checkOtp(SmsType.FORGET_PASSWORD.getCode(),
                     MessageNoticeChannel.SMS, recipient, code);
             }
@@ -301,10 +299,10 @@ public class AccountServiceImpl implements AccountService {
 
         // 生成忘记密码TOKEN ID
         String tokenId = UUID.randomUUID().toString();
-        HttpSession session = ServletContextHelp.getSession();
+        HttpSession session = ServletContextService.getSession();
         // 保存用户ID到Redis, 有效期10分钟
         stringRedisTemplate.opsForValue().set(session.getId() + tokenId,
-            String.valueOf(user.get().getId()), 10, TimeUnit.MINUTES);
+            String.valueOf(optional.get().getId()), 10, TimeUnit.MINUTES);
         // 保存TOKEN ID到会话
         session.setAttribute(FORGET_PASSWORD_TOKEN_ID, tokenId);
         return true;
@@ -313,7 +311,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Boolean forgetPassword(ForgetPasswordRequest forgetPasswordRequest) {
         // 验证TOKEN
-        HttpSession session = ServletContextHelp.getSession();
+        HttpSession session = ServletContextService.getSession();
         String redisTokenId = session.getId() + session.getAttribute(FORGET_PASSWORD_TOKEN_ID);
         String userId = stringRedisTemplate.opsForValue().get(redisTokenId);
         if (Objects.isNull(userId)) {
@@ -322,10 +320,10 @@ public class AccountServiceImpl implements AccountService {
             return false;
         }
         //修改密码
-        Optional<UserEntity> user = userRepository.findById(Long.valueOf(userId));
+        Optional<UserEntity> user = userRepository.findById(userId);
         if (user.isPresent()) {
             UserEntity userEntity = user.get();
-            userRepository.updateUserPassword(userEntity.getId(),
+            userRepository.updatePassword(userEntity.getId(),
                 passwordEncoder.encode(forgetPasswordRequest.getNewPassword()),
                 LocalDateTime.now());
             logger.info("忘记密码: 用户ID: [{}] 用户名: [{}] 修改密码成功", userEntity.getId(),
@@ -344,18 +342,21 @@ public class AccountServiceImpl implements AccountService {
             .findByEnabledIsTrueAndDisplayedIsTrue();
         // 获取已绑定idp
         Iterable<UserIdpBindPO> userIdpBindList = userIdpRepository
-            .getUserIdpBindList(Long.valueOf(SecurityUtils.getCurrentUserId()));
+            .getUserIdpBindList(SecurityUtils.getCurrentUserId());
         return accountConverter.entityConverterToBoundIdpListResult(identityProviderList,
             userIdpBindList);
     }
 
     @Override
     public Boolean unbindIdp(String id) {
-        userIdpRepository.deleteByUserIdAndIdpId(SecurityUtils.getCurrentUserId(), id);
+        userIdpRepository.deleteById(id);
+        UserDetails currentUser = SecurityUtils.getCurrentUser();
         AuditContext.setTarget(
-            Target.builder().type(USER).id(SecurityUtils.getCurrentUserId()).build(),
-            Target.builder().type(USER_DETAIL).id(SecurityUtils.getCurrentUserId()).build(),
-            Target.builder().type(IDENTITY_PROVIDER).id(id).build());
+            Target.builder().type(USER).id(currentUser.getId()).name(currentUser.getUsername())
+                .build(),
+            Target.builder().type(USER_DETAIL).id(currentUser.getId())
+                .name(currentUser.getUsername()).build(),
+            Target.builder().type(USER_IDP).id(id).name("").build());
         return true;
     }
 
@@ -381,7 +382,7 @@ public class AccountServiceImpl implements AccountService {
      */
     public UserEntity getCurrentUser() {
         String userId = SecurityUtils.getCurrentUserId();
-        Optional<UserEntity> optional = userRepository.findById(Long.valueOf(userId));
+        Optional<UserEntity> optional = userRepository.findById(userId);
         if (optional.isPresent()) {
             return optional.get();
         }

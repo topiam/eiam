@@ -36,11 +36,6 @@ public enum IdentitySourceProvider implements BaseEnum {
                                                                  "钉钉（Ding Talk）是阿里巴巴集团打造的企业级智能移动办公平台，是数字经济时代的企业组织协同办公和应用开发平台。"),
 
                                                         /**
-                                                         * 企业微信
-                                                         */
-                                                        WECHAT_WORK("wechat_work", "企业微信",
-                                                                    "企业微信是腾讯微信团队打造的企业通讯与办公工具，具有与微信一致的沟通体验，丰富的OA应用，和连接微信生态的能力，可帮助企业连接内部、连接生态伙伴、连接消费者。专业协作、安全管理、人即服务。"),
-                                                        /**
                                                          * 飞书
                                                          */
                                                         FEISHU("feishu", "飞书",

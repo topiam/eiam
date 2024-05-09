@@ -34,7 +34,7 @@ import lombok.AllArgsConstructor;
  * LoginConfigService
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/3/25 21:50
+ * Created by support@topiam.cn on 2022/3/25 21:50
  */
 @Service
 @AllArgsConstructor

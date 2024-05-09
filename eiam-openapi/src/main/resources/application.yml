@@ -114,10 +114,10 @@ server:
       charset: UTF-8
   #错误处理
   error:
-    include-stacktrace: always
+    include-stacktrace: never
     include-exception: true
     include-message: always
-    include-binding-errors: always
+    include-binding-errors: never
   # undertow
   undertow:
     threads:

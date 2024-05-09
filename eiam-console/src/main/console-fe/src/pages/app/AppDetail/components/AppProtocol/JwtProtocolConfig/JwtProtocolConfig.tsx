@@ -15,12 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { getAppConfig, saveAppConfig } from '@/services/app';
+import { getAppConfig, saveAppConfig } from '../../../service';
 import { useAsyncEffect } from 'ahooks';
-import { Alert, App, Divider, Form, Spin } from 'antd';
+import { App, Form, Spin } from 'antd';
 import React, { useState } from 'react';
 import {
   FooterToolbar,
+  ProCard,
   ProForm,
   ProFormDigit,
   ProFormRadio,
@@ -30,16 +31,15 @@ import {
 import ConfigAbout from './ConfigAbout';
 import { omit } from 'lodash';
 import { useIntl } from '@umijs/max';
-import { AuthorizationType } from '../CommonConfig';
 import { GetApp } from '../../../data.d';
-import { Container } from '@/components/Container';
+import Alert from '@/components/Alert';
 
 const layout = {
   labelCol: {
     span: 6,
   },
   wrapperCol: {
-    span: 12,
+    span: 14,
   },
 };
 export default (props: { app: GetApp | Record<string, any> }) => {
@@ -68,77 +68,78 @@ export default (props: { app: GetApp | Record<string, any> }) => {
 
   return (
     <Spin spinning={loading}>
-      <Alert
-        showIcon={true}
-        banner
-        type={'info'}
-        message={
-          <span>
-            {intl.formatMessage({ id: 'app.issue' })}
-            {intl.formatMessage({ id: 'app.disposition' })}{' '}
-            <a
-              target={'_blank'}
-              href={'https://eiam.topiam.cn/docs/application/jwt/overview'}
-              rel="noreferrer"
-            >
-              {intl.formatMessage({
-                id: 'pages.app.config.detail.items.login_access.protocol_config.jwt',
-              })}
-            </a>{' '}
-            。
-          </span>
-        }
-      />
-      <br />
-      <Container maxWidth={1152}>
-        <ProForm
-          layout={'horizontal'}
-          {...layout}
-          form={form}
-          scrollToFirstError
-          onFinish={async (values) => {
-            setLoading(true);
-            const { success } = await saveAppConfig({
-              id,
-              template,
-              config: omit(values, 'id', 'template'),
-            }).finally(() => {
-              setLoading(false);
-            });
-            if (success) {
-              message.success(intl.formatMessage({ id: 'app.save_success' }));
-              await getConfig();
-              return true;
+      <ProForm
+        layout={'horizontal'}
+        labelAlign={'right'}
+        {...layout}
+        form={form}
+        scrollToFirstError
+        onFinish={async (values) => {
+          setLoading(true);
+          const { success } = await saveAppConfig({
+            id,
+            template,
+            config: omit(values, 'id', 'template'),
+          }).finally(() => {
+            setLoading(false);
+          });
+          if (success) {
+            message.success(intl.formatMessage({ id: 'app.save_success' }));
+            await getConfig();
+            return true;
+          }
+          message.error(intl.formatMessage({ id: 'app.save_fail' }));
+          return false;
+        }}
+        submitter={{
+          render: (_, dom) => {
+            return <FooterToolbar>{dom.map((item) => item)}</FooterToolbar>;
+          },
+        }}
+      >
+        <ProCard bordered>
+          <Alert
+            showIcon={true}
+            banner
+            type={'grey'}
+            message={
+              <span>
+                {intl.formatMessage({ id: 'app.issue' })}
+                {intl.formatMessage({ id: 'app.disposition' })}{' '}
+                <a
+                  target={'_blank'}
+                  href={'https://eiam.topiam.cn/docs/portal/jwt/overview'}
+                  rel="noreferrer"
+                >
+                  {intl.formatMessage({
+                    id: 'pages.app.config.detail.protocol_config.jwt',
+                  })}
+                </a>{' '}
+                。
+              </span>
             }
-            message.error(intl.formatMessage({ id: 'app.save_fail' }));
-            return false;
-          }}
-          submitter={{
-            render: (_, dom) => {
-              return <FooterToolbar>{dom}</FooterToolbar>;
-            },
-          }}
-        >
+          />
+          <br />
           <ProFormText
             label={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.redirect_url',
+              id: 'pages.app.config.detail.protocol_config.jwt.redirect_url',
             })}
             name={'redirectUrl'}
             fieldProps={{ allowClear: false }}
             extra={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.redirect_url.extra',
+              id: 'pages.app.config.detail.protocol_config.jwt.redirect_url.extra',
             })}
             rules={[
               {
                 required: true,
                 message: intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.redirect_url.rule.0.message',
+                  id: 'pages.app.config.detail.protocol_config.jwt.redirect_url.rule.0.message',
                 }),
               },
               {
                 type: 'url',
                 message: intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.redirect_url.rule.1.message',
+                  id: 'pages.app.config.detail.protocol_config.jwt.redirect_url.rule.1.message',
                 }),
               },
             ]}
@@ -148,13 +149,13 @@ export default (props: { app: GetApp | Record<string, any> }) => {
             name={'targetLinkUrl'}
             fieldProps={{ allowClear: false }}
             extra={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.target_link_url.extra',
+              id: 'pages.app.config.detail.protocol_config.jwt.target_link_url.extra',
             })}
             rules={[
               {
                 type: 'url',
                 message: intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.target_link_url.rule.0.message',
+                  id: 'pages.app.config.detail.protocol_config.jwt.target_link_url.rule.0.message',
                 }),
               },
             ]}
@@ -163,11 +164,11 @@ export default (props: { app: GetApp | Record<string, any> }) => {
           <ProFormRadio.Group
             name={'bindingType'}
             label={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.binding_type',
+              id: 'pages.app.config.detail.protocol_config.jwt.binding_type',
             })}
             initialValue={['post']}
             extra={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.binding_type.extra',
+              id: 'pages.app.config.detail.protocol_config.jwt.binding_type.extra',
             })}
             options={[
               { value: 'post', label: 'POST' },
@@ -177,39 +178,39 @@ export default (props: { app: GetApp | Record<string, any> }) => {
               {
                 required: true,
                 message: intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.binding_type.rule.0.message',
+                  id: 'pages.app.config.detail.protocol_config.jwt.binding_type.rule.0.message',
                 }),
               },
             ]}
           />
           <ProFormSelect
             label={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.idtoken_subject_type',
+              id: 'pages.app.config.detail.protocol_config.jwt.idtoken_subject_type',
             })}
             name={'idTokenSubjectType'}
             options={[
               {
                 value: 'user_id',
                 label: intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.idtoken_subject_type.option.0',
+                  id: 'pages.app.config.detail.protocol_config.jwt.idtoken_subject_type.option.0',
                 }),
               },
               {
                 value: 'app_user',
                 label: intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.idtoken_subject_type.option.1',
+                  id: 'pages.app.config.detail.protocol_config.jwt.idtoken_subject_type.option.1',
                 }),
               },
             ]}
             fieldProps={{ allowClear: false }}
             extra={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.idtoken_subject_type.extra',
+              id: 'pages.app.config.detail.protocol_config.jwt.idtoken_subject_type.extra',
             })}
             rules={[
               {
                 required: true,
                 message: intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.idtoken_subject_type.rule.0.message',
+                  id: 'pages.app.config.detail.protocol_config.jwt.idtoken_subject_type.rule.0.message',
                 }),
               },
             ]}
@@ -217,38 +218,36 @@ export default (props: { app: GetApp | Record<string, any> }) => {
           <ProFormDigit
             name={'idTokenTimeToLive'}
             label={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.idtoken_time_to_live',
+              id: 'pages.app.config.detail.protocol_config.jwt.idtoken_time_to_live',
             })}
-            addonWarpStyle={{
-              flexWrap: 'nowrap',
-            }}
             addonAfter={'秒'}
             max={84600}
             min={1}
             extra={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.idtoken_time_to_live.extra',
+              id: 'pages.app.config.detail.protocol_config.jwt.idtoken_time_to_live.extra',
             })}
             rules={[
               {
                 required: true,
                 message: intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.idtoken_time_to_live.rule.0.message',
+                  id: 'pages.app.config.detail.protocol_config.jwt.idtoken_time_to_live.rule.0.message',
                 }),
               },
             ]}
           />
-          <Divider />
-          {/*授权类型*/}
-          <AuthorizationType />
-        </ProForm>
-        <Divider style={{ margin: 0 }} />
-        <ConfigAbout
-          appId={app.id}
-          protocolEndpoint={protocolEndpoint}
-          collapsed={false}
-          {...layout}
-        />
-      </Container>
+        </ProCard>
+      </ProForm>
+      <br />
+      <ProCard
+        title={intl.formatMessage({
+          id: 'pages.app.config.detail.protocol_config.jwt.config_about',
+        })}
+        bordered
+        collapsible
+        headerBordered
+      >
+        <ConfigAbout appId={app.id} protocolEndpoint={protocolEndpoint} {...layout} />
+      </ProCard>
     </Spin>
   );
 };

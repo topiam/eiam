@@ -27,7 +27,7 @@ import lombok.Data;
  * 用户模型
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/28 23:03
+ * Created by support@topiam.cn on 2022/2/28 23:03
  */
 @Data
 public class User implements Serializable {

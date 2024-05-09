@@ -23,7 +23,7 @@ import static cn.topiam.employee.support.constant.EiamConstants.V1_API_PATH;
  * Open API 常量
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/9/5 21:58
+ * Created by support@topiam.cn on 2022/9/5 21:58
  */
 public class OpenApiV1Constants {
     /**

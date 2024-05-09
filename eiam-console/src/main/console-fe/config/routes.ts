@@ -41,6 +41,13 @@ export default [
     component: './user/SessionExpired',
   },
   {
+    name: 'reset-password',
+    path: '/user/reset-password',
+    layout: false,
+    hideInMenu: true,
+    component: './user/ResetPassword',
+  },
+  {
     name: 'account.profile',
     path: '/user/profile',
     hideInMenu: true,
@@ -54,23 +61,12 @@ export default [
     icon: 'SmileOutlined',
     hideInMenu: true,
   },
-  //仪表盘
+  //总览
   {
     name: 'dashboard',
     path: '/dashboard',
-    icon: 'DashboardOutlined',
-    routes: [
-      {
-        path: '/dashboard',
-        redirect: '/dashboard/analysis',
-      },
-      /*分析页*/
-      {
-        name: 'analysis',
-        path: '/dashboard/analysis',
-        component: './dashboard/Analysis',
-      },
-    ],
+    icon: 'HomeOutlined',
+    component: './dashboard',
   }, //账户
   {
     name: 'account',
@@ -245,11 +241,11 @@ export default [
         path: '/monitor',
         redirect: '/monitor/session',
       },
-      //系统监控
+      //会话管理
       {
         name: 'session',
         path: '/monitor/session',
-        component: './monitor/SessionList',
+        component: './monitor/Session',
       },
     ],
   },

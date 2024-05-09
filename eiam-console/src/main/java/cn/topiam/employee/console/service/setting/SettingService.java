@@ -23,7 +23,7 @@ import cn.topiam.employee.common.entity.setting.SettingEntity;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/9 22:30
+ * Created by support@topiam.cn on 2021/11/9 22:30
  */
 public interface SettingService {
     /**

@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -44,7 +45,7 @@ import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.core.security.session.ClusterSessionRegistryImpl;
 import cn.topiam.employee.core.security.session.Session;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.context.ApplicationContextService;
 import cn.topiam.employee.support.geo.GeoLocation;
 import cn.topiam.employee.support.lock.Lock;
 import cn.topiam.employee.support.preview.Preview;
@@ -68,7 +69,7 @@ import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIM
  * 会话管理
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/8 21:39
+ * Created by support@topiam.cn on 2021/9/8 21:39
  */
 @Tag(name = "会话管理")
 @RestController
@@ -86,7 +87,7 @@ public class SessionManageEndpoint {
     public ApiRestResult<List<OnlineSession>> list(HttpServletRequest req) {
         List<OnlineSession> list = new ArrayList<>();
         List<Object> principals;
-        SessionRegistry registry = ApplicationContextHelp.getBean(SessionRegistry.class);
+        SessionRegistry registry = ApplicationContextService.getBean(SessionRegistry.class);
         if (registry instanceof ClusterSessionRegistryImpl) {
             //根据用户查询
             if (StringUtils.isNoneBlank(req.getParameter(USERNAME))) {
@@ -102,9 +103,11 @@ public class SessionManageEndpoint {
                     if (!((Session) principal).getSessionId()
                         .equals(req.getSession(false).getId())) {
                         //@formatter:off
-                        OnlineUserConverter userConverter = ApplicationContextHelp.getBean(OnlineUserConverter.class);
-                        OnlineSession user = userConverter.sessionDetailsToOnlineSession(((Session) principal));
-                        list.add(user);
+                        OnlineSession user = OnlineUserConverter.INSTANCE.sessionDetailsToOnlineSession(((Session) principal));
+                        String userType = req.getParameter("userType");
+                        if (StringUtils.isEmpty(userType) || user.getUserType().equals(userType)) {
+                            list.add(user);
+                        }
                         //@formatter:on
                     }
                 }
@@ -126,20 +129,21 @@ public class SessionManageEndpoint {
     @Preview
     @Operation(summary = "下线会话")
     @Audit(type = EventType.DOWN_LINE_SESSION)
-    @DeleteMapping("/remove")
     @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
+    @DeleteMapping("/remove")
     public ApiRestResult<Boolean> remove(HttpServletRequest req, HttpServletResponse resp) {
         String sessionIds = req.getParameter("sessionIds");
         //session id blank
         if (!StringUtils.isNoneBlank(sessionIds)) {
             HttpResponseUtils.flushResponse(resp, JSON.toJSONString(ApiRestResult.err("会话ID不存在!")));
         }
-        SessionRegistry registry = ApplicationContextHelp.getBean(SessionRegistry.class);
+        SessionRegistry registry = ApplicationContextService.getBean(SessionRegistry.class);
         String[] ids = sessionIds.split(",");
         Arrays.stream(ids).forEach((i) -> {
             //如果sessionId等于当前操作用户sessionId不操作
             if (!req.getSession(false).getId().equals(i)) {
-                AuditContext.setTarget(Target.builder().id(i).type(TargetType.SESSION).build());
+                AuditContext
+                    .setTarget(Target.builder().id(i).name("").type(TargetType.SESSION).build());
                 registry.removeSessionInformation(i);
             }
         });
@@ -147,95 +151,103 @@ public class SessionManageEndpoint {
         return ApiRestResult.ok();
     }
 
-}
-
-/**
- * 在线用户
- *
- * @author TopIAM
- * Created by support@topiam.cn on  2021/9/8 21:42
- */
-@Data
-@Accessors(chain = true)
-class OnlineSession implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 8227098865368453321L;
     /**
-     * 用户ID
-     */
-    private String            id;
-    /**
-     * 用户名
-     */
-    private String            username;
-
-    /**
-     * 活动地点
-     */
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
-    private GeoLocation       geoLocation;
-
-    /**
-     * 用户代理
-     */
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
-    private UserAgent         userAgent;
-
-    /**
-     * 认证类型
-     */
-    private String            authType;
-
-    /**
-     * 登录时间
-     */
-    @JSONField(format = DEFAULT_DATE_TIME_FORMATTER_PATTERN)
-    private LocalDateTime     loginTime;
-
-    /**
-     * 最后请求时间
-     */
-    @JSONField(format = DEFAULT_DATE_TIME_FORMATTER_PATTERN)
-    private LocalDateTime     lastRequest;
-
-    /**
-     * session ID
-     */
-    private String            sessionId;
-
-}
-
-@Mapper(componentModel = "spring")
-interface OnlineUserConverter {
-    /**
-     * 系统用户转在线会话
+     * 在线用户
      *
-     * @param session {@link Session}
-     * @return {@link OnlineSession}
+     * @author TopIAM
+     * Created by support@topiam.cn on  2021/9/8 21:42
      */
-    default OnlineSession sessionDetailsToOnlineSession(Session session) {
-        if (session == null) {
-            return null;
-        }
+    @Data
+    @Accessors(chain = true)
+    public static class OnlineSession implements Serializable {
 
-        OnlineSession onlineSession = new OnlineSession();
-        //ID
-        onlineSession.setId(session.getId());
-        //用户名
-        onlineSession.setUsername(session.getUsername());
-        //session id
-        onlineSession.setSessionId(session.getSessionId());
-        //地理位置
-        onlineSession.setGeoLocation(session.getGeoLocation());
-        //用户代理
-        onlineSession.setUserAgent(session.getUserAgent());
-        //认证类型
-        onlineSession.setAuthType(session.getAuthenticationProvider());
-        //登录时间
-        onlineSession.setLoginTime(session.getAuthenticationTime());
-        //最后请求时间
-        onlineSession.setLastRequest(session.getLastRequestTime());
-        return onlineSession;
+        @Serial
+        private static final long serialVersionUID = 8227098865368453321L;
+        /**
+         * 用户ID
+         */
+        private String            id;
+        /**
+         * 用户名
+         */
+        private String            username;
+
+        /**
+         * 活动地点
+         */
+        @JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
+        private GeoLocation       geoLocation;
+
+        /**
+         * 用户代理
+         */
+        @JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
+        private UserAgent         userAgent;
+
+        /**
+         * 认证类型
+         */
+        private String            authType;
+
+        /**
+         * 用户类型
+         */
+        private String            userType;
+
+        /**
+         * 登录时间
+         */
+        @JSONField(format = DEFAULT_DATE_TIME_FORMATTER_PATTERN)
+        private LocalDateTime     loginTime;
+
+        /**
+         * 最后请求时间
+         */
+        @JSONField(format = DEFAULT_DATE_TIME_FORMATTER_PATTERN)
+        private LocalDateTime     lastRequest;
+
+        /**
+         * session ID
+         */
+        private String            sessionId;
+
+    }
+
+    @Mapper
+    interface OnlineUserConverter {
+        OnlineUserConverter INSTANCE = Mappers.getMapper(OnlineUserConverter.class);
+
+        /**
+         * 系统用户转在线会话
+         *
+         * @param session {@link Session}
+         * @return {@link OnlineSession}
+         */
+        default OnlineSession sessionDetailsToOnlineSession(Session session) {
+            if (session == null) {
+                return null;
+            }
+
+            OnlineSession onlineSession = new OnlineSession();
+            //ID
+            onlineSession.setId(session.getId());
+            //用户名
+            onlineSession.setUsername(session.getUsername());
+            //session id
+            onlineSession.setSessionId(session.getSessionId());
+            //地理位置
+            onlineSession.setGeoLocation(session.getGeoLocation());
+            //用户代理
+            onlineSession.setUserAgent(session.getUserAgent());
+            //认证类型
+            onlineSession.setAuthType(session.getAuthenticationProvider());
+            //用户类型
+            onlineSession.setUserType(session.getUserType().getType());
+            //登录时间
+            onlineSession.setLoginTime(session.getAuthenticationTime());
+            //最后请求时间
+            onlineSession.setLastRequest(session.getLastRequestTime());
+            return onlineSession;
+        }
     }
 }

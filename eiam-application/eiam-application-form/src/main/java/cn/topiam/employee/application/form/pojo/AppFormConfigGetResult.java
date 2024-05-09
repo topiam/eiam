@@ -21,10 +21,8 @@ import java.io.Serializable;
 import java.util.List;
 
 import cn.topiam.employee.common.entity.app.AppFormConfigEntity;
-import cn.topiam.employee.common.enums.app.AuthorizationType;
 import cn.topiam.employee.common.enums.app.FormEncryptType;
 import cn.topiam.employee.common.enums.app.FormSubmitType;
-import cn.topiam.employee.common.enums.app.InitLoginType;
 
 import lombok.Data;
 
@@ -34,7 +32,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * Form 配置返回
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/5/31 22:46
+ * Created by support@topiam.cn on 2022/5/31 22:46
  */
 @Data
 @Schema(description = "Form 配置返回响应")
@@ -46,22 +44,10 @@ public class AppFormConfigGetResult implements Serializable {
     private String                               appId;
 
     /**
-     * SSO 发起方
-     */
-    @Schema(description = "SSO 发起方")
-    private InitLoginType                        initLoginType;
-
-    /**
      * SSO 登录链接
      */
     @Schema(description = "SSO 登录链接")
     private String                               initLoginUrl;
-
-    /**
-     * 授权范围
-     */
-    @Schema(description = "SSO 授权范围")
-    private AuthorizationType                    authorizationType;
 
     /**
      * 登录URL

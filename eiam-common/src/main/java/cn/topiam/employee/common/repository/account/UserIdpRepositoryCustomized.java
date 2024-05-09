@@ -26,9 +26,11 @@ import cn.topiam.employee.support.repository.page.domain.Page;
  * UserIdp Repository Customized
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020/12/29 21:27
+ * Created by support@topiam.cn on 2020/12/29 21:27
  */
 public interface UserIdpRepositoryCustomized {
+
+    Optional<UserIdpBindPO> selectById(String id);
 
     /**
      * 根据身份源ID和openId查询
@@ -46,13 +48,13 @@ public interface UserIdpRepositoryCustomized {
      * @param userId {@link  String}
      * @return {@link Optional}
      */
-    Optional<UserIdpBindPO> findByIdpIdAndUserId(String idpId, Long userId);
+    Optional<UserIdpBindPO> findByIdpIdAndUserId(String idpId, String userId);
 
     /**
      * 查询用户身份提供商绑定
      *
-     * @param userId     {@link  Long}
+     * @param userId {@link  String}
      * @return {@link Page}
      */
-    Iterable<UserIdpBindPO> getUserIdpBindList(Long userId);
+    Iterable<UserIdpBindPO> getUserIdpBindList(String userId);
 }

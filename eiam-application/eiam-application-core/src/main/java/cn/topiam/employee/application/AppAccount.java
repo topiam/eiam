@@ -25,7 +25,7 @@ import lombok.Data;
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/10 21:07
+ * Created by support@topiam.cn on 2023/7/10 21:07
  */
 @Data
 public class AppAccount implements Serializable {
@@ -36,12 +36,12 @@ public class AppAccount implements Serializable {
     /**
      * 应用ID
      */
-    private Long              appId;
+    private String            appId;
 
     /**
      * 用户ID
      */
-    private Long              userId;
+    private String            userId;
 
     /**
      * 账户名称
@@ -52,4 +52,9 @@ public class AppAccount implements Serializable {
      * 账户密码
      */
     private String            password;
+
+    /**
+     * 是否默认
+     */
+    private Boolean           defaulted;
 }

@@ -19,8 +19,8 @@ import { FieldNames, ServerExceptionStatus } from '../constant';
 import { changePassword } from '../service';
 import { ModalForm, ProFormInstance, ProFormText } from '@ant-design/pro-components';
 import { App, Spin } from 'antd';
-import { useEffect, useRef, useState } from 'react';
 import * as React from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useIntl } from '@umijs/max';
 
 /**

@@ -25,7 +25,6 @@ import java.util.Objects;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -45,9 +44,10 @@ import cn.topiam.employee.console.pojo.result.account.UserLoginAuditListResult;
 import cn.topiam.employee.console.pojo.result.account.UserResult;
 import cn.topiam.employee.console.pojo.save.account.UserCreateParam;
 import cn.topiam.employee.console.pojo.update.account.UserUpdateParam;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.context.ApplicationContextService;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
+import cn.topiam.employee.support.security.userdetails.DataOrigin;
 
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
@@ -133,14 +133,14 @@ public interface UserConverter {
         userEntity.setFullName(param.getFullName());
         userEntity.setNickName(param.getNickName());
         userEntity.setLastUpdatePasswordTime(LocalDateTime.now());
-        userEntity.setStatus(cn.topiam.employee.common.enums.UserStatus.ENABLE);
+        userEntity.setStatus(cn.topiam.employee.common.enums.UserStatus.ENABLED);
         userEntity.setAvatar(getRandomAvatar());
-        userEntity.setDataOrigin(cn.topiam.employee.common.enums.DataOrigin.INPUT);
+        userEntity.setDataOrigin(DataOrigin.INPUT.getType());
         userEntity.setExpireDate(
             java.util.Objects.isNull(param.getExpireDate()) ? java.time.LocalDate.of(2116, 12, 31)
                 : param.getExpireDate());
         userEntity.setAuthTotal(0L);
-        userEntity.setPassword(cn.topiam.employee.support.context.ApplicationContextHelp
+        userEntity.setPassword(cn.topiam.employee.support.context.ApplicationContextService
             .getBean(org.springframework.security.crypto.password.PasswordEncoder.class)
             .encode(param.getPassword()));
 
@@ -159,7 +159,7 @@ public interface UserConverter {
         }
         UserEntity userEntity = new UserEntity();
         if (param.getId() != null) {
-            userEntity.setId(Long.parseLong(param.getId()));
+            userEntity.setId(param.getId());
         }
         userEntity.setRemark(param.getRemark());
         if (org.apache.commons.lang3.StringUtils.isNotEmpty(param.getEmail())) {
@@ -187,7 +187,7 @@ public interface UserConverter {
      */
     @Mapping(target = "id", source = "user.id")
     @Mapping(target = "username", source = "user.username")
-    @Mapping(target = "dataOrigin", source = "user.dataOrigin.code")
+    @Mapping(target = "dataOrigin", source = "user.dataOrigin")
     @Mapping(target = "emailVerified", source = "user.emailVerified")
     @Mapping(target = "phoneVerified", source = "user.phoneVerified")
     @Mapping(target = "expireDate", source = "user.expireDate")
@@ -214,7 +214,7 @@ public interface UserConverter {
      * @param param {@link UserUpdateParam}
      * @return {@link UserDetailEntity}
      */
-    @Mapping(target = "deleted", ignore = true)
+
     @Mapping(target = "website", ignore = true)
     @Mapping(target = "idType", ignore = true)
     @Mapping(target = "updateTime", ignore = true)
@@ -230,7 +230,7 @@ public interface UserConverter {
      * @param param {@link  UserCreateParam}
      * @return {@link  UserDetailEntity}
      */
-    @Mapping(target = "deleted", ignore = true)
+
     @Mapping(target = "website", ignore = true)
     @Mapping(target = "idType", ignore = true)
     @Mapping(target = "userId", ignore = true)
@@ -247,9 +247,9 @@ public interface UserConverter {
      * 审计列表请求到本机搜索查询
      *
      * @param id   {@link Long}
-     * @return {@link NativeQuery}
+     * @return {@link Specification}
      */
-    default Specification<AuditEntity> auditListRequestConvertToSpecification(Long id,
+    default Specification<AuditEntity> auditListRequestConvertToSpecification(String id,
                                                                               PageModel pageModel) {
         //@formatter:off
         return (root, query, cb) -> {
@@ -287,7 +287,7 @@ public interface UserConverter {
         //总记录数
         auditEntityPage.forEach(audit -> {
             UserLoginAuditListResult result = new UserLoginAuditListResult();
-            result.setId(audit.getId().toString());
+            result.setId(audit.getId());
             //单点登录
             if (audit.getEventType().getCode().equals(PortalEventType.APP_SSO.getCode())) {
                 result.setAppName(getAppName(audit.getTargets().get(0).getId()));
@@ -327,7 +327,7 @@ public interface UserConverter {
     @Mapping(target = "status", source = "status.code")
     @Mapping(target = "phone", ignore = true)
     @Mapping(target = "authTotal", defaultValue = "0L", source = "authTotal")
-    @Mapping(target = "dataOrigin", source = "dataOrigin.code")
+    @Mapping(target = "dataOrigin", source = "dataOrigin")
     UserListResult userPoConvertToUserListResult(UserPO po);
 
     /**
@@ -340,8 +340,8 @@ public interface UserConverter {
         if (!StringUtils.hasText(targetId)) {
             return null;
         }
-        AppRepository repository = ApplicationContextHelp.getBean(AppRepository.class);
-        AppEntity app = repository.findById(Long.valueOf(targetId)).orElse(new AppEntity());
+        AppRepository repository = ApplicationContextService.getBean(AppRepository.class);
+        AppEntity app = repository.findById(targetId).orElse(new AppEntity());
         return app.getName();
     }
 

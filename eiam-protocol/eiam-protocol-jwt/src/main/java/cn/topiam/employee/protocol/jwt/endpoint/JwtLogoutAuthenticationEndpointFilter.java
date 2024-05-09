@@ -25,7 +25,8 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.web.DefaultRedirectStrategy;
+import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -36,6 +37,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import cn.topiam.employee.protocol.jwt.authentication.JwtAuthenticationFailureHandler;
 import cn.topiam.employee.protocol.jwt.authentication.JwtLogoutAuthenticationToken;
@@ -53,7 +55,7 @@ import static cn.topiam.employee.protocol.jwt.constant.JwtProtocolConstants.JWT_
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/9/4 20:14
+ * Created by support@topiam.cn on 2023/9/4 20:14
  */
 public final class JwtLogoutAuthenticationEndpointFilter extends OncePerRequestFilter {
 
@@ -61,6 +63,11 @@ public final class JwtLogoutAuthenticationEndpointFilter extends OncePerRequestF
      * 端点匹配器
      */
     private final RequestMatcher                               requestMatcher;
+
+    /**
+     * 重定向策略
+     */
+    private final RedirectStrategy                             redirectStrategy             = new DefaultRedirectStrategy();
 
     /**
      * 身份验证失败处理程序
@@ -93,11 +100,9 @@ public final class JwtLogoutAuthenticationEndpointFilter extends OncePerRequestF
     private final AuthenticationManager                        authenticationManager;
 
     public JwtLogoutAuthenticationEndpointFilter(RequestMatcher requestMatcher,
-                                                 SessionRegistry sessionRegistry,
                                                  AuthenticationManager authenticationManager) {
         Assert.notNull(requestMatcher, "requestMatcher cannot be empty");
-        Assert.notNull(sessionRegistry, "sessionRegistry cannot be empty");
-        Assert.notNull(sessionRegistry, "authenticationManager cannot be empty");
+        Assert.notNull(authenticationManager, "authenticationManager cannot be empty");
         this.authenticationManager = authenticationManager;
         this.logoutHandler = new SecurityContextLogoutHandler();
         this.requestMatcher = requestMatcher;
@@ -184,7 +189,7 @@ public final class JwtLogoutAuthenticationEndpointFilter extends OncePerRequestF
      * @param authentication {@link Authentication}
      */
     private void sendAuthorizationResponse(HttpServletRequest request, HttpServletResponse response,
-                                           Authentication authentication) {
+                                           Authentication authentication) throws IOException {
         JwtLogoutAuthenticationToken jwtLogoutAuthentication = (JwtLogoutAuthenticationToken) authentication;
         // Check for active user session
         if (jwtLogoutAuthentication.isPrincipalAuthenticated()
@@ -193,6 +198,12 @@ public final class JwtLogoutAuthenticationEndpointFilter extends OncePerRequestF
             this.logoutHandler.logout(request, response,
                 (Authentication) jwtLogoutAuthentication.getPrincipal());
         }
+        // Perform post-logout redirect
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder
+            .fromUriString(jwtLogoutAuthentication.getPostLogoutRedirectUri());
+        // build(true) -> Components are explicitly encoded
+        String redirectUri = uriBuilder.build(true).toUriString();
+        this.redirectStrategy.sendRedirect(request, response, redirectUri);
     }
 
 }

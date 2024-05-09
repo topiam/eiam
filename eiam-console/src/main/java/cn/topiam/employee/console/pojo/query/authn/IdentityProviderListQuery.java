@@ -30,7 +30,7 @@ import jakarta.validation.constraints.NotNull;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2022/3/21 21:52
+ * Created by support@topiam.cn on 2022/3/21 21:52
  */
 @Data
 @Schema(description = "查询认证源列表入参")

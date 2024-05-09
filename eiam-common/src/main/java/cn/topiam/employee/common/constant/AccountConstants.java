@@ -31,60 +31,38 @@ public final class AccountConstants {
     /**
      * 用户API
      */
-    public final static String   USER_PATH                  = V1_API_PATH + "/user";
+    public final static String USER_PATH            = V1_API_PATH + "/user";
     /**
      * 组织机构API
      */
-    public final static String   ORGANIZATION_PATH          = V1_API_PATH + "/organization";
+    public final static String ORGANIZATION_PATH    = V1_API_PATH + "/organization";
     /**
      * 用户组API
      */
-    public final static String   USER_GROUP_PATH            = V1_API_PATH + "/user_group";
-
-    /**
-     * 动态用户组API
-     */
-    public final static String   USER_DYNAMIC_GROUP_PATH    = V1_API_PATH + "/user_dynamic_group";
+    public final static String USER_GROUP_PATH      = V1_API_PATH + "/user_group";
 
     /**
      * 身份源API
      */
-    public final static String   IDENTITY_SOURCE_PATH       = V1_API_PATH + "/identity_source";
+    public final static String IDENTITY_SOURCE_PATH = V1_API_PATH + "/identity_source";
 
-    /**
-     * 组名称
-     */
-    public static final String   ACCOUNT_API_DOC_GROUP_NAME = "系统账户";
-
-    /**
-     * ACCOUNT_API_PATHS
-     */
-    public static final String[] ACCOUNT_API_PATHS          = { USER_PATH + "/**",
-                                                                ORGANIZATION_PATH + "/**",
-                                                                USER_GROUP_PATH + "/**",
-                                                                USER_DYNAMIC_GROUP_PATH + "/**",
-                                                                IDENTITY_SOURCE_PATH + "/**" };
     /**
      * 身份源缓存 cacheName
      */
-    public static final String   IDS_CACHE_NAME             = "ids";
+    public static final String IDS_CACHE_NAME       = "ids";
 
     /**
      * user 缓存 cacheName
      */
-    public static final String   USER_CACHE_NAME            = "user";
+    public static final String USER_CACHE_NAME      = "user";
     /**
      * org 缓存 cacheName
      */
-    public static final String   ORG_CACHE_NAME             = "organization";
+    public static final String ORG_CACHE_NAME       = "organization";
+
     /**
      * 根部门 ID
      */
-    public static final String   ROOT_DEPT_ID               = ROOT_NODE;
-
-    /**
-     * 根部门名称
-     */
-    public static final String   ROOT_DEPT_NAME             = "TopIAM Employee";
+    public static final String ROOT_DEPT_ID         = ROOT_NODE;
 
 }

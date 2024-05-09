@@ -21,11 +21,11 @@ import java.io.Serial;
 import java.util.Objects;
 
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SoftDelete;
 
 import cn.topiam.employee.common.enums.account.UserIdType;
-import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
+import cn.topiam.employee.support.repository.SoftDeleteConverter;
+import cn.topiam.employee.support.repository.base.BaseEntity;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -35,8 +35,7 @@ import lombok.experimental.Accessors;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
+import static cn.topiam.employee.support.repository.base.BaseEntity.IS_DELETED_COLUMN;
 
 /**
  * <p>
@@ -44,17 +43,16 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-08-07
+ * Created by support@topiam.cn on 2020-08-07
  */
 @Getter
 @Setter
 @ToString
 @Accessors(chain = true)
 @Entity
-@Table(name = "user_detail")
-@SQLDelete(sql = "update user_detail set " + SOFT_DELETE_SET + " where id_ = ?")
-@Where(clause = SOFT_DELETE_WHERE)
-public class UserDetailEntity extends LogicDeleteEntity<Long> {
+@Table(name = "eiam_user_detail")
+@SoftDelete(columnName = IS_DELETED_COLUMN, converter = SoftDeleteConverter.class)
+public class UserDetailEntity extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = -3599183663669763315L;
@@ -62,7 +60,7 @@ public class UserDetailEntity extends LogicDeleteEntity<Long> {
      * 用户表ID
      */
     @Column(name = "user_id")
-    private Long              userId;
+    private String            userId;
 
     /**
      * 证件类型

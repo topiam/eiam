@@ -45,13 +45,19 @@ public class AppAccessPolicyResult {
      * 应用ID
      */
     @Schema(description = "应用ID")
-    private Long                 appId;
+    private String               appId;
 
     /**
      * 应用名称
      */
     @Schema(description = "应用名称")
     private String               appName;
+
+    /**
+     * 应用图标
+     */
+    @Schema(description = "应用图标")
+    private String               appIcon;
 
     /**
      * 模板
@@ -88,6 +94,12 @@ public class AppAccessPolicyResult {
      */
     @Schema(description = "主体类型")
     private AppPolicySubjectType subjectType;
+
+    /**
+     * 是否启用
+     */
+    @Schema(description = "是否启用")
+    private Boolean              enabled;
 
     /**
      * 添加时间

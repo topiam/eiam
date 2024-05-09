@@ -26,7 +26,7 @@ import cn.topiam.employee.portal.pojo.result.BoundIdpListResult;
  * 账户服务
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/4/3 22:20
+ * Created by support@topiam.cn on 2022/4/3 22:20
  */
 public interface AccountService {
 

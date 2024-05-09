@@ -31,9 +31,9 @@ import cn.topiam.employee.console.pojo.result.setting.PasswordPolicyConfigResult
 import cn.topiam.employee.console.pojo.result.setting.WeakPasswordLibListResult;
 import cn.topiam.employee.console.pojo.save.setting.PasswordPolicySaveParam;
 import cn.topiam.employee.console.service.setting.PasswordPolicyService;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.context.ApplicationContextService;
 import cn.topiam.employee.support.security.password.weak.PasswordWeakLib;
-import static cn.topiam.employee.core.setting.constant.PasswordPolicySettingConstants.PASSWORD_POLICY_KEYS;
+import static cn.topiam.employee.core.setting.PasswordPolicySettingConstants.PASSWORD_POLICY_KEYS;
 
 /**
  * <p>
@@ -41,7 +41,7 @@ import static cn.topiam.employee.core.setting.constant.PasswordPolicySettingCons
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-08-17
+ * Created by support@topiam.cn on 2020-08-17
  */
 @Service
 public class PasswordPolicyServiceImpl extends SettingServiceImpl implements PasswordPolicyService {
@@ -74,7 +74,7 @@ public class PasswordPolicyServiceImpl extends SettingServiceImpl implements Pas
             .passwordPolicySaveParamConvertToEntity(param);
         Boolean save = settingRepository.save(list);
         //refresh
-        ApplicationContextHelp.refresh(ConfigBeanNameConstants.DEFAULT_PASSWORD_POLICY_MANAGER);
+        ApplicationContextService.refresh(ConfigBeanNameConstants.DEFAULT_PASSWORD_POLICY_MANAGER);
         return save;
     }
 

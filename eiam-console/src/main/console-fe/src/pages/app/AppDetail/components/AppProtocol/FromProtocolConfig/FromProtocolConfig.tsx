@@ -15,13 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { getAppConfig, saveAppConfig } from '@/services/app';
+import { getAppConfig, saveAppConfig } from '../../../service';
 import { useAsyncEffect } from 'ahooks';
-import { Alert, App, Divider, Form, Spin } from 'antd';
+import { App, Form, Spin } from 'antd';
 import React, { useState } from 'react';
 import {
   EditableProTable,
   FooterToolbar,
+  ProCard,
   ProColumns,
   ProForm,
   ProFormDependency,
@@ -33,17 +34,16 @@ import { FormEncryptType } from '../../../constant';
 import { omit } from 'lodash';
 import ConfigAbout from './ConfigAbout';
 import { useIntl } from '@umijs/max';
-import { AuthorizationType } from '../CommonConfig';
 import { GetApp } from '../../../data.d';
 import { generateUUID } from '@/utils/utils';
-import { Container } from '@/components/Container';
+import Alert from '@/components/Alert';
 
 const layout = {
   labelCol: {
     span: 6,
   },
   wrapperCol: {
-    span: 12,
+    span: 14,
   },
 };
 export default (props: { app: GetApp | Record<string, any> }) => {
@@ -86,211 +86,93 @@ export default (props: { app: GetApp | Record<string, any> }) => {
 
   return (
     <Spin spinning={loading}>
-      <Alert
-        banner
-        type={'info'}
-        showIcon={true}
-        message={
-          <span>
-            {intl.formatMessage({ id: 'app.issue' })}
-            {intl.formatMessage({ id: 'app.disposition' })}{' '}
-            <a
-              target={'_blank'}
-              href={'https://eiam.topiam.cn/docs/application/form/overview'}
-              rel="noreferrer"
-            >
-              {intl.formatMessage({
-                id: 'pages.app.config.detail.items.login_access.protocol_config.form',
-              })}
-            </a>{' '}
-            。
-          </span>
-        }
-      />
-      <br />
-      <Container maxWidth={1152}>
-        <ProForm
-          form={form}
-          requiredMark={true}
-          layout={'horizontal'}
-          {...layout}
-          scrollToFirstError
-          onFinish={async (values) => {
-            const validate = await otherFieldTableForm.validateFields();
-            setLoading(true);
-            if (validate) {
-              const { success } = await saveAppConfig({
-                id,
-                template,
-                config: omit(values, 'id', 'template'),
-              }).finally(() => {
-                setLoading(false);
-              });
-              if (success) {
-                message.success(intl.formatMessage({ id: 'app.save_success' }));
-                await getConfig();
-                return true;
-              }
-              message.error(intl.formatMessage({ id: 'app.save_fail' }));
+      <ProForm
+        form={form}
+        requiredMark={true}
+        layout={'horizontal'}
+        labelAlign={'right'}
+        {...layout}
+        scrollToFirstError
+        onFinish={async (values) => {
+          const validate = await otherFieldTableForm.validateFields();
+          setLoading(true);
+          if (validate) {
+            const { success } = await saveAppConfig({
+              id,
+              template,
+              config: omit(values, 'id', 'template'),
+            }).finally(() => {
+              setLoading(false);
+            });
+            if (success) {
+              message.success(intl.formatMessage({ id: 'app.save_success' }));
+              await getConfig();
+              return true;
             }
-            return false;
-          }}
-          submitter={{
-            render: (_, dom) => {
-              return <FooterToolbar>{dom}</FooterToolbar>;
-            },
-          }}
-        >
+            message.error(intl.formatMessage({ id: 'app.save_fail' }));
+          }
+          return false;
+        }}
+        submitter={{
+          render: (_, dom) => {
+            return <FooterToolbar>{dom.map((item) => item)}</FooterToolbar>;
+          },
+        }}
+      >
+        <ProCard bordered>
+          <Alert
+            banner
+            type={'grey'}
+            showIcon={true}
+            message={
+              <span>
+                {intl.formatMessage({ id: 'app.issue' })}
+                {intl.formatMessage({ id: 'app.disposition' })}{' '}
+                <a
+                  target={'_blank'}
+                  href={'https://eiam.topiam.cn/docs/portal/form/overview'}
+                  rel="noreferrer"
+                >
+                  {intl.formatMessage({
+                    id: 'pages.app.config.detail.protocol_config.form',
+                  })}
+                </a>{' '}
+                。
+              </span>
+            }
+          />
+          <br />
           <ProFormText name={'appId'} hidden />
           <ProFormText
             name={'loginUrl'}
             label={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.form.login_url',
+              id: 'pages.app.config.detail.protocol_config.form.login_url',
             })}
             placeholder={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.form.login_url.placeholder',
+              id: 'pages.app.config.detail.protocol_config.form.login_url.placeholder',
             })}
             extra={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.form.login_url.extra',
+              id: 'pages.app.config.detail.protocol_config.form.login_url.extra',
             })}
             rules={[
               {
                 required: true,
                 message: intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.protocol_config.form.login_url.rule.0.message',
+                  id: 'pages.app.config.detail.protocol_config.form.login_url.rule.0.message',
                 }),
               },
               {
                 type: 'url',
                 message: intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.protocol_config.form.login_url.rule.1.message',
+                  id: 'pages.app.config.detail.protocol_config.form.login_url.rule.1.message',
                 }),
               },
             ]}
           />
-          <ProFormText
-            name={'usernameField'}
-            label={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.form.username_field',
-            })}
-            placeholder={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.form.username_field.placeholder',
-            })}
-            extra={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.form.username_field.extra',
-            })}
-            rules={[
-              {
-                required: true,
-                message: intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.protocol_config.form.username_field.rule.0.message',
-                }),
-              },
-            ]}
-          />
-          <ProFormText
-            name={'passwordField'}
-            label={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.form.password_field',
-            })}
-            placeholder={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.form.password_field.placeholder',
-            })}
-            extra={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.form.password_field.extra',
-            })}
-            rules={[
-              {
-                required: true,
-                message: intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.protocol_config.form.password_field.rule.0.message',
-                }),
-              },
-            ]}
-          />
-          <ProFormSelect
-            label={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.form.password_encrypt_type',
-            })}
-            name={'passwordEncryptType'}
-            options={[
-              { value: FormEncryptType.aes, label: 'AES' },
-              { value: FormEncryptType.base64, label: 'BASE64' },
-              { value: FormEncryptType.md5, label: 'MD5' },
-            ]}
-            fieldProps={{ allowClear: true }}
-            extra={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.form.password_encrypt_type.extra',
-            })}
-          />
-          <ProFormDependency name={['passwordEncryptType']}>
-            {({ passwordEncryptType }) => {
-              return passwordEncryptType === FormEncryptType.aes ? (
-                <ProFormText
-                  label={intl.formatMessage({
-                    id: 'pages.app.config.detail.items.login_access.protocol_config.form.password_encrypt_key',
-                  })}
-                  name={'passwordEncryptKey'}
-                  extra={intl.formatMessage({
-                    id: 'pages.app.config.detail.items.login_access.protocol_config.form.password_encrypt_key.extra',
-                  })}
-                  rules={[
-                    {
-                      required: true,
-                      message: intl.formatMessage({
-                        id: 'pages.app.config.detail.items.login_access.protocol_config.form.password_encrypt_key.rule.0.message',
-                      }),
-                    },
-                  ]}
-                />
-              ) : (
-                <></>
-              );
-            }}
-          </ProFormDependency>
-          <ProFormSelect
-            label={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.form.username_encrypt_type',
-            })}
-            name={'usernameEncryptType'}
-            options={[
-              { value: FormEncryptType.aes, label: 'AES' },
-              { value: FormEncryptType.base64, label: 'BASE64' },
-            ]}
-            fieldProps={{ allowClear: true }}
-            extra={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.form.username_encrypt_type.extra',
-            })}
-          />
-          <ProFormDependency name={['usernameEncryptType']}>
-            {({ usernameEncryptType }) => {
-              return usernameEncryptType === FormEncryptType.aes ? (
-                <ProFormText
-                  label={intl.formatMessage({
-                    id: 'pages.app.config.detail.items.login_access.protocol_config.form.username_encrypt_key',
-                  })}
-                  name={'usernameEncryptKey'}
-                  extra={intl.formatMessage({
-                    id: 'pages.app.config.detail.items.login_access.protocol_config.form.username_encrypt_key.extra',
-                  })}
-                  rules={[
-                    {
-                      required: true,
-                      message: intl.formatMessage({
-                        id: 'pages.app.config.detail.items.login_access.protocol_config.form.username_encrypt_key.rule.0.message',
-                      }),
-                    },
-                  ]}
-                />
-              ) : (
-                <></>
-              );
-            }}
-          </ProFormDependency>
           <ProFormRadio.Group
             name={'submitType'}
             label={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.form.submit_type',
+              id: 'pages.app.config.detail.protocol_config.form.submit_type',
             })}
             initialValue={['post']}
             options={[
@@ -301,18 +183,133 @@ export default (props: { app: GetApp | Record<string, any> }) => {
               {
                 required: true,
                 message: intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.protocol_config.form.submit_type.rule.0.message',
+                  id: 'pages.app.config.detail.protocol_config.form.submit_type.rule.0.message',
                 }),
               },
             ]}
           />
-          <Divider />
-          {/*授权类型*/}
-          <AuthorizationType />
-          <Divider />
+          <ProFormText
+            name={'usernameField'}
+            label={intl.formatMessage({
+              id: 'pages.app.config.detail.protocol_config.form.username_field',
+            })}
+            placeholder={intl.formatMessage({
+              id: 'pages.app.config.detail.protocol_config.form.username_field.placeholder',
+            })}
+            extra={intl.formatMessage({
+              id: 'pages.app.config.detail.protocol_config.form.username_field.extra',
+            })}
+            rules={[
+              {
+                required: true,
+                message: intl.formatMessage({
+                  id: 'pages.app.config.detail.protocol_config.form.username_field.rule.0.message',
+                }),
+              },
+            ]}
+          />
+          <ProFormText
+            name={'passwordField'}
+            label={intl.formatMessage({
+              id: 'pages.app.config.detail.protocol_config.form.password_field',
+            })}
+            placeholder={intl.formatMessage({
+              id: 'pages.app.config.detail.protocol_config.form.password_field.placeholder',
+            })}
+            extra={intl.formatMessage({
+              id: 'pages.app.config.detail.protocol_config.form.password_field.extra',
+            })}
+            rules={[
+              {
+                required: true,
+                message: intl.formatMessage({
+                  id: 'pages.app.config.detail.protocol_config.form.password_field.rule.0.message',
+                }),
+              },
+            ]}
+          />
+          <ProFormSelect
+            label={intl.formatMessage({
+              id: 'pages.app.config.detail.protocol_config.form.password_encrypt_type',
+            })}
+            name={'passwordEncryptType'}
+            options={[
+              { value: FormEncryptType.aes, label: 'AES' },
+              { value: FormEncryptType.base64, label: 'BASE64' },
+              { value: FormEncryptType.md5, label: 'MD5' },
+            ]}
+            fieldProps={{ allowClear: true }}
+            extra={intl.formatMessage({
+              id: 'pages.app.config.detail.protocol_config.form.password_encrypt_type.extra',
+            })}
+          />
+          <ProFormDependency name={['passwordEncryptType']}>
+            {({ passwordEncryptType }) => {
+              return passwordEncryptType === FormEncryptType.aes ? (
+                <ProFormText
+                  label={intl.formatMessage({
+                    id: 'pages.app.config.detail.protocol_config.form.password_encrypt_key',
+                  })}
+                  name={'passwordEncryptKey'}
+                  extra={intl.formatMessage({
+                    id: 'pages.app.config.detail.protocol_config.form.password_encrypt_key.extra',
+                  })}
+                  rules={[
+                    {
+                      required: true,
+                      message: intl.formatMessage({
+                        id: 'pages.app.config.detail.protocol_config.form.password_encrypt_key.rule.0.message',
+                      }),
+                    },
+                  ]}
+                />
+              ) : (
+                <></>
+              );
+            }}
+          </ProFormDependency>
+          <ProFormSelect
+            label={intl.formatMessage({
+              id: 'pages.app.config.detail.protocol_config.form.username_encrypt_type',
+            })}
+            name={'usernameEncryptType'}
+            options={[
+              { value: FormEncryptType.aes, label: 'AES' },
+              { value: FormEncryptType.base64, label: 'BASE64' },
+            ]}
+            fieldProps={{ allowClear: true }}
+            extra={intl.formatMessage({
+              id: 'pages.app.config.detail.protocol_config.form.username_encrypt_type.extra',
+            })}
+          />
+          <ProFormDependency name={['usernameEncryptType']}>
+            {({ usernameEncryptType }) => {
+              return usernameEncryptType === FormEncryptType.aes ? (
+                <ProFormText
+                  label={intl.formatMessage({
+                    id: 'pages.app.config.detail.protocol_config.form.username_encrypt_key',
+                  })}
+                  name={'usernameEncryptKey'}
+                  extra={intl.formatMessage({
+                    id: 'pages.app.config.detail.protocol_config.form.username_encrypt_key.extra',
+                  })}
+                  rules={[
+                    {
+                      required: true,
+                      message: intl.formatMessage({
+                        id: 'pages.app.config.detail.protocol_config.form.username_encrypt_key.rule.0.message',
+                      }),
+                    },
+                  ]}
+                />
+              ) : (
+                <></>
+              );
+            }}
+          </ProFormDependency>
           <ProForm.Item
             label={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.protocol_config.form.other_field',
+              id: 'pages.app.config.detail.protocol_config.form.other_field',
             })}
             name="otherField"
             trigger="onValuesChange"
@@ -327,7 +324,7 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                 [
                   {
                     title: intl.formatMessage({
-                      id: 'pages.app.config.detail.items.login_access.protocol_config.form.other_field.columns.field_name',
+                      id: 'pages.app.config.detail.protocol_config.form.other_field.columns.field_name',
                     }),
                     dataIndex: 'fieldName',
                     fieldProps: {
@@ -338,7 +335,7 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                         {
                           required: true,
                           message: intl.formatMessage({
-                            id: 'pages.app.config.detail.items.login_access.protocol_config.form.other_field.columns.field_name.rule.0',
+                            id: 'pages.app.config.detail.protocol_config.form.other_field.columns.field_name.rule.0',
                           }),
                         },
                       ],
@@ -346,7 +343,7 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                   },
                   {
                     title: intl.formatMessage({
-                      id: 'pages.app.config.detail.items.login_access.protocol_config.form.other_field.columns.field_value',
+                      id: 'pages.app.config.detail.protocol_config.form.other_field.columns.field_value',
                     }),
                     key: 'fieldValue',
                     dataIndex: 'fieldValue',
@@ -356,7 +353,7 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                         {
                           required: true,
                           message: intl.formatMessage({
-                            id: 'pages.app.config.detail.items.login_access.protocol_config.form.other_field.columns.field_value.rule.0',
+                            id: 'pages.app.config.detail.protocol_config.form.other_field.columns.field_value.rule.0',
                           }),
                         },
                       ],
@@ -364,7 +361,7 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                   },
                   {
                     title: intl.formatMessage({
-                      id: 'pages.app.config.detail.items.login_access.protocol_config.form.other_field.columns.option',
+                      id: 'pages.app.config.detail.protocol_config.form.other_field.columns.option',
                     }),
                     valueType: 'option',
                     align: 'center',
@@ -375,7 +372,7 @@ export default (props: { app: GetApp | Record<string, any> }) => {
               }
               recordCreatorProps={{
                 creatorButtonText: intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.protocol_config.form.other_field.record_creator_props',
+                  id: 'pages.app.config.detail.protocol_config.form.other_field.record_creator_props',
                 }),
                 newRecordType: 'dataSource',
                 position: 'bottom',
@@ -389,7 +386,7 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                 editableKeys: otherFieldEditableKeys,
                 onChange: setOtherFieldEditableKeys,
                 deletePopconfirmMessage: intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.protocol_config.form.other_field.editable',
+                  id: 'pages.app.config.detail.protocol_config.form.other_field.editable',
                 }),
                 actionRender: (row, _, dom) => {
                   return [dom.delete];
@@ -397,10 +394,19 @@ export default (props: { app: GetApp | Record<string, any> }) => {
               }}
             />
           </ProForm.Item>
-        </ProForm>
-        <Divider style={{ margin: 0 }} />
-        <ConfigAbout appId={id} protocolEndpoint={protocolEndpoint} collapsed={false} {...layout} />
-      </Container>
+        </ProCard>
+      </ProForm>
+      <br />
+      <ProCard
+        title={intl.formatMessage({
+          id: 'pages.app.config.detail.protocol_config.form.config_about',
+        })}
+        bordered
+        collapsible
+        headerBordered
+      >
+        <ConfigAbout appId={id} protocolEndpoint={protocolEndpoint} {...layout} />
+      </ProCard>
     </Spin>
   );
 };

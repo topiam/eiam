@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * 获取应用证书列表结果
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/5/31 23:29
+ * Created by support@topiam.cn on 2022/5/31 23:29
  */
 @Data
 @AllArgsConstructor

@@ -28,13 +28,12 @@ import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.enums.app.AppProtocol;
 import cn.topiam.employee.common.enums.app.AppType;
 import cn.topiam.employee.common.enums.app.AuthorizationType;
-import cn.topiam.employee.common.enums.app.InitLoginType;
 
 /**
  * 应用接口
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/8/20 23:20
+ * Created by support@topiam.cn on 2022/8/20 23:20
  */
 public interface ApplicationService {
 
@@ -76,9 +75,11 @@ public interface ApplicationService {
     /**
      * 获取表单Schema
      *
-     * @return {@link Map}
+     * @return {@link Object}
      */
-    List<Map> getFormSchema();
+    default Object getFormSchema() {
+        return null;
+    }
 
     /**
      * 获取base64图标
@@ -90,10 +91,10 @@ public interface ApplicationService {
     /**
      * 创建应用
      *
-     * @param name {@link String} 名称
-     * @param icon {@link String} 图标
-     * @param remark {@link String} 备注
-     * @return {@link Long} 应用ID
+     * @param name     {@link String} 名称
+     * @param icon     {@link String} 图标
+     * @param remark   {@link String} 备注
+     * @return {@link String} 应用ID
      */
     @Transactional(rollbackFor = Exception.class)
     default String create(String name, String icon, String remark) {
@@ -103,14 +104,14 @@ public interface ApplicationService {
     /**
      * 创建应用
      *
-     * @param name {@link String} 名称
-     * @param icon {@link String} 图标
-     * @param remark {@link String} 备注
-     * @param groupIds {@link String} 分组id
-     * @return {@link Long} 应用ID
+     * @param name     {@link String} 名称
+     * @param icon     {@link String} 图标
+     * @param remark   {@link String} 备注
+     * @param groups {@link String} 应用分组
+     * @return {@link String} 应用ID
      */
     @Transactional(rollbackFor = Exception.class)
-    String create(String name, String icon, String remark, List<String> groupIds);
+    String create(String name, String icon, String remark, List<String> groups);
 
     /**
      * 删除应用
@@ -137,13 +138,13 @@ public interface ApplicationService {
     Object getConfig(String appId);
 
     /**
-     * 获取应用用户信息
+     * 获取默认应用用户信息
      *
-     * @param appId {@link Long}
-     * @param userId {@link Long}
+     * @param appId {@link String}
+     * @param userId {@link String}
      * @return {@link AppAccountEntity}
      */
-    AppAccount getAppAccount(Long appId, Long userId);
+    AppAccount getDefaultAppAccount(String appId, String userId);
 
     /**
      * 创建应用
@@ -151,11 +152,10 @@ public interface ApplicationService {
      * @param name {@link String}
      * @param icon  {@link String}
      * @param remark  {@link String}
-     * @param initLoginType  {@link InitLoginType}
      * @param authorizationType {@link AuthorizationType}
      * @return {@link AppEntity}
      */
-    AppEntity createApp(String name, String icon, String remark, InitLoginType initLoginType,
+    AppEntity createApp(String name, String icon, String remark,
                         AuthorizationType authorizationType);
 
     /**
@@ -164,11 +164,10 @@ public interface ApplicationService {
      * @param name {@link String}
      * @param icon  {@link String}
      * @param remark  {@link String}
-     * @param groupIds {@link Long} 分组id
-     * @param initLoginType  {@link InitLoginType}
+     * @param groups {@link String} 应用分组
      * @param authorizationType {@link AuthorizationType}
      * @return {@link AppEntity}
      */
-    AppEntity createApp(String name, String icon, String remark, List<String> groupIds,
-                        InitLoginType initLoginType, AuthorizationType authorizationType);
+    AppEntity createApp(String name, String icon, String remark, List<String> groups,
+                        AuthorizationType authorizationType);
 }

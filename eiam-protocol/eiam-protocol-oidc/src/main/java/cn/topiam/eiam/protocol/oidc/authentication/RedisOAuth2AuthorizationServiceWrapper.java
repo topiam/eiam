@@ -17,9 +17,8 @@
  */
 package cn.topiam.eiam.protocol.oidc.authentication;
 
-import java.util.*;
+import java.util.Objects;
 
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
@@ -31,16 +30,15 @@ import cn.topiam.employee.application.context.ApplicationContextHolder;
  * RedisOAuth2AuthorizationService
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/10/31 21:41
+ * Created by support@topiam.cn on 2022/10/31 21:41
  */
 @SuppressWarnings({ "AlibabaServiceOrDaoClassShouldEndWithImpl",
                     "AlibabaClassNamingShouldBeCamel" })
 public class RedisOAuth2AuthorizationServiceWrapper extends RedisOAuth2AuthorizationService {
 
     public RedisOAuth2AuthorizationServiceWrapper(RedisOperations<String, String> redisOperations,
-                                                  RegisteredClientRepository clientRepository,
-                                                  AutowireCapableBeanFactory beanFactory) {
-        super(redisOperations, clientRepository, beanFactory);
+                                                  RegisteredClientRepository clientRepository) {
+        super(redisOperations, clientRepository);
     }
 
     /**
@@ -50,7 +48,7 @@ public class RedisOAuth2AuthorizationServiceWrapper extends RedisOAuth2Authoriza
      */
     @Override
     public void save(OAuth2Authorization authorization) {
-        Long appId = ApplicationContextHolder.getApplicationContext().getAppId();
+        String appId = ApplicationContextHolder.getApplicationContext().getAppId();
         if (authorization.getRegisteredClientId().equals(String.valueOf(appId))) {
             super.save(authorization);
         }
@@ -63,7 +61,7 @@ public class RedisOAuth2AuthorizationServiceWrapper extends RedisOAuth2Authoriza
      */
     @Override
     public void remove(OAuth2Authorization authorization) {
-        Long appId = ApplicationContextHolder.getApplicationContext().getAppId();
+        String appId = ApplicationContextHolder.getApplicationContext().getAppId();
         if (authorization.getRegisteredClientId().equals(String.valueOf(appId))) {
             super.remove(authorization);
         }
@@ -80,7 +78,7 @@ public class RedisOAuth2AuthorizationServiceWrapper extends RedisOAuth2Authoriza
     public OAuth2Authorization findById(String id) {
         OAuth2Authorization authorization = super.findById(id);
         if (!Objects.isNull(authorization)) {
-            Long appId = ApplicationContextHolder.getApplicationContext().getAppId();
+            String appId = ApplicationContextHolder.getApplicationContext().getAppId();
             if (authorization.getRegisteredClientId().equals(String.valueOf(appId))) {
                 return authorization;
             }
@@ -100,7 +98,7 @@ public class RedisOAuth2AuthorizationServiceWrapper extends RedisOAuth2Authoriza
     public OAuth2Authorization findByToken(String token, OAuth2TokenType tokenType) {
         OAuth2Authorization authorization = super.findByToken(token, tokenType);
         if (!Objects.isNull(authorization)) {
-            Long appId = ApplicationContextHolder.getApplicationContext().getAppId();
+            String appId = ApplicationContextHolder.getApplicationContext().getAppId();
             if (authorization.getRegisteredClientId().equals(String.valueOf(appId))) {
                 return authorization;
             }

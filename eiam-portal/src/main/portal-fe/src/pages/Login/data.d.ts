@@ -39,6 +39,7 @@ export type IdpList = {
   name: string;
   type: string;
   category: string;
+  authorizationUri: string;
 };
 
 export type LoginConfig = {

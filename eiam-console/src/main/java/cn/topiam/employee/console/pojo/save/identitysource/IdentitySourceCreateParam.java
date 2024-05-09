@@ -33,7 +33,7 @@ import jakarta.validation.constraints.NotNull;
  * 身份源保存入参
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/1 01:37
+ * Created by support@topiam.cn on 2022/2/1 01:37
  */
 @Data
 @Schema(description = "身份源保存入参")

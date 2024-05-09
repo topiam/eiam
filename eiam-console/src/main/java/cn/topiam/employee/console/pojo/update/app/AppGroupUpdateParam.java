@@ -28,7 +28,7 @@ import jakarta.validation.constraints.NotNull;
  * 分组修改入参
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/7/18 23:26
+ * Created by support@topiam.cn on 2021/7/18 23:26
  */
 @Data
 @Schema(description = "分组修改入参")
@@ -39,7 +39,7 @@ public class AppGroupUpdateParam implements Serializable {
      */
     @Schema(description = "分组id")
     @NotNull(message = "ID不能为空")
-    private Long   id;
+    private String id;
 
     /**
      * 分组名称

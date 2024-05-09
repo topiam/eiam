@@ -30,7 +30,7 @@ import jakarta.validation.constraints.NotEmpty;
  * 身份源修改参数入参
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/25 23:04
+ * Created by support@topiam.cn on 2022/2/25 23:04
  */
 @Data
 @Schema(description = "身份源修改参数")

@@ -26,7 +26,7 @@ import cn.topiam.employee.support.web.converter.EnumConvert;
  * 规则效果
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/4 21:07
+ * Created by support@topiam.cn on 2021/11/4 21:07
  */
 public enum AppPolicyEffect implements BaseEnum {
                                                  /**

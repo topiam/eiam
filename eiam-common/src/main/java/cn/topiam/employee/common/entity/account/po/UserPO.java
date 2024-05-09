@@ -42,8 +42,31 @@ public class UserPO extends UserEntity {
      */
     private String            orgDisplayPath;
 
-    /**
-     * 主组织机构显示目录
-     */
-    private String            primaryOrgDisplayPath;
+    public UserPO(UserEntity user, String orgDisplayPath) {
+        super.setId(user.getId());
+        super.setUsername(user.getUsername());
+        super.setPassword(user.getPassword());
+        super.setEmail(user.getEmail());
+        super.setPhone(user.getPhone());
+        super.setPhoneAreaCode(user.getPhoneAreaCode());
+        super.setFullName(user.getFullName());
+        super.setNickName(user.getNickName());
+        super.setAvatar(user.getAvatar());
+        super.setStatus(user.getStatus());
+        super.setDataOrigin(user.getDataOrigin());
+        super.setEmailVerified(user.getEmailVerified());
+        super.setPhoneVerified(user.getPhoneVerified());
+        super.setAuthTotal(user.getAuthTotal());
+        super.setLastAuthIp(user.getLastAuthIp());
+        super.setLastAuthTime(user.getLastAuthTime());
+        super.setExpand(user.getExpand());
+        super.setExternalId(user.getExternalId());
+        super.setExpireDate(user.getExpireDate());
+        super.setCreateBy(user.getCreateBy());
+        super.setCreateTime(user.getCreateTime());
+        super.setUpdateBy(user.getUpdateBy());
+        super.setUpdateTime(user.getUpdateTime());
+        super.setRemark(user.getRemark());
+        setOrgDisplayPath(orgDisplayPath);
+    }
 }

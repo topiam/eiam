@@ -17,9 +17,13 @@
  */
 package cn.topiam.employee.console.service.app.impl;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -32,10 +36,10 @@ import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.AppGroupAssociationEntity;
-import cn.topiam.employee.common.entity.app.query.AppQuery;
 import cn.topiam.employee.common.repository.app.AppGroupAssociationRepository;
 import cn.topiam.employee.common.repository.app.AppRepository;
 import cn.topiam.employee.console.converter.app.AppConverter;
+import cn.topiam.employee.console.pojo.query.app.AppQuery;
 import cn.topiam.employee.console.pojo.result.app.AppCreateResult;
 import cn.topiam.employee.console.pojo.result.app.AppGetResult;
 import cn.topiam.employee.console.pojo.result.app.AppListResult;
@@ -50,8 +54,8 @@ import cn.topiam.employee.support.util.BeanUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
-import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
+import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_BY;
+import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_TIME;
 
 /**
  * ApplicationServiceImpl
@@ -72,10 +76,17 @@ public class AppServiceImpl implements AppService {
      * @return {@link AppListResult}
      */
     @Override
-    public Page<AppListResult> getAppList(PageModel pageModel, AppQuery query) {
+    public Page<AppListResult> getAppList(PageModel pageModel,
+                                          cn.topiam.employee.console.pojo.query.app.AppQuery query) {
+        //查询条件
+        Specification<AppEntity> specification = appConverter
+            .queryAppListParamConvertToSpecification(query);
+        //分页条件
+        PageRequest request = PageRequest.of(pageModel.getCurrent(), pageModel.getPageSize(),
+            Sort.by(Sort.Direction.DESC, LAST_MODIFIED_TIME));
         //查询映射
-        org.springframework.data.domain.Page<AppEntity> list = appRepository.getAppList(query,
-            PageRequest.of(pageModel.getCurrent(), pageModel.getPageSize()));
+        org.springframework.data.domain.Page<AppEntity> list = appRepository.findAll(specification,
+            request);
         return appConverter.entityConvertToAppListResult(list);
     }
 
@@ -97,7 +108,8 @@ public class AppServiceImpl implements AppService {
         } else {
             appId = applicationService.create(param.getName(), param.getIcon(), param.getRemark());
         }
-        AuditContext.setTarget(Target.builder().id(appId).type(TargetType.APPLICATION).build());
+        AuditContext.setTarget(
+            Target.builder().id(appId).name(param.getName()).type(TargetType.APPLICATION).build());
         return new AppCreateResult(appId);
     }
 
@@ -114,17 +126,25 @@ public class AppServiceImpl implements AppService {
         AppEntity entity = appConverter.appUpdateParamConverterToEntity(param);
         BeanUtils.merge(entity, app, LAST_MODIFIED_TIME, LAST_MODIFIED_BY);
         appRepository.save(app);
-        appGroupAssociationRepository.deleteAllByAppId(app.getId());
-        List<AppGroupAssociationEntity> list = new ArrayList<>();
-        for (String id : param.getGroupIds()) {
-            AppGroupAssociationEntity appGroupAssociationEntity = new AppGroupAssociationEntity();
-            appGroupAssociationEntity.setGroupId(Long.valueOf(id));
-            appGroupAssociationEntity.setAppId(app.getId());
-            list.add(appGroupAssociationEntity);
-        }
-        appGroupAssociationRepository.saveAll(list);
-        AuditContext.setTarget(
-            Target.builder().id(param.getId().toString()).type(TargetType.APPLICATION).build());
+        //应用分组
+        List<AppGroupAssociationEntity> list = appGroupAssociationRepository.findByApp(app);
+        //要添加的分组
+        List<String> addGroupIds = param.getGroupIds().stream().distinct()
+            .filter(id -> list.stream().noneMatch(i -> id.equals(i.getGroupId()))).toList();
+        addGroupIds.forEach(groupId -> {
+            AppGroupAssociationEntity association = new AppGroupAssociationEntity();
+            association.setApp(app);
+            association.setGroupId(String.valueOf(groupId));
+            appGroupAssociationRepository.save(association);
+        });
+        //要删除的分组
+        List<String> deleteGroupIds = list.stream().map(AppGroupAssociationEntity::getGroupId)
+            .toList().stream().distinct()
+            .filter(id -> param.getGroupIds().stream().noneMatch(id::equals)).toList();
+        deleteGroupIds.forEach(groupId -> appGroupAssociationRepository
+            .deleteByGroupIdAndAppId(groupId, entity.getId()));
+        AuditContext.setTarget(Target.builder().id(param.getId()).name(param.getName())
+            .type(TargetType.APPLICATION).build());
         return true;
     }
 
@@ -136,12 +156,12 @@ public class AppServiceImpl implements AppService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean deleteApp(Long id) {
+    public boolean deleteApp(String id) {
         AppEntity app = appRequireNonNull(id);
-        applicationServiceLoader.getApplicationService(app.getTemplate()).delete(id.toString());
-        appGroupAssociationRepository.deleteByAppId(id);
-        AuditContext
-            .setTarget(Target.builder().id(id.toString()).type(TargetType.APPLICATION).build());
+        applicationServiceLoader.getApplicationService(app.getTemplate()).delete(id);
+        appGroupAssociationRepository.deleteByApp(app);
+        AuditContext.setTarget(
+            Target.builder().id(id).name(app.getName()).type(TargetType.APPLICATION).build());
         return true;
     }
 
@@ -152,11 +172,11 @@ public class AppServiceImpl implements AppService {
      * @return {@link AppEntity}
      */
     @Override
-    public AppGetResult getApp(Long id) {
+    public AppGetResult getApp(String id) {
         Optional<AppEntity> optional = appRepository.findById(id);
         if (optional.isPresent()) {
             AppEntity entity = optional.get();
-            List<Long> groupIds = appGroupAssociationRepository.findGroupIdByAppId(id);
+            List<String> groupIds = appGroupAssociationRepository.findGroupIdByAppId(id);
             return appConverter.entityConvertToAppResult(entity, groupIds);
         }
         return null;
@@ -171,9 +191,10 @@ public class AppServiceImpl implements AppService {
      */
     @Override
     public Boolean enableApp(String id) {
-        appRequireNonNull(Long.valueOf(id));
-        Integer count = appRepository.updateAppStatus(Long.valueOf(id), Boolean.TRUE);
-        AuditContext.setTarget(Target.builder().id(id).type(TargetType.APPLICATION).build());
+        AppEntity appEntity = appRequireNonNull(id);
+        Integer count = appRepository.updateAppStatus(id, Boolean.TRUE);
+        AuditContext.setTarget(
+            Target.builder().id(id).name(appEntity.getName()).type(TargetType.APPLICATION).build());
         return count > 0;
     }
 
@@ -185,9 +206,10 @@ public class AppServiceImpl implements AppService {
      */
     @Override
     public Boolean disableApp(String id) {
-        appRequireNonNull(Long.valueOf(id));
-        Integer count = appRepository.updateAppStatus(Long.valueOf(id), Boolean.FALSE);
-        AuditContext.setTarget(Target.builder().id(id).type(TargetType.APPLICATION).build());
+        AppEntity appEntity = appRequireNonNull(id);
+        Integer count = appRepository.updateAppStatus(id, Boolean.FALSE);
+        AuditContext.setTarget(
+            Target.builder().id(id).name(appEntity.getName()).type(TargetType.APPLICATION).build());
         return count > 0;
     }
 
@@ -202,8 +224,8 @@ public class AppServiceImpl implements AppService {
         ApplicationService applicationService = applicationServiceLoader
             .getApplicationService(param.getTemplate());
         applicationService.saveConfig(param.getId(), param.getConfig());
-        AuditContext
-            .setTarget(Target.builder().id(param.getId()).type(TargetType.APPLICATION).build());
+        AuditContext.setTarget(
+            Target.builder().id(param.getId()).name("").type(TargetType.APPLICATION).build());
         return true;
     }
 
@@ -215,7 +237,7 @@ public class AppServiceImpl implements AppService {
      */
     @Override
     public Object getAppConfig(String appId) {
-        Optional<AppEntity> optional = appRepository.findById(Long.valueOf(appId));
+        Optional<AppEntity> optional = appRepository.findById(appId);
         if (optional.isPresent()) {
             ApplicationService applicationService = applicationServiceLoader
                 .getApplicationService(optional.get().getTemplate());
@@ -230,7 +252,7 @@ public class AppServiceImpl implements AppService {
      * @param id {@link Long}
      * @return {@link AppEntity}
      */
-    private AppEntity appRequireNonNull(Long id) {
+    private AppEntity appRequireNonNull(String id) {
         Optional<AppEntity> optional = appRepository.findById(id);
         if (optional.isEmpty()) {
             AuditContext.setContent("操作失败，应用不存在");

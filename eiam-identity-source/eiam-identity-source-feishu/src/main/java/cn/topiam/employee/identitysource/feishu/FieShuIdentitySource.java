@@ -42,7 +42,7 @@ import jakarta.servlet.http.HttpServletRequest;
  * 飞书身份源
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/9/21 21:04
+ * Created by support@topiam.cn on 2022/9/21 21:04
  */
 @Slf4j
 public class FieShuIdentitySource extends AbstractDefaultIdentitySource<FeiShuConfig> {

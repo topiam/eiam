@@ -19,10 +19,10 @@ package cn.topiam.eiam.protocol.oidc.authentication;
 
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.core.log.LogMessage;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2Error;
@@ -31,17 +31,19 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationValidator;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+import static org.springframework.security.oauth2.core.OAuth2ErrorCodes.INVALID_REQUEST;
+
 import static cn.topiam.eiam.protocol.oidc.authentication.OAuth2AuthorizationImplicitRequestAuthenticationProvider.IMPLICIT;
+import static cn.topiam.eiam.protocol.oidc.endpoint.OAuth2ParameterNames.*;
 
 /**
  * 验证器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/11/9 23:54
+ * Created by support@topiam.cn on 2022/11/9 23:54
  */
 @SuppressWarnings("AlibabaClassNamingShouldBeCamel")
 public final class OAuth2AuthorizationImplicitRequestAuthenticationValidator implements
@@ -61,9 +63,11 @@ public final class OAuth2AuthorizationImplicitRequestAuthenticationValidator imp
      */
     public static final Consumer<OAuth2AuthorizationImplicitRequestAuthenticationContext> DEFAULT_REDIRECT_URI_VALIDATOR = OAuth2AuthorizationImplicitRequestAuthenticationValidator::validateRedirectUri;
     public static final Consumer<OAuth2AuthorizationImplicitRequestAuthenticationContext> DEFAULT_GRANT_TYPE_VALIDATOR   = OAuth2AuthorizationImplicitRequestAuthenticationValidator::validateGrantType;
+    public static final Consumer<OAuth2AuthorizationImplicitRequestAuthenticationContext> DEFAULT_VALIDATE_RESPONSE_MODE = OAuth2AuthorizationImplicitRequestAuthenticationValidator::validateResponseMode;
 
     private final Consumer<OAuth2AuthorizationImplicitRequestAuthenticationContext>       authenticationValidator        = DEFAULT_REDIRECT_URI_VALIDATOR
-        .andThen(DEFAULT_SCOPE_VALIDATOR).andThen(DEFAULT_GRANT_TYPE_VALIDATOR);
+        .andThen(DEFAULT_SCOPE_VALIDATOR).andThen(DEFAULT_GRANT_TYPE_VALIDATOR)
+        .andThen(DEFAULT_VALIDATE_RESPONSE_MODE);
 
     @Override
     public void accept(OAuth2AuthorizationImplicitRequestAuthenticationContext authenticationContext) {
@@ -80,15 +84,19 @@ public final class OAuth2AuthorizationImplicitRequestAuthenticationValidator imp
         OAuth2AuthorizationImplicitRequestAuthenticationToken authorizationImplicitRequestAuthenticationToken = authenticationContext
             .getAuthentication();
         Set<String> requestedScopes = authorizationImplicitRequestAuthenticationToken.getScopes();
-        if (!CollectionUtils.isEmpty(requestedScopes)) {
-            Set<String> unauthorizedScopes = requestedScopes.stream()
-                .filter(requestedScope -> !registeredClient.getScopes().contains(requestedScope))
-                .collect(Collectors.toSet());
-            if (!CollectionUtils.isEmpty(unauthorizedScopes)) {
-                throwError(OAuth2ErrorCodes.INVALID_SCOPE, OAuth2ParameterNames.SCOPE,
-                    authorizationImplicitRequestAuthenticationToken, registeredClient);
+        Set<String> allowedScopes = registeredClient.getScopes();
+
+        if (!requestedScopes.isEmpty() && !allowedScopes.containsAll(requestedScopes)) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(
+                    LogMessage.format("Invalid request: requested scope is not allowed"
+                                      + " for registered client '%s'",
+                        registeredClient.getId()));
             }
+            throwError(OAuth2ErrorCodes.INVALID_SCOPE, OAuth2ParameterNames.SCOPE,
+                authorizationImplicitRequestAuthenticationToken, registeredClient);
         }
+
     }
 
     /**
@@ -102,19 +110,27 @@ public final class OAuth2AuthorizationImplicitRequestAuthenticationValidator imp
         RegisteredClient registeredClient = authenticationContext.getRegisteredClient();
         //校验 grant type
         if (!registeredClient.getAuthorizationGrantTypes().contains(IMPLICIT)) {
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.warn(LogMessage.format(
+                    "Invalid request: requested grant_type is not allowed for registered client '%s'",
+                    registeredClient.getId()));
+            }
             throwError(OAuth2ErrorCodes.UNAUTHORIZED_CLIENT, OAuth2ParameterNames.CLIENT_ID,
                 authorizationCodeRequestAuthentication, registeredClient);
         }
     }
 
-    @SuppressWarnings("AlibabaUndefineMagicConstant")
+    /**
+     * 验证重定向uri
+     *
+     * @param authenticationContext {@link OAuth2AuthorizationImplicitRequestAuthenticationContext}
+     */
     private static void validateRedirectUri(OAuth2AuthorizationImplicitRequestAuthenticationContext authenticationContext) {
-        OAuth2AuthorizationImplicitRequestAuthenticationToken authorizationImplicitRequestAuthenticationToken = authenticationContext
+        OAuth2AuthorizationImplicitRequestAuthenticationToken authorizationImplicitRequestAuthentication = authenticationContext
             .getAuthentication();
         RegisteredClient registeredClient = authenticationContext.getRegisteredClient();
 
-        String requestedRedirectUri = authorizationImplicitRequestAuthenticationToken
-            .getRedirectUri();
+        String requestedRedirectUri = authorizationImplicitRequestAuthentication.getRedirectUri();
 
         if (StringUtils.hasText(requestedRedirectUri)) {
             // ***** redirect_uri is available in authorization request
@@ -123,7 +139,7 @@ public final class OAuth2AuthorizationImplicitRequestAuthenticationValidator imp
             try {
                 requestedRedirect = UriComponentsBuilder.fromUriString(requestedRedirectUri)
                     .build();
-            } catch (Exception ignored) {
+            } catch (Exception ex) {
             }
             if (requestedRedirect == null || requestedRedirect.getFragment() != null) {
                 if (LOGGER.isDebugEnabled()) {
@@ -133,8 +149,7 @@ public final class OAuth2AuthorizationImplicitRequestAuthenticationValidator imp
                             registeredClient.getId()));
                 }
                 throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.REDIRECT_URI,
-                    authorizationImplicitRequestAuthenticationToken, registeredClient);
-                return;
+                    authorizationImplicitRequestAuthentication, registeredClient);
             }
 
             if (!isLoopbackAddress(requestedRedirect.getHost())) {
@@ -143,7 +158,7 @@ public final class OAuth2AuthorizationImplicitRequestAuthenticationValidator imp
                 // authorization servers MUST utilize exact string matching.
                 if (!registeredClient.getRedirectUris().contains(requestedRedirectUri)) {
                     throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.REDIRECT_URI,
-                        authorizationImplicitRequestAuthenticationToken, registeredClient);
+                        authorizationImplicitRequestAuthentication, registeredClient);
                 }
             } else {
                 // As per https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-08#section-8.4.2
@@ -170,23 +185,22 @@ public final class OAuth2AuthorizationImplicitRequestAuthenticationValidator imp
                                 registeredClient.getId()));
                     }
                     throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.REDIRECT_URI,
-                        authorizationImplicitRequestAuthenticationToken, registeredClient);
+                        authorizationImplicitRequestAuthentication, registeredClient);
                 }
             }
 
         } else {
             // ***** redirect_uri is NOT available in authorization request
 
-            if (authorizationImplicitRequestAuthenticationToken.getScopes()
-                .contains(OidcScopes.OPENID) || registeredClient.getRedirectUris().size() != 1) {
+            if (authorizationImplicitRequestAuthentication.getScopes().contains(OidcScopes.OPENID)
+                || registeredClient.getRedirectUris().size() != 1) {
                 // redirect_uri is REQUIRED for OpenID Connect
                 throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.REDIRECT_URI,
-                    authorizationImplicitRequestAuthenticationToken, registeredClient);
+                    authorizationImplicitRequestAuthentication, registeredClient);
             }
         }
     }
 
-    @SuppressWarnings("AlibabaUndefineMagicConstant")
     private static boolean isLoopbackAddress(String host) {
         if (!StringUtils.hasText(host)) {
             return false;
@@ -212,6 +226,30 @@ public final class OAuth2AuthorizationImplicitRequestAuthenticationValidator imp
         }
     }
 
+    /**
+     * 验证响应模式
+     *
+     * @param authenticationContext {@link OAuth2AuthorizationImplicitRequestAuthenticationContext}
+     */
+    private static void validateResponseMode(OAuth2AuthorizationImplicitRequestAuthenticationContext authenticationContext) {
+        OAuth2AuthorizationImplicitRequestAuthenticationToken implicitRequestAuthenticationToken = authenticationContext
+            .getAuthentication();
+        RegisteredClient registeredClient = authenticationContext.getRegisteredClient();
+        if (implicitRequestAuthenticationToken.getResponseMode() == null) {
+            return;
+        }
+        if (!FRAGMENT.equals(implicitRequestAuthenticationToken.getResponseMode())
+            || !QUERY.equals(implicitRequestAuthenticationToken.getResponseMode())) {
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.warn(
+                    LogMessage.format("Invalidated response_type used by registered client '%s'",
+                        registeredClient.getId()));
+            }
+            throwError(INVALID_REQUEST, RESPONSE_MODE, implicitRequestAuthenticationToken,
+                registeredClient);
+        }
+    }
+
     private static void throwError(String errorCode, String parameterName,
                                    OAuth2AuthorizationImplicitRequestAuthenticationToken authorizationCodeRequestAuthentication,
                                    RegisteredClient registeredClient) {
@@ -228,24 +266,29 @@ public final class OAuth2AuthorizationImplicitRequestAuthenticationValidator imp
             .hasText(authorizationCodeRequestAuthentication.getRedirectUri())
                 ? authorizationCodeRequestAuthentication.getRedirectUri()
                 : registeredClient.getRedirectUris().iterator().next();
-        if (error.getErrorCode().equals(OAuth2ErrorCodes.INVALID_REQUEST)
+        if (error.getErrorCode().equals(INVALID_REQUEST)
             && parameterName.equals(OAuth2ParameterNames.REDIRECT_URI)) {
             // Prevent redirects
             redirectUri = null;
         }
 
-        OAuth2AuthorizationImplicitRequestAuthenticationToken authorizationImplicitRequestAuthenticationToken = new OAuth2AuthorizationImplicitRequestAuthenticationToken(
-            authorizationCodeRequestAuthentication.getAuthorizationUri(),
-            authorizationCodeRequestAuthentication.getClientId(),
-            (Authentication) authorizationCodeRequestAuthentication.getPrincipal(), redirectUri,
-            authorizationCodeRequestAuthentication.getState(),
-            authorizationCodeRequestAuthentication.getScopes(),
-            authorizationCodeRequestAuthentication.getResponseTypes(),
-            authorizationCodeRequestAuthentication.getAdditionalParameters());
-        authorizationImplicitRequestAuthenticationToken.setAuthenticated(true);
-
         throw new OAuth2AuthorizationImplicitRequestAuthenticationException(error,
-            authorizationImplicitRequestAuthenticationToken);
+            getRequestAuthenticationToken(authorizationCodeRequestAuthentication, redirectUri));
+    }
+
+    @NotNull
+    private static OAuth2AuthorizationImplicitRequestAuthenticationToken getRequestAuthenticationToken(OAuth2AuthorizationImplicitRequestAuthenticationToken requestAuthenticationToken,
+                                                                                                       String redirectUri) {
+        OAuth2AuthorizationImplicitRequestAuthenticationToken authorizationImplicitRequestAuthenticationToken = new OAuth2AuthorizationImplicitRequestAuthenticationToken(
+            requestAuthenticationToken.getAuthorizationUri(),
+            requestAuthenticationToken.getClientId(),
+            (Authentication) requestAuthenticationToken.getPrincipal(), redirectUri,
+            requestAuthenticationToken.getState(), requestAuthenticationToken.getScopes(),
+            requestAuthenticationToken.getResponseTypes(),
+            requestAuthenticationToken.getResponseMode(),
+            requestAuthenticationToken.getAdditionalParameters());
+        authorizationImplicitRequestAuthenticationToken.setAuthenticated(true);
+        return authorizationImplicitRequestAuthenticationToken;
     }
 
 }

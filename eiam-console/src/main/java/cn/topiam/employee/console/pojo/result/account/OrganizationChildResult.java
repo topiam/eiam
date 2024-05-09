@@ -24,7 +24,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
@@ -42,65 +41,65 @@ public class OrganizationChildResult implements Serializable {
     /**
      * 主键ID
      */
-    @Parameter(description = "ID")
+    @Schema(description = "ID")
     private String            id;
 
     /**
      * 名称
      */
-    @Parameter(description = "名称")
+    @Schema(description = "名称")
     private String            name;
 
     /**
      * 父级
      */
-    @Parameter(description = "父级")
+    @Schema(description = "父级")
     private String            parentId;
 
     /**
      * 显示路径
      */
-    @Parameter(description = "显示路径")
+    @Schema(description = "显示路径")
     private String            displayPath;
 
     /**
      * 编码
      */
-    @Parameter(description = "编码")
+    @Schema(description = "编码")
     private String            code;
 
     /**
      * 外部ID
      */
-    @Parameter(description = "外部ID")
+    @Schema(description = "外部ID")
     private String            externalId;
     /**
      * 来源
      */
-    @Parameter(description = "类型")
+    @Schema(description = "类型")
     private String            type;
     /**
      * 来源
      */
-    @Parameter(description = "数据来源")
+    @Schema(description = "数据来源")
     private String            dataOrigin;
 
     /**
      * 排序
      */
-    @Parameter(description = "排序")
+    @Schema(description = "排序")
     private Integer           order;
 
     /**
      * 是否启用
      */
-    @Parameter(description = "是否启用")
+    @Schema(description = "是否启用")
     private Boolean           enabled;
     /**
      * 是否叶子节点
      */
     @JsonProperty(value = "isLeaf")
-    @Parameter(description = "是否叶子节点")
+    @Schema(description = "是否叶子节点")
     private Boolean           leaf;
 
 }

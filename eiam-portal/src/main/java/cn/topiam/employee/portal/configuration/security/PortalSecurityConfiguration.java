@@ -34,14 +34,12 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
-import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
 import org.springframework.security.config.annotation.web.configurers.RequestCacheConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -51,60 +49,53 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.topiam.employee.audit.event.AuditEventPublish;
 import cn.topiam.employee.authentication.alipay.configurer.AlipayAuthenticationConfigurer;
-import cn.topiam.employee.authentication.common.configurer.IdpBindAuthenticationConfigurer;
+import cn.topiam.employee.authentication.common.IdentityProviderAuthenticationService;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClientRepository;
+import cn.topiam.employee.authentication.common.configurer.IdentityProviderBindAuthenticationConfigurer;
 import cn.topiam.employee.authentication.common.jackjson.AuthenticationJacksonModule;
-import cn.topiam.employee.authentication.common.service.UserIdpService;
-import cn.topiam.employee.authentication.dingtalk.configurer.DingtalkOAuth2AuthenticationConfigurer;
-import cn.topiam.employee.authentication.dingtalk.configurer.DingtalkScanCodeAuthenticationConfigurer;
-import cn.topiam.employee.authentication.feishu.configurer.FeiShuScanCodeAuthenticationConfigurer;
+import cn.topiam.employee.authentication.dingtalk.configurer.DingTalkAuthenticationConfigurer;
+import cn.topiam.employee.authentication.feishu.configurer.FeiShuAuthenticationConfigurer;
 import cn.topiam.employee.authentication.gitee.configurer.GiteeAuthenticationConfigurer;
-import cn.topiam.employee.authentication.github.configurer.GithubOauthAuthenticationConfigurer;
+import cn.topiam.employee.authentication.github.configurer.GithubAuthenticationConfigurer;
 import cn.topiam.employee.authentication.otp.mail.configurer.MailOtpAuthenticationConfigurer;
 import cn.topiam.employee.authentication.otp.sms.configurer.SmsOtpAuthenticationConfigurer;
-import cn.topiam.employee.authentication.qq.configurer.QqOauthAuthenticationConfigurer;
-import cn.topiam.employee.authentication.wechat.configurer.WeChatScanCodeAuthenticationConfigurer;
-import cn.topiam.employee.authentication.wechatwork.configurer.WeChatWorkScanCodeAuthenticationConfigurer;
+import cn.topiam.employee.authentication.qq.configurer.QqAuthenticationConfigurer;
+import cn.topiam.employee.authentication.wechat.configurer.WeChatAuthenticationConfigurer;
+import cn.topiam.employee.authentication.wechatwork.configurer.WeChatWorkAuthenticationConfigurer;
 import cn.topiam.employee.common.repository.account.UserRepository;
-import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
 import cn.topiam.employee.core.message.mail.MailMsgEventPublish;
 import cn.topiam.employee.core.message.sms.SmsMsgEventPublish;
-import cn.topiam.employee.core.security.form.FormLoginSecretFilter;
 import cn.topiam.employee.core.security.otp.OtpContextHelp;
 import cn.topiam.employee.core.security.password.task.PasswordExpireTask;
 import cn.topiam.employee.core.security.password.task.impl.PasswordExpireLockTask;
 import cn.topiam.employee.core.security.password.task.impl.PasswordExpireWarnTask;
 import cn.topiam.employee.core.security.task.UserExpireLockTask;
 import cn.topiam.employee.core.security.task.UserUnlockTask;
-import cn.topiam.employee.portal.authentication.PortalAuthenticationFailureEventListener;
-import cn.topiam.employee.portal.authentication.PortalAuthenticationFailureHandler;
-import cn.topiam.employee.portal.authentication.PortalAuthenticationSuccessEventListener;
-import cn.topiam.employee.portal.authentication.PortalAuthenticationSuccessHandler;
-import cn.topiam.employee.portal.authentication.PortalLogoutSuccessEventListener;
+import cn.topiam.employee.portal.authentication.*;
 import cn.topiam.employee.support.geo.GeoLocationService;
 import cn.topiam.employee.support.jackjson.SupportJackson2Module;
 import cn.topiam.employee.support.security.authentication.WebAuthenticationDetailsSource;
+import cn.topiam.employee.support.security.configurer.FormLoginConfigurer;
 import static org.springframework.http.HttpMethod.*;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 import static cn.topiam.employee.authentication.alipay.configurer.AlipayAuthenticationConfigurer.alipayOauth;
-import static cn.topiam.employee.authentication.common.configurer.IdpBindAuthenticationConfigurer.idpBind;
-import static cn.topiam.employee.authentication.dingtalk.configurer.DingtalkOAuth2AuthenticationConfigurer.dingtalkOAuth2;
-import static cn.topiam.employee.authentication.dingtalk.configurer.DingtalkScanCodeAuthenticationConfigurer.dingtalkScanCode;
-import static cn.topiam.employee.authentication.feishu.configurer.FeiShuScanCodeAuthenticationConfigurer.feiShuScanCode;
+import static cn.topiam.employee.authentication.dingtalk.configurer.DingTalkAuthenticationConfigurer.dingTalkOAuth2;
+import static cn.topiam.employee.authentication.feishu.configurer.FeiShuAuthenticationConfigurer.feiShuOAuth2;
 import static cn.topiam.employee.authentication.gitee.configurer.GiteeAuthenticationConfigurer.giteeOauth;
-import static cn.topiam.employee.authentication.github.configurer.GithubOauthAuthenticationConfigurer.github;
+import static cn.topiam.employee.authentication.github.configurer.GithubAuthenticationConfigurer.githubOAuth2;
 import static cn.topiam.employee.authentication.otp.mail.configurer.MailOtpAuthenticationConfigurer.mailOtp;
 import static cn.topiam.employee.authentication.otp.sms.configurer.SmsOtpAuthenticationConfigurer.smsOtp;
-import static cn.topiam.employee.authentication.qq.configurer.QqOauthAuthenticationConfigurer.qq;
-import static cn.topiam.employee.authentication.wechat.configurer.WeChatScanCodeAuthenticationConfigurer.weChatScanCode;
-import static cn.topiam.employee.authentication.wechatwork.configurer.WeChatWorkScanCodeAuthenticationConfigurer.weChatWorkScanCode;
-import static cn.topiam.employee.common.constant.AuthorizeConstants.*;
+import static cn.topiam.employee.authentication.qq.configurer.QqAuthenticationConfigurer.qqOAuth2;
+import static cn.topiam.employee.authentication.wechat.configurer.WeChatAuthenticationConfigurer.weChatOauth;
+import static cn.topiam.employee.authentication.wechatwork.configurer.WeChatWorkAuthenticationConfigurer.weChatWorkOAuth2;
+import static cn.topiam.employee.common.constant.AuthnConstants.LOGIN_CONFIG;
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.*;
 import static cn.topiam.employee.common.constant.SessionConstants.CURRENT_STATUS;
-import static cn.topiam.employee.core.endpoint.security.PublicSecretEndpoint.PUBLIC_SECRET_PATH;
+import static cn.topiam.employee.core.security.PublicSecretEndpoint.PUBLIC_SECRET_PATH;
 import static cn.topiam.employee.portal.constant.PortalConstants.*;
-import static cn.topiam.employee.protocol.code.util.ProtocolConfigUtils.getAuthenticationDetailsSource;
+import static cn.topiam.employee.protocol.code.configurer.AuthenticationUtils.getAuthenticationDetailsSource;
 import static cn.topiam.employee.support.constant.EiamConstants.API_PATH;
 
 /**
@@ -151,7 +142,7 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
         List<RequestMatcher> requestMatchers = new ArrayList<>();
 
         //QQ
-        QqOauthAuthenticationConfigurer qq = qq(identityProviderRepository, userIdpService)
+        QqAuthenticationConfigurer qq = qqOAuth2(registeredIdentityProviderClientRepository ,identityProviderAuthenticationService)
                 .successHandler(successHandler)
                 .failureHandler(failureHandler)
                 .authenticationDetailsSource(authenticationDetailsSource);
@@ -159,7 +150,7 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
         httpSecurity.with(qq,configurer-> {});
 
         //微信扫码
-        WeChatScanCodeAuthenticationConfigurer chatScanCode = weChatScanCode(identityProviderRepository, userIdpService)
+        WeChatAuthenticationConfigurer chatScanCode = weChatOauth(registeredIdentityProviderClientRepository ,identityProviderAuthenticationService)
                 .successHandler(successHandler)
                 .failureHandler(failureHandler)
                 .authenticationDetailsSource(authenticationDetailsSource);
@@ -167,7 +158,7 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
         httpSecurity.with(chatScanCode,configurer-> {});
 
         //GITHUB
-        GithubOauthAuthenticationConfigurer github = github(identityProviderRepository, userIdpService)
+        GithubAuthenticationConfigurer github = githubOAuth2(registeredIdentityProviderClientRepository ,identityProviderAuthenticationService)
                 .successHandler(successHandler)
                 .failureHandler(failureHandler)
                 .authenticationDetailsSource(authenticationDetailsSource);
@@ -175,31 +166,23 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
         httpSecurity.with(github,configurer-> {});
 
         //企业微信
-        WeChatWorkScanCodeAuthenticationConfigurer weChatWorkScanCode = weChatWorkScanCode(identityProviderRepository, userIdpService)
+        WeChatWorkAuthenticationConfigurer weChatWork = weChatWorkOAuth2(registeredIdentityProviderClientRepository ,identityProviderAuthenticationService)
                 .successHandler(successHandler)
                 .failureHandler(failureHandler)
                 .authenticationDetailsSource(authenticationDetailsSource);
-        requestMatchers.add(weChatWorkScanCode.getRequestMatcher());
-        httpSecurity.with(weChatWorkScanCode,configurer-> {});
+        requestMatchers.add(weChatWork.getRequestMatcher());
+        httpSecurity.with(weChatWork,configurer-> {});
 
         //钉钉OAuth2
-        DingtalkOAuth2AuthenticationConfigurer dingtalkOauth2 = dingtalkOAuth2(identityProviderRepository, userIdpService)
+        DingTalkAuthenticationConfigurer dingtalkOauth2 = dingTalkOAuth2(registeredIdentityProviderClientRepository ,identityProviderAuthenticationService)
                 .successHandler(successHandler)
                 .failureHandler(failureHandler)
                 .authenticationDetailsSource(authenticationDetailsSource);
         requestMatchers.add(dingtalkOauth2.getRequestMatcher());
         httpSecurity.with(dingtalkOauth2,configurer-> {});
 
-        //钉钉扫码
-        DingtalkScanCodeAuthenticationConfigurer dingtalkScanCode = dingtalkScanCode(identityProviderRepository, userIdpService)
-                .successHandler(successHandler)
-                .failureHandler(failureHandler)
-                .authenticationDetailsSource(authenticationDetailsSource);
-        requestMatchers.add(dingtalkScanCode.getRequestMatcher());
-        httpSecurity.with(dingtalkScanCode,configurer-> {});
-
-        //飞书扫码
-        FeiShuScanCodeAuthenticationConfigurer feiShuScanCode = feiShuScanCode(identityProviderRepository, userIdpService)
+        //飞书
+        FeiShuAuthenticationConfigurer feiShuScanCode = feiShuOAuth2(registeredIdentityProviderClientRepository ,identityProviderAuthenticationService)
                 .successHandler(successHandler)
                 .failureHandler(failureHandler)
                 .authenticationDetailsSource(authenticationDetailsSource);
@@ -208,7 +191,7 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
 
 
         //Gitee
-        GiteeAuthenticationConfigurer giteeCode = giteeOauth(identityProviderRepository, userIdpService)
+        GiteeAuthenticationConfigurer giteeCode = giteeOauth(registeredIdentityProviderClientRepository ,identityProviderAuthenticationService)
                 .successHandler(successHandler)
                 .failureHandler(failureHandler)
                 .authenticationDetailsSource(authenticationDetailsSource);
@@ -216,7 +199,7 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
         httpSecurity.with(giteeCode,configurer-> {});
 
         //支付宝
-        AlipayAuthenticationConfigurer alipayOauth = alipayOauth(identityProviderRepository, userIdpService)
+        AlipayAuthenticationConfigurer alipayOauth = alipayOauth(registeredIdentityProviderClientRepository ,identityProviderAuthenticationService)
                 .successHandler(successHandler)
                 .failureHandler(failureHandler)
                 .authenticationDetailsSource(authenticationDetailsSource);
@@ -269,8 +252,6 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
                 .securityContext(securityContext())
                 //请求缓存
                 .requestCache(withRequestCacheConfigurer())
-                // 表单登录配置
-                .formLogin(withFormLoginConfigurerDefaults(httpSecurity))
                 //x509
                 .x509(withDefaults())
                 //异常处理
@@ -286,9 +267,8 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
                 //退出配置
                 .logout(withLogoutConfigurerDefaults())
                 //会话管理器
-                .sessionManagement(withSessionManagementConfigurerDefaults());
-        //表单登录解密过滤器
-        httpSecurity.addFilterBefore(new FormLoginSecretFilter(), UsernamePasswordAuthenticationFilter.class);
+                .sessionManagement(withSessionManagementConfigurerDefaults())
+                .with(withFormLoginConfigurer(),configurer-> {});
         //邮件验证码登录认证
         MailOtpAuthenticationConfigurer mailOtpAuthenticationConfigurer = mailOtp(userRepository, userDetailsService, otpContextHelp)
                 .successHandler(successHandler)
@@ -302,11 +282,11 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
                 .authenticationDetailsSource(authenticationDetailsSource);
         httpSecurity.with(smsAuthenticationConfigurer,configurer-> {});
         //IDP 绑定用户
-        IdpBindAuthenticationConfigurer idpBindAuthenticationConfigurer = idpBind(userIdpService, passwordEncoder)
+        IdentityProviderBindAuthenticationConfigurer identityProviderBindAuthenticationConfigurer = IdentityProviderBindAuthenticationConfigurer.idpBind(identityProviderAuthenticationService, passwordEncoder)
                 .successHandler(successHandler)
                 .failureHandler(failureHandler)
                 .authenticationDetailsSource(authenticationDetailsSource);
-        httpSecurity.with(idpBindAuthenticationConfigurer,configurer-> {});
+        httpSecurity.with(identityProviderBindAuthenticationConfigurer,configurer-> {});
         // @formatter:on
         return httpSecurity.build();
     }
@@ -365,20 +345,17 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
     }
 
     /**
-     * form
+     * 表单登录
      *
      * @return {@link FormLoginConfigurer}
      */
-    public Customizer<FormLoginConfigurer<HttpSecurity>> withFormLoginConfigurerDefaults(HttpSecurity httpSecurity) {
+    public FormLoginConfigurer<HttpSecurity> withFormLoginConfigurer() {
         // @formatter:off
-        AuthenticationSuccessHandler successHandler=new PortalAuthenticationSuccessHandler(userRepository,  auditEventPublish );
-        return configurer -> {
-            configurer.loginPage(FE_LOGIN)
-                    .loginProcessingUrl(FORM_LOGIN)
-                    .successHandler(successHandler)
-                    .failureHandler(new PortalAuthenticationFailureHandler())
-                    .authenticationDetailsSource(getAuthenticationDetailsSource(httpSecurity));
-        };
+        AuthenticationSuccessHandler successHandler = new PortalAuthenticationSuccessHandler(userRepository,  auditEventPublish );
+        FormLoginConfigurer<HttpSecurity> configurer=new FormLoginConfigurer<>();
+        configurer.successHandler(successHandler)
+                .failureHandler(new PortalAuthenticationFailureHandler());
+        return configurer;
         // @formatter:on
     }
 
@@ -469,39 +446,32 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
     /**
      * UserRepository
      */
-    private final UserRepository             userRepository;
+    private final UserRepository                             userRepository;
 
     /**
      * UserDetailsService
      */
-    private final UserDetailsService         userDetailsService;
+    private final UserDetailsService                         userDetailsService;
 
     /**
      * OtpContextHelp
      */
-    private final OtpContextHelp             otpContextHelp;
+    private final OtpContextHelp                             otpContextHelp;
 
     /**
      * PasswordEncoder
      */
-    private final PasswordEncoder            passwordEncoder;
+    private final PasswordEncoder                            passwordEncoder;
 
     /**
      * AuditEventPublish
      */
-    private final AuditEventPublish          auditEventPublish;
+    private final AuditEventPublish                          auditEventPublish;
 
-    /**
-     * 账户认证
-     */
-    private final UserIdpService             userIdpService;
+    private final RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository;
+    private final IdentityProviderAuthenticationService      identityProviderAuthenticationService;
 
-    /**
-     * 认证源repository
-     */
-    private final IdentityProviderRepository identityProviderRepository;
-
-    private ClassLoader                      loader;
+    private ClassLoader                                      loader;
 
     @Override
     public void setBeanClassLoader(@NonNull ClassLoader classLoader) {
@@ -514,16 +484,16 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
                                        PasswordEncoder passwordEncoder,
                                        AuditEventPublish auditEventPublish,
                                        SettingRepository settingRepository,
-                                       UserIdpService userIdpService,
-                                       IdentityProviderRepository identityProviderRepository) {
+                                       RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository,
+                                       IdentityProviderAuthenticationService identityProviderAuthenticationService) {
         super(settingRepository);
         this.userRepository = userRepository;
         this.userDetailsService = userDetailsService;
         this.otpContextHelp = otpContextHelp;
         this.passwordEncoder = passwordEncoder;
         this.auditEventPublish = auditEventPublish;
-        this.userIdpService = userIdpService;
-        this.identityProviderRepository = identityProviderRepository;
+        this.registeredIdentityProviderClientRepository = registeredIdentityProviderClientRepository;
+        this.identityProviderAuthenticationService = identityProviderAuthenticationService;
     }
 
 }

@@ -38,13 +38,13 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.nimbusds.oauth2.sdk.GrantType;
 
-import cn.topiam.employee.authentication.common.authentication.IdpUserDetails;
-import cn.topiam.employee.authentication.common.filter.AbstractIdpAuthenticationProcessingFilter;
-import cn.topiam.employee.authentication.common.service.UserIdpService;
-import cn.topiam.employee.authentication.feishu.FeiShuIdpScanCodeConfig;
-import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
-import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
-import cn.topiam.employee.core.help.ServerHelp;
+import cn.topiam.employee.authentication.common.IdentityProviderAuthenticationService;
+import cn.topiam.employee.authentication.common.authentication.IdentityProviderUserDetails;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClient;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClientRepository;
+import cn.topiam.employee.authentication.common.filter.AbstractIdentityProviderAuthenticationProcessingFilter;
+import cn.topiam.employee.authentication.feishu.FeiShuIdentityProviderOAuth2Config;
+import cn.topiam.employee.core.context.ContextService;
 import cn.topiam.employee.support.util.HttpClientUtils;
 import cn.topiam.employee.support.util.UrlUtils;
 
@@ -58,9 +58,10 @@ import static cn.topiam.employee.authentication.feishu.constant.FeiShuAuthentica
  * 飞书扫码登录过滤器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/12/8 21:11
+ * Created by support@topiam.cn on 2021/12/8 21:11
  */
-public class FeiShuLoginAuthenticationFilter extends AbstractIdpAuthenticationProcessingFilter {
+public class FeiShuLoginAuthenticationFilter extends
+                                             AbstractIdentityProviderAuthenticationProcessingFilter {
 
     public final static String                DEFAULT_FILTER_PROCESSES_URI = FEISHU_OAUTH
         .getLoginPathPrefix() + "/" + "{" + PROVIDER_CODE + "}";
@@ -70,12 +71,13 @@ public class FeiShuLoginAuthenticationFilter extends AbstractIdpAuthenticationPr
     /**
      * Creates a new instance
      *
-     * @param identityProviderRepository the {@link IdentityProviderRepository}
-     * @param userIdpService  {@link  UserIdpService}
+     * @param registeredIdentityProviderClientRepository the {@link RegisteredIdentityProviderClientRepository}
+     * @param identityProviderAuthenticationService  {@link  IdentityProviderAuthenticationService}
      */
-    public FeiShuLoginAuthenticationFilter(IdentityProviderRepository identityProviderRepository,
-                                           UserIdpService userIdpService) {
-        super(REQUEST_MATCHER, userIdpService, identityProviderRepository);
+    public FeiShuLoginAuthenticationFilter(RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository,
+                                           IdentityProviderAuthenticationService identityProviderAuthenticationService) {
+        super(REQUEST_MATCHER, identityProviderAuthenticationService,
+            registeredIdentityProviderClientRepository);
     }
 
     /**
@@ -116,14 +118,14 @@ public class FeiShuLoginAuthenticationFilter extends AbstractIdpAuthenticationPr
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
         }
         //获取身份提供商
-        IdentityProviderEntity provider = getIdentityProviderEntity(providerCode);
-        FeiShuIdpScanCodeConfig config = JSONObject.parseObject(provider.getConfig(),
-            FeiShuIdpScanCodeConfig.class);
+        RegisteredIdentityProviderClient<FeiShuIdentityProviderOAuth2Config> provider = getRegisteredIdentityProviderClient(
+            providerCode);
+        FeiShuIdentityProviderOAuth2Config config = provider.getConfig();
         if (Objects.isNull(config)) {
             logger.error("未查询到飞书扫码登录配置");
             //无效身份提供商
             OAuth2Error oauth2Error = new OAuth2Error(
-                AbstractIdpAuthenticationProcessingFilter.INVALID_IDP_CONFIG);
+                AbstractIdentityProviderAuthenticationProcessingFilter.INVALID_IDP_CONFIG);
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
         }
         //获取access token
@@ -141,14 +143,17 @@ public class FeiShuLoginAuthenticationFilter extends AbstractIdpAuthenticationPr
                              + result.getString(OAuth2ParameterNames.ACCESS_TOKEN));
         result = JSON.parseObject(HttpClientUtils.get(USER_INFO, param, authorization));
         // 返回
-        IdpUserDetails idpUserDetails = IdpUserDetails.builder().openId(result.getString(OPEN_ID))
+        IdentityProviderUserDetails identityProviderUserDetails = IdentityProviderUserDetails
+            .builder().openId(result.getString(OPEN_ID)).unionId(result.getString("union_id"))
+            .email(result.getString("email")).mobile(result.getString("mobile"))
+            .nickName(result.getString("name")).avatarUrl(result.getString("avatar_url"))
             .providerType(FEISHU_OAUTH).providerCode(providerCode).providerId(providerId).build();
-        return attemptAuthentication(request, response, idpUserDetails);
+        return attemptAuthentication(request, response, identityProviderUserDetails);
     }
 
     public static String getLoginUrl(String providerId) {
-        String url = ServerHelp.getPortalPublicBaseUrl() + FEISHU_OAUTH.getLoginPathPrefix() + "/"
-                     + providerId;
+        String url = ContextService.getPortalPublicBaseUrl() + FEISHU_OAUTH.getLoginPathPrefix()
+                     + "/" + providerId;
         return UrlUtils.format(url);
     }
 

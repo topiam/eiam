@@ -23,7 +23,7 @@ export type AppList = {
   icon?: string;
   name: string;
   initLoginType: InitLoginType | string;
-  initLoginUrl?: string;
+  initLoginUrl: string;
   description: string;
 };
 

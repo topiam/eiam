@@ -29,14 +29,14 @@ import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.EventStatus;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.audit.event.AuditEventPublish;
-import cn.topiam.employee.protocol.jwt.exception.JwtAuthenticationException;
+import static cn.topiam.employee.audit.event.type.EventType.APP_SLO;
 import static cn.topiam.employee.audit.event.type.EventType.APP_SSO;
 
 /**
  * 认证失败监听
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/8 21:25
+ * Created by support@topiam.cn on 2023/7/8 21:25
  */
 public class JwtAuthenticationFailureEventListener implements
                                                    ApplicationListener<AbstractAuthenticationFailureEvent> {
@@ -48,12 +48,19 @@ public class JwtAuthenticationFailureEventListener implements
      */
     @Override
     public void onApplicationEvent(@NonNull AbstractAuthenticationFailureEvent event) {
-        if (event.getException() instanceof JwtAuthenticationException) {
-            JwtRequestAuthenticationToken authentication = (JwtRequestAuthenticationToken) event
-                .getAuthentication();
+        //登录
+        if (event.getAuthentication() instanceof JwtLoginAuthenticationToken authentication) {
             JwtProtocolConfig config = authentication.getConfig();
-            auditEventPublish.publish(APP_SSO, authentication, EventStatus.FAIL, Lists.newArrayList(
-                Target.builder().id(config.getAppId()).type(TargetType.APPLICATION).build()));
+            auditEventPublish.publish(APP_SSO, authentication, EventStatus.FAIL,
+                Lists.newArrayList(Target.builder().id(config.getAppId())
+                    .type(TargetType.APPLICATION).name(config.getAppName()).build()));
+        }
+        //登出
+        if (event.getAuthentication() instanceof JwtLogoutAuthenticationToken authentication) {
+            JwtProtocolConfig config = authentication.getConfig();
+            auditEventPublish.publish(APP_SLO, authentication, EventStatus.FAIL,
+                Lists.newArrayList(Target.builder().id(config.getAppId())
+                    .type(TargetType.APPLICATION).name(config.getAppName()).build()));
         }
     }
 

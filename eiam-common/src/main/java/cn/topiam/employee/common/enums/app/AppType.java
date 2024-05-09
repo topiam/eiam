@@ -26,7 +26,7 @@ import cn.topiam.employee.support.web.converter.EnumConvert;
  * 应用类型
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/5/22 21:21
+ * Created by support@topiam.cn on 2022/5/22 21:21
  */
 public enum AppType implements BaseEnum {
                                          /**

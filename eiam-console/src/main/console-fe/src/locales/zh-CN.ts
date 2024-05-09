@@ -84,7 +84,7 @@ export default {
   'app.minute': '分钟',
   'app.minute.not_update': '分钟（暂不支持修改）',
   'app.displayed': '是否显示',
-  'app.issue': '不知道怎么配置？请参考 TopIAM ',
+  'app.issue': '不知道怎么配置？请参考 TOPIAM ',
   'app.disposition': '配置',
   'app.required_field': '此项为必填项',
   'app.doc': '对接文档',

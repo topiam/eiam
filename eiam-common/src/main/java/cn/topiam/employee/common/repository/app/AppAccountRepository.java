@@ -17,32 +17,31 @@
  */
 package cn.topiam.employee.common.repository.app;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.app.AppAccountEntity;
-import cn.topiam.employee.support.repository.LogicDeleteRepository;
 import static cn.topiam.employee.common.constant.AppConstants.APP_ACCOUNT_CACHE_NAME;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 
 /**
  * 应用账户
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/3 22:26
+ * Created by support@topiam.cn on 2022/6/3 22:26
  */
 @Repository
 @CacheConfig(cacheNames = { APP_ACCOUNT_CACHE_NAME })
-public interface AppAccountRepository extends LogicDeleteRepository<AppAccountEntity, Long>,
+public interface AppAccountRepository extends JpaRepository<AppAccountEntity, String>,
                                       AppAccountRepositoryCustomized {
     /**
      * save
@@ -63,39 +62,57 @@ public interface AppAccountRepository extends LogicDeleteRepository<AppAccountEn
      */
     @CacheEvict(allEntries = true)
     @Override
-    void deleteById(@NotNull Long id);
+    void deleteById(@NotNull String id);
 
     /**
-     * 根据应用ID，用户ID查询应用账户
+     * 根据应用ID，用户ID查询应用账户list
      *
-     * @param appId  {@link Long}
-     * @param userId {@link Long}
+     * @param appId  {@link String}
+     * @param userId {@link String}
      * @return {@link Optional}
      */
-    @Cacheable
-    Optional<AppAccountEntity> findByAppIdAndUserId(Long appId, Long userId);
+    @Cacheable(key = "#p0+':'+#p1", unless = "#result==null || #result.isEmpty()")
+    List<AppAccountEntity> findByAppIdAndUserId(String appId, String userId);
+
+    /**
+     * 根据应用ID，用户ID查询默认应用账户
+     *
+     * @param appId  {@link String}
+     * @param userId {@link String}
+     * @return {@link Optional}
+     */
+    @Cacheable(key = "'default:'+#p0+':'+#p1", unless = "#result == null")
+    Optional<AppAccountEntity> findByAppIdAndUserIdAndDefaultedIsTrue(String appId, String userId);
+
+    /**
+     * 根据应用ID，用户ID和Account查询应用账户
+     *
+     * @param appId  {@link String}
+     * @param userId {@link String}
+     * @param account {@link String}
+     * @return {@link Optional}
+     */
+    @Cacheable(key = "#p0+':'+#p1+':'+#p2", unless = "#result == null")
+    Optional<AppAccountEntity> findByAppIdAndUserIdAndAccount(String appId, String userId,
+                                                              String account);
 
     /**
      * 根据appid删除所有的数据
      *
-     * @param appId {@link Long}
+     * @param appId {@link String}
      */
     @CacheEvict(allEntries = true)
     @Modifying
     @Transactional(rollbackFor = Exception.class)
-    @Query(value = "UPDATE app_account SET " + SOFT_DELETE_SET
-                   + " WHERE app_id = :appId", nativeQuery = true)
-    void deleteAllByAppId(@Param("appId") Long appId);
+    void deleteAllByAppId(@Param("appId") String appId);
 
     /**
      * 根据userId 删除用户数据
      *
-     * @param userId {@link Long}
+     * @param userId {@link String}
      */
     @CacheEvict(allEntries = true)
     @Modifying
     @Transactional(rollbackFor = Exception.class)
-    @Query(value = "UPDATE app_account SET " + SOFT_DELETE_SET
-                   + " WHERE user_id = :userId", nativeQuery = true)
-    void deleteByUserId(@Param("userId") Long userId);
+    void deleteByUserId(@Param("userId") String userId);
 }

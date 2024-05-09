@@ -51,7 +51,7 @@ import static cn.topiam.employee.audit.enums.TargetType.IDENTITY_SOURCE;
  * 同步身份源同步
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/3/16 21:04
+ * Created by support@topiam.cn on 2022/3/16 21:04
  */
 @Slf4j
 @Service
@@ -106,7 +106,8 @@ public class IdentitySourceSyncServiceImpl implements IdentitySourceSyncService 
     @Override
     public void executeIdentitySourceSync(String id) {
         IdentitySourceEntity entity = identitySourceService.getIdentitySource(id);
-        AuditContext.setTarget(Target.builder().id(id).type(IDENTITY_SOURCE).build());
+        AuditContext.setTarget(
+            Target.builder().id(id).name(entity.getName()).type(IDENTITY_SOURCE).build());
         if (!ObjectUtils.isEmpty(entity)) {
             if (Objects.isNull(entity.getBasicConfig())) {
                 throw new NullPointerException("请完善参数配置");

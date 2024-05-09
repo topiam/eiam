@@ -26,11 +26,11 @@ import {
   updateIdentityProvider,
 } from './service';
 import { history } from '@@/core/history';
-import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType } from '@ant-design/pro-components';
 import { PageContainer, ProList } from '@ant-design/pro-components';
 import { useMount } from 'ahooks';
-import { App, Avatar, Button, Popconfirm, Tag, Typography } from 'antd';
+import { App, Avatar, Button, Tag, Typography } from 'antd';
 import { Fragment, useRef, useState } from 'react';
 import CreateDrawer from './components/CreateModal';
 import UpdateDrawer from './components/UpdateModal';
@@ -102,26 +102,6 @@ const List = (props: { category: IdentityProviderCategory }) => {
           message.success(intl.formatMessage({ id: 'app.add_success' }));
         }
         setCreateDrawerVisible(false);
-        actionRef.current?.reload();
-        return true;
-      }
-      return false;
-    } catch (e) {
-      return false;
-    }
-  };
-
-  /**
-   * 更新提交
-   *
-   * @param values
-   */
-  const onUpdateFinish = async (values: Record<any, any>) => {
-    try {
-      const result = await updateIdentityProvider({ ...values });
-      if (result?.result && result?.success) {
-        message.success(intl.formatMessage({ id: 'app.operation_success' })).then();
-        setUpdateDrawerVisible(false);
         actionRef.current?.reload();
         return true;
       }
@@ -228,61 +208,69 @@ const List = (props: { category: IdentityProviderCategory }) => {
             render: (_text, row) => [
               <Fragment key={'status'}>
                 {row.enabled ? (
-                  <Popconfirm
-                    title={intl.formatMessage({
-                      id: 'pages.authn.identity_provider.disable_confirm',
-                    })}
-                    placement="bottomRight"
-                    icon={
-                      <QuestionCircleOutlined
-                        style={{
-                          color: 'red',
-                        }}
-                      />
-                    }
-                    onConfirm={async () => {
-                      const { success, result } = await disableIdentityProvider(row.id);
-                      if (success && result) {
-                        message.success(intl.formatMessage({ id: 'app.operation_success' }));
-                        actionRef.current?.reload();
-                        return;
-                      }
-                    }}
-                    okText={intl.formatMessage({ id: 'app.yes' })}
-                    cancelText={intl.formatMessage({ id: 'app.no' })}
+                  <a
                     key="disabled"
-                  >
-                    <a>
-                      {intl.formatMessage({
-                        id: 'app.disable',
-                      })}
-                    </a>
-                  </Popconfirm>
-                ) : (
-                  <Popconfirm
-                    title={intl.formatMessage({
-                      id: 'pages.authn.identity_provider.enable_confirm',
-                    })}
-                    placement="bottomRight"
-                    icon={<QuestionCircleOutlined />}
-                    onConfirm={async () => {
-                      const { success, result } = await enableIdentityProvider(row.id);
-                      if (success && result) {
-                        message.success(intl.formatMessage({ id: 'app.operation_success' }));
-                        actionRef.current?.reload();
-                        return;
-                      }
+                    onClick={() => {
+                      const confirmed = modal.warning({
+                        title: intl.formatMessage({
+                          id: 'pages.authn.identity_provider.disable_confirm_title',
+                        }),
+                        content: intl.formatMessage({
+                          id: 'pages.authn.identity_provider.disable_confirm_content',
+                        }),
+                        okText: intl.formatMessage({ id: 'app.confirm' }),
+                        centered: true,
+                        okType: 'primary',
+                        okCancel: true,
+                        cancelText: intl.formatMessage({ id: 'app.cancel' }),
+                        onOk: async () => {
+                          const { success } = await disableIdentityProvider(row.id);
+                          if (success) {
+                            confirmed.destroy();
+                            message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                            actionRef.current?.reload();
+                            return;
+                          }
+                        },
+                      });
                     }}
-                    okText={intl.formatMessage({ id: 'app.yes' })}
-                    cancelText={intl.formatMessage({ id: 'app.no' })}
-                    key="enabled"
                   >
-                    <a>
-                      {intl.formatMessage({
-                        id: 'app.enable',
-                      })}
-                    </a>
-                  </Popconfirm>
+                    {intl.formatMessage({
+                      id: 'app.disable',
+                    })}
+                  </a>
+                ) : (
+                  <a
+                    key="enabled"
+                    onClick={() => {
+                      const confirmed = modal.warning({
+                        title: intl.formatMessage({
+                          id: 'pages.authn.identity_provider.enable_confirm_title',
+                        }),
+                        content: intl.formatMessage({
+                          id: 'pages.authn.identity_provider.enable_confirm_content',
+                        }),
+                        okText: intl.formatMessage({ id: 'app.confirm' }),
+                        centered: true,
+                        okType: 'primary',
+                        okCancel: true,
+                        cancelText: intl.formatMessage({ id: 'app.cancel' }),
+                        onOk: async () => {
+                          const { success } = await enableIdentityProvider(row.id);
+                          if (success) {
+                            confirmed.destroy();
+                            message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                            actionRef.current?.reload();
+                            return;
+                          }
+                        },
+                      });
+                    }}
+                  >
+                    {intl.formatMessage({
+                      id: 'app.enable',
+                    })}
+                  </a>
                 )}
               </Fragment>,
               <a
@@ -296,40 +284,39 @@ const List = (props: { category: IdentityProviderCategory }) => {
                   id: 'pages.authn.identity_provider.metas_config',
                 })}
               </a>,
-              <Popconfirm
-                title={intl.formatMessage({
-                  id: 'pages.authn.identity_provider.delete_confirm',
-                })}
-                key={'remove'}
-                placement="bottomRight"
-                icon={
-                  <QuestionCircleOutlined
-                    style={{
-                      color: 'red',
-                    }}
-                  />
-                }
-                onConfirm={async () => {
-                  const { success, result } = await removeIdentityProvider(row.id);
-                  if (success && result) {
-                    message.success(intl.formatMessage({ id: 'app.operation_success' }));
-                    await actionRef.current?.reload();
-                    return;
-                  }
+              <a
+                target="_blank"
+                style={{
+                  color: 'red',
                 }}
-                okText={intl.formatMessage({ id: 'app.yes' })}
-                cancelText={intl.formatMessage({ id: 'app.no' })}
+                key="remove"
+                onClick={() => {
+                  const confirmed = modal.error({
+                    title: intl.formatMessage({
+                      id: 'pages.authn.identity_provider.delete_confirm_title',
+                    }),
+                    content: intl.formatMessage({
+                      id: 'pages.authn.identity_provider.delete_confirm_content',
+                    }),
+                    okText: intl.formatMessage({ id: 'app.confirm' }),
+                    centered: true,
+                    okType: 'primary',
+                    okCancel: true,
+                    cancelText: intl.formatMessage({ id: 'app.cancel' }),
+                    onOk: async () => {
+                      const { success } = await removeIdentityProvider(row.id);
+                      if (success) {
+                        confirmed.destroy();
+                        message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                        actionRef.current?.reload();
+                        return;
+                      }
+                    },
+                  });
+                }}
               >
-                <a
-                  target="_blank"
-                  style={{
-                    color: 'red',
-                  }}
-                  key="remove"
-                >
-                  {intl.formatMessage({ id: 'app.delete' })}
-                </a>
-              </Popconfirm>,
+                {intl.formatMessage({ id: 'app.delete' })}
+              </a>,
             ],
           },
         }}
@@ -348,9 +335,19 @@ const List = (props: { category: IdentityProviderCategory }) => {
         <UpdateDrawer
           visible={updateDrawerVisible}
           id={id}
-          onFinish={onUpdateFinish}
+          onFinish={async (values: Record<any, any>) => {
+            const result = await updateIdentityProvider({ ...values });
+            if (result?.result && result?.success) {
+              message.success(intl.formatMessage({ id: 'app.operation_success' })).then();
+              setUpdateDrawerVisible(false);
+              actionRef.current?.reload();
+            }
+          }}
           onCancel={() => {
             setUpdateDrawerVisible(false);
+          }}
+          afterClose={() => {
+            setId(undefined);
           }}
         />
       )}

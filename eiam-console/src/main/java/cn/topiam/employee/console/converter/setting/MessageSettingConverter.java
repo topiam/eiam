@@ -47,15 +47,15 @@ import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.validation.ValidationUtils;
 
 import jakarta.validation.ValidationException;
-import static cn.topiam.employee.core.help.SettingHelp.getSmsProviderConfig;
-import static cn.topiam.employee.core.setting.constant.MessageSettingConstants.MESSAGE_PROVIDER_EMAIL;
-import static cn.topiam.employee.core.setting.constant.MessageSettingConstants.MESSAGE_SMS_PROVIDER;
+import static cn.topiam.employee.core.context.ContextService.getSmsProviderConfig;
+import static cn.topiam.employee.core.setting.MessageSettingConstants.MESSAGE_PROVIDER_EMAIL;
+import static cn.topiam.employee.core.setting.MessageSettingConstants.MESSAGE_SMS_PROVIDER;
 
 /**
  * 消息设置转换器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/10/1 23:18
+ * Created by support@topiam.cn on 2021/10/1 23:18
  */
 @Mapper(componentModel = "spring")
 public interface MessageSettingConverter {

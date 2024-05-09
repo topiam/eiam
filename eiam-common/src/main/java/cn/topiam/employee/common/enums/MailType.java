@@ -82,31 +82,6 @@ public enum MailType implements BaseEnum {
                                                 "系统账户",
                                                 getMailContentPath() + "login-content.html"),
 
-                                          //                                          /**
-                                          //                                           * 验证邮箱
-                                          //                                           */
-                                          //                                          VERIFY_EMAIL("verify_email", "验证邮箱",
-                                          //                                                       "用户用邮箱初次注册时会发送一封验证邮箱的链接，用户点击邮件内的网址即可完成验证。",
-                                          //                                                       "请点击此链接进行验证： ${verify_link}", "系统账户",
-                                          //                                                       getMailContentPath() + "verify-email-content.html"),
-                                          /**
-                                           * 二次验证
-                                           */
-                                          AGAIN_VERIFY("again_verify", "二次验证",
-                                                       "管理员开启邮件二次认证后，用户使用账号密码登录，选择邮件二次认证时。",
-                                                       "您正在进行二次认证，验证码为：${verify_code}，${expire_time}分钟内有效。",
-                                                       "系统账户", getMailContentPath()
-                                                               + "again-verify-mail-content.html"),
-                                          /**
-                                           * 欢迎邮件
-                                           */
-                                          WELCOME_MAIL("welcome_mail", "欢迎邮件",
-                                                       "一旦用户验证其电子邮件地址，将发送此电子邮件。 如果验证电子邮件已关闭， 则会在用户第一次注册或登录时发送。",
-                                                       "您已注册成功",
-
-                                                       "系统账户", getMailContentPath()
-                                                               + "welcome-mail-content.html"),
-
                                           /**
                                            * 密码过期提醒
                                            */
@@ -117,11 +92,12 @@ public enum MailType implements BaseEnum {
                                                                        "系统账户", getMailContentPath()
                                                                                + "password-soon-expired-content.html"),
                                           /**
-                                           * 风险预警 暂不实现
+                                           * 欢迎邮件
                                            */
-                                          WARNING("warning", "风险预警", "用户每次执行风险操作，都会发送此电子邮件。",
-                                                  "您的账号存在风险操作, 验证码为：${verify_code}。", "系统账户",
-                                                  getMailContentPath() + "warning-content.html");
+                                          WELCOME_MAIL("welcome_mail", "欢迎邮件",
+                                                       "一旦用户验证其电子邮件地址，将发送此电子邮件。 如果验证电子邮件已关闭， 则会在用户第一次注册或登录时发送。",
+                                                       "您已注册成功", "系统账户", getMailContentPath()
+                                                                         + "welcome-mail-content.html");
 
     /**
      * code

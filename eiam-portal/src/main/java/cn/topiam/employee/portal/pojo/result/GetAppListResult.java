@@ -22,7 +22,6 @@ import java.io.Serializable;
 
 import cn.topiam.employee.common.enums.app.AppProtocol;
 import cn.topiam.employee.common.enums.app.AppType;
-import cn.topiam.employee.common.enums.app.InitLoginType;
 
 import lombok.Data;
 
@@ -33,7 +32,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * 获取应用列表
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/8 21:58
+ * Created by support@topiam.cn on 2022/6/8 21:58
  */
 @Data
 @Schema(description = "获取应用列表")
@@ -83,12 +82,6 @@ public class GetAppListResult implements Serializable {
     private String            icon;
 
     /**
-     * Sso 发起方
-     */
-    @Parameter(description = "SSO 发起方")
-    private InitLoginType     initLoginType;
-
-    /**
      * SSO 发起URL
      */
     @Parameter(description = "SSO 发起URL")
@@ -99,22 +92,4 @@ public class GetAppListResult implements Serializable {
      */
     @Parameter(description = "应用描述")
     private String            description;
-
-    /**
-     * Init 登录
-     */
-    public static class InitLogin implements Serializable {
-
-        /**
-         * Sso 发起方
-         */
-        @Parameter(description = "SSO 发起方")
-        private InitLoginType type;
-
-        /**
-         * SSO 发起URL
-         */
-        @Parameter(description = "SSO 发起URL")
-        private String        url;
-    }
 }

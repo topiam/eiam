@@ -38,6 +38,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public class IdentitySourceConfigGetResult implements Serializable {
     @Serial
     private static final long serialVersionUID = -1440230086940289961L;
+
     /**
      * ID
      */

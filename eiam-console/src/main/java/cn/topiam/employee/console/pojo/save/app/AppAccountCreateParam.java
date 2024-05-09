@@ -27,7 +27,7 @@ import jakarta.validation.constraints.NotNull;
  * AppAccountCreateParam 应用账户新增入参
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/5/24 22:13
+ * Created by support@topiam.cn on 2022/5/24 22:13
  */
 @Data
 @Schema(description = "应用账户新增入参")
@@ -38,25 +38,31 @@ public class AppAccountCreateParam {
      */
     @Schema(description = "应用ID")
     @NotNull(message = "应用ID不能为空")
-    private Long   appId;
+    private String  appId;
 
     /**
      * 用户ID
      */
     @Schema(description = "用户ID")
     @NotNull(message = "用户ID不能为空")
-    private Long   userId;
+    private String  userId;
 
     /**
      * 账户名称
      */
     @Schema(description = "账户名称")
     @NotBlank(message = "账户名称不能为空")
-    private String account;
+    private String  account;
 
     /**
      * 账户密码
      */
     @Schema(description = "账户密码")
-    private String password;
+    private String  password;
+
+    /**
+     * 是否默认
+     */
+    @Schema(description = "是否默认")
+    private Boolean defaulted;
 }

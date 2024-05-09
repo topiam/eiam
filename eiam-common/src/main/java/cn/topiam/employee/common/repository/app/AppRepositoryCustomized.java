@@ -23,44 +23,39 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import cn.topiam.employee.common.entity.app.AppEntity;
-import cn.topiam.employee.common.entity.app.query.AppQuery;
+import cn.topiam.employee.common.entity.app.po.AppPO;
 import cn.topiam.employee.common.entity.app.query.GetAppListQuery;
 
 /**
  * 应用 Repository Customized
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/5/26 23:40
+ * Created by support@topiam.cn on 2022/5/26 23:40
  */
 public interface AppRepositoryCustomized {
+    /**
+     * 根据主体ID获取应用列表
+     *
+     * @param subjectIds {@link  List}
+     * @return {@link Page}
+     */
+    List<AppPO> getAppList(List<String> subjectIds);
 
     /**
+     * 根据主体ID，查询参数、分页条件获取应用列表
      *
-     * 获取我的应用列表
-     *
-     * @param userId {@link  Long}
+     * @param subjectIds {@link  List}
      * @param query {@link GetAppListQuery}
      * @param pageable    {@link  Pageable}
-     * @return {@link List}
+     * @return {@link Page}
      */
-    Page<AppEntity> getAppList(Long userId, GetAppListQuery query, Pageable pageable);
-
-    /**
-     *
-     * 获取应用列表
-     *
-     * @param appQuery {@link  AppQuery}
-     * @param pageable    {@link  Pageable}
-     * @return {@link List}
-     */
-    Page<AppEntity> getAppList(AppQuery appQuery, Pageable pageable);
+    Page<AppEntity> getAppList(List<String> subjectIds, GetAppListQuery query, Pageable pageable);
 
     /**
      * 获取用户应用数量
      *
-     * @param userId {@link Long}
+     * @param subjectIds {@link List}
      * @return {@link Long}
      */
-    Long getAppCount(Long userId);
-
+    Long getAppCount(List<String> subjectIds);
 }

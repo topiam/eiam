@@ -32,12 +32,14 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.*;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.access.ExceptionTranslationFilter;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -52,19 +54,14 @@ import com.google.common.collect.Lists;
 
 import cn.topiam.employee.audit.event.AuditEventPublish;
 import cn.topiam.employee.authentication.common.jackjson.AuthenticationJacksonModule;
-import cn.topiam.employee.common.constant.AuthorizeConstants;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.repository.setting.AdministratorRepository;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
 import cn.topiam.employee.console.authentication.*;
-import cn.topiam.employee.console.authentication.ConsoleAuthenticationFailureEventListener;
-import cn.topiam.employee.console.authentication.ConsoleAuthenticationSuccessEventListener;
-import cn.topiam.employee.console.authentication.ConsoleLogoutSuccessEventListener;
-import cn.topiam.employee.console.authentication.ConsoleSessionInformationExpiredStrategy;
-import cn.topiam.employee.core.security.form.FormLoginSecretFilter;
 import cn.topiam.employee.support.geo.GeoLocationService;
 import cn.topiam.employee.support.jackjson.SupportJackson2Module;
 import cn.topiam.employee.support.security.authentication.WebAuthenticationDetailsSource;
+import cn.topiam.employee.support.security.configurer.FormLoginConfigurer;
 import cn.topiam.employee.support.security.csrf.SpaCsrfTokenRequestHandler;
 
 import lombok.RequiredArgsConstructor;
@@ -72,15 +69,13 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.header.writers.XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK;
 import static org.springframework.web.cors.CorsConfiguration.ALL;
 
-import static cn.topiam.employee.common.constant.AuthorizeConstants.FE_LOGIN;
-import static cn.topiam.employee.common.constant.AuthorizeConstants.FORM_LOGIN;
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.DEFAULT_SECURITY_FILTER_CHAIN;
 import static cn.topiam.employee.common.constant.SessionConstants.CURRENT_STATUS;
 import static cn.topiam.employee.common.constant.SynchronizerConstants.EVENT_RECEIVE_PATH;
-import static cn.topiam.employee.core.endpoint.security.PublicSecretEndpoint.PUBLIC_SECRET_PATH;
-import static cn.topiam.employee.core.setting.constant.SecuritySettingConstants.*;
-import static cn.topiam.employee.protocol.code.util.ProtocolConfigUtils.getAuthenticationDetailsSource;
+import static cn.topiam.employee.core.security.PublicSecretEndpoint.PUBLIC_SECRET_PATH;
+import static cn.topiam.employee.core.setting.SecuritySettingConstants.*;
 import static cn.topiam.employee.support.constant.EiamConstants.*;
+import static cn.topiam.employee.support.security.constant.SecurityConstants.LOGOUT_PATH;
 
 /**
  * ConsoleSecurityConfiguration
@@ -122,8 +117,6 @@ public class ConsoleSecurityConfiguration implements BeanClassLoaderAware {
                 .authorizeHttpRequests(authorizeHttpRequests())
                 //安全上下文
                 .securityContext(securityContext())
-                //表单登录配置
-                .formLogin(withFormLoginConfigurerDefaults(httpSecurity))
                 //x509
                 .x509(withDefaults())
                 //异常处理
@@ -140,8 +133,7 @@ public class ConsoleSecurityConfiguration implements BeanClassLoaderAware {
                 .logout(withLogoutConfigurerDefaults())
                 //会话管理器
                 .sessionManagement(withSessionManagementConfigurerDefaults(settingRepository))
-                //表单登录解密过滤器
-                .addFilterBefore(new FormLoginSecretFilter(), UsernamePasswordAuthenticationFilter.class);
+                .with(withFormLoginConfigurer(),configurer-> {});
         // @formatter:on
         return httpSecurity.build();
     }
@@ -168,7 +160,8 @@ public class ConsoleSecurityConfiguration implements BeanClassLoaderAware {
      * @return {@link SecurityContextConfigurer}
      */
     public Customizer<SecurityContextConfigurer<HttpSecurity>> securityContext() {
-        return configurer -> configurer.requireExplicitSave(false);
+        return configurer -> {
+        };
     }
 
     /**
@@ -197,7 +190,7 @@ public class ConsoleSecurityConfiguration implements BeanClassLoaderAware {
      */
     public Customizer<LogoutConfigurer<HttpSecurity>> withLogoutConfigurerDefaults() {
         return configurer -> {
-            configurer.logoutUrl(AuthorizeConstants.LOGOUT)
+            configurer.logoutUrl(LOGOUT_PATH)
                 .logoutSuccessHandler(new ConsoleLogoutSuccessHandler()).permitAll();
         };
     }
@@ -254,8 +247,17 @@ public class ConsoleSecurityConfiguration implements BeanClassLoaderAware {
      */
     public Customizer<ExceptionHandlingConfigurer<HttpSecurity>> withExceptionConfigurerDefaults() {
         return configurer -> {
-            configurer.authenticationEntryPoint(new ConsoleAuthenticationEntryPoint())
-                .accessDeniedHandler(new ConsoleAccessDeniedHandler());
+            configurer.authenticationEntryPoint(new ConsoleAuthenticationEntryPoint());
+            configurer.accessDeniedHandler(new ConsoleAccessDeniedHandler());
+            configurer
+                .withObjectPostProcessor(new ObjectPostProcessor<ExceptionTranslationFilter>() {
+                    @Override
+                    public <O extends ExceptionTranslationFilter> O postProcess(O filter) {
+                        filter
+                            .setAuthenticationTrustResolver(new AuthenticationTrustResolverImpl());
+                        return filter;
+                    }
+                });
         };
     }
 
@@ -291,19 +293,17 @@ public class ConsoleSecurityConfiguration implements BeanClassLoaderAware {
     }
 
     /**
-     * form
+     * 表单登录
      *
-     * @return {@link FormLoginConfigurer}
+     * @return {@link cn.topiam.employee.support.security.configurer.FormLoginConfigurer}
      */
-    public Customizer<FormLoginConfigurer<HttpSecurity>> withFormLoginConfigurerDefaults(HttpSecurity httpSecurity) {
+    public cn.topiam.employee.support.security.configurer.FormLoginConfigurer<HttpSecurity> withFormLoginConfigurer() {
         // @formatter:off
-        return configurer -> {
-            configurer.loginPage(FE_LOGIN)
-            .loginProcessingUrl(FORM_LOGIN)
-            .successHandler(new ConsoleAuthenticationSuccessHandler(administratorRepository,  auditEventPublish))
-            .failureHandler(new ConsoleAuthenticationFailureHandler())
-            .authenticationDetailsSource(getAuthenticationDetailsSource(httpSecurity));
-        };
+        AuthenticationSuccessHandler successHandler = new ConsoleAuthenticationSuccessHandler(administratorRepository,  auditEventPublish );
+        cn.topiam.employee.support.security.configurer.FormLoginConfigurer<HttpSecurity> configurer=new FormLoginConfigurer<>();
+        configurer.successHandler(successHandler);
+        configurer.failureHandler(new ConsoleAuthenticationFailureHandler());
+        return configurer;
         // @formatter:on
     }
 

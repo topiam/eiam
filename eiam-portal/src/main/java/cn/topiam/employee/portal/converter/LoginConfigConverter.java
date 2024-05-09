@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.mapstruct.Mapper;
 
+import cn.topiam.employee.authentication.common.IdentityProviderType;
 import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
 import cn.topiam.employee.portal.pojo.result.IdentityProviderResult;
 
@@ -29,7 +30,7 @@ import cn.topiam.employee.portal.pojo.result.IdentityProviderResult;
  * AuthenticationConverter
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/3/25 21:52
+ * Created by support@topiam.cn on 2022/3/25 21:52
  */
 @Mapper(componentModel = "spring")
 public interface LoginConfigConverter {
@@ -48,6 +49,8 @@ public interface LoginConfigConverter {
             idp.setName(entity.getName());
             idp.setType(entity.getType());
             idp.setCategory(entity.getCategory());
+            idp.setAuthorizationUri(IdentityProviderType.getIdentityProviderType(entity.getType())
+                .getAuthorizationPathPrefix() + "/" + entity.getCode());
             result.add(idp);
         }
         return result;

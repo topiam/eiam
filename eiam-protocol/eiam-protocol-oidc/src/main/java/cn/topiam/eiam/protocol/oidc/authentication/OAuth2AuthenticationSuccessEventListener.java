@@ -44,7 +44,7 @@ import static cn.topiam.eiam.protocol.oidc.constant.OidcProtocolConstants.ID_TOK
  * 监听登录成功事件
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020/9/3
+ * Created by support@topiam.cn on 2020/9/3
  */
 @SuppressWarnings("AlibabaClassNamingShouldBeCamel")
 public class OAuth2AuthenticationSuccessEventListener implements
@@ -63,7 +63,7 @@ public class OAuth2AuthenticationSuccessEventListener implements
             if (!Objects.isNull(token) && !Objects.isNull(token.getAttribute(Principal.class.getName()))){
                 Authentication principal = token.getAttribute(Principal.class.getName());
                 if (!Objects.isNull(principal)) {
-                    Target target = Target.builder().id(authorization.getRegisteredClient().getId()).type(TargetType.APPLICATION).build();
+                    Target target = Target.builder().id(authorization.getRegisteredClient().getId()).type(TargetType.APPLICATION).name(authorization.getRegisteredClient().getClientName()).build();
                     auditEventPublish.publish(EventType.APP_SSO, principal, EventStatus.SUCCESS, Lists.newArrayList(target));
                 }
             }
@@ -73,7 +73,7 @@ public class OAuth2AuthenticationSuccessEventListener implements
             if (!Objects.isNull(token) && !Objects.isNull(token.getAttribute(Principal.class.getName()))){
                 Authentication principal = token.getAttribute(Principal.class.getName());
                 if (!Objects.isNull(principal)) {
-                    Target target = Target.builder().id(token.getRegisteredClientId()).type(TargetType.APPLICATION).build();
+                    Target target = Target.builder().id(token.getRegisteredClientId()).name(token.getPrincipalName()).type(TargetType.APPLICATION).build();
                     auditEventPublish.publish(EventType.APP_SLO, principal, EventStatus.SUCCESS, Lists.newArrayList(target));
                 }
             }

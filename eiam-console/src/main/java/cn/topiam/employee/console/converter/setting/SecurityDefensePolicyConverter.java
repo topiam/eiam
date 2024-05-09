@@ -29,7 +29,7 @@ import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.console.pojo.result.setting.EmailProviderConfigResult;
 import cn.topiam.employee.console.pojo.result.setting.SecurityDefensePolicyConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.SecurityDefensePolicyParam;
-import static cn.topiam.employee.core.setting.constant.SecuritySettingConstants.*;
+import static cn.topiam.employee.core.setting.SecuritySettingConstants.*;
 
 /**
  * 安全防御策略映射

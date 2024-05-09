@@ -26,7 +26,7 @@ import cn.topiam.employee.support.web.converter.EnumConvert;
  * 触发类型
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/3/9 23:47
+ * Created by support@topiam.cn on 2022/3/9 23:47
  */
 public enum TriggerType implements BaseEnum {
                                              /**

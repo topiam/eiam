@@ -23,7 +23,7 @@ import cn.topiam.employee.common.message.enums.MailProvider;
  * None
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/27 21:06
+ * Created by support@topiam.cn on 2021/9/27 21:06
  */
 public class MailNoneProviderSend implements MailProviderSend {
 

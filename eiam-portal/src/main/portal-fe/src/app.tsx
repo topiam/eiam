@@ -33,8 +33,7 @@ import { AvatarProps } from 'antd';
 import { GithubFilled, QuestionCircleFilled } from '@ant-design/icons';
 import About from './components/About';
 import { AvatarDropdown, AvatarName } from '@/components/RightContent/AvatarDropdown';
-
-const showBanner = process.env.PREVIEW_ENV || process.env.NODE_ENV === 'development';
+import PageContainer from '@/components/PageContainer';
 
 /**
  * 跳转登录页面
@@ -71,7 +70,7 @@ export async function getInitialState(): Promise<{
   /**
    * 控制台打印
    */
-  console.log('%c欢迎使用 TopIAM 企业数字身份管控平台', 'font-size: 24px;');
+  console.log('%c欢迎使用 TOPIAM 企业数字身份管控平台', 'font-size: 24px;');
   return {
     fetchUserInfo,
     currentUser: isLoginPath() ? undefined : await fetchUserInfo(),
@@ -114,7 +113,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, loading }) => {
       },
       header: {
         colorBgHeader: '#fff',
-        heightLayoutHeader: showBanner ? 78 : 56,
+        heightLayoutHeader: 78,
       },
       pageContainer: {
         paddingBlockPageContainerContent: 12,
@@ -122,7 +121,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, loading }) => {
       },
     },
     headerRender: (props: ProLayoutProps, defaultDom: React.ReactNode) => {
-      return showBanner ? (
+      return (
         <>
           <Banner play={props.isMobile} />
           {React.cloneElement(defaultDom as any, {
@@ -132,15 +131,13 @@ export const layout: RunTimeLayoutConfig = ({ initialState, loading }) => {
             },
           })}
         </>
-      ) : (
-        defaultDom
       );
     },
     avatarProps: {
       src: initialState?.currentUser?.avatar,
       size: 'small',
       title: <AvatarName />,
-      render: (props: AvatarProps, defaultDom: React.ReactNode) => {
+      render: (_props: AvatarProps, defaultDom: React.ReactNode) => {
         return <AvatarDropdown>{defaultDom}</AvatarDropdown>;
       },
     },
@@ -171,7 +168,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, loading }) => {
       if (loading) {
         return <PageLoading />;
       }
-      return dom;
+      return <PageContainer>{dom}</PageContainer>;
     },
     menuDataRender: (menuData: MenuDataItem[]) => {
       return menuData;

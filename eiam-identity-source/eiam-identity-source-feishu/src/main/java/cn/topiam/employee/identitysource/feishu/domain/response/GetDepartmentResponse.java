@@ -22,6 +22,7 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
+import static cn.topiam.employee.support.repository.base.BaseEntity.IS_DELETED_COLUMN;
 
 /**
  * dept
@@ -146,7 +147,7 @@ public class GetDepartmentResponse implements Serializable {
          *
          * 是否被删除
          */
-        @JsonProperty("is_deleted")
+        @JsonProperty(IS_DELETED_COLUMN)
         private boolean isDeleted;
     }
 }

@@ -38,12 +38,11 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.google.common.collect.Maps;
 
-import cn.topiam.employee.authentication.feishu.FeiShuIdpScanCodeConfig;
-import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
-import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClient;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClientRepository;
+import cn.topiam.employee.authentication.feishu.FeiShuIdentityProviderOAuth2Config;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -62,7 +61,7 @@ import static cn.topiam.employee.authentication.feishu.filter.FeiShuLoginAuthent
  * https://open.feishu.cn/document/common-capabilities/sso/web-application-sso/qr-sdk-documentation
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/12/8 21:11
+ * Created by support@topiam.cn on 2021/12/8 21:11
  */
 public class FeiShuAuthorizationRequestRedirectFilter extends OncePerRequestFilter {
 
@@ -83,10 +82,10 @@ public class FeiShuAuthorizationRequestRedirectFilter extends OncePerRequestFilt
 
     private static final StringKeyGenerator                                  DEFAULT_STATE_GENERATOR           = new Base64StringKeyGenerator(
         Base64.getUrlEncoder());
-    private final IdentityProviderRepository                                 identityProviderRepository;
+    private final RegisteredIdentityProviderClientRepository                 registeredIdentityProviderClientRepository;
 
-    public FeiShuAuthorizationRequestRedirectFilter(IdentityProviderRepository identityProviderRepository) {
-        this.identityProviderRepository = identityProviderRepository;
+    public FeiShuAuthorizationRequestRedirectFilter(RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository) {
+        this.registeredIdentityProviderClientRepository = registeredIdentityProviderClientRepository;
     }
 
     @Override
@@ -101,14 +100,14 @@ public class FeiShuAuthorizationRequestRedirectFilter extends OncePerRequestFilt
         }
         Map<String, String> variables = matcher.getVariables();
         String providerCode = variables.get(PROVIDER_CODE);
-        Optional<IdentityProviderEntity> optional = identityProviderRepository
-            .findByCodeAndEnabledIsTrue(providerCode);
+        Optional<RegisteredIdentityProviderClient<FeiShuIdentityProviderOAuth2Config>> optional = registeredIdentityProviderClientRepository
+            .findByCode(providerCode);
         if (optional.isEmpty()) {
             throw new NullPointerException("未查询到身份提供商信息");
         }
-        IdentityProviderEntity entity = optional.get();
-        FeiShuIdpScanCodeConfig config = JSONObject.parseObject(entity.getConfig(),
-            FeiShuIdpScanCodeConfig.class);
+        RegisteredIdentityProviderClient<FeiShuIdentityProviderOAuth2Config> entity = optional
+            .get();
+        FeiShuIdentityProviderOAuth2Config config = entity.getConfig();
         Assert.notNull(config, "飞书扫码登录配置不能为空");
         //构建授权请求
         //@formatter:off

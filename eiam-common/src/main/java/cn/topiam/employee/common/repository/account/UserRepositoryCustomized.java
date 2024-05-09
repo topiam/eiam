@@ -31,7 +31,7 @@ import cn.topiam.employee.common.entity.account.query.UserListQuery;
  * User Repository Customized
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020/12/29 21:27
+ * Created by support@topiam.cn on 2020/12/29 21:27
  */
 public interface UserRepositoryCustomized {
     /**
@@ -53,40 +53,12 @@ public interface UserRepositoryCustomized {
     Page<UserPO> getUserListNotInGroupId(UserListNotInGroupQuery query, Pageable pageable);
 
     /**
-     * 根据组织ID查询用户列表
-     *
-     * @param organizationId {@link String}
-     * @return {@link List}
-     */
-    List<UserEntity> findAllByOrgId(String organizationId);
-
-    /**
-     * 根据组织ID、数据来源查询用户列表
-     *
-     * @param organizationId {@link String}
-     * @param identitySourceId {@link Long}
-     * @return {@link List}
-     */
-    List<UserEntity> findAllByOrgIdAndIdentitySourceId(String organizationId,
-                                                       Long identitySourceId);
-
-    /**
-     * 按组织外部 ID 和数据来源查找用户列表
-     *
-     * @param externalId {@link String}
-     * @param identitySourceId {@link Long}
-     * @return {@link List}
-     */
-    List<UserPO> findAllByOrgExternalIdAndIdentitySourceId(String externalId,
-                                                           Long identitySourceId);
-
-    /**
      * 不在组织下和数据来源查找用户列表
      *
-     * @param identitySourceId {@link Long}
+     * @param identitySourceId {@link String}
      * @return {@link List}
      */
-    List<UserEntity> findAllByOrgIdNotExistAndIdentitySourceId(Long identitySourceId);
+    List<UserEntity> findAllByOrgIdNotExistAndIdentitySourceId(String identitySourceId);
 
     /**
      * 批量新增
@@ -101,5 +73,4 @@ public interface UserRepositoryCustomized {
      * @param list {@link List}
      */
     void batchUpdate(List<UserEntity> list);
-
 }

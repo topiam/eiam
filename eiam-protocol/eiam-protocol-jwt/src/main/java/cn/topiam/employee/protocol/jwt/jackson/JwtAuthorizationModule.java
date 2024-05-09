@@ -28,7 +28,7 @@ import cn.topiam.employee.protocol.jwt.authentication.JwtAuthenticationToken;
  * JwtAuthorizationModule
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/30 21:07
+ * Created by support@topiam.cn on 2023/6/30 21:07
  */
 public class JwtAuthorizationModule extends SimpleModule {
 

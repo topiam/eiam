@@ -94,7 +94,7 @@ export default (props: {
         destroyOnClose: true,
         maskClosable: false,
         onCancel: async () => {
-          await setVisible(false);
+          setVisible(false);
           setHasSendCaptcha(false);
         },
       }}
@@ -106,8 +106,8 @@ export default (props: {
         const { success } = await changePhone(omit(formData, FieldNames.PASSWORD));
         if (success) {
           useApp.message.success(intl.formatMessage({ id: 'app.update_success' }));
-          await setVisible(false);
-          await setRefresh(true);
+          setVisible(false);
+          setRefresh(true);
           setHasSendCaptcha(false);
           return Promise.resolve();
         }
@@ -149,7 +149,7 @@ export default (props: {
                 //校验手机号格式
                 const isValidNumber = await phoneIsValidNumber(value, phoneRegion);
                 if (!isValidNumber) {
-                  return Promise.reject<any>(
+                  return Promise.reject<Error>(
                     new Error(intl.formatMessage({ id: 'page.account.common.form.phone.rule.1' })),
                   );
                 }
@@ -158,10 +158,10 @@ export default (props: {
                   `${phoneRegion}${value}`,
                 );
                 if (!success) {
-                  return Promise.reject<any>();
+                  return Promise.reject<Error>();
                 }
                 if (!result) {
-                  return Promise.reject<any>(
+                  return Promise.reject<Error>(
                     new Error(intl.formatMessage({ id: 'page.account.common.form.phone.rule.2' })),
                   );
                 }
@@ -171,9 +171,9 @@ export default (props: {
           ]}
           phoneName={FieldNames.PHONE}
           addonWarpStyle={{
-          flexWrap: 'nowrap',
-        }}
-addonBefore={<PhoneAreaCodeSelect defaultValue={phoneRegion} onChange={setPhoneRegion} />}
+            flexWrap: 'nowrap',
+          }}
+          addonBefore={<PhoneAreaCodeSelect defaultValue={phoneRegion} onChange={setPhoneRegion} />}
           onGetCaptcha={async (mobile) => {
             if (!(await formRef.current?.validateFields([FieldNames.PASSWORD]))) {
               return Promise.reject();

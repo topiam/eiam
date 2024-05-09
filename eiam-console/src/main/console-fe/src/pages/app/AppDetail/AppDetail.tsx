@@ -17,7 +17,6 @@
  */
 import { history } from '@@/core/history';
 import { PageContainer, ProDescriptions, RouteContext } from '@ant-design/pro-components';
-import { useAsyncEffect } from 'ahooks';
 import { App, Button, Skeleton } from 'antd';
 import React, { useState } from 'react';
 import AccessPolicy from './components/AccessPolicy';
@@ -26,11 +25,12 @@ import AppConfig from './components/AppConfig';
 import { ConfigTabs } from './constant';
 import AppProtocol from './components/AppProtocol';
 import queryString from 'query-string';
-import { useIntl, useLocation } from '@umijs/max';
-import { GetApp } from './data.d';
+import { useIntl, useLocation, useModel } from '@umijs/max';
 import { getApp } from './service';
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import { removeApp } from '@/services/app';
+import { useAsyncEffect, useUnmount } from 'ahooks';
+import { AppProtocolType } from '@/constant';
 
 export default () => {
   const [tabActiveKey, setTabActiveKey] = useState<string>(ConfigTabs.app_config);
@@ -38,12 +38,11 @@ export default () => {
   const location = useLocation();
   const intl = useIntl();
   const { message, modal } = App.useApp();
-  const [app, setApp] = useState<GetApp>();
+  const { app, setApp } = useModel('app.AppDetail.model');
   const query = queryString.parse(location.search) as {
     id: string;
     name: string;
     type: string;
-    protocol: string;
   };
   const { type, id } = query as {
     id: string;
@@ -60,7 +59,7 @@ export default () => {
       goAppList();
       return;
     }
-    if (!type || !ConfigTabs[type]) {
+    if (!type && !ConfigTabs[type]) {
       setTabActiveKey(ConfigTabs.app_config);
       history.replace({
         pathname: location.pathname,
@@ -71,6 +70,7 @@ export default () => {
       });
       return;
     }
+    setTabActiveKey(type);
   }, []);
 
   useAsyncEffect(async () => {
@@ -82,6 +82,10 @@ export default () => {
       setApp(result);
     }
   }, [id]);
+
+  useUnmount(() => {
+    setApp(undefined);
+  });
 
   const description = (
     <RouteContext.Consumer>
@@ -131,14 +135,26 @@ export default () => {
             />
             <ProDescriptions.Item
               dataIndex="clientSecret"
-              label={intl.formatMessage({ id: 'pages.app.config.detail.config.client_secret' })}
+              label={intl.formatMessage({
+                id: 'pages.app.config.detail.config.client_secret',
+              })}
               valueType={'password'}
               editable={false}
               copyable={true}
             />
             <ProDescriptions.Item
+              dataIndex="code"
+              label={intl.formatMessage({
+                id: 'pages.app.config.detail.config.code',
+              })}
+              copyable={true}
+              editable={false}
+            />
+            <ProDescriptions.Item
               dataIndex="createTime"
-              label={intl.formatMessage({ id: 'pages.app.config.detail.config.create_time' })}
+              label={intl.formatMessage({
+                id: 'pages.app.config.detail.config.create_time',
+              })}
               valueType={'dateTime'}
               copyable={false}
               editable={false}
@@ -148,11 +164,23 @@ export default () => {
       }
     </RouteContext.Consumer>
   );
-
+  const ComponentByKey = ({ key }: { key: string }) => {
+    const components = {
+      //  基本信息
+      [ConfigTabs.app_config]: AppConfig,
+      //  协议配置
+      [ConfigTabs.protocol_config]: AppProtocol,
+      //  应用账户
+      [ConfigTabs.app_account]: AppAccount,
+      //  访问策略
+      [ConfigTabs.access_policy]: AccessPolicy,
+    };
+    const Component = components[key];
+    return <Component />;
+  };
   return (
     <PageContainer
       title={loading ? <Skeleton.Input style={{ width: 50 }} active size={'small'} /> : app?.name}
-      style={{ overflow: 'hidden' }}
       onBack={() => {
         goAppList();
       }}
@@ -166,14 +194,14 @@ export default () => {
             const confirmed = modal.error({
               centered: true,
               title: intl.formatMessage({
-                id: 'pages.app.config.detail.extra.delete.confirm_title',
+                id: 'pages.app.config.detail.extra.delete_confirm_title',
               }),
               icon: <ExclamationCircleFilled />,
               content: intl.formatMessage({
-                id: 'pages.app.config.detail.extra.delete.confirm_content',
+                id: 'pages.app.config.detail.extra.delete_confirm_content',
               }),
               okText: intl.formatMessage({ id: 'app.confirm' }),
-              okType: 'danger',
+              okType: 'primary',
               okCancel: true,
               cancelText: intl.formatMessage({ id: 'app.cancel' }),
               onOk: async () => {
@@ -207,38 +235,29 @@ export default () => {
           tab: intl.formatMessage({ id: 'pages.app.config.detail.config' }),
         },
         {
-          key: ConfigTabs.login_access,
-          tab: intl.formatMessage({ id: 'pages.app.config.detail.items.login_access' }),
+          key: ConfigTabs.protocol_config,
+          tab: intl.formatMessage({ id: 'pages.app.config.detail.protocol_config' }),
         },
-        {
-          key: ConfigTabs.app_account,
-          tab: intl.formatMessage({
-            id: 'pages.app.config.detail.items.login_access.app_account',
-          }),
-        },
+        ...(app && app?.protocol && app?.protocol !== AppProtocolType.oidc
+          ? [
+              {
+                key: ConfigTabs.app_account,
+                tab: intl.formatMessage({
+                  id: 'pages.app.config.detail.protocol_config.app_account',
+                }),
+              },
+            ]
+          : []),
         {
           key: ConfigTabs.access_policy,
           tab: intl.formatMessage({
-            id: 'pages.app.config.detail.items.login_access.access_policy',
+            id: 'pages.app.config.detail.protocol_config.access_policy',
           }),
         },
       ]}
       content={description}
     >
-      {app && (
-        <>
-          {/*基本信息*/}
-          {ConfigTabs.app_config === tabActiveKey && <AppConfig app={app} />}
-          {/*协议配置*/}
-          {ConfigTabs.login_access === tabActiveKey && <AppProtocol appId={app?.id} />}
-          {/*应用账户*/}
-          {ConfigTabs.app_account === tabActiveKey && (
-            <AppAccount appId={app?.id} protocol={app.protocol} />
-          )}
-          {/*访问策略*/}
-          {ConfigTabs.access_policy === tabActiveKey && <AccessPolicy appId={app?.id} />}
-        </>
-      )}
+      {app && ComponentByKey({ key: tabActiveKey })}
     </PageContainer>
   );
 };

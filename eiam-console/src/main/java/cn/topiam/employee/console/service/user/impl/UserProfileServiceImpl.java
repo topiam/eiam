@@ -41,7 +41,6 @@ import cn.topiam.employee.common.entity.setting.AdministratorEntity;
 import cn.topiam.employee.common.enums.MailType;
 import cn.topiam.employee.common.enums.MessageNoticeChannel;
 import cn.topiam.employee.common.enums.SmsType;
-import cn.topiam.employee.common.exception.PasswordValidatedFailException;
 import cn.topiam.employee.common.exception.UserNotFoundException;
 import cn.topiam.employee.common.repository.setting.AdministratorRepository;
 import cn.topiam.employee.console.converter.user.UserProfileConverter;
@@ -49,10 +48,11 @@ import cn.topiam.employee.console.pojo.update.user.*;
 import cn.topiam.employee.console.service.user.UserProfileService;
 import cn.topiam.employee.core.message.sms.SmsMsgEventPublish;
 import cn.topiam.employee.core.security.otp.OtpContextHelp;
-import cn.topiam.employee.support.context.ServletContextHelp;
+import cn.topiam.employee.support.context.ServletContextService;
 import cn.topiam.employee.support.exception.BadParamsException;
 import cn.topiam.employee.support.exception.InfoValidityFailException;
 import cn.topiam.employee.support.exception.TopIamException;
+import cn.topiam.employee.support.security.password.exception.PasswordValidatedFailException;
 import cn.topiam.employee.support.security.util.SecurityUtils;
 import cn.topiam.employee.support.util.BeanUtils;
 import cn.topiam.employee.support.util.PhoneNumberUtils;
@@ -61,15 +61,15 @@ import jakarta.servlet.http.HttpSession;
 import static cn.topiam.employee.core.message.sms.SmsMsgEventPublish.USERNAME;
 import static cn.topiam.employee.support.constant.EiamConstants.FORGET_PASSWORD_TOKEN_ID;
 import static cn.topiam.employee.support.exception.enums.ExceptionStatus.EX000102;
-import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
-import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
+import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_BY;
+import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_TIME;
 import static cn.topiam.employee.support.util.EmailUtils.isEmailValidate;
 import static cn.topiam.employee.support.util.PhoneNumberUtils.isPhoneValidate;
 
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/10/3 22:20
+ * Created by support@topiam.cn on 2022/10/3 22:20
  */
 @Service
 public class UserProfileServiceImpl implements UserProfileService {
@@ -83,7 +83,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         AdministratorEntity administrator = userProfileConverter
             .userUpdateParamConvertToAdministratorEntity(param);
         AdministratorEntity user = administratorRepository
-            .findById(Long.valueOf(SecurityUtils.getCurrentUser().getId())).orElseThrow();
+            .findById(SecurityUtils.getCurrentUser().getId()).orElseThrow();
         BeanUtils.merge(administrator, user, LAST_MODIFIED_BY, LAST_MODIFIED_TIME);
         administratorRepository.save(user);
         return true;
@@ -101,7 +101,7 @@ public class UserProfileServiceImpl implements UserProfileService {
             throw new PasswordValidatedFailException("旧密码错误");
         }
         //修改密码
-        administratorRepository.updatePassword(Long.valueOf(SecurityUtils.getCurrentUser().getId()),
+        administratorRepository.updatePassword(SecurityUtils.getCurrentUser().getId(),
             passwordEncoder.encode(param.getNewPassword()), LocalDateTime.now());
         logger.info("用户ID: [{}] 用户名: [{}] 修改密码成功", administrator.getId(),
             administrator.getUsername());
@@ -153,8 +153,8 @@ public class UserProfileServiceImpl implements UserProfileService {
             && !user.getId().equals(optionalAdministrator.get().getId())) {
             throw new TopIamException("系统中已存在[" + param.getPhone() + "]手机号, 请先解绑");
         }
-        Long id = Long.valueOf(SecurityUtils.getCurrentUser().getId());
-        administratorRepository.updatePhone(id, param.getPhone());
+        String id = SecurityUtils.getCurrentUser().getId();
+        administratorRepository.updateByIdAndPhone(id, param.getPhone());
         // 修改手机号成功发送短信
         LinkedHashMap<String, String> parameter = Maps.newLinkedHashMap();
         parameter.put(USERNAME, user.getUsername());
@@ -210,7 +210,7 @@ public class UserProfileServiceImpl implements UserProfileService {
             && !administrator.getId().equals(optionalAdministrator.get().getId())) {
             throw new TopIamException("系统中已存在[" + param.getEmail() + "]邮箱, 请先解绑");
         }
-        administratorRepository.updateEmail(Long.valueOf(SecurityUtils.getCurrentUser().getId()),
+        administratorRepository.updateByIdAndEmail(SecurityUtils.getCurrentUser().getId(),
             param.getEmail());
         return true;
     }
@@ -265,7 +265,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         // 生成忘记密码TOKEN ID
         String tokenId = UUID.randomUUID().toString();
-        HttpSession session = ServletContextHelp.getSession();
+        HttpSession session = ServletContextService.getSession();
         // 保存用户ID到Redis, 有效期10分钟
         stringRedisTemplate.opsForValue().set(session.getId() + tokenId,
             String.valueOf(user.get().getId()), 10, TimeUnit.MINUTES);
@@ -277,7 +277,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Override
     public Boolean forgetPassword(ForgetPasswordRequest forgetPasswordRequest) {
         // 验证TOKEN
-        HttpSession session = ServletContextHelp.getSession();
+        HttpSession session = ServletContextService.getSession();
         String redisTokenId = session.getId() + session.getAttribute(FORGET_PASSWORD_TOKEN_ID);
         String userId = stringRedisTemplate.opsForValue().get(redisTokenId);
         if (Objects.isNull(userId)) {
@@ -286,7 +286,7 @@ public class UserProfileServiceImpl implements UserProfileService {
             return false;
         }
         //修改密码
-        Optional<AdministratorEntity> user = administratorRepository.findById(Long.valueOf(userId));
+        Optional<AdministratorEntity> user = administratorRepository.findById(userId);
         if (user.isPresent()) {
             AdministratorEntity administratorEntity = user.get();
             administratorRepository.updatePassword(administratorEntity.getId(),
@@ -323,8 +323,7 @@ public class UserProfileServiceImpl implements UserProfileService {
      */
     public AdministratorEntity getCurrentUser() {
         String userId = SecurityUtils.getCurrentUserId();
-        Optional<AdministratorEntity> optional = administratorRepository
-            .findById(Long.valueOf(userId));
+        Optional<AdministratorEntity> optional = administratorRepository.findById(userId);
         if (optional.isPresent()) {
             return optional.get();
         }

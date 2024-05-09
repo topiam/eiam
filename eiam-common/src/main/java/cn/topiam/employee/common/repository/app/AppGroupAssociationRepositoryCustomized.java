@@ -25,7 +25,7 @@ import cn.topiam.employee.common.entity.app.query.AppGroupAssociationListQuery;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2023/9/7 21:27
+ * Created by support@topiam.cn on 2023/9/7 21:27
  */
 public interface AppGroupAssociationRepositoryCustomized {
 

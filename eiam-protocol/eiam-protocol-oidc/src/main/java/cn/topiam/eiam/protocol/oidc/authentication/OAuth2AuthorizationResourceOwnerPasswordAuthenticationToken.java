@@ -32,7 +32,7 @@ import org.springframework.util.Assert;
  * An {@link Authentication} implementation used for the OAuth 2.0 Authorization Username Grant.
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/26 22:30
+ * Created by support@topiam.cn on 2023/6/26 22:30
  */
 @SuppressWarnings("AlibabaClassNamingShouldBeCamel")
 public class OAuth2AuthorizationResourceOwnerPasswordAuthenticationToken extends

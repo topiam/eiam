@@ -29,8 +29,8 @@ import org.springframework.util.Assert;
 
 import cn.topiam.employee.authentication.alipay.filter.AlipayAuthorizationRequestRedirectFilter;
 import cn.topiam.employee.authentication.alipay.filter.AlipayLoginAuthenticationFilter;
-import cn.topiam.employee.authentication.common.service.UserIdpService;
-import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
+import cn.topiam.employee.authentication.common.IdentityProviderAuthenticationService;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClientRepository;
 
 import lombok.NonNull;
 import lombok.Setter;
@@ -40,36 +40,38 @@ import static cn.topiam.employee.support.security.util.HttpSecurityFilterOrderRe
  * 认证配置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/8/19 15:52
+ * Created by support@topiam.cn on 2023/8/19 15:52
  */
 public class AlipayAuthenticationConfigurer extends
                                             AbstractAuthenticationFilterConfigurer<HttpSecurity, AlipayAuthenticationConfigurer, AlipayLoginAuthenticationFilter> {
     @Setter
     @NonNull
-    private String                           loginProcessingUrl = AlipayLoginAuthenticationFilter.DEFAULT_FILTER_PROCESSES_URI;
+    private String                                           loginProcessingUrl = AlipayLoginAuthenticationFilter.DEFAULT_FILTER_PROCESSES_URI;
 
-    private final IdentityProviderRepository identityProviderRepository;
-    private final UserIdpService             userIdpService;
+    private final RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository;
+    private final IdentityProviderAuthenticationService      identityProviderAuthenticationService;
 
-    AlipayAuthenticationConfigurer(IdentityProviderRepository identityProviderRepository,
-                                   UserIdpService userIdpService) {
-        Assert.notNull(identityProviderRepository, "identityProviderRepository must not be null");
-        Assert.notNull(userIdpService, "userIdpService must not be null");
-        this.identityProviderRepository = identityProviderRepository;
-        this.userIdpService = userIdpService;
+    AlipayAuthenticationConfigurer(RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository,
+                                   IdentityProviderAuthenticationService identityProviderAuthenticationService) {
+        Assert.notNull(registeredIdentityProviderClientRepository,
+            "registeredIdentityProviderClientRepository must not be null");
+        Assert.notNull(identityProviderAuthenticationService, "userIdpService must not be null");
+        this.registeredIdentityProviderClientRepository = registeredIdentityProviderClientRepository;
+        this.identityProviderAuthenticationService = identityProviderAuthenticationService;
     }
 
     @Override
     public void init(HttpSecurity http) throws Exception {
         //支付宝登录认证
-        this.setAuthenticationFilter(
-            new AlipayLoginAuthenticationFilter(userIdpService, identityProviderRepository));
+        this.setAuthenticationFilter(new AlipayLoginAuthenticationFilter(
+            identityProviderAuthenticationService, registeredIdentityProviderClientRepository));
         putFilterBefore(http, this.getAuthenticationFilter(),
             OAuth2LoginAuthenticationFilter.class);
 
         //支付宝请求重定向
         http.addFilterBefore(
-            new AlipayAuthorizationRequestRedirectFilter(identityProviderRepository),
+            new AlipayAuthorizationRequestRedirectFilter(
+                registeredIdentityProviderClientRepository),
             OAuth2AuthorizationRequestRedirectFilter.class);
 
         //登录处理地址
@@ -94,8 +96,9 @@ public class AlipayAuthenticationConfigurer extends
             AlipayLoginAuthenticationFilter.getRequestMatcher());
     }
 
-    public static AlipayAuthenticationConfigurer alipayOauth(IdentityProviderRepository identityProviderRepository,
-                                                             UserIdpService userIdpService) {
-        return new AlipayAuthenticationConfigurer(identityProviderRepository, userIdpService);
+    public static AlipayAuthenticationConfigurer alipayOauth(RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository,
+                                                             IdentityProviderAuthenticationService identityProviderAuthenticationService) {
+        return new AlipayAuthenticationConfigurer(registeredIdentityProviderClientRepository,
+            identityProviderAuthenticationService);
     }
 }

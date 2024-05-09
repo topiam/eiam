@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * 用户身份提供商绑定列表查询结果
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/11/3 22:13
+ * Created by support@topiam.cn on 2022/11/3 22:13
  */
 @Data
 @Schema(description = "用户身份提供商绑定列表查询响应")

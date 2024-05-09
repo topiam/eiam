@@ -28,7 +28,7 @@ import cn.topiam.employee.common.storage.StorageProviderException;
  * 本地存储配置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/10 21:32
+ * Created by support@topiam.cn on 2021/11/10 21:32
  */
 public class NoneStorage implements Storage {
 

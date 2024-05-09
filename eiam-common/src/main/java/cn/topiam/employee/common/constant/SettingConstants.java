@@ -26,8 +26,6 @@ import cn.topiam.employee.support.constant.EiamConstants;
  * Created by support@topiam.cn on 2020/7/26 21:07
  */
 public final class SettingConstants {
-    public static final String NOT_CONFIG         = "{}";
-
     /**
      * 系统设置API路径
      */
@@ -37,11 +35,6 @@ public final class SettingConstants {
      * 安全设置API路径
      */
     public final static String SECURITY_PATH      = SETTING_PATH + "/security";
-
-    /**
-     * 组名称
-     */
-    public static final String SETTING_GROUP_NAME = "系统设置";
 
     /**
      * 系统设置缓存 cacheName
@@ -57,4 +50,5 @@ public final class SettingConstants {
      * 应用AES秘钥
      */
     public static final String AES_SECRET         = "security.aes_secret";
+
 }

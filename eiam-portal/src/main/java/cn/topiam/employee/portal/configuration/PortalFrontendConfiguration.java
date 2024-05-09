@@ -30,7 +30,7 @@ import org.springframework.web.servlet.resource.PathResourceResolver;
  * 控制台前端配置
  *
  * @author TopIAM
- * Created by support@topiam.cn on   2022/12/4 21:49
+ * Created by support@topiam.cn on  2022/12/4 21:49
  */
 @Configuration
 public class PortalFrontendConfiguration implements WebMvcConfigurer {

@@ -23,15 +23,15 @@ import java.util.Map;
  * 应用上下文
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/30 23:52
+ * Created by support@topiam.cn on 2023/6/30 23:52
  */
 public interface ApplicationContext {
     /**
      * 获取应用ID
      *
-     * @return {@link Long}
+     * @return {@link String}
      */
-    Long getAppId();
+    String getAppId();
 
     /**
      * 获取客户端ID

@@ -17,7 +17,6 @@
  */
 package cn.topiam.employee.portal.configuration;
 
-import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -25,12 +24,11 @@ import org.springframework.core.env.Environment;
 import cn.topiam.employee.EiamPortalApplication;
 import cn.topiam.employee.support.util.AppVersionUtils;
 
-import lombok.RequiredArgsConstructor;
-
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
-import static cn.topiam.employee.support.constant.EiamConstants.V1_API_PATH;
 
 /**
  * ApiConfiguration
@@ -39,28 +37,7 @@ import static cn.topiam.employee.support.constant.EiamConstants.V1_API_PATH;
  * Created by support@topiam.cn on 2019/5/16 21:28
  */
 @Configuration
-@RequiredArgsConstructor
 public class PortalApiConfiguration {
-    /**
-     * 账户 RestAPI
-     *
-     * @return {@link GroupedOpenApi}
-     */
-    @Bean
-    public GroupedOpenApi accountRestApi() {
-        return GroupedOpenApi.builder().group("账户管理").pathsToMatch(V1_API_PATH + "/account/**")
-            .build();
-    }
-
-    /**
-     * 应用 RestAPI
-     *
-     * @return {@link GroupedOpenApi}
-     */
-    @Bean
-    public GroupedOpenApi appRestApi() {
-        return GroupedOpenApi.builder().group("应用管理").pathsToMatch(V1_API_PATH + "/app/**").build();
-    }
 
     /**
      * API INFO
@@ -70,13 +47,13 @@ public class PortalApiConfiguration {
     private Info info() {
         Contact contact = new Contact();
         contact.setEmail("support@topiam.cn");
-        contact.setName("TopIAM");
+        contact.setName("TOPIAM");
         contact.setUrl("https://eiam.topiam.cn");
         return new Info()
             //title
             .title(environment.getProperty("spring.application.name"))
             //描述
-            .description("REST API 文档")
+            .description("TOPIAM 门户端 REST API 文档")
             //服务条款网址
             .termsOfService("https://eiam.topiam.cn")
             //内容
@@ -85,10 +62,23 @@ public class PortalApiConfiguration {
             .version(AppVersionUtils.getVersion(EiamPortalApplication.class));
     }
 
+    /**
+     * 定义openapi
+     *
+     * @return {@link OpenAPI}
+     */
     @Bean
     public OpenAPI openApi() {
-        return new OpenAPI().info(info());
+        OpenAPI openApi = new OpenAPI();
+        openApi.setComponents(new Components());
+        openApi.setPaths(new Paths());
+        openApi.setInfo(info());
+        return openApi;
     }
 
     private final Environment environment;
+
+    public PortalApiConfiguration(Environment environment) {
+        this.environment = environment;
+    }
 }

@@ -26,18 +26,16 @@ import cn.topiam.employee.common.enums.app.JwtIdTokenSubjectType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
-import lombok.extern.jackson.Jacksonized;
 
 /**
  * Form 协议配置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/02/12 21:43
+ * Created by support@topiam.cn on 2023/02/12 21:43
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
 @SuperBuilder
-@Jacksonized
 public class JwtProtocolConfig extends AbstractProtocolConfig {
 
     @Serial
@@ -65,7 +63,7 @@ public class JwtProtocolConfig extends AbstractProtocolConfig {
     /**
      * Token 过期时间（秒）
      */
-    private Integer               idTokenTimeToLive;
+    private String                idTokenTimeToLive;
 
     /**
      * JWT 公钥
@@ -81,4 +79,14 @@ public class JwtProtocolConfig extends AbstractProtocolConfig {
      * id_token 主体类型
      */
     private JwtIdTokenSubjectType idTokenSubjectType;
+
+    /**
+     * 登出重定向地址
+     */
+    private String                postLogoutRedirectUri;
+
+    /**
+     * 是否配置
+     */
+    private Boolean               configured;
 }

@@ -24,7 +24,7 @@
     <parent>
         <groupId>cn.topiam</groupId>
         <artifactId>eiam-identity-source</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.1.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -48,18 +48,6 @@
         <dependency>
             <groupId>cn.topiam</groupId>
             <artifactId>eiam-identity-source-feishu</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <!--wechatwork -->
-        <dependency>
-            <groupId>cn.topiam</groupId>
-            <artifactId>eiam-identity-source-wechatwork</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <!--excel -->
-        <dependency>
-            <groupId>cn.topiam</groupId>
-            <artifactId>eiam-identity-source-excel</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

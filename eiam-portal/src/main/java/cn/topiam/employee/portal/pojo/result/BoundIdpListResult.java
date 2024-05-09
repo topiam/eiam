@@ -26,12 +26,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * 账号绑定
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/3/31 21:58
+ * Created by support@topiam.cn on 2023/3/31 21:58
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "账号绑定")
 public class BoundIdpListResult extends IdentityProviderResult {
+
+    /**
+     * ID
+     */
+    @Schema(description = "ID")
+    private String  id;
+
     /**
      * IDP id
      */

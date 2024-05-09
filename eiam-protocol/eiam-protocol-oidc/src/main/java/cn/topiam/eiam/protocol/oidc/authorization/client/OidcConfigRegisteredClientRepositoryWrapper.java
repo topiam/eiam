@@ -17,7 +17,6 @@
  */
 package cn.topiam.eiam.protocol.oidc.authorization.client;
 
-import java.time.Duration;
 import java.util.Objects;
 
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -39,7 +38,7 @@ import cn.topiam.employee.application.oidc.model.OidcProtocolConfig;
  * OidcConfigRegisteredClientRepositoryWrapper
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/3 21:46
+ * Created by support@topiam.cn on 2023/7/3 21:46
  */
 public class OidcConfigRegisteredClientRepositoryWrapper implements RegisteredClientRepository {
 
@@ -58,7 +57,7 @@ public class OidcConfigRegisteredClientRepositoryWrapper implements RegisteredCl
     @Override
     public RegisteredClient findById(String id) {
         ApplicationContext context = ApplicationContextHolder.getApplicationContext();
-        Long appId = context.getAppId();
+        String appId = context.getAppId();
         if (!String.valueOf(appId).equals(id)) {
             return null;
         }
@@ -135,9 +134,9 @@ public class OidcConfigRegisteredClientRepositoryWrapper implements RegisteredCl
             //Token设置
             .tokenSettings(TokenSettings.builder()
                 //刷新令牌生存时间
-                .refreshTokenTimeToLive(Duration.ofSeconds(config.getRefreshTokenTimeToLive()))
+                .refreshTokenTimeToLive(config.getRefreshTokenTimeToLive())
                 //访问令牌生存时间
-                .accessTokenTimeToLive(Duration.ofSeconds(config.getAccessTokenTimeToLive()))
+                .accessTokenTimeToLive(config.getAccessTokenTimeToLive())
                 //ID 令牌签名算法
                 .idTokenSignatureAlgorithm(
                     SignatureAlgorithm.from(config.getIdTokenSignatureAlgorithm()))

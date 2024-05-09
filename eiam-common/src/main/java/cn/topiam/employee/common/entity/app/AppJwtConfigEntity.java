@@ -17,12 +17,14 @@
  */
 package cn.topiam.employee.common.entity.app;
 
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import java.time.Duration;
+
+import org.hibernate.annotations.SoftDelete;
 
 import cn.topiam.employee.common.enums.app.JwtBindingType;
 import cn.topiam.employee.common.enums.app.JwtIdTokenSubjectType;
-import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
+import cn.topiam.employee.support.repository.SoftDeleteConverter;
+import cn.topiam.employee.support.repository.base.BaseEntity;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -32,30 +34,28 @@ import lombok.experimental.Accessors;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
+import static cn.topiam.employee.support.repository.base.BaseEntity.IS_DELETED_COLUMN;
 
 /**
  * APP Form 配置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/02/12 22:31
+ * Created by support@topiam.cn on 2023/02/12 22:31
  */
 @Getter
 @Setter
 @ToString
 @Entity
 @Accessors(chain = true)
-@Table(name = "app_jwt_config")
-@SQLDelete(sql = "update app_jwt_config set " + SOFT_DELETE_SET + " where id_ = ?")
-@Where(clause = SOFT_DELETE_WHERE)
-public class AppJwtConfigEntity extends LogicDeleteEntity<Long> {
+@Table(name = "eiam_app_jwt_config")
+@SoftDelete(columnName = IS_DELETED_COLUMN, converter = SoftDeleteConverter.class)
+public class AppJwtConfigEntity extends BaseEntity {
 
     /**
      * APP ID
      */
     @Column(name = "app_id")
-    private Long                  appId;
+    private String                appId;
 
     /**
      * 业务系统中的JWT SSO地址，在单点登录时本系统将向该地址发送id_token信息，参数名为id_token，业务系统通过id_token与Public Key可获取业务系统中的用户信息，如果在业务系统（SP）发起登录，请求SP登录地址时如果携带service参数，系统会检验合法性，成功后会将浏览器重定向到该地址，并携带id_token身份令牌。
@@ -87,5 +87,5 @@ public class AppJwtConfigEntity extends LogicDeleteEntity<Long> {
      * 令牌过期时间
      */
     @Column(name = "id_token_time_to_live")
-    private Integer               idTokenTimeToLive;
+    private Duration              idTokenTimeToLive;
 }

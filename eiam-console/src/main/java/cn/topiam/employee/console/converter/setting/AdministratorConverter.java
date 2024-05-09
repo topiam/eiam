@@ -19,7 +19,6 @@ package cn.topiam.employee.console.converter.setting;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
@@ -40,10 +39,9 @@ import cn.topiam.employee.support.util.ImageAvatarUtils;
 
 import jakarta.persistence.criteria.Predicate;
 import static cn.topiam.employee.common.entity.setting.AdministratorEntity.*;
-import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
-import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
+import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_BY;
+import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_TIME;
 import static cn.topiam.employee.support.util.ImageAvatarUtils.generateAvatarImg;
-import static cn.topiam.employee.support.util.ImageAvatarUtils.getRandomAvatar;
 import static cn.topiam.employee.support.util.PhoneNumberUtils.getPhoneAreaCode;
 import static cn.topiam.employee.support.util.PhoneNumberUtils.getPhoneNumber;
 
@@ -102,7 +100,7 @@ public interface AdministratorConverter {
      * @param page {@link AdministratorEntity}
      * @return {@link AdministratorListResult}
      */
-    @Mapping(target = "initialized", expression = "java(page.getUsername().equals(cn.topiam.employee.common.constant.SecurityConstants.DEFAULT_ADMIN_USERNAME))")
+    @Mapping(target = "initialized", expression = "java(page.getUsername().equals(cn.topiam.employee.support.constant.EiamConstants.DEFAULT_ADMIN_USERNAME))")
     @Mapping(target = "status", source = "status.code")
     @Mapping(target = "emailVerified", source = "emailVerified", defaultValue = "false")
     @Mapping(target = "authTotal", source = "authTotal", defaultValue = "0L")
@@ -135,12 +133,11 @@ public interface AdministratorConverter {
             entity.setPhoneVerified(Boolean.TRUE);
             entity.setPhoneAreaCode(getPhoneAreaCode(param.getPhone()));
         }
-        entity.setAvatar(Objects.toString(param.getAvatar(), getRandomAvatar()));
-        entity.setStatus(cn.topiam.employee.common.enums.UserStatus.ENABLE);
+        entity.setStatus(cn.topiam.employee.common.enums.UserStatus.ENABLED);
         entity.setAuthTotal(0L);
         entity.setLastUpdatePasswordTime(java.time.LocalDateTime.now());
         //密码处理
-        entity.setPassword(cn.topiam.employee.support.context.ApplicationContextHelp
+        entity.setPassword(cn.topiam.employee.support.context.ApplicationContextService
             .getBean(org.springframework.security.crypto.password.PasswordEncoder.class)
             .encode(param.getPassword()));
         return entity;
@@ -161,7 +158,7 @@ public interface AdministratorConverter {
 
         AdministratorEntity entity = new AdministratorEntity();
         if (param.getId() != null) {
-            entity.setId(Long.parseLong(param.getId()));
+            entity.setId(param.getId());
         }
         entity.setRemark(param.getRemark());
         //邮箱
@@ -196,7 +193,7 @@ public interface AdministratorConverter {
      * @return {@link AdministratorResult} 管理员详情
      */
     @Mapping(target = "status", source = "status.code")
-    @Mapping(target = "initialized", expression = "java(user.getUsername().equals(cn.topiam.employee.common.constant.SecurityConstants.DEFAULT_ADMIN_USERNAME))")
+    @Mapping(target = "initialized", expression = "java(user.getUsername().equals(cn.topiam.employee.support.constant.EiamConstants.DEFAULT_ADMIN_USERNAME))")
     AdministratorResult entityConvertToAdministratorDetailsResult(AdministratorEntity user);
 
     /**

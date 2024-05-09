@@ -35,7 +35,7 @@ import cn.topiam.employee.openapi.constant.OpenApiStatus;
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/25 21:02
+ * Created by support@topiam.cn on 2023/6/25 21:02
  */
 public class AccessTokenAuthenticationProvider implements AuthenticationProvider {
 

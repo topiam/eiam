@@ -18,7 +18,6 @@
 package cn.topiam.employee.console.controller.app;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -74,7 +73,7 @@ public class AppTemplateController {
     @Operation(summary = "模板表单架构")
     @GetMapping(value = "/form_schema")
     @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
-    public ApiRestResult<List<Map>> getAppTemplateFormSchema(@Validated @Parameter(description = "模板编码") @NotEmpty(message = "模板编码不能为空") @RequestParam(value = "code", required = false) String code) {
+    public ApiRestResult<Object> getAppTemplateFormSchema(@Validated @Parameter(description = "模板编码") @NotEmpty(message = "模板编码不能为空") @RequestParam(value = "code", required = false) String code) {
         return ApiRestResult.ok(templateService.getAppTemplateFormSchema(code));
     }
 

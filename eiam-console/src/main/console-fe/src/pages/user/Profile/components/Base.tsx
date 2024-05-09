@@ -15,85 +15,35 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { UploadOutlined } from '@ant-design/icons';
-import { ProForm, ProFormText, useStyle as useAntdStyle } from '@ant-design/pro-components';
-import { App, Avatar, Button, Form, Skeleton, Upload } from 'antd';
+import { ProForm, ProFormText } from '@ant-design/pro-components';
+import { App, Form, Skeleton } from 'antd';
 import { useState } from 'react';
 
 import { changeBaseInfo } from '../service';
 import { useAsyncEffect } from 'ahooks';
-import ImgCrop from 'antd-img-crop';
-import { uploadFile } from '@/services/upload';
 import { useModel } from '@umijs/max';
-import classnames from 'classnames';
 import { useIntl } from '@@/exports';
+import { createStyles } from 'antd-style';
 
 const prefixCls = 'account-base';
 
-function useStyle() {
-  return useAntdStyle('AccountBaseComponent', (token) => {
-    return [
-      {
-        [`.${prefixCls}`]: {
-          display: 'flex',
-          'padding-top': '12px',
-          [`&-left`]: {
-            minWidth: '224px',
-            maxWidth: '448px',
-          },
-          [`&-right`]: {
-            flex: 1,
-            'padding-inline-start': '104px',
-          },
-          [`&-avatar`]: {
-            marginBottom: '12px',
-            overflow: 'hidden',
-            img: {
-              width: '100%',
-            },
-            [`&-name`]: {
-              verticalAlign: 'middle',
-              backgroundColor: `${token.colorPrimary} !important`,
-            },
-            [`${token.antCls}-avatar`]: {
-              [`&-string`]: {
-                fontSize: '75px',
-              },
-            },
-            [`&-title`]: {
-              height: '22px',
-              marginBottom: '8px',
-              color: '@heading-color',
-              fontSize: '@font-size-base',
-              lineHeight: '22px',
-            },
-            [`&-button-view`]: {
-              width: '144px',
-              textAlign: 'center',
-            },
-          },
-        },
-        [`@media screen and (max-width: ${token.screenXL}px)`]: {
-          [`.${prefixCls}`]: {
-            flexDirection: 'column-reverse',
-            [`&-right`]: {
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              maxWidth: '448px',
-              padding: '20px',
-            },
-            ['&-avatar']: {
-              ['&-title']: {
-                display: 'none',
-              },
-            },
-          },
-        },
+const useStyles = createStyles(({ token }, props) => {
+  const prefixClassName = `.${props}`;
+  return {
+    accountBase: {
+      display: 'flex',
+      paddingTop: '12px',
+      [`@media screen and (max-width: ${token.screenMD}px)`]: {
+        flexDirection: 'column-reverse',
       },
-    ];
-  });
-}
+      [`${prefixClassName}-left`]: {
+        minWidth: '224px',
+        maxWidth: '448px',
+      },
+    },
+  };
+});
+
 export const FORM_ITEM_LAYOUT = {
   labelCol: {
     span: 5,
@@ -106,18 +56,13 @@ export const FORM_ITEM_LAYOUT = {
 const BaseView = () => {
   const intl = useIntl();
   const useApp = App.useApp();
-  const { wrapSSR, hashId } = useStyle();
+  const { styles, cx } = useStyles(prefixCls);
   const [loading, setLoading] = useState<boolean>();
   const { initialState, setInitialState } = useModel('@@initialState');
-  const [avatarURL, setAvatarURL] = useState<string | undefined>(initialState?.currentUser?.avatar);
-  const [avatarUploaded, setAvatarUploaded] = useState<boolean>(false);
-  const [name, setName] = useState<string>('');
 
   useAsyncEffect(async () => {
     setLoading(true);
     if (initialState && initialState.currentUser) {
-      setAvatarURL(initialState?.currentUser?.avatar);
-      setName(initialState?.currentUser?.fullName || initialState?.currentUser?.username);
       setTimeout(async () => {
         setLoading(false);
       }, 500);
@@ -128,7 +73,6 @@ const BaseView = () => {
     const { success } = await changeBaseInfo({
       fullName: values.fullName,
       nickName: values.nickName,
-      avatar: avatarUploaded ? avatarURL : undefined,
     });
     if (success) {
       useApp.message.success(intl.formatMessage({ id: 'app.update_success' }));
@@ -138,87 +82,20 @@ const BaseView = () => {
     }
   };
 
-  /**
-   * 头像组件 方便以后独立，增加裁剪之类的功能
-   *
-   * @param avatar
-   * @param name
-   * @param callBack
-   * @constructor
-   */
-  const AvatarView = ({
-    avatar,
-    name,
-    callBack,
-  }: {
-    avatar: string | undefined;
-    name: string;
-    callBack: any;
-  }) => (
-    <>
-      <div className={classnames(`${prefixCls}-avatar-title`, hashId)}>
-        {intl.formatMessage({ id: 'page.user.profile.base.avatar_title' })}
-      </div>
-      <div className={classnames(`${prefixCls}-avatar`, hashId)}>
-        {avatar ? (
-          <Avatar alt="avatar" shape={'circle'} size={144} src={avatar} />
-        ) : (
-          <Avatar
-            shape={'circle'}
-            className={classnames(`${prefixCls}-avatar-name`, hashId)}
-            size={144}
-          >
-            {name.substring(0, 1)}
-          </Avatar>
-        )}
-      </div>
-      <ImgCrop
-        rotationSlider
-        aspectSlider
-        modalOk={intl.formatMessage({ id: 'app.confirm' })}
-        modalCancel={intl.formatMessage({ id: 'app.cancel' })}
-      >
-        <Upload
-          name="file"
-          showUploadList={false}
-          accept="image/png, image/jpeg"
-          customRequest={async (files) => {
-            if (!files.file) {
-              return;
-            }
-            const { success, result, message } = await uploadFile(files.file);
-            if (success && result) {
-              callBack(result);
-              return;
-            }
-            useApp.message.error(message);
-          }}
-        >
-          <div className={classnames(`${prefixCls}-avatar-button-view`, hashId)}>
-            <Button>
-              <UploadOutlined />
-              {intl.formatMessage({ id: 'page.user.profile.base.avatar_change_title' })}
-            </Button>
-          </div>
-        </Upload>
-      </ImgCrop>
-    </>
-  );
-
-  return wrapSSR(
-    <div className={classnames(`${prefixCls}`, hashId)}>
+  return (
+    <div className={styles.accountBase}>
       {loading ? (
         <Skeleton paragraph={{ rows: 8 }} active />
       ) : (
         <>
-          <div className={classnames(`${prefixCls}-left`, hashId)}>
+          <div className={cx(`${prefixCls}-left`)}>
             <ProForm
               layout="horizontal"
               labelAlign={'left'}
               {...FORM_ITEM_LAYOUT}
               onFinish={handleFinish}
               submitter={{
-                render: (p, dom) => {
+                render: (_p, dom) => {
                   return <Form.Item wrapperCol={{ span: 19, offset: 5 }}>{dom}</Form.Item>;
                 },
                 searchConfig: {
@@ -267,36 +144,26 @@ const BaseView = () => {
                 name="fullName"
                 label={intl.formatMessage({ id: 'page.user.profile.base.form.full_name' })}
                 allowClear={false}
+                rules={[
+                  {
+                    required: true,
+                    message: intl.formatMessage({
+                      id: 'page.user.profile.base.form.full_name.rule.0',
+                    }),
+                  },
+                ]}
               />
               <ProFormText
                 width="md"
                 name="nickName"
                 label={intl.formatMessage({ id: 'page.user.profile.base.form.nick_name' })}
                 allowClear={false}
-                rules={[
-                  {
-                    required: true,
-                    message: intl.formatMessage({
-                      id: 'page.user.profile.base.form.nick_name.rule.0',
-                    }),
-                  },
-                ]}
               />
             </ProForm>
           </div>
-          <div className={classnames(`${prefixCls}-right`, hashId)}>
-            <AvatarView
-              avatar={avatarURL}
-              callBack={(avatarUrl: string) => {
-                setAvatarURL(avatarUrl);
-                setAvatarUploaded(true);
-              }}
-              name={name}
-            />
-          </div>
         </>
       )}
-    </div>,
+    </div>
   );
 };
 

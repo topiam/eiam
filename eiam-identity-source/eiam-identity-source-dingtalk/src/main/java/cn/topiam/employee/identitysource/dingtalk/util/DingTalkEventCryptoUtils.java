@@ -145,8 +145,7 @@ public class DingTalkEventCryptoUtils {
      * 对明文加密.
      * @param text 需要加密的明文
      * @return 加密后base64编码的字符串
-     */
-    private String encrypt(String random, String plaintext) throws DingTalkEncryptException {
+     */private String encrypt(String random, String plaintext) throws DingTalkEncryptException {
         try {
             byte[] randomBytes = random.getBytes(CHARSET);
             byte[] plainTextBytes = plaintext.getBytes(CHARSET);
@@ -177,8 +176,7 @@ public class DingTalkEventCryptoUtils {
      * 对密文进行解密.
      * @param text 需要解密的密文
      * @return 解密得到的明文
-     */
-    private String decrypt(String text) throws DingTalkEncryptException {
+     */private String decrypt(String text) throws DingTalkEncryptException {
         byte[] originalArr;
         try {
             // 设置解密模式为AES的CBC模式

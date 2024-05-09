@@ -23,7 +23,7 @@ import java.io.InputStream;
  * 存储
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/10 21:29
+ * Created by support@topiam.cn on 2021/11/10 21:29
  */
 public interface Storage {
     /**

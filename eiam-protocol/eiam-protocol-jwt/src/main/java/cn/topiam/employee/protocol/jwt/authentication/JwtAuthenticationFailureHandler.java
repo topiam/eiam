@@ -25,14 +25,15 @@ import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
+import cn.topiam.employee.protocol.jwt.endpoint.http.converter.JwtErrorHttpMessageConverter;
 import cn.topiam.employee.protocol.jwt.exception.JwtAuthenticationException;
 import cn.topiam.employee.protocol.jwt.exception.JwtError;
 import cn.topiam.employee.protocol.jwt.exception.JwtErrorCodes;
-import cn.topiam.employee.protocol.jwt.http.converter.JwtErrorHttpMessageConverter;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import static cn.topiam.employee.support.context.ServletContextService.isHtmlRequest;
 
 /**
  *
@@ -55,13 +56,20 @@ public class JwtAuthenticationFailureHandler implements AuthenticationFailureHan
         if (exception instanceof JwtAuthenticationException) {
             ServletServerHttpResponse httpResponse = new ServletServerHttpResponse(response);
             JwtError error = ((JwtAuthenticationException) exception).getError();
-            if (error.getErrorCode().equals(JwtErrorCodes.SERVER_ERROR)) {
-                httpResponse.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
+            boolean isHtmlRequest = isHtmlRequest(request);
+            //JSON
+            if (!isHtmlRequest) {
+                if (error.getErrorCode().equals(JwtErrorCodes.SERVER_ERROR)) {
+                    httpResponse.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+                if (error.getErrorCode().equals(JwtErrorCodes.INVALID_REQUEST)) {
+                    httpResponse.setStatusCode(HttpStatus.BAD_REQUEST);
+                }
+                errorHttpResponseConverter.write(error, null, httpResponse);
+                return;
             }
-            if (error.getErrorCode().equals(JwtErrorCodes.INVALID_REQUEST)) {
-                httpResponse.setStatusCode(HttpStatus.BAD_REQUEST);
-            }
-            errorHttpResponseConverter.write(error, null, httpResponse);
+            //Html
+            response.sendError(HttpStatus.BAD_REQUEST.value(), error.toString());
         }
     }
 

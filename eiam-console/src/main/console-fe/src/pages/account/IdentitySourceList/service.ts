@@ -66,10 +66,3 @@ export async function enableIdentitySource(id: string): Promise<API.ApiResult<bo
 export async function disableIdentitySource(id: string): Promise<API.ApiResult<boolean>> {
   return request(`/api/v1/identity_source/disable/${id}`, { method: 'PUT' });
 }
-
-/**
- * 删除身份源
- */
-export async function deleteIdentitySource(id: string): Promise<API.ApiResult<boolean>> {
-  return request(`/api/v1/identity_source/delete/${id}`, { method: 'DELETE' });
-}

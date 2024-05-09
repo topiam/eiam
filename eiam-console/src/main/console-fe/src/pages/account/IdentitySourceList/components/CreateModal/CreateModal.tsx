@@ -17,8 +17,7 @@
  */
 import React, { useRef, useState } from 'react';
 import { ModalForm, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
-import { Avatar, FormInstance, Space } from 'antd';
-import { Spin } from 'antd';
+import { Avatar, FormInstance, Space, Spin } from 'antd';
 import { useIntl } from '@umijs/max';
 import { IdentitySourceProvider } from '@/constant';
 import { ICON_LIST } from '@/components/IconFont/constant';
@@ -40,7 +39,7 @@ export default (props: CreateModelProps) => {
         width="500px"
         layout={'horizontal'}
         labelCol={{ span: 4 }}
-        wrapperCol={{ span: 19 }}
+        wrapperCol={{ span: 20 }}
         onFinish={async (values: Record<string, string>) => {
           setLoading(true);
           await onFinish(values).finally(() => {
@@ -89,13 +88,6 @@ export default (props: CreateModelProps) => {
                   id: 'pages.account.identity_source_list.create_modal.provider.placeholder.options.feishu',
                 }),
                 icon: ICON_LIST[IdentitySourceProvider.feishu],
-              },
-              {
-                value: IdentitySourceProvider.wework,
-                label: intl.formatMessage({
-                  id: 'pages.account.identity_source_list.create_modal.provider.placeholder.options.wework',
-                }),
-                icon: ICON_LIST[IdentitySourceProvider.wework],
               },
             ]}
             rules={[

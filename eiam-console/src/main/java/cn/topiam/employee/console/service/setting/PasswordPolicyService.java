@@ -29,7 +29,7 @@ import cn.topiam.employee.console.pojo.save.setting.PasswordPolicySaveParam;
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-08-17
+ * Created by support@topiam.cn on 2020-08-17
  */
 public interface PasswordPolicyService extends SettingService {
 

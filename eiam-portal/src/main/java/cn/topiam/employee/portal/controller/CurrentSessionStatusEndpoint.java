@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson2.annotation.JSONField;
 
-import cn.topiam.employee.authentication.common.authentication.IdpNotBindAuthentication;
+import cn.topiam.employee.authentication.common.authentication.IdentityProviderNotBindAuthentication;
 import cn.topiam.employee.portal.authentication.AuthenticationTrustResolverImpl;
 import cn.topiam.employee.support.result.ApiRestResult;
 
@@ -45,7 +45,7 @@ import static cn.topiam.employee.common.constant.SessionConstants.CURRENT_STATUS
  * 会话状态
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/7/30 21:09
+ * Created by support@topiam.cn on 2022/7/30 21:09
  */
 @Slf4j
 @RestController
@@ -63,7 +63,7 @@ public class CurrentSessionStatusEndpoint {
             builder.authenticated(false);
         }
         // IDP
-        if (authentication instanceof IdpNotBindAuthentication) {
+        if (authentication instanceof IdentityProviderNotBindAuthentication) {
             builder.status(Status.require_bind_idp);
         }
         //其他信息

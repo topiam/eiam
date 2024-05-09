@@ -23,6 +23,7 @@ import java.util.List;
 
 import cn.topiam.employee.common.enums.app.AppProtocol;
 import cn.topiam.employee.common.enums.app.AppType;
+import cn.topiam.employee.common.enums.app.AuthorizationType;
 
 import lombok.Data;
 
@@ -41,74 +42,90 @@ public class AppGetResult implements Serializable {
     /**
      * ID
      */
-    @Parameter(description = "ID")
-    private String        id;
+    @Schema(description = "ID")
+    private String            id;
+
     /**
      * 应用名称
      */
-    @Parameter(description = "应用名称")
-    private String        name;
+    @Schema(description = "应用名称")
+    private String            name;
+
+    /**
+     * 应用编码
+     */
+    @Schema(description = "应用编码")
+    private String            code;
+
     /**
      * 客户端ID
      */
-    @Parameter(description = "客户端ID")
-    private String        clientId;
+    @Schema(description = "客户端ID")
+    private String            clientId;
+
     /**
      * 客户端秘钥
      */
-    @Parameter(description = "客户端秘钥")
-    private String        clientSecret;
+    @Schema(description = "客户端秘钥")
+    private String            clientSecret;
+
     /**
      * 应用类型
      */
-    @Parameter(description = "应用类型")
-    private AppType       type;
+    @Schema(description = "应用类型")
+    private AppType           type;
 
     /**
      * 应用图标
      */
-    @Parameter(description = "应用图标")
-    private String        icon;
+    @Schema(description = "应用图标")
+    private String            icon;
 
     /**
      * 模板
      */
-    @Parameter(description = "模板")
-    private String        template;
+    @Schema(description = "模板")
+    private String            template;
 
     /**
      * 协议
      */
-    @Parameter(description = "协议")
-    private AppProtocol   protocol;
+    @Schema(description = "协议")
+    private AppProtocol       protocol;
+
+    /**
+     * SSO 授权类型
+     */
+    @Schema(description = "授权类型")
+    private AuthorizationType authorizationType;
 
     /**
      * 协议名称
      */
-    @Parameter(description = "协议名称")
-    private String        protocolName;
+    @Schema(description = "协议名称")
+    private String            protocolName;
 
     /**
      * 是否启用
      */
-    @Parameter(description = "是否启用")
-    private Boolean       enabled;
+    @Schema(description = "是否启用")
+    private Boolean           enabled;
 
     /**
      * 创建时间
      */
-    @Parameter(description = "创建时间")
-    private LocalDateTime createTime;
+    @Schema(description = "创建时间")
+    private LocalDateTime     createTime;
 
     /**
      * 备注
      */
-    @Parameter(description = "备注")
-    private String        remark;
+    @Schema(description = "备注")
+    private String            remark;
 
     /**
      * 应用组ID集合
      */
     @Parameter(description = "应用组ID集合")
-    private List<String>  groupIds;
+    private List<String>      groupIds;
 }

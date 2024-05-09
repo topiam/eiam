@@ -33,7 +33,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * 获取管理员权限策略
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/5/22 21:55
+ * Created by support@topiam.cn on 2023/5/22 21:55
  */
 @Data
 @Schema(description = "获取管理员权限点列表响应")

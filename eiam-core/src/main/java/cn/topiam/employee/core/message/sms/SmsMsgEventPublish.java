@@ -37,8 +37,8 @@ import cn.topiam.employee.support.exception.TopIamException;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import static cn.topiam.employee.core.help.SettingHelp.getCodeValidTime;
-import static cn.topiam.employee.core.help.SettingHelp.getSmsProviderConfig;
+import static cn.topiam.employee.core.context.ContextService.getCodeValidTime;
+import static cn.topiam.employee.core.context.ContextService.getSmsProviderConfig;
 import static cn.topiam.employee.core.message.MsgVariable.EXPIRE_TIME_KEY;
 import static cn.topiam.employee.core.message.MsgVariable.VERIFY_CODE;
 
@@ -46,7 +46,7 @@ import static cn.topiam.employee.core.message.MsgVariable.VERIFY_CODE;
  * 短信消息发送
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/25 21:07
+ * Created by support@topiam.cn on 2021/9/25 21:07
  */
 @Component
 @Slf4j

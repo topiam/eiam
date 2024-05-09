@@ -28,7 +28,7 @@ import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.console.pojo.result.setting.PasswordPolicyConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.PasswordPolicySaveParam;
 import cn.topiam.employee.support.security.password.enums.PasswordComplexityRule;
-import static cn.topiam.employee.core.setting.constant.PasswordPolicySettingConstants.*;
+import static cn.topiam.employee.core.setting.PasswordPolicySettingConstants.*;
 
 /**
  * 密码规则数据转换

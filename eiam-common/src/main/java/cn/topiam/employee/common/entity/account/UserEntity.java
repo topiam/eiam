@@ -17,20 +17,22 @@
  */
 package cn.topiam.employee.common.entity.account;
 
-import java.io.Serial;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Objects;
 
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SoftDelete;
+import org.springframework.security.core.GrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import cn.topiam.employee.common.enums.DataOrigin;
 import cn.topiam.employee.common.enums.UserStatus;
-import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
+import cn.topiam.employee.support.repository.SoftDeleteConverter;
+import cn.topiam.employee.support.repository.base.BaseEntity;
+import cn.topiam.employee.support.security.userdetails.UserDetails;
+import cn.topiam.employee.support.security.userdetails.UserType;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -41,8 +43,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
+import static cn.topiam.employee.support.repository.base.BaseEntity.IS_DELETED_COLUMN;
 
 /**
  * <p>
@@ -50,150 +51,185 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-07-31 22:10
+ * Created by support@topiam.cn on 2020-07-31 22:10
  */
 @Getter
 @Setter
 @ToString
 @Accessors(chain = true)
 @Entity
-@Table(name = "user")
-@SQLDelete(sql = "update user set " + SOFT_DELETE_SET + " where id_ = ?")
-@Where(clause = SOFT_DELETE_WHERE)
-public class UserEntity extends LogicDeleteEntity<Long> {
-
-    @Serial
-    private static final long serialVersionUID = -2619231849746900857L;
+@Table(name = "eiam_user")
+@SoftDelete(columnName = IS_DELETED_COLUMN, converter = SoftDeleteConverter.class)
+public class UserEntity extends BaseEntity {
 
     /**
      * 用户名
      */
     @Column(name = "username_")
-    private String            username;
+    private String        username;
 
     /**
      * 密码
      */
     @Column(name = "password_")
-    private String            password;
+    private String        password;
 
     /**
      * 邮箱
      */
     @Column(name = "email_")
-    private String            email;
+    private String        email;
 
     /**
      * 手机号
      */
     @Column(name = "phone_")
-    private String            phone;
+    private String        phone;
 
     /**
      * 手机号
      */
     @Column(name = "phone_area_code")
-    private String            phoneAreaCode;
+    private String        phoneAreaCode;
 
     /**
      * 姓名
      */
     @Column(name = "full_name")
-    private String            fullName;
+    private String        fullName;
 
     /**
      * 昵称
      */
     @Column(name = "nick_name")
-    private String            nickName;
+    private String        nickName;
 
     /**
      * 头像URL
      */
     @Column(name = "avatar_")
-    private String            avatar;
+    private String        avatar;
 
     /**
      * 状态  ENABLE:启用 DISABLE:禁用 LOCKING:锁定
      */
     @Column(name = "status_")
-    private UserStatus        status;
+    private UserStatus    status;
 
     /**
      * 数据来源
      */
     @Column(name = "data_origin")
-    private DataOrigin        dataOrigin;
+    private String        dataOrigin;
 
     /**
      * 身份源ID
      */
     @Column(name = "identity_source_id")
-    private Long              identitySourceId;
+    private String        identitySourceId;
 
     /**
      * 邮箱验证有效
      */
     @Column(name = "email_verified")
-    private Boolean           emailVerified;
+    private Boolean       emailVerified;
 
     /**
      * 手机有效
      */
     @Column(name = "phone_verified")
-    private Boolean           phoneVerified;
+    private Boolean       phoneVerified;
 
     /**
      * 认证次数
      */
     @Column(name = "auth_total")
-    private Long              authTotal;
+    private Long          authTotal;
+
     /**
      * 上次认证IP
      */
     @Column(name = "last_auth_ip")
-    private String            lastAuthIp;
+    private String        lastAuthIp;
+
     /**
      * 上次认证时间
      */
     @Column(name = "last_auth_time")
-    private LocalDateTime     lastAuthTime;
+    private LocalDateTime lastAuthTime;
 
     /**
      * 锁定时间
      */
     @Column(name = "lock_expired_time")
-    private LocalDateTime     lockExpiredTime;
+    private LocalDateTime lockExpiredTime;
+
+    /**
+     * 需要更改密码
+     */
+    @Column(name = "need_change_password")
+    private Boolean       needChangePassword;
 
     /**
      * 扩展参数
      */
     @Column(name = "expand_")
-    private String            expand;
+    private String        expand;
 
     /**
      * 外部ID
      */
     @Column(name = "external_id")
-    private String            externalId;
+    private String        externalId;
+
     /**
      * 过期时间
      */
     @Column(name = "expire_date")
-    private LocalDate         expireDate;
+    private LocalDate     expireDate;
 
     /**
      * 最后修改密码时间
      */
     @Column(name = "last_update_password_time")
-    private LocalDateTime     lastUpdatePasswordTime;
+    private LocalDateTime lastUpdatePasswordTime;
 
     /**
      * 暂存密码(明文)
      */
     @Transient
     @JsonIgnore
-    private String            passwordPlainText;
+    private String        passwordPlainText;
+
+    public Boolean isLocked() {
+        return UserStatus.LOCKED.equals(this.getStatus())
+               || UserStatus.PASSWORD_EXPIRED_LOCKED.equals(this.getStatus())
+               || UserStatus.EXPIRED_LOCKED.equals(this.getStatus());
+    }
+
+    public Boolean isDisabled() {
+        return UserStatus.DISABLED.equals(this.getStatus());
+    }
+
+    public UserDetails toUserDetails(Collection<GrantedAuthority> authorities) {
+        //@formatter:off
+        UserDetails userDetails = new UserDetails(String.valueOf(this.getId()), this.getUsername(), this.getPassword(), UserType.USER, !isDisabled(), true, true, !isLocked(), authorities);
+        userDetails.setPhone(this.getPhone());
+        userDetails.setAvatar(this.getAvatar());
+        userDetails.setEmail(this.getEmail());
+        userDetails.setPhoneAreaCode(this.getPhoneAreaCode());
+        userDetails.setPhoneVerified(this.getPhoneVerified());
+        userDetails.setEmailVerified(this.getEmailVerified());
+        userDetails.setLastUpdatePasswordTime(this.getLastUpdatePasswordTime());
+        userDetails.setFullName(this.getFullName());
+        userDetails.setNeedChangePassword(this.getNeedChangePassword());
+        userDetails.setExternalId(this.getExternalId());
+        userDetails.setExpireDate(this.getExpireDate());
+        userDetails.setUpdateTime(this.getUpdateTime());
+        userDetails.setNickName(this.getNickName());
+        //@formatter:on
+        return userDetails;
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -46,13 +46,12 @@ import io.minio.*;
 import io.minio.errors.*;
 import io.minio.http.Method;
 import jakarta.validation.constraints.NotEmpty;
-import static cn.topiam.employee.common.constant.StorageConstants.URL_REGEXP;
 
 /**
  * minio
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/10 21:32
+ * Created by support@topiam.cn on 2021/11/10 21:32
  */
 @Slf4j
 public class MinIoStorage extends AbstractStorage {

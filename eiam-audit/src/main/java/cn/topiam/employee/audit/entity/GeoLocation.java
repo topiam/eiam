@@ -20,8 +20,6 @@ package cn.topiam.employee.audit.entity;
 import java.io.Serial;
 import java.io.Serializable;
 
-import org.springframework.data.elasticsearch.core.geo.GeoPoint;
-
 import cn.topiam.employee.support.geo.GeoLocationProvider;
 
 import lombok.AllArgsConstructor;
@@ -33,7 +31,7 @@ import lombok.NoArgsConstructor;
  * 地理位置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/11/5 23:31
+ * Created by support@topiam.cn on 2022/11/5 23:31
  */
 @Data
 @Builder

@@ -142,7 +142,7 @@ public class UserGroupController {
     @GetMapping(value = "/get/{id}")
     @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<UserGroupResult> getUserGroup(@PathVariable(value = "id") String id) {
-        UserGroupEntity entity = userGroupService.getUserGroup(Long.valueOf(id));
+        UserGroupEntity entity = userGroupService.getUserGroup(id);
         UserGroupResult result = userGroupConverter.entityConvertToUserGroupResult(entity);
         return ApiRestResult.<UserGroupResult> builder().result(result).build();
     }

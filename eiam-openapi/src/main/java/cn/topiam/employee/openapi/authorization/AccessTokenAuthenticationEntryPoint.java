@@ -39,7 +39,7 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/25 21:55
+ * Created by support@topiam.cn on 2023/6/25 21:55
  */
 public final class AccessTokenAuthenticationEntryPoint extends AbstractAuthenticationEntryPoint {
 

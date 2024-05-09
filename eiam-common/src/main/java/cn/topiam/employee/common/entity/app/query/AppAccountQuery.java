@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * AppAccountCreateParam 应用账户查询入参
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/5/24 22:13
+ * Created by support@topiam.cn on 2022/5/24 22:13
  */
 @Data
 @Schema(description = "应用账户查询入参")

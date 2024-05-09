@@ -24,7 +24,7 @@ import cn.topiam.employee.application.jwt.model.JwtProtocolConfig;
  * 应用接口
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/8/20 23:20
+ * Created by support@topiam.cn on 2022/8/20 23:20
  */
 public interface JwtApplicationService extends ApplicationService {
 

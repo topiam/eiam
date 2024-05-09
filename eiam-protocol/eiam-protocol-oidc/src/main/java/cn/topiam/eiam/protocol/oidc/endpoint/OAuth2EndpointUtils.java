@@ -29,7 +29,7 @@ import org.springframework.web.util.UriComponentsBuilder;
  * 授权工具类
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/26 22:22
+ * Created by support@topiam.cn on 2023/6/26 22:22
  */
 @SuppressWarnings("AlibabaClassNamingShouldBeCamel")
 public class OAuth2EndpointUtils {

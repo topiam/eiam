@@ -35,6 +35,7 @@ export default {
   'pages.login.phone.captcha-second-text': '秒后重新获取',
   'pages.login.remember-me': '自动登录',
   'pages.login.forgot-password': '忘记密码',
+  'pages.login.get-preview-account': '演示账号',
   'pages.login.submit': '登录',
   'pages.login.login-with': '其他登录方式',
   'pages.login.register-account': '注册账户',

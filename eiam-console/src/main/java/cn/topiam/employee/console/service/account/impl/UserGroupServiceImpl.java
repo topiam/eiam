@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
@@ -32,12 +34,16 @@ import com.google.common.collect.Lists;
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
+import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.entity.account.UserGroupEntity;
 import cn.topiam.employee.common.entity.account.UserGroupMemberEntity;
 import cn.topiam.employee.common.entity.account.po.UserPO;
 import cn.topiam.employee.common.entity.account.query.UserGroupMemberListQuery;
+import cn.topiam.employee.common.exception.UserGroupExistUserException;
+import cn.topiam.employee.common.exception.UserGroupNotExistException;
 import cn.topiam.employee.common.repository.account.UserGroupMemberRepository;
 import cn.topiam.employee.common.repository.account.UserGroupRepository;
+import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.console.converter.account.UserGroupConverter;
 import cn.topiam.employee.console.pojo.query.account.UserGroupListQuery;
 import cn.topiam.employee.console.pojo.result.account.UserGroupListResult;
@@ -52,14 +58,14 @@ import cn.topiam.employee.support.util.BeanUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
-import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
+import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_BY;
+import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_TIME;
 
 /**
  * 用户组实现service
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/10/11 21:30
+ * Created by support@topiam.cn on 2021/10/11 21:30
  */
 @Slf4j
 @Service
@@ -93,8 +99,8 @@ public class UserGroupServiceImpl implements UserGroupService {
     public Boolean createUserGroup(UserGroupCreateParam param) {
         UserGroupEntity entity = userGroupConverter.userGroupCreateParamConvertToEntity(param);
         userGroupRepository.save(entity);
-        AuditContext.setTarget(
-            Target.builder().id(entity.getId().toString()).type(TargetType.USER_GROUP).build());
+        AuditContext.setTarget(Target.builder().id(entity.getId()).name(entity.getName())
+            .type(TargetType.USER_GROUP).build());
         return true;
     }
 
@@ -107,11 +113,11 @@ public class UserGroupServiceImpl implements UserGroupService {
     @Override
     public Boolean updateUserGroup(UserGroupUpdateParam param) {
         UserGroupEntity entity = userGroupConverter.userGroupUpdateParamConvertToEntity(param);
-        UserGroupEntity details = getUserGroup(Long.valueOf(param.getId()));
+        UserGroupEntity details = getUserGroup(param.getId());
         BeanUtils.merge(entity, details, LAST_MODIFIED_TIME, LAST_MODIFIED_BY);
         userGroupRepository.save(details);
-        AuditContext.setTarget(
-            Target.builder().id(details.getId().toString()).type(TargetType.USER_GROUP).build());
+        AuditContext.setTarget(Target.builder().id(details.getId()).name(entity.getName())
+            .type(TargetType.USER_GROUP).build());
         return true;
     }
 
@@ -123,22 +129,23 @@ public class UserGroupServiceImpl implements UserGroupService {
      */
     @Override
     public Boolean deleteUserGroup(String id) {
-        Optional<UserGroupEntity> optional = userGroupRepository.findById(Long.valueOf(id));
-        //用户不存在
+        Optional<UserGroupEntity> optional = userGroupRepository.findById(id);
+        //用户组不存在
         if (optional.isEmpty()) {
             AuditContext.setContent("删除用户组失败，用户组不存在");
             log.warn(AuditContext.getContent());
-            throw new TopIamException(AuditContext.getContent());
+            throw new UserGroupNotExistException(AuditContext.getContent());
         }
         //用户组存在用户
         Long count = getUserGroupMemberCount(id);
         if (count > 0) {
             AuditContext.setContent("删除用户组失败，当前用户组下存在用户");
             log.warn(AuditContext.getContent());
-            throw new RuntimeException(AuditContext.getContent());
+            throw new UserGroupExistUserException(AuditContext.getContent());
         }
-        userGroupRepository.deleteById(Long.valueOf(id));
-        AuditContext.setTarget(Target.builder().id(id).type(TargetType.USER_GROUP).build());
+        userGroupRepository.deleteById(id);
+        AuditContext.setTarget(Target.builder().id(id).name(optional.get().getName())
+            .type(TargetType.USER_GROUP).build());
         return true;
     }
 
@@ -166,9 +173,9 @@ public class UserGroupServiceImpl implements UserGroupService {
     @Override
     public Boolean removeMember(String id, String userId) {
         //查询关联关系
-        userGroupMemberRepository.deleteByGroupIdAndUserId(Long.valueOf(id), Long.valueOf(userId));
-        AuditContext.setTarget(Target.builder().id(userId).type(TargetType.USER).build(),
-            Target.builder().id(id).type(TargetType.USER_GROUP).build());
+        userGroupMemberRepository.deleteByGroupIdAndUserId(id, userId);
+        AuditContext.setTarget(Target.builder().id(userId).name("").type(TargetType.USER).build(),
+            Target.builder().id(id).name("").type(TargetType.USER_GROUP).build());
         return true;
     }
 
@@ -181,7 +188,7 @@ public class UserGroupServiceImpl implements UserGroupService {
      */
     @Override
     public Boolean addMember(String groupId, String[] userIds) {
-        Optional<UserGroupEntity> optional = userGroupRepository.findById(Long.valueOf(groupId));
+        Optional<UserGroupEntity> optional = userGroupRepository.findById(groupId);
         //用户组不存在
         if (optional.isEmpty()) {
             AuditContext.setContent("操作失败，用户组不存在");
@@ -191,16 +198,28 @@ public class UserGroupServiceImpl implements UserGroupService {
         List<UserGroupMemberEntity> list = new ArrayList<>();
         Lists.newArrayList(userIds).forEach(id -> {
             UserGroupMemberEntity member = new UserGroupMemberEntity();
-            member.setGroupId(Long.valueOf(groupId));
-            member.setUserId(Long.valueOf(id));
+            member.setGroupId(groupId);
+            member.setUserId(id);
             list.add(member);
         });
         //添加
         userGroupMemberRepository.saveAll(list);
-        List<Target> targets = new ArrayList<>(Arrays.stream(userIds)
-            .map(i -> Target.builder().id(i).type(TargetType.USER).build()).toList());
-
-        targets.add(Target.builder().id(groupId).type(TargetType.USER_GROUP).build());
+        List<Target> targets;
+        CompletableFuture<List<Target>> future = CompletableFuture
+            .supplyAsync(() -> new ArrayList<>(Arrays.stream(userIds).map(i -> {
+                Optional<UserEntity> userEntityOptional = userRepository.findById(i);
+                return userEntityOptional.map(userEntity -> Target.builder().id(i)
+                    .name(userEntity.getFullName()).type(TargetType.USER).build()).orElse(null);
+            }).toList()));
+        try {
+            // 等待最终结果
+            targets = future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            // 处理异常
+            return false;
+        }
+        targets.add(Target.builder().id(groupId).name(optional.get().getName())
+            .type(TargetType.USER_GROUP).build());
         AuditContext.setTarget(targets);
         return true;
     }
@@ -212,7 +231,7 @@ public class UserGroupServiceImpl implements UserGroupService {
      * @return {@link UserGroupEntity}
      */
     @Override
-    public UserGroupEntity getUserGroup(Long id) {
+    public UserGroupEntity getUserGroup(String id) {
         return userGroupRepository.findById(id).orElse(null);
     }
 
@@ -225,19 +244,30 @@ public class UserGroupServiceImpl implements UserGroupService {
      */
     @Override
     public Boolean batchRemoveMember(String id, List<String> userIds) {
-        Optional<UserGroupEntity> optional = userGroupRepository.findById(Long.valueOf(id));
+        Optional<UserGroupEntity> optional = userGroupRepository.findById(id);
         //用户组不存在
         if (optional.isEmpty()) {
             AuditContext.setContent("操作失败，用户组不存在");
             log.warn(AuditContext.getContent());
             throw new TopIamException(AuditContext.getContent());
         }
-        userIds.forEach(userId -> userGroupMemberRepository
-            .deleteByGroupIdAndUserId(Long.valueOf(id), Long.valueOf(userId)));
-        List<Target> targets = new ArrayList<>(userIds.stream()
-            .map(i -> Target.builder().id(i).type(TargetType.USER).build()).toList());
-
-        targets.add(Target.builder().id(id).type(TargetType.USER_GROUP).build());
+        userIds.forEach(userId -> userGroupMemberRepository.deleteByGroupIdAndUserId(id, userId));
+        List<Target> targets;
+        CompletableFuture<List<Target>> future = CompletableFuture
+            .supplyAsync(() -> new ArrayList<>(userIds.stream().map(i -> {
+                Optional<UserEntity> userEntityOptional = userRepository.findById(i);
+                return userEntityOptional.map(userEntity -> Target.builder().id(i)
+                    .name(userEntity.getFullName()).type(TargetType.USER).build()).orElse(null);
+            }).toList()));
+        try {
+            // 等待最终结果
+            targets = future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            // 处理异常
+            return false;
+        }
+        targets.add(Target.builder().id(id).name(optional.get().getName())
+            .type(TargetType.USER_GROUP).build());
         AuditContext.setTarget(targets);
         return true;
     }
@@ -245,7 +275,7 @@ public class UserGroupServiceImpl implements UserGroupService {
     @Override
     public Long getUserGroupMemberCount(String groupId) {
         return userGroupMemberRepository
-            .count(Example.of(new UserGroupMemberEntity().setGroupId(Long.valueOf(groupId))));
+            .count(Example.of(new UserGroupMemberEntity().setGroupId(groupId)));
     }
 
     /**
@@ -262,4 +292,9 @@ public class UserGroupServiceImpl implements UserGroupService {
      * UserGroupMemberRepository
      */
     private final UserGroupMemberRepository userGroupMemberRepository;
+
+    /**
+     * UserRepository
+     */
+    private final UserRepository            userRepository;
 }

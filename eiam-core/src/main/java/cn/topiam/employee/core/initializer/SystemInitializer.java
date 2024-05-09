@@ -17,18 +17,17 @@
  */
 package cn.topiam.employee.core.initializer;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import org.jetbrains.annotations.NotNull;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.ApplicationListener;
-import org.springframework.core.Ordered;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,34 +36,40 @@ import org.springframework.util.AlternativeJdkIdGenerator;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 
+import cn.topiam.employee.common.entity.account.OrganizationEntity;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.geo.GeoLocationProviderConfig;
 import cn.topiam.employee.common.jackjson.encrypt.EncryptionModule;
+import cn.topiam.employee.common.repository.account.OrganizationRepository;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
+import cn.topiam.employee.support.init.Initializer;
+import cn.topiam.employee.support.security.util.SecurityUtils;
 import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.support.util.AesUtils;
 import static cn.topiam.employee.common.constant.SettingConstants.AES_SECRET;
+import static cn.topiam.employee.common.enums.account.OrganizationType.DEPARTMENT;
 import static cn.topiam.employee.common.geo.ip2region.Ip2regionGeoLocationServiceImpl.IP2REGION;
-import static cn.topiam.employee.core.setting.constant.GeoIpProviderConstants.IPADDRESS_SETTING_NAME;
-import static cn.topiam.employee.support.constant.EiamConstants.COLON;
-import static cn.topiam.employee.support.constant.EiamConstants.TOPIAM_INIT_AUTHENTICATION;
+import static cn.topiam.employee.core.setting.GeoIpProviderConstants.IPADDRESS_SETTING_NAME;
+import static cn.topiam.employee.support.constant.EiamConstants.*;
 import static cn.topiam.employee.support.lock.LockAspect.getTopiamLockKeyPrefix;
+import static cn.topiam.employee.support.security.userdetails.DataOrigin.INPUT;
 
 /**
  * SystemInitializer
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2024/04/04 21:24
+ * Created by support@topiam.cn on 2024/04/04 21:24
  */
 @Component
-public class SystemInitializer implements ApplicationListener<ApplicationReadyEvent>, Ordered {
+public class SystemInitializer implements Initializer {
 
     private final Logger logger = LoggerFactory.getLogger(SystemInitializer.class);
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void onApplicationEvent(@NotNull ApplicationReadyEvent event) {
+    public void execute(ApplicationContext applicationContext) {
         String traceId = idGenerator.generateId().toString();
         TraceUtils.put(traceId);
         RLock lock = redissonClient.getLock(getTopiamLockKeyPrefix() + COLON + "system_init");
@@ -77,9 +82,11 @@ public class SystemInitializer implements ApplicationListener<ApplicationReadyEv
                 initEncryptSecret();
                 //init IP 提供商
                 initIpProvider();
+                //初始化组织机构
+                initRootOrganization();
             }
         } catch (Exception e) {
-            int exitCode = SpringApplication.exit(event.getApplicationContext(), () -> 0);
+            int exitCode = SpringApplication.exit(applicationContext, () -> 0);
             System.exit(exitCode);
         } finally {
             if (tryLock && lock.isLocked()) {
@@ -129,6 +136,35 @@ public class SystemInitializer implements ApplicationListener<ApplicationReadyEv
         //@formatter:on
     }
 
+    /**
+     * 初始化组织机构
+     */
+    private void initRootOrganization() {
+        //@formatter:off
+        Optional<OrganizationEntity> optional = organizationRepository.findById(ROOT_NODE);
+        if (optional.isEmpty()) {
+            logger.info("初始化父级组织");
+            OrganizationEntity organization = new OrganizationEntity();
+            organization.setId(ROOT_NODE);
+            organization.setName(ROOT_DEPT_NAME);
+            organization.setCode(ROOT_NODE);
+            organization.setPath(PATH_SEPARATOR+ROOT_NODE);
+            organization.setDisplayPath(PATH_SEPARATOR+ROOT_DEPT_NAME);
+            organization.setType(DEPARTMENT);
+            organization.setDataOrigin(INPUT.getType());
+            organization.setLeaf(false);
+            organization.setEnabled(true);
+            organization.setOrder(0L);
+            organization.setCreateBy(SecurityUtils.getCurrentUserName());
+            organization.setCreateTime(LocalDateTime.now());
+            organization.setUpdateBy(SecurityUtils.getCurrentUserName());
+            organization.setUpdateTime(LocalDateTime.now());
+            organization.setRemark("Root organization");
+            organizationRepository.batchSave(Lists.newArrayList(organization));
+        }
+        //@formatter:on
+    }
+
     private final AlternativeJdkIdGenerator idGenerator = new AlternativeJdkIdGenerator();
 
     /**
@@ -142,17 +178,20 @@ public class SystemInitializer implements ApplicationListener<ApplicationReadyEv
     private final SettingRepository         settingRepository;
 
     /**
+     * OrganizationRepository
+     */
+    private final OrganizationRepository    organizationRepository;
+
+    /**
      *
      * @param redissonClient {@link RedissonClient}
      * @param settingRepository {@link SettingRepository}
+     * @param organizationRepository {@link OrganizationRepository}
      */
-    public SystemInitializer(RedissonClient redissonClient, SettingRepository settingRepository) {
+    public SystemInitializer(RedissonClient redissonClient, SettingRepository settingRepository,
+                             OrganizationRepository organizationRepository) {
         this.redissonClient = redissonClient;
         this.settingRepository = settingRepository;
-    }
-
-    @Override
-    public int getOrder() {
-        return HIGHEST_PRECEDENCE + 1;
+        this.organizationRepository = organizationRepository;
     }
 }

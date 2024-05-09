@@ -44,7 +44,7 @@ import static cn.topiam.employee.common.constant.AppConstants.APP_PATH;
  * 应用账户资源
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/4 21:06
+ * Created by support@topiam.cn on 2022/6/4 21:06
  */
 @Validated
 @Tag(name = "应用账户")
@@ -101,6 +101,40 @@ public class AppAccountController {
     public ApiRestResult<Boolean> deleteAppAccount(@PathVariable(value = "id") String id) {
         return ApiRestResult.<Boolean> builder().result(appAccountService.deleteAppAccount(id))
             .build();
+    }
+
+    /**
+     * 设置应用账户是否默认
+     *
+     * @param id {@link String}
+     * @return {@link Boolean}
+     */
+    @Lock
+    @Preview
+    @Operation(summary = "设置应用账户为默认")
+    @Audit(type = EventType.UPDATE_DEFAULT_APP_ACCOUNT)
+    @PutMapping(value = "/activate_default/{id}")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
+    public ApiRestResult<Boolean> updateAppAccountSetDefault(@PathVariable(value = "id") String id) {
+        return ApiRestResult.<Boolean> builder()
+            .result(appAccountService.updateAppAccountDefault(id, true)).build();
+    }
+
+    /**
+     * 设置应用账户是否默认
+     *
+     * @param id {@link String}
+     * @return {@link Boolean}
+     */
+    @Lock
+    @Preview
+    @Operation(summary = "取消应用账户为默认")
+    @Audit(type = EventType.UPDATE_DEFAULT_APP_ACCOUNT)
+    @PutMapping(value = "/deactivate_default/{id}")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
+    public ApiRestResult<Boolean> updateAppAccountUnsetDefault(@PathVariable(value = "id") String id) {
+        return ApiRestResult.<Boolean> builder()
+            .result(appAccountService.updateAppAccountDefault(id, false)).build();
     }
 
     /**

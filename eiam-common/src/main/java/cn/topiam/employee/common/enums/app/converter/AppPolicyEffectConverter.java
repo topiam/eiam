@@ -26,7 +26,7 @@ import jakarta.persistence.Converter;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/4 21:07
+ * Created by support@topiam.cn on 2021/11/4 21:07
  */
 @Converter(autoApply = true)
 public class AppPolicyEffectConverter implements AttributeConverter<AppPolicyEffect, String> {

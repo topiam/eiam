@@ -18,8 +18,11 @@
 package cn.topiam.employee.application.oidc.model;
 
 import java.io.Serial;
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
+
+import org.springframework.util.CollectionUtils;
 
 import com.nimbusds.jose.jwk.JWK;
 
@@ -28,18 +31,16 @@ import cn.topiam.employee.application.AbstractProtocolConfig;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
-import lombok.extern.jackson.Jacksonized;
 
 /**
  * Oidc 协议配置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/8/28 21:43
+ * Created by support@topiam.cn on 2022/8/28 21:43
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
 @SuperBuilder
-@Jacksonized
 public class OidcProtocolConfig extends AbstractProtocolConfig {
 
     @Serial
@@ -91,19 +92,29 @@ public class OidcProtocolConfig extends AbstractProtocolConfig {
     private String            tokenEndpointAuthSigningAlgorithm;
 
     /**
+     * 授权码模式授权码生存时间
+     */
+    private Duration          authorizationCodeTimeToLive;
+
+    /**
+     * 设备模式授权码生存时间
+     */
+    private Duration          deviceCodeTimeToLive;
+
+    /**
      * 刷新 Token生存时间（分钟）
      */
-    private Integer           refreshTokenTimeToLive;
+    private Duration          refreshTokenTimeToLive;
 
     /**
      * ID Token生存时间（分钟）
      */
-    private Integer           idTokenTimeToLive;
+    private Duration          idTokenTimeToLive;
 
     /**
      * 访问 Token生存时间（分钟）
      */
-    private Integer           accessTokenTimeToLive;
+    private Duration          accessTokenTimeToLive;
 
     /**
      * Id Token 签名算法
@@ -124,4 +135,33 @@ public class OidcProtocolConfig extends AbstractProtocolConfig {
      * jwks
      */
     private List<JWK>         jwks;
+
+    /**
+     * 是否配置
+     */
+    private Boolean           configured;
+
+    public Set<String> getRedirectUris() {
+        return CollectionUtils.isEmpty(redirectUris) ? Set.of() : redirectUris;
+    }
+
+    public Set<String> getPostLogoutRedirectUris() {
+        return CollectionUtils.isEmpty(postLogoutRedirectUris) ? Set.of() : postLogoutRedirectUris;
+    }
+
+    public Set<String> getGrantScopes() {
+        return CollectionUtils.isEmpty(grantScopes) ? Set.of() : grantScopes;
+    }
+
+    public Set<String> getClientAuthMethods() {
+        return CollectionUtils.isEmpty(clientAuthMethods) ? Set.of() : clientAuthMethods;
+    }
+
+    public Set<String> getResponseTypes() {
+        return CollectionUtils.isEmpty(responseTypes) ? Set.of() : responseTypes;
+    }
+
+    public List<JWK> getJwks() {
+        return CollectionUtils.isEmpty(jwks) ? List.of() : jwks;
+    }
 }

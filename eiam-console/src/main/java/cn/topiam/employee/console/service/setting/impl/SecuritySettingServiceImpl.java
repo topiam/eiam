@@ -32,10 +32,10 @@ import cn.topiam.employee.console.pojo.result.setting.SecurityBasicConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.SecurityBasicSaveParam;
 import cn.topiam.employee.console.service.setting.SecuritySettingService;
 import cn.topiam.employee.core.security.session.Session;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
-import cn.topiam.employee.support.context.ServletContextHelp;
+import cn.topiam.employee.support.context.ApplicationContextService;
+import cn.topiam.employee.support.context.ServletContextService;
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.DEFAULT_SECURITY_FILTER_CHAIN;
-import static cn.topiam.employee.core.setting.constant.SecuritySettingConstants.SECURITY_BASIC_KEY;
+import static cn.topiam.employee.core.setting.SecuritySettingConstants.SECURITY_BASIC_KEY;
 
 /**
  * <p>
@@ -43,7 +43,7 @@ import static cn.topiam.employee.core.setting.constant.SecuritySettingConstants.
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-10-01
+ * Created by support@topiam.cn on 2020-10-01
  */
 @Service
 public class SecuritySettingServiceImpl extends SettingServiceImpl
@@ -77,7 +77,7 @@ public class SecuritySettingServiceImpl extends SettingServiceImpl
         List<SettingEntity> list = securitySettingConverter
             .securityBasicSaveParamConvertToEntity(param);
         Boolean save = settingRepository.save(list);
-        String currentSessionId = ServletContextHelp.getSession().getId();
+        String currentSessionId = ServletContextService.getSession().getId();
         //异步下线所有用户（排除当前操作用户）
         executor.execute(() -> {
             List<Object> principals = sessionRegistry.getAllPrincipals();
@@ -91,7 +91,7 @@ public class SecuritySettingServiceImpl extends SettingServiceImpl
             });
         });
         // refresh
-        ApplicationContextHelp.refresh(DEFAULT_SECURITY_FILTER_CHAIN);
+        ApplicationContextService.refresh(DEFAULT_SECURITY_FILTER_CHAIN);
         return save;
     }
 

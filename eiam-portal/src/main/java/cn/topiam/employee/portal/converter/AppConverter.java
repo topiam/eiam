@@ -17,7 +17,6 @@
  */
 package cn.topiam.employee.portal.converter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,111 +24,110 @@ import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 
+import com.google.common.collect.Lists;
+
 import cn.topiam.employee.application.ApplicationService;
 import cn.topiam.employee.application.ApplicationServiceLoader;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.enums.app.AppProtocol;
-import cn.topiam.employee.core.help.ServerHelp;
-import cn.topiam.employee.portal.constant.PortalConstants;
+import cn.topiam.employee.core.context.ContextService;
 import cn.topiam.employee.portal.pojo.result.GetAppListResult;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.context.ApplicationContextService;
 import cn.topiam.employee.support.repository.page.domain.Page;
-import static cn.topiam.employee.common.constant.AppConstants.APP_CODE_VARIABLE;
-import static cn.topiam.employee.common.enums.app.InitLoginType.PORTAL_OR_APP;
+import cn.topiam.employee.support.repository.page.domain.PageModel;
+import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CODE_VARIABLE;
+import static cn.topiam.employee.common.constant.ProtocolConstants.FormEndpointConstants.IDP_FORM_SSO_INITIATOR;
+import static cn.topiam.employee.common.constant.ProtocolConstants.JwtEndpointConstants.IDP_JWT_SSO_INITIATOR;
+import static cn.topiam.employee.common.constant.ProtocolConstants.OidcEndpointConstants.AUTHORIZATION_ENDPOINT;
 
 /**
  * Converter
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/7/7 23:05
+ * Created by support@topiam.cn on 2022/7/7 23:05
  */
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface AppConverter {
+
     /**
      * 实体转应用列表返回
      *
-     * @param list {@link AppEntity}
+     * @param entityList      {@link AppEntity}
+     * @param pageModel      {@link PageModel}
      * @return {@link GetAppListResult}
      */
-    default Page<GetAppListResult> entityConvertToAppListResult(org.springframework.data.domain.Page<AppEntity> list) {
-       //@formatter:off
-       List<GetAppListResult> results = new ArrayList<>();
-       for (AppEntity entity : list) {
-           GetAppListResult result = new GetAppListResult();
-           result.setId(entity.getId().toString());
-           result.setName(entity.getName());
-           result.setType(entity.getType());
-           result.setProtocol(entity.getProtocol());
-           result.setTemplate(entity.getTemplate());
-           result.setInitLoginType(entity.getInitLoginType());
-           //登录发起URL
-           if (PORTAL_OR_APP.equals(entity.getInitLoginType())){
-               result.setInitLoginUrl(StringUtils.defaultIfBlank(entity.getInitLoginUrl(), getIdpInitUrl(entity.getProtocol(), entity.getCode())));
-           }
-           result.setIcon(entity.getIcon());
-           //图标未配置，所以先从模版中拿
-           if (StringUtils.isBlank(entity.getIcon())){
-               ApplicationService applicationService = getApplicationServiceLoader()
-                       .getApplicationService(entity.getTemplate());
-               result.setIcon(applicationService.getBase64Icon());
-           }
-           if (StringUtils.isNotBlank(entity.getRemark())){
-               result.setDescription(entity.getRemark());
-           }else {
-               ApplicationServiceLoader loader = ApplicationContextHelp.getBean(ApplicationServiceLoader.class);
-               ApplicationService applicationService = loader.getApplicationService(entity.getTemplate());
-               if (!Objects.isNull(applicationService)){
-                   result.setDescription(applicationService.getDescription());
-               }
-           }
-           results.add(result);
-       }
-       Page<GetAppListResult> page = new Page<>();
-       page.setList(results);
-       page.setPagination(Page.Pagination.builder()
-               .total(list.getTotalElements())
-               .totalPages(list.getTotalPages())
-               .current(list.getPageable().getPageNumber() + 1)
-               .build());
-       //@formatter:on
+    default Page<GetAppListResult> entityConvertToAppListResult(List<AppEntity> entityList,
+                                                                PageModel pageModel) {
+        //@formatter:off
+        Page<GetAppListResult> page = new Page<>();
+        List<GetAppListResult> list = Lists.newArrayList();
+        for (AppEntity entity : entityList) {
+            GetAppListResult result = entityConvertToAppListResult(entity);
+            list.add(result);
+        }
+        int startIndex = (pageModel.getCurrent()) * pageModel.getPageSize();
+        int endIndex = Math.min(startIndex + pageModel.getPageSize(), list.size());
+        page.setList(list.subList(startIndex, endIndex));
+        //@formatter:off
+        long total = list.size();
+        page.setPagination(Page.Pagination.builder()
+                .total(total)
+                .totalPages((int) Math.ceil((double) list.size() / pageModel.getPageSize()))
+                .current(pageModel.getCurrent())
+                .build());
+        //@formatter:on
         return page;
     }
 
-    default List<GetAppListResult> entityConvertToAppListResult(List<AppEntity> list) {
-        //@formatter:off
-        List<GetAppListResult> results = new ArrayList<>();
-        for (AppEntity entity : list) {
-            GetAppListResult result = new GetAppListResult();
-            result.setId(entity.getId().toString());
-            result.setName(entity.getName());
-            result.setType(entity.getType());
-            result.setProtocol(entity.getProtocol());
-            result.setTemplate(entity.getTemplate());
-            result.setInitLoginType(entity.getInitLoginType());
-            //登录发起URL
-            if (PORTAL_OR_APP.equals(entity.getInitLoginType())){
-                result.setInitLoginUrl(StringUtils.defaultIfBlank(entity.getInitLoginUrl(), getIdpInitUrl(entity.getProtocol(), entity.getCode())));
-            }
-            result.setIcon(entity.getIcon());
-            //图标未配置，所以先从模版中拿
-            if (StringUtils.isBlank(entity.getIcon())){
-                ApplicationService applicationService = getApplicationServiceLoader()
-                        .getApplicationService(entity.getTemplate());
-                result.setIcon(applicationService.getBase64Icon());
-            }
-            if (StringUtils.isNotBlank(entity.getRemark())){
-                result.setDescription(entity.getRemark());
-            }else {
-                ApplicationServiceLoader loader = ApplicationContextHelp.getBean(ApplicationServiceLoader.class);
-                ApplicationService applicationService = loader.getApplicationService(entity.getTemplate());
-                if (!Objects.isNull(applicationService)){
-                    result.setDescription(applicationService.getDescription());
-                }
-            }
-            results.add(result);
+    /**
+     * 实体转应用管理列表
+     *
+     * @param entity {@link AppEntity}
+     * @return {@link GetAppListResult}
+     */
+    default GetAppListResult entityConvertToAppListResult(AppEntity entity) {
+        if (entity == null) {
+            return null;
         }
-        //@formatter:on
-        return results;
+
+        GetAppListResult result = new GetAppListResult();
+        result.setId(entity.getId());
+        result.setName(entity.getName());
+        result.setType(entity.getType());
+        result.setProtocol(entity.getProtocol());
+        result.setInitLoginUrl(StringUtils.defaultIfBlank(entity.getInitLoginUrl(),
+            getIdpInitUrl(entity.getProtocol(), entity.getCode())));
+        result.setIcon(entity.getIcon());
+        //图标未配置，所以先从模版中拿
+        if (StringUtils.isBlank(entity.getIcon())) {
+            ApplicationService applicationService = getApplicationServiceLoader()
+                .getApplicationService(entity.getTemplate());
+            result.setIcon(applicationService.getBase64Icon());
+        }
+        result.setTemplate(entity.getTemplate());
+        result.setProtocol(entity.getProtocol());
+        result.setCode(entity.getCode());
+        result.setDescription(entity.getRemark());
+        // 如果备注为空、放置详情，由于 entityConvertToAppListResult 为共用，所以这里单独处理。
+        if (StringUtils.isBlank(result.getDescription())) {
+            ApplicationServiceLoader loader = ApplicationContextService
+                .getBean(ApplicationServiceLoader.class);
+            ApplicationService applicationService = loader
+                .getApplicationService(entity.getTemplate());
+            if (!Objects.isNull(applicationService)) {
+                result.setDescription(applicationService.getDescription());
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 获取 ApplicationServiceLoader
+     *
+     * @return {@link ApplicationServiceLoader}
+     */
+    private ApplicationServiceLoader getApplicationServiceLoader() {
+        return ApplicationContextService.getBean(ApplicationServiceLoader.class);
     }
 
     /**
@@ -142,29 +140,20 @@ public interface AppConverter {
     private String getIdpInitUrl(AppProtocol protocol, String appCode) {
         //OAuth2
         if (AppProtocol.OIDC.equals(protocol)) {
-            return ServerHelp.getPortalPublicBaseUrl()
-                   + PortalConstants.IDP_OAUTH2_SSO_INITIATOR.replace(APP_CODE_VARIABLE, appCode);
+            return getPortalInitUrl(AUTHORIZATION_ENDPOINT.replace(APP_CODE_VARIABLE, appCode));
         }
         //Form
         if (AppProtocol.FORM.equals(protocol)) {
-            return ServerHelp.getPortalPublicBaseUrl()
-                   + PortalConstants.IDP_FORM_SSO_INITIATOR.replace(APP_CODE_VARIABLE, appCode);
+            return getPortalInitUrl(IDP_FORM_SSO_INITIATOR.replace(APP_CODE_VARIABLE, appCode));
         }
         //JWT
         if (AppProtocol.JWT.equals(protocol)) {
-            return ServerHelp.getPortalPublicBaseUrl()
-                   + PortalConstants.IDP_JWT_SSO_INITIATOR.replace(APP_CODE_VARIABLE, appCode);
+            return getPortalInitUrl(IDP_JWT_SSO_INITIATOR.replace(APP_CODE_VARIABLE, appCode));
         }
         return null;
     }
 
-    /**
-     * 获取 ApplicationServiceLoader
-     *
-     * @return {@link ApplicationServiceLoader}
-     */
-    private ApplicationServiceLoader getApplicationServiceLoader() {
-        return ApplicationContextHelp.getBean(ApplicationServiceLoader.class);
+    private String getPortalInitUrl(String path) {
+        return ContextService.getPortalPublicBaseUrl() + path;
     }
-
 }

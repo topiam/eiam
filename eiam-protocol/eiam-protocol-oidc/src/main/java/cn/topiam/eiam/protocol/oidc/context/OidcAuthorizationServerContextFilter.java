@@ -19,8 +19,7 @@ package cn.topiam.eiam.protocol.oidc.context;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,12 +37,18 @@ import com.alibaba.fastjson2.JSONObject;
 import cn.topiam.employee.application.ApplicationServiceLoader;
 import cn.topiam.employee.application.context.ApplicationContext;
 import cn.topiam.employee.application.context.ApplicationContextHolder;
+import cn.topiam.employee.application.exception.AppNotConfigException;
+import cn.topiam.employee.application.exception.AppNotExistException;
 import cn.topiam.employee.application.oidc.OidcApplicationService;
 import cn.topiam.employee.application.oidc.model.OidcProtocolConfig;
-import cn.topiam.employee.core.help.ServerHelp;
+import cn.topiam.employee.common.exception.app.AppAccessDeniedException;
+import cn.topiam.employee.core.context.ContextService;
+import cn.topiam.employee.protocol.code.EndpointMatcher;
+import cn.topiam.employee.support.security.userdetails.Application;
+import cn.topiam.employee.support.security.userdetails.UserDetails;
+import cn.topiam.employee.support.security.util.SecurityUtils;
 import cn.topiam.employee.support.util.IpUtils;
 import cn.topiam.employee.support.util.UrlUtils;
-import cn.topiam.employee.support.web.servlet.RepeatedlyRequestWrapper;
 
 import lombok.Getter;
 
@@ -51,9 +56,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import static org.springframework.security.oauth2.server.authorization.settings.ConfigurationSettingNames.Token.ACCESS_TOKEN_FORMAT;
+import static org.springframework.security.oauth2.server.authorization.settings.ConfigurationSettingNames.Token.*;
 
-import static cn.topiam.employee.common.constant.AppConstants.APP_CODE;
+import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CODE;
 import static cn.topiam.employee.common.constant.ProtocolConstants.OidcEndpointConstants.*;
 import static cn.topiam.employee.support.util.HttpRequestUtils.getRequestHeaders;
 
@@ -61,23 +66,23 @@ import static cn.topiam.employee.support.util.HttpRequestUtils.getRequestHeaders
  * 上下文过滤器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/26 23:55
+ * Created by support@topiam.cn on 2023/6/26 23:55
  */
 public final class OidcAuthorizationServerContextFilter extends OncePerRequestFilter {
 
     public static final String             SEPARATE = "----------------------------------------------------------";
 
     @Getter
-    private final RequestMatcher           endpointsMatcher;
+    private final List<EndpointMatcher>    endpointMatchers;
 
     private final ApplicationServiceLoader applicationServiceLoader;
 
-    public OidcAuthorizationServerContextFilter(RequestMatcher endpointsMatcher,
+    public OidcAuthorizationServerContextFilter(List<EndpointMatcher> endpointMatchers,
                                                 ApplicationServiceLoader applicationServiceLoader) {
-        Assert.notNull(endpointsMatcher, "endpointsMatcher cannot be null");
+        Assert.notNull(endpointMatchers, "requestMatchers cannot be null");
         Assert.notNull(applicationServiceLoader, "applicationServiceLoader cannot be null");
         this.applicationServiceLoader = applicationServiceLoader;
-        this.endpointsMatcher = endpointsMatcher;
+        this.endpointMatchers = endpointMatchers;
     }
 
     @Override
@@ -85,16 +90,36 @@ public final class OidcAuthorizationServerContextFilter extends OncePerRequestFi
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException,
                                                                       IOException {
-        RequestMatcher.MatchResult matcher = endpointsMatcher.matcher(request);
-        if (!matcher.isMatch()) {
+        boolean match = false, access = false;
+        Map<String, String> variables = new HashMap<>(16);
+        for (EndpointMatcher endpointMatcher : endpointMatchers) {
+            RequestMatcher requestMatcher = endpointMatcher.getRequestMatcher();
+            if (requestMatcher.matches(request)) {
+                match = true;
+                access = endpointMatcher.getAccess();
+                variables = requestMatcher.matcher(request).getVariables();
+            }
+        }
+        if (!match) {
             filterChain.doFilter(request, response);
             return;
         }
+        String appCode = variables.get(APP_CODE);
+        //校验访问权限（未登录不校验访问权限）
+        if (access && SecurityUtils.isAuthenticated()) {
+            UserDetails userDetails = SecurityUtils.getCurrentUser();
+            Collection<Application> applications = userDetails.getApplications();
+            if (applications.stream()
+                .noneMatch(application -> application.getCode().equals(appCode))) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN,
+                    new AppAccessDeniedException().getMessage());
+                return;
+            }
+        }
         try {
             //@formatter:off
-            Map<String, String> variables = matcher.getVariables();
-            String appCode = variables.get(APP_CODE);
             if (this.logger.isTraceEnabled()) {
+                String body = IOUtils.toString(request.getInputStream(),StandardCharsets.UTF_8).replaceAll("\\s+", " ");
                 String logs = "\n" +
                         "┣ " + SEPARATE + "\n" +
                         "┣ App: " + appCode + "\n" +
@@ -102,16 +127,22 @@ public final class OidcAuthorizationServerContextFilter extends OncePerRequestFi
                         "┣ Request ip: " + IpUtils.getIpAddr(request) + "\n" +
                         "┣ Request headers: " + JSONObject.toJSONString(getRequestHeaders(request)) + "\n" +
                         "┣ Request parameters: " + JSONObject.toJSONString(request.getParameterMap()) + "\n" +
-                        "┣ Request payload: " + StringUtils.defaultIfBlank(IOUtils.toString(new RepeatedlyRequestWrapper(request, response).getInputStream(),StandardCharsets.UTF_8).replaceAll("\\s+", " "), "-") + "\n" +
+                        "┣ Request payload: " + StringUtils.defaultIfBlank(body, "-") + "\n" +
                         "┣ " + SEPARATE;
                 logger.trace(logs);
             }
             OidcApplicationService applicationService = (OidcApplicationService) applicationServiceLoader.getApplicationServiceByAppCode(appCode);
             OidcProtocolConfig config = applicationService.getProtocolConfig(appCode);
+            if (Objects.isNull(config)) {
+                throw new AppNotExistException();
+            }
+            if (!config.getConfigured()){
+                throw new AppNotConfigException();
+            }
             //封装 ProviderSettings
             StringSubstitutor sub = new StringSubstitutor(variables, "{", "}");
             AuthorizationServerSettings providerSettings = AuthorizationServerSettings.builder()
-                    .issuer(sub.replace(UrlUtils.format(ServerHelp.getPortalPublicBaseUrl() + OIDC_AUTHORIZE_PATH)))
+                    .issuer(sub.replace(UrlUtils.format(ContextService.getPortalPublicBaseUrl() + OIDC_AUTHORIZE_PATH)))
                     .authorizationEndpoint(sub.replace(AUTHORIZATION_ENDPOINT))
                     .tokenEndpoint(sub.replace(TOKEN_ENDPOINT))
                     .jwkSetEndpoint(sub.replace(JWK_SET_ENDPOINT))
@@ -123,6 +154,12 @@ public final class OidcAuthorizationServerContextFilter extends OncePerRequestFi
                     .deviceAuthorizationEndpoint(sub.replace(DEVICE_AUTHORIZATION_ENDPOINT))
                     .deviceVerificationEndpoint(sub.replace(DEVICE_VERIFICATION_ENDPOINT))
                     .setting(ACCESS_TOKEN_FORMAT,config.getAccessTokenFormat())
+                    .setting(REUSE_REFRESH_TOKENS,config.getReuseRefreshToken())
+                    .setting(REFRESH_TOKEN_TIME_TO_LIVE,config.getRefreshTokenTimeToLive())
+                    .setting(AUTHORIZATION_CODE_TIME_TO_LIVE,config.getAuthorizationCodeTimeToLive())
+                    .setting(DEVICE_CODE_TIME_TO_LIVE,config.getDeviceCodeTimeToLive())
+                    .setting(ACCESS_TOKEN_TIME_TO_LIVE,config.getAccessTokenTimeToLive())
+                    .setting(ID_TOKEN_SIGNATURE_ALGORITHM,config.getIdTokenSignatureAlgorithm())
                     .build();
             AuthorizationServerContext providerContext = new AuthorizationServerContext() {
                 @Override
@@ -147,19 +184,18 @@ public final class OidcAuthorizationServerContextFilter extends OncePerRequestFi
 
     private record DefaultApplicationContext(OidcProtocolConfig config) implements ApplicationContext {
 
-    private DefaultApplicationContext(OidcProtocolConfig config) {
+        private DefaultApplicationContext {
             Assert.notNull(config, "config cannot be null");
-            this.config = config;
-    }
+        }
 
     /**
      * 获取应用ID
      *
-     * @return {@link Long}
+     * @return {@link String}
      */
     @Override
-    public Long getAppId() {
-        return Long.valueOf(config.getAppId());
+    public String getAppId() {
+        return this.config.getAppId();
     }
 
     /**
@@ -173,10 +209,10 @@ public final class OidcAuthorizationServerContextFilter extends OncePerRequestFi
     }
 
     /**
-    * 获取应用编码
-    *
-    * @return {@link String}
-    */
+     * 获取应用编码
+     *
+     * @return {@link String}
+     */
     @Override
     public String getAppCode() {
         return config.getAppCode();

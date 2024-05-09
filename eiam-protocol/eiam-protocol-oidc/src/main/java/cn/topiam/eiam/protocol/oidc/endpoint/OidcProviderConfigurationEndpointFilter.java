@@ -40,12 +40,14 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import cn.topiam.employee.core.help.ServerHelp;
+import cn.topiam.employee.core.context.ContextService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import static cn.topiam.eiam.protocol.oidc.authentication.OAuth2AuthorizationImplicitRequestAuthenticationProvider.IMPLICIT;
+import static cn.topiam.eiam.protocol.oidc.authentication.OAuth2AuthorizationResourceOwnerPasswordAuthenticationToken.PASSWORD;
 import static cn.topiam.eiam.protocol.oidc.endpoint.authentication.OAuth2AuthorizationImplicitRequestAuthenticationConverter.ID_TOKEN;
 import static cn.topiam.eiam.protocol.oidc.endpoint.authentication.OAuth2AuthorizationImplicitRequestAuthenticationConverter.TOKEN;
 import static cn.topiam.employee.common.constant.ProtocolConstants.OidcEndpointConstants.WELL_KNOWN_OPENID_CONFIGURATION;
@@ -95,47 +97,72 @@ public final class OidcProviderConfigurationEndpointFilter extends OncePerReques
         OidcProviderConfiguration.Builder providerConfiguration = OidcProviderConfiguration
             .builder().issuer(issuer)
             //认证端点
-            .authorizationEndpoint(asUrl(ServerHelp.getPortalPublicBaseUrl(),
+            .authorizationEndpoint(asUrl(ContextService.getPortalPublicBaseUrl(),
                 authorizationServerSettings.getAuthorizationEndpoint()))
-            //设备授权端点
-            .deviceAuthorizationEndpoint(asUrl(ServerHelp.getPortalPublicBaseUrl(),
-                authorizationServerSettings.getDeviceAuthorizationEndpoint()))
             //令牌端点
-            .tokenEndpoint(asUrl(ServerHelp.getPortalPublicBaseUrl(),
+            .tokenEndpoint(asUrl(ContextService.getPortalPublicBaseUrl(),
                 authorizationServerSettings.getTokenEndpoint()))
             //令牌端点身份验证方法
             .tokenEndpointAuthenticationMethods(clientAuthenticationMethods())
             //JWK
-            .jwkSetUrl(asUrl(ServerHelp.getPortalPublicBaseUrl(),
+            .jwkSetUrl(asUrl(ContextService.getPortalPublicBaseUrl(),
                 authorizationServerSettings.getJwkSetEndpoint()))
             //用户信息端点
-            .userInfoEndpoint(asUrl(ServerHelp.getPortalPublicBaseUrl(),
+            .userInfoEndpoint(asUrl(ContextService.getPortalPublicBaseUrl(),
                 authorizationServerSettings.getOidcUserInfoEndpoint()))
             //退出端点
-            .endSessionEndpoint(asUrl(ServerHelp.getPortalPublicBaseUrl(),
+            .endSessionEndpoint(asUrl(ContextService.getPortalPublicBaseUrl(),
                 authorizationServerSettings.getOidcLogoutEndpoint()))
-            //动态处理影响类型
-            .responseType(OAuth2AuthorizationResponseType.CODE.getValue())
-            .responseType(TOKEN.getValue()).responseType(ID_TOKEN.getValue())
+            //响应类型
+            .responseTypes(responseTypes())
             //动态处理授权类型
             .grantTypes(grantTypes())
             //令牌吊销端点
-            .tokenRevocationEndpoint(asUrl(ServerHelp.getPortalPublicBaseUrl(),
+            .tokenRevocationEndpoint(asUrl(ContextService.getPortalPublicBaseUrl(),
                 authorizationServerSettings.getTokenRevocationEndpoint()))
             //令牌吊销端点身份验证方法
             .tokenRevocationEndpointAuthenticationMethods(clientAuthenticationMethods())
             //令牌解析端点
-            .tokenIntrospectionEndpoint(asUrl(ServerHelp.getPortalPublicBaseUrl(),
+            .tokenIntrospectionEndpoint(asUrl(ContextService.getPortalPublicBaseUrl(),
                 authorizationServerSettings.getTokenIntrospectionEndpoint()))
             //令牌解析身份验证方法
             .tokenIntrospectionEndpointAuthenticationMethods(clientAuthenticationMethods())
             .subjectType("public")
             //ID_TOKEN签名端点
-            .idTokenSigningAlgorithm(SignatureAlgorithm.RS256.getName()).scope(OidcScopes.OPENID);
+            .idTokenSigningAlgorithm(SignatureAlgorithm.RS256.getName())
+            //scope
+            .scopes(scopes());
 
         ServletServerHttpResponse httpResponse = new ServletServerHttpResponse(response);
         this.providerConfigurationHttpMessageConverter.write(providerConfiguration.build(),
             MediaType.APPLICATION_JSON, httpResponse);
+    }
+
+    /**
+     * scopes
+     *
+     * @return {@link List}
+     */
+    private static Consumer<List<String>> scopes() {
+        return strings -> {
+            strings.add(OidcScopes.OPENID);
+            strings.add(OidcScopes.PHONE);
+            strings.add(OidcScopes.EMAIL);
+            strings.add(OidcScopes.PROFILE);
+        };
+    }
+
+    /**
+     * 响应类型
+     *
+     * @return {@link List}
+     */
+    private static Consumer<List<String>> responseTypes() {
+        return strings -> {
+            strings.add(OAuth2AuthorizationResponseType.CODE.getValue());
+            strings.add(TOKEN.getValue());
+            strings.add(ID_TOKEN.getValue());
+        };
     }
 
     /**
@@ -146,9 +173,9 @@ public final class OidcProviderConfigurationEndpointFilter extends OncePerReques
     private static Consumer<List<String>> grantTypes() {
         return strings -> {
             strings.add(AuthorizationGrantType.AUTHORIZATION_CODE.getValue());
-            strings.add(AuthorizationGrantType.CLIENT_CREDENTIALS.getValue());
+            strings.add(PASSWORD.getValue());
+            strings.add(IMPLICIT.getValue());
             strings.add(AuthorizationGrantType.REFRESH_TOKEN.getValue());
-            strings.add(AuthorizationGrantType.DEVICE_CODE.getValue());
         };
     }
 

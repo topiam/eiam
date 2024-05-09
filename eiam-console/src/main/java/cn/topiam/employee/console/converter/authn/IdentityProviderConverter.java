@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.jpa.domain.Specification;
@@ -31,25 +32,24 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cn.topiam.employee.authentication.alipay.AlipayIdpOAuth2Config;
+import cn.topiam.employee.authentication.alipay.AlipayIdentityProviderOAuth2Config;
 import cn.topiam.employee.authentication.common.IdentityProviderCategory;
 import cn.topiam.employee.authentication.common.IdentityProviderType;
-import cn.topiam.employee.authentication.common.config.IdentityProviderConfig;
-import cn.topiam.employee.authentication.dingtalk.DingTalkIdpOauthConfig;
-import cn.topiam.employee.authentication.dingtalk.DingTalkIdpScanCodeConfig;
-import cn.topiam.employee.authentication.feishu.FeiShuIdpScanCodeConfig;
-import cn.topiam.employee.authentication.gitee.GiteeIdpOAuth2Config;
-import cn.topiam.employee.authentication.github.GithubIdpOauthConfig;
-import cn.topiam.employee.authentication.qq.QqIdpOauthConfig;
-import cn.topiam.employee.authentication.wechat.WeChatIdpScanCodeConfig;
-import cn.topiam.employee.authentication.wechatwork.WeChatWorkIdpScanCodeConfig;
+import cn.topiam.employee.authentication.common.client.IdentityProviderConfig;
+import cn.topiam.employee.authentication.dingtalk.DingTalkIdentityProviderOAuth2Config;
+import cn.topiam.employee.authentication.feishu.FeiShuIdentityProviderOAuth2Config;
+import cn.topiam.employee.authentication.gitee.GiteeIdentityProviderOAuth2Config;
+import cn.topiam.employee.authentication.github.GithubIdentityProviderOAuth2Config;
+import cn.topiam.employee.authentication.qq.QqIdentityProviderOAuth2Config;
+import cn.topiam.employee.authentication.wechat.WeChatIdentityProviderOAuth2Config;
+import cn.topiam.employee.authentication.wechatwork.WeChatWorkIdentityProviderOAuth2Config;
 import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
 import cn.topiam.employee.console.pojo.query.authn.IdentityProviderListQuery;
 import cn.topiam.employee.console.pojo.result.authn.IdentityProviderListResult;
 import cn.topiam.employee.console.pojo.result.authn.IdentityProviderResult;
 import cn.topiam.employee.console.pojo.save.authn.IdentityProviderCreateParam;
 import cn.topiam.employee.console.pojo.update.authn.IdpUpdateParam;
-import cn.topiam.employee.core.help.ServerHelp;
+import cn.topiam.employee.core.context.ContextService;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.validation.ValidationUtils;
@@ -99,7 +99,7 @@ public interface IdentityProviderConverter {
      * @param entity {@link  IdentityProviderEntity}
      * @return {@link  IdentityProviderListResult}
      */
-    @Mapping(target = "desc", expression = "java(IdentityProviderConverter.getIdentityProviderType(entity.getType()).desc())")
+    @Mapping(target = "desc", expression = "java(cn.topiam.employee.authentication.common.IdentityProviderType.getIdentityProviderType(entity.getType()).desc())")
     IdentityProviderListResult entityConverterToIdentityProviderResult(IdentityProviderEntity entity);
 
     /**
@@ -160,7 +160,7 @@ public interface IdentityProviderConverter {
         result.setName(entity.getName());
         result.setRemark(entity.getRemark());
         //回调地址
-        result.setRedirectUri(ServerHelp.getPortalPublicBaseUrl()
+        result.setRedirectUri(ContextService.getPortalPublicBaseUrl()
                               + getIdentityProviderType(entity.getType()).getLoginPathPrefix() + "/"
                               + entity.getCode());
         try {
@@ -186,11 +186,11 @@ public interface IdentityProviderConverter {
     default Specification<IdentityProviderEntity> queryIdentityProviderListParamConvertToSpecification(IdentityProviderListQuery listQuery) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (!Objects.isNull(listQuery.getCategory())) {
-                predicates.add(cb.equal(root.get(CATEGORY_FIELD_NAME), listQuery.getCategory()));
-            }
-            if (!Objects.isNull(listQuery.getName())) {
+            if (StringUtils.isNotBlank(listQuery.getName())) {
                 predicates.add(cb.like(root.get(NAME_FIELD_NAME), "%" + listQuery.getName() + "%"));
+            }
+            if (Objects.nonNull(listQuery.getCategory())) {
+                predicates.add(cb.equal(root.get(CATEGORY_FIELD_NAME), listQuery.getCategory()));
             }
             query.where(predicates.toArray(new Predicate[0]));
             query.orderBy(cb.desc(root.get(LAST_MODIFIED_TIME)));
@@ -241,34 +241,32 @@ public interface IdentityProviderConverter {
         //开始处理不同提供商的配置
         IdentityProviderConfig identityProviderConfig;
         //微信扫码
-        if (type.equals(WECHAT_QR.value())) {
-            identityProviderConfig = config.to(WeChatIdpScanCodeConfig.class);
-            //钉钉扫码
-        } else if (type.equals(DINGTALK_QR.value())) {
-            identityProviderConfig = config.to(DingTalkIdpScanCodeConfig.class);
-            //钉钉OAuth
-        } else if (type.equals(DINGTALK_OAUTH.value())) {
-            identityProviderConfig = config.to(DingTalkIdpOauthConfig.class);
+        if (type.equals(WECHAT.value())) {
+            identityProviderConfig = config.to(WeChatIdentityProviderOAuth2Config.class);
+        }
+        //钉钉OAuth
+        else if (type.equals(DINGTALK_OAUTH.value())) {
+            identityProviderConfig = config.to(DingTalkIdentityProviderOAuth2Config.class);
             //企业微信扫码
-        } else if (type.equals(WECHAT_WORK_QR.value())) {
-            identityProviderConfig = config.to(WeChatWorkIdpScanCodeConfig.class);
+        } else if (type.equals(WECHAT_WORK_OAUTH.value())) {
+            identityProviderConfig = config.to(WeChatWorkIdentityProviderOAuth2Config.class);
             //QQ认证
         } else if (type.equals(QQ_OAUTH.value())) {
-            identityProviderConfig = config.to(QqIdpOauthConfig.class);
+            identityProviderConfig = config.to(QqIdentityProviderOAuth2Config.class);
             //飞书认证
         } else if (type.equals(FEISHU_OAUTH.value())) {
-            identityProviderConfig = config.to(FeiShuIdpScanCodeConfig.class);
+            identityProviderConfig = config.to(FeiShuIdentityProviderOAuth2Config.class);
             //GITHUB认证
         } else if (type.equals(GITHUB_OAUTH.value())) {
-            identityProviderConfig = config.to(GithubIdpOauthConfig.class);
+            identityProviderConfig = config.to(GithubIdentityProviderOAuth2Config.class);
         }
         //Gitee认证
         else if (type.equals(GITEE_OAUTH.value())) {
-            identityProviderConfig = config.to(GiteeIdpOAuth2Config.class);
+            identityProviderConfig = config.to(GiteeIdentityProviderOAuth2Config.class);
         }
         //支付宝认证
         else if (type.equals(ALIPAY_OAUTH.value())) {
-            identityProviderConfig = config.to(AlipayIdpOAuth2Config.class);
+            identityProviderConfig = config.to(AlipayIdentityProviderOAuth2Config.class);
         } else {
             throw new TopIamException("不支持此身份提供商");
         }
@@ -281,57 +279,5 @@ public interface IdentityProviderConverter {
             throw new ConstraintViolationException(validationResult.getConstraintViolations());
         }
         return identityProviderConfig;
-    }
-
-    /**
-     * getIdentityProviderType
-     *
-     * @param type {@link String}
-     * @return {@link IdentityProviderType}
-     */
-    static IdentityProviderType getIdentityProviderType(String type) {
-        if (FEISHU_OAUTH.value().equals(type)) {
-            return FEISHU_OAUTH;
-        }
-        if (MAIL.value().equals(type)) {
-            return MAIL;
-        }
-        if (DINGTALK_OAUTH.value().equals(type)) {
-            return DINGTALK_OAUTH;
-        }
-        if (DINGTALK_QR.value().equals(type)) {
-            return DINGTALK_QR;
-        }
-        if (WECHAT_QR.value().equals(type)) {
-            return WECHAT_QR;
-        }
-        if (WECHAT_WORK_QR.value().equals(type)) {
-            return WECHAT_WORK_QR;
-        }
-        if (QQ_OAUTH.value().equals(type)) {
-            return QQ_OAUTH;
-        }
-        if (LDAP.value().equals(type)) {
-            return LDAP;
-        }
-        if (USERNAME_PASSWORD.value().equals(type)) {
-            return USERNAME_PASSWORD;
-        }
-        if (SMS.value().equals(type)) {
-            return SMS;
-        }
-        if (WECHAT_WEB_PAGE.value().equals(type)) {
-            return WECHAT_WEB_PAGE;
-        }
-        if (GITHUB_OAUTH.value().equals(type)) {
-            return GITHUB_OAUTH;
-        }
-        if (GITEE_OAUTH.value().equals(type)) {
-            return GITEE_OAUTH;
-        }
-        if (ALIPAY_OAUTH.value().equals(type)) {
-            return ALIPAY_OAUTH;
-        }
-        throw new IllegalArgumentException("未知身份提供商类型");
     }
 }

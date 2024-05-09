@@ -20,7 +20,7 @@ package cn.topiam.employee.portal.authentication;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RAtomicLong;
@@ -30,23 +30,21 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
-import org.springframework.util.ObjectUtils;
 
 import cn.topiam.employee.audit.entity.Actor;
 import cn.topiam.employee.audit.enums.EventStatus;
 import cn.topiam.employee.audit.event.AuditEventPublish;
 import cn.topiam.employee.audit.event.type.EventType;
-import cn.topiam.employee.audit.repository.AuditRepository;
 import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.enums.UserStatus;
 import cn.topiam.employee.common.repository.account.UserRepository;
-import cn.topiam.employee.core.help.SettingHelp;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
-import cn.topiam.employee.support.util.PhoneNumberUtils;
-import static cn.topiam.employee.core.help.SettingHelp.getLoginFailureDuration;
+import cn.topiam.employee.core.context.ContextService;
+import cn.topiam.employee.portal.service.UserService;
+import cn.topiam.employee.support.context.ApplicationContextService;
+import cn.topiam.employee.support.security.userdetails.UserDetails;
+import static cn.topiam.employee.core.context.ContextService.getLoginFailureDuration;
 import static cn.topiam.employee.core.security.util.SecurityUtils.getFailureMessage;
 import static cn.topiam.employee.support.security.userdetails.UserType.USER;
-import static cn.topiam.employee.support.security.util.SecurityUtils.getPrincipal;
 
 /**
  * 认证失败
@@ -68,27 +66,24 @@ public class PortalAuthenticationFailureEventListener implements
     @Override
     public void onApplicationEvent(@NonNull AbstractAuthenticationFailureEvent event) {
         //@formatter:off
-        AuditEventPublish publish = ApplicationContextHelp.getBean(AuditEventPublish.class);
+        AuditEventPublish publish = ApplicationContextService.getBean(AuditEventPublish.class);
         String content = getFailureMessage(event);
-        logger.error("认证失败", event.getException());
-        String principal = getPrincipal(event);
+        logger.error("User account authentication failed :{}", event.getException().getMessage());
+        String principal = null;
+        if (event.getAuthentication().getPrincipal() instanceof String) {
+            principal = (String) event.getAuthentication().getPrincipal();
+        }
+        if (event.getAuthentication().getPrincipal() instanceof UserDetails || event.getAuthentication().getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails) {
+            principal = ((UserDetails) event.getAuthentication().getPrincipal()).getUsername();
+        }
         if (StringUtils.isNotBlank(principal)) {
-            UserEntity user = getUserRepository().findByUsername(principal);
-            if (ObjectUtils.isEmpty(user)) {
-                // 手机号
-                if (PhoneNumberUtils.isPhoneValidate(principal)) {
-                    user = getUserRepository().findByPhone(PhoneNumberUtils.getPhoneNumber(principal));
-                }
-                if (ObjectUtils.isEmpty(user)) {
-                    // 邮箱
-                    user = getUserRepository().findByEmail(principal);
-                }
-            }
-            if (Objects.isNull(user)) {
-                logger.error("账户不存在:[{}]", principal);
+            Optional<UserEntity> optional = getUserService().findByUsernameOrPhoneOrEmail(principal);
+            if (optional.isEmpty()) {
+                logger.error("The account does not exist: [{}]", principal);
                 return;
             }
-            Actor actor = Actor.builder().id(user.getId().toString()).type(USER).build();
+            UserEntity user= optional.get();
+            Actor actor = Actor.builder().id(user.getId()).type(USER).build();
             publish.publish(EventType.LOGIN_PORTAL, content + "：" + user.getUsername(), actor, EventStatus.FAIL);
             //更新登录失败计数
             updateLoginFailCount(user);
@@ -101,16 +96,11 @@ public class PortalAuthenticationFailureEventListener implements
      *
      * @param user {@link UserEntity}
      */
-    /**
-     * 更新登录失败计数
-     *
-     * @param user {@link UserEntity}
-     */
     private void updateLoginFailCount(UserEntity user) {
-        Integer count = SettingHelp.getLoginFailureCount();
+        Integer count = ContextService.getLoginFailureCount();
         UserRepository userRepository = getUserRepository();
         //统计用户登录失败次数
-        RAtomicLong rAtomicLong = getRedissonClient().getAtomicLong(String.valueOf(user.getId()));
+        RAtomicLong rAtomicLong = getRedissonClient().getAtomicLong(user.getId());
         //如果存在该key
         if (rAtomicLong.isExists()) {
             long loginFailCount = rAtomicLong.incrementAndGet();
@@ -130,11 +120,15 @@ public class PortalAuthenticationFailureEventListener implements
     }
 
     private UserRepository getUserRepository() {
-        return ApplicationContextHelp.getBean(UserRepository.class);
+        return ApplicationContextService.getBean(UserRepository.class);
+    }
+
+    private UserService getUserService() {
+        return ApplicationContextService.getBean(UserService.class);
     }
 
     private RedissonClient getRedissonClient() {
-        return ApplicationContextHelp.getBean(RedissonClient.class);
+        return ApplicationContextService.getBean(RedissonClient.class);
     }
 
 }

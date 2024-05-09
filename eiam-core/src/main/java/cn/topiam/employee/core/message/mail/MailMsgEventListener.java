@@ -39,7 +39,7 @@ import cn.topiam.employee.common.message.mail.MailProviderSend;
 import cn.topiam.employee.common.message.mail.SendMailRequest;
 import cn.topiam.employee.common.repository.message.MailSendRecordRepository;
 import cn.topiam.employee.core.message.MsgVariable;
-import cn.topiam.employee.core.setting.constant.MessageSettingConstants;
+import cn.topiam.employee.core.setting.MessageSettingConstants;
 
 import freemarker.cache.StringTemplateLoader;
 import freemarker.cache.TemplateLoader;
@@ -54,7 +54,7 @@ import static cn.topiam.employee.support.constant.EiamConstants.COLON;
  * 消息通知事件
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/25 21:07
+ * Created by support@topiam.cn on 2021/9/25 21:07
  */
 @Async
 @Component

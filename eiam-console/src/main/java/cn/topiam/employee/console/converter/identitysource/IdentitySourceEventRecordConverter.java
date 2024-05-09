@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.CollectionUtils;
@@ -31,7 +30,7 @@ import cn.topiam.employee.common.entity.identitysource.IdentitySourceEventRecord
 import cn.topiam.employee.console.pojo.query.identity.IdentitySourceEventRecordListQuery;
 import cn.topiam.employee.console.pojo.result.account.UserGroupListResult;
 import cn.topiam.employee.console.pojo.result.identitysource.IdentitySourceEventRecordListResult;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.context.ApplicationContextService;
 import cn.topiam.employee.support.repository.page.domain.Page;
 
 import jakarta.persistence.criteria.Predicate;
@@ -42,7 +41,7 @@ import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIE
  * 身份源事件记录转换器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/13 21:37
+ * Created by support@topiam.cn on 2022/2/13 21:37
  */
 @Mapper(componentModel = "spring")
 public interface IdentitySourceEventRecordConverter {
@@ -57,19 +56,17 @@ public interface IdentitySourceEventRecordConverter {
         //查询条件
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (StringUtils.isNotBlank(listQuery.getIdentitySourceId())) {
-                predicates.add(criteriaBuilder.equal(root.get(IDENTITY_SOURCE_ID_FIELD_NAME),
-                    listQuery.getIdentitySourceId()));
-            }
-            if (Objects.isNull(listQuery.getActionType())) {
+            predicates.add(criteriaBuilder.equal(root.get(IDENTITY_SOURCE_ID_FIELD_NAME),
+                listQuery.getIdentitySourceId()));
+            if (Objects.nonNull(listQuery.getActionType())) {
                 predicates.add(criteriaBuilder.equal(root.get(ACTION_TYPE_FIELD_NAME),
                     listQuery.getActionType()));
             }
-            if (Objects.isNull(listQuery.getObjectType())) {
+            if (Objects.nonNull(listQuery.getObjectType())) {
                 predicates.add(criteriaBuilder.equal(root.get(OBJECT_TYPE_FIELD_NAME),
                     listQuery.getObjectType()));
             }
-            if (Objects.isNull(listQuery.getStatus())) {
+            if (Objects.nonNull(listQuery.getStatus())) {
                 predicates
                     .add(criteriaBuilder.equal(root.get(STATUS_FIELD_NAME), listQuery.getStatus()));
             }
@@ -90,7 +87,7 @@ public interface IdentitySourceEventRecordConverter {
         if (!CollectionUtils.isEmpty(page.getContent())) {
             List<IdentitySourceEventRecordListResult> list = new ArrayList<>();
             for (IdentitySourceEventRecordEntity entity : page.getContent()) {
-                IdentitySourceEventRecordConverter bean = ApplicationContextHelp
+                IdentitySourceEventRecordConverter bean = ApplicationContextService
                     .getBean(IdentitySourceEventRecordConverter.class);
                 list.add(bean.entityConvertToIdentitySourceSyncRecordListResult(entity));
             }

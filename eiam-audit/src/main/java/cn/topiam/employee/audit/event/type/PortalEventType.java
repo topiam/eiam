@@ -22,13 +22,14 @@ import java.util.List;
 import cn.topiam.employee.audit.event.ConsoleResource;
 import cn.topiam.employee.audit.event.Type;
 import cn.topiam.employee.support.security.userdetails.UserType;
-import static cn.topiam.employee.audit.event.PortalResource.*;
+import static cn.topiam.employee.audit.event.PortalResource.MY_ACCOUNT_RESOURCE;
+import static cn.topiam.employee.audit.event.PortalResource.MY_APP_RESOURCE;
 
 /**
  * 门户端审计事件类型
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/24 22:58
+ * Created by support@topiam.cn on 2021/11/24 22:58
  */
 public class PortalEventType {
     /**

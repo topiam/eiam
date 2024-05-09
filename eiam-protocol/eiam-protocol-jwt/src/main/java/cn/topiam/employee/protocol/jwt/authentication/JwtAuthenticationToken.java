@@ -27,11 +27,12 @@ import cn.topiam.employee.application.jwt.model.JwtProtocolConfig;
 import cn.topiam.employee.protocol.jwt.token.IdToken;
 
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/8 00:08
+ * Created by support@topiam.cn on 2023/7/8 00:08
  */
 public class JwtAuthenticationToken extends AbstractAuthenticationToken {
 
@@ -54,6 +55,10 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
      */
     @Getter
     private final JwtProtocolConfig config;
+
+    @Getter
+    @Setter
+    private String                  targetUrl;
 
     /**
      * Creates a token with the supplied array of authorities.
@@ -99,7 +104,6 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
      */
     @Override
     public Object getPrincipal() {
-        return this.principal;
+        return principal;
     }
-
 }

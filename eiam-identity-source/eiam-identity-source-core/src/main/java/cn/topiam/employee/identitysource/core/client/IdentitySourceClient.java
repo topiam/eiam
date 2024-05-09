@@ -27,7 +27,7 @@ import cn.topiam.employee.identitysource.core.domain.User;
  * IdentityProviderClient
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/28 03:39
+ * Created by support@topiam.cn on 2022/2/28 03:39
  */
 public interface IdentitySourceClient {
 

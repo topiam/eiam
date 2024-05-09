@@ -47,7 +47,7 @@ import static cn.topiam.employee.identitysource.dingtalk.DingTalkConstants.LOGGE
  * 钉钉组织机构
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/29 21:56
+ * Created by support@topiam.cn on 2021/9/29 21:56
  */
 @Slf4j(topic = LOGGER_NAME)
 public class DingTalkClient extends AbstractDingTalkClient implements IdentitySourceClient {

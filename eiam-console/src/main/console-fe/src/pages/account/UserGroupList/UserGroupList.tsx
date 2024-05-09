@@ -17,198 +17,201 @@
  */
 import { createUserGroup, getUserGroupList, removeUserGroup } from '@/services/account';
 import { history } from '@@/core/history';
-import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import type { ActionType } from '@ant-design/pro-components';
-import {
-  PageContainer,
-  ProCard,
-  ProFormText,
-  ProList,
-  QueryFilter,
-} from '@ant-design/pro-components';
-import { App, Avatar, Button, Card, Popconfirm, Typography } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { ActionType, PageContainer, type ProColumns, ProTable } from '@ant-design/pro-components';
+import { App, Button, Space, Table } from 'antd';
 import React, { useRef, useState } from 'react';
 import AddUserGroup from './components/AddUserGroup';
-import useStyle from './style';
 import { useIntl } from '@umijs/max';
 
-const { Paragraph } = Typography;
+/**
+ * onDetailClick
+ * @param id
+ */
+const onDetailClick = (id: string) => {
+  history.push(`/account/user-group/detail?id=${id}&type=member`);
+};
 
 const UserGroupList = () => {
   const intl = useIntl();
-  const { styles } = useStyle();
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   const actionRef = useRef<ActionType>();
   const [addUserGroupVisible, setAddUserGroupVisible] = useState<boolean>(false);
-  const [searchParams, setSearchParams] = useState<Record<string, any>>();
+  const [loading, setLoading] = useState(false);
 
-  /**
-   * onDetailClick
-   * @param id
-   */
-  const onDetailClick = (id: string) => {
-    history.push(`/account/user-group/detail?id=${id}&type=member`);
-  };
-  return (
-    <div className={styles.main}>
-      <PageContainer content={intl.formatMessage({ id: 'pages.account.user_group_list.desc' })}>
-        <ProCard bodyStyle={{ padding: 0 }}>
-          <QueryFilter
-            layout="horizontal"
-            onFinish={(values) => {
-              setSearchParams({ ...searchParams, ...values });
-              actionRef.current?.reset?.();
-              return Promise.resolve();
-            }}
-          >
-            <ProFormText
-              name="name"
-              label={intl.formatMessage({ id: 'pages.account.user_group_list.metas.title' })}
-            />
-          </QueryFilter>
-        </ProCard>
-        <br />
-        <ProList<AccountAPI.ListUserGroup>
-          actionRef={actionRef}
-          showActions="always"
-          search={false}
-          params={{ ...searchParams }}
-          pagination={{
-            size: 'small',
-            defaultPageSize: 10,
-            showSizeChanger: false,
-          }}
-          rowKey="id"
-          toolBarRender={() => {
-            return [
-              <Button
-                key={'create'}
-                type={'primary'}
-                onClick={() => {
-                  setAddUserGroupVisible(true);
-                }}
-              >
-                <PlusOutlined />
-                {intl.formatMessage({
-                  id: 'pages.account.user_group_list.tool_bar_render.button',
-                })}
-              </Button>,
-            ];
-          }}
-          grid={{ gutter: 8, xs: 1, sm: 1, md: 3, lg: 3, xl: 4, xxl: 5 }}
-          headerTitle={intl.formatMessage({ id: 'pages.account.user_group_list' })}
-          form={{
-            // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
-            syncToUrl: (values, type) => {
-              if (type === 'get') {
-                return {
-                  ...values,
-                };
-              }
-              return values;
-            },
-          }}
-          renderItem={(item) => {
-            return (
-              <Card
-                hoverable
-                style={{ margin: 10 }}
-                actions={[
-                  <a
-                    key={'member'}
-                    className={'user-group-detail'}
-                    onClick={() => {
-                      onDetailClick(item.id);
-                    }}
-                  >
-                    {intl.formatMessage({ id: 'app.detail' })}
-                  </a>,
-                  // 删除用户组
-                  <Popconfirm
-                    key={'delete'}
-                    title={intl.formatMessage({
-                      id: 'pages.account.user_group_list.actions.popconfirm.title',
-                    })}
-                    placement="bottomRight"
-                    icon={
-                      <QuestionCircleOutlined
-                        style={{
-                          color: 'red',
-                        }}
-                      />
+  const columns: ProColumns<AccountAPI.ListUserGroup>[] = [
+    {
+      title: intl.formatMessage({
+        id: 'pages.account.user_group_list.column.name',
+      }),
+      dataIndex: 'name',
+      ellipsis: true,
+      fixed: 'left',
+    },
+    {
+      title: intl.formatMessage({
+        id: 'pages.account.user_group_list.column.code',
+      }),
+      dataIndex: 'code',
+      search: false,
+      ellipsis: true,
+    },
+    {
+      title: intl.formatMessage({ id: 'pages.account.user_group_list.column.remark' }),
+      dataIndex: 'remark',
+      search: false,
+      ellipsis: true,
+    },
+    {
+      title: intl.formatMessage({
+        id: 'pages.account.user_group_list.column.create_time',
+      }),
+      dataIndex: 'createTime',
+      valueType: 'dateTime',
+      align: 'center',
+      search: false,
+      ellipsis: true,
+    },
+    {
+      title: intl.formatMessage({
+        id: 'pages.account.user_group_list.column.option',
+      }),
+      valueType: 'option',
+      key: 'option',
+      width: 120,
+      align: 'center',
+      render: (_text, record) => {
+        return (
+          <Space>
+            <a
+              key={'detail'}
+              onClick={() => {
+                onDetailClick(record.id);
+              }}
+            >
+              {intl.formatMessage({ id: 'app.detail' })}
+            </a>
+            <a
+              key="remove"
+              style={{
+                color: 'red',
+              }}
+              onClick={() => {
+                modal.error({
+                  title: intl.formatMessage({
+                    id: 'pages.account.user_group_list.column.option.delete_title',
+                  }),
+                  content: intl.formatMessage({
+                    id: 'pages.account.user_group_list.column.option.delete_content',
+                  }),
+                  okText: intl.formatMessage({ id: 'app.confirm' }),
+                  okType: 'primary',
+                  cancelText: intl.formatMessage({ id: 'app.cancel' }),
+                  centered: true,
+                  okCancel: true,
+                  onOk: async () => {
+                    setLoading(true);
+                    const { success } = await removeUserGroup(record.id)
+                      .catch(({ response: { data } }) => {
+                        return data;
+                      })
+                      .finally(() => {
+                        setLoading(false);
+                      });
+                    if (success) {
+                      message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                      actionRef.current?.reload();
+                      return;
                     }
-                    onConfirm={async () => {
-                      let success: boolean;
-                      const result = await removeUserGroup(item.id);
-                      success = result.success;
-                      if (success) {
-                        message.success(intl.formatMessage({ id: 'app.operation_success' }));
-                        actionRef.current?.reload();
-                        return;
-                      }
-                    }}
-                    okText={intl.formatMessage({ id: 'app.yes' })}
-                    cancelText={intl.formatMessage({ id: 'app.no' })}
-                  >
-                    <a
-                      target="_blank"
-                      key="remove"
-                      style={{
-                        color: 'red',
-                      }}
-                    >
-                      {intl.formatMessage({ id: 'app.delete' })}
-                    </a>
-                  </Popconfirm>,
-                ]}
-              >
-                <Card.Meta
-                  avatar={<Avatar>{item.name.substring(0, 1).toLocaleUpperCase()}</Avatar>}
-                  title={item.name}
-                  description={
-                    <Paragraph
-                      className={'user-group-remark'}
-                      ellipsis={{ tooltip: item.remark }}
-                      title={item.remark}
-                    >
-                      {item.remark ? item.remark : <>&nbsp;</>}
-                    </Paragraph>
-                  }
-                />
-              </Card>
-            );
-          }}
-          request={(params, sort, filter) => {
-            return getUserGroupList(params, sort, filter);
-          }}
-        />
-        {/*新增用户组*/}
-        <AddUserGroup
-          visible={addUserGroupVisible}
-          onFinish={async (values: AccountAPI.BaseUserGroup) => {
-            try {
-              let success = false;
-              const result = await createUserGroup(values);
-              success = result.success;
-              actionRef.current?.reload();
-              if (success) {
-                message.success(intl.formatMessage({ id: 'app.operation_success' }));
-                setAddUserGroupVisible(false);
-                return true;
-              }
-              return false;
-            } catch (e) {
-              return false;
+                  },
+                });
+              }}
+            >
+              {intl.formatMessage({ id: 'app.delete' })}
+            </a>
+          </Space>
+        );
+      },
+    },
+  ];
+
+  return (
+    <PageContainer content={intl.formatMessage({ id: 'pages.account.user_group_list.desc' })}>
+      <ProTable<AccountAPI.ListUserGroup>
+        actionRef={actionRef}
+        columns={columns}
+        pagination={{
+          size: 'small',
+          defaultPageSize: 10,
+          showSizeChanger: false,
+        }}
+        rowKey="id"
+        toolBarRender={() => {
+          return [
+            <Button
+              key={'create'}
+              type={'primary'}
+              onClick={() => {
+                setAddUserGroupVisible(true);
+              }}
+            >
+              <PlusOutlined />
+              {intl.formatMessage({
+                id: 'pages.account.user_group_list.create_button',
+              })}
+            </Button>,
+          ];
+        }}
+        loading={loading}
+        onLoadingChange={(loading) => {
+          if (typeof loading === 'boolean') {
+            setLoading(loading);
+          }
+        }}
+        form={{
+          // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
+          syncToUrl: (values, type) => {
+            if (type === 'get') {
+              return {
+                ...values,
+              };
             }
-          }}
-          onCancel={() => {
-            setAddUserGroupVisible(false);
-          }}
-        />
-      </PageContainer>
-    </div>
+            return values;
+          },
+        }}
+        request={(params, sort, filter) => {
+          return getUserGroupList(params, sort, filter);
+        }}
+        rowSelection={{
+          // 自定义选择项参考: https://ant.design/components/table-cn/#components-table-demo-row-selection-custom
+          // 注释该行则默认不显示下拉选项
+          selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
+        }}
+      />
+      {/*新增用户组*/}
+      <AddUserGroup
+        visible={addUserGroupVisible}
+        onFinish={async (values: AccountAPI.BaseUserGroup) => {
+          try {
+            let success: boolean;
+            const result = await createUserGroup(values);
+            success = result.success;
+            actionRef.current?.reload();
+            if (success) {
+              message.success(intl.formatMessage({ id: 'app.operation_success' }));
+              setAddUserGroupVisible(false);
+              return true;
+            }
+            return false;
+          } catch (e) {
+            return false;
+          }
+        }}
+        onCancel={() => {
+          setAddUserGroupVisible(false);
+        }}
+      />
+    </PageContainer>
   );
 };
-export default () => {
-  return <UserGroupList />;
-};
+export default UserGroupList;

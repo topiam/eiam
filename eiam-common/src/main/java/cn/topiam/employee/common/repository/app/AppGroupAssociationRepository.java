@@ -19,25 +19,25 @@ package cn.topiam.employee.common.repository.app;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.AppGroupAssociationEntity;
-import cn.topiam.employee.support.repository.LogicDeleteRepository;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 
 /**
  * 应用组成员
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023年09月06日22:03:18
+ * Created by support@topiam.cn on 2023年09月06日22:03:18
  */
 @Repository
 public interface AppGroupAssociationRepository extends
-                                               LogicDeleteRepository<AppGroupAssociationEntity, Long>,
+                                               JpaRepository<AppGroupAssociationEntity, String>,
                                                AppGroupAssociationRepositoryCustomized {
 
     /**
@@ -48,49 +48,41 @@ public interface AppGroupAssociationRepository extends
      */
     @Modifying
     @Transactional(rollbackFor = Exception.class)
-    @Query(value = "UPDATE app_group_association SET " + SOFT_DELETE_SET
-                   + " WHERE app_id = :appId and group_id = :groupId", nativeQuery = true)
-    void deleteByGroupIdAndAppId(@Param("groupId") Long groupId, @Param("appId") Long appId);
+    @Query("DELETE FROM AppGroupAssociationEntity ass WHERE ass.groupId = :groupId and ass.app.id = :appId ")
+    void deleteByGroupIdAndAppId(@Param("groupId") String groupId, @Param("appId") String appId);
 
     /**
      * 根据应用ID删除关联
      *
-     * @param appId {@link  Long}
-     * @return {@link  Boolean}
+     * @param appEntity {@link  AppEntity}
      */
     @Modifying
     @Transactional(rollbackFor = Exception.class)
-    @Query(value = "UPDATE app_group_association SET " + SOFT_DELETE_SET
-                   + " WHERE app_id = :appId", nativeQuery = true)
-    void deleteByAppId(@Param(value = "appId") Long appId);
+    void deleteByApp(AppEntity appEntity);
 
     /**
      * 根据应用组ID删除关联
      *
-     * @param groupId {@link  Long}
-     * @return {@link  Boolean}
+     * @param groupId {@link  String}
      */
     @Modifying
     @Transactional(rollbackFor = Exception.class)
-    @Query(value = "UPDATE app_group_association SET " + SOFT_DELETE_SET
-                   + " WHERE group_id = :groupId", nativeQuery = true)
-    void deleteAllByGroupId(@Param(value = "groupId") Long groupId);
-
-    /**
-     * 根据应用ID删除关联信息
-     *
-     * @param appId {@link Long}
-     */
-    @Modifying
-    @Query(value = "DELETE FROM app_group_association WHERE app_id = :appId AND is_deleted = '0'", nativeQuery = true)
-    void deleteAllByAppId(Long appId);
+    void deleteAllByGroupId(@Param(value = "groupId") String groupId);
 
     /**
      * 根据应用ID 查询关联信息
      *
-     * @param appId {@link Long}
+     * @param appId {@link String}
      * @return {@link List}
      */
-    @Query(value = "SELECT group_id FROM `app_group_association` ass LEFT JOIN app_group `group` ON ass.group_id = `group`.id_ WHERE  ass.app_id  = :appId AND ass.is_deleted = '0' AND `group`.is_deleted = '0'", nativeQuery = true)
-    List<Long> findGroupIdByAppId(Long appId);
+    @Query("SELECT ass.groupId FROM AppGroupAssociationEntity ass WHERE ass.app.id = :appId")
+    List<String> findGroupIdByAppId(String appId);
+
+    /**
+     * 按应用 ID
+     *
+     * @param appEntity {@link AppEntity}
+     * @return {@link List}
+     */
+    List<AppGroupAssociationEntity> findByApp(AppEntity appEntity);
 }

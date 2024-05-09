@@ -37,12 +37,17 @@ ENV TZ=Asia/Shanghai
 RUN sed -i 's/archive.ubuntu.com/cn.archive.ubuntu.com/g' /etc/apt/sources.list \
           && apt-get update \
           && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
-          && apt-get install tzdata \
           && apt-get clean \
           && apt-get autoclean \
-          && apt-get autoremove \
+          && apt-get autoremove -y \
+          && apt-get install -y curl \
+          && apt-get install -y iputils-ping \
+          && apt-get install -y wget \
+          && apt-get install -y tzdata \
+          && apt-get install -y fontconfig \
           && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+
 
 EXPOSE 1988
 
-ENTRYPOINT ["java","-XX:TieredStopAtLevel=1","-Djava.security.egd=file:/dev/./urandom","-Dspring.main.lazy-initialization=false","org.springframework.boot.loader.JarLauncher"]
+ENTRYPOINT ["java","-XX:TieredStopAtLevel=1","-Djava.security.egd=file:/dev/./urandom","-Dspring.main.lazy-initialization=false","org.springframework.boot.loader.launch.JarLauncher"]

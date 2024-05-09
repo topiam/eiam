@@ -41,7 +41,7 @@ import cn.topiam.employee.support.repository.page.domain.PageModel;
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-07-31
+ * Created by support@topiam.cn on 2020-07-31
  */
 public interface UserService {
 
@@ -78,7 +78,7 @@ public interface UserService {
      * @param status {@link UserStatus}
      * @return {@link Boolean}
      */
-    boolean changeUserStatus(Long id, UserStatus status);
+    boolean changeUserStatus(String id, UserStatus status);
 
     /**
      * 创建用户
@@ -136,7 +136,7 @@ public interface UserService {
      * @param id    {@link Long}
      * @return {@link Boolean}
      */
-    Boolean userParamCheck(CheckValidityType type, String value, Long id);
+    Boolean userParamCheck(CheckValidityType type, String value, String id);
 
     /**
      * 查看用户登录日志
@@ -145,7 +145,7 @@ public interface UserService {
      * @param pageModel {@link PageModel}
      * @return {@link   List}
      */
-    Page<UserLoginAuditListResult> findUserLoginAuditList(Long id, PageModel pageModel);
+    Page<UserLoginAuditListResult> findUserLoginAuditList(String id, PageModel pageModel);
 
     /**
      * 批量获取用户信息
@@ -153,5 +153,5 @@ public interface UserService {
      * @param ids {@link List}
      * @return {@link List}
      */
-    List<BatchUserResult> batchGetUser(List<Long> ids);
+    List<BatchUserResult> batchGetUser(List<String> ids);
 }

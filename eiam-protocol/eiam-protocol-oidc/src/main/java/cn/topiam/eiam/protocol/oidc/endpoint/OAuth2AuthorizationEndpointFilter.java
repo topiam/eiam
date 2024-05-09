@@ -23,20 +23,25 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.log.LogMessage;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationResponse;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
@@ -55,24 +60,35 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.util.matcher.*;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.UriUtils;
+
+import com.google.common.collect.Sets;
 
 import cn.topiam.eiam.protocol.oidc.authentication.OAuth2AuthorizationImplicitAccessTokenAuthenticationToken;
 import cn.topiam.eiam.protocol.oidc.authentication.OAuth2AuthorizationImplicitRequestAuthenticationException;
 import cn.topiam.eiam.protocol.oidc.authentication.OAuth2AuthorizationImplicitRequestAuthenticationToken;
 import cn.topiam.eiam.protocol.oidc.endpoint.authentication.OAuth2AuthorizationImplicitRequestAuthenticationConverter;
+import cn.topiam.employee.application.context.ApplicationContext;
+import cn.topiam.employee.application.context.ApplicationContextHolder;
+import cn.topiam.employee.application.oidc.model.OidcProtocolConfig;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.security.oauth2.core.OAuth2ErrorCodes.UNSUPPORTED_RESPONSE_TYPE;
 import static org.springframework.security.oauth2.core.OAuth2TokenIntrospectionClaimNames.TOKEN_TYPE;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.*;
 
+import static cn.topiam.eiam.protocol.oidc.constant.OidcProtocolConstants.OIDC_ERROR_URI;
 import static cn.topiam.eiam.protocol.oidc.endpoint.OAuth2EndpointUtils.appendUrl;
+import static cn.topiam.eiam.protocol.oidc.endpoint.OAuth2ParameterNames.FRAGMENT;
+import static cn.topiam.eiam.protocol.oidc.endpoint.OAuth2ParameterNames.RESPONSE_MODE;
 import static cn.topiam.eiam.protocol.oidc.endpoint.authentication.OAuth2AuthorizationImplicitRequestAuthenticationConverter.ID_TOKEN;
 import static cn.topiam.eiam.protocol.oidc.endpoint.authentication.OAuth2AuthorizationImplicitRequestAuthenticationConverter.TOKEN;
 
@@ -80,7 +96,7 @@ import static cn.topiam.eiam.protocol.oidc.endpoint.authentication.OAuth2Authori
  * 处理授权请求
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/26 21:52
+ * Created by support@topiam.cn on 2023/6/26 21:52
  * @see <a target="_blank" href="https://datatracker.ietf.org/doc/html/rfc6749#section-4.1">Section 4.1 Authorization Code Grant</a>
  * @see <a target="_blank" href="https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.1">Section 4.1.1 Authorization Request</a>
  * @see <a target="_blank" href="https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2">Section 4.1.2 Authorization Response</a>
@@ -91,7 +107,9 @@ public final class OAuth2AuthorizationEndpointFilter extends OncePerRequestFilte
     /**
      * The default endpoint {@code URI} for authorization requests.
      */
-    private static final String DEFAULT_AUTHORIZATION_ENDPOINT_URI = "/oauth2/authorize";
+    private static final String         DEFAULT_AUTHORIZATION_ENDPOINT_URI = "/oauth2/authorize";
+    private static final Authentication ANONYMOUS_AUTHENTICATION           = new AnonymousAuthenticationToken(
+        "anonymous", "anonymousUser", AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS"));
 
     /**
      * Constructs an {@code OAuth2AuthorizationEndpointFilter} using the provided parameters.
@@ -120,17 +138,38 @@ public final class OAuth2AuthorizationEndpointFilter extends OncePerRequestFilte
         this.authenticationManager = authenticationManager;
         this.authorizationEndpointMatcher = createDefaultRequestMatcher(authorizationEndpointUri);
         this.authenticationConverter = request -> {
+            //@formatter:off
+            //sept1：只允许GET 和POST 请求，并判断是否存在请求参数，没有请求对象，走自发起认证模式
+            if (isRequestWithoutParams(request)) {
+                //获取应用配置
+                ApplicationContext context = ApplicationContextHolder.getApplicationContext();
+                String clientId = context.getClientId();
+                OidcProtocolConfig config = (OidcProtocolConfig) context.getConfig().get(OidcProtocolConfig.class.getName());
+
+                String authorizationUri = request.getRequestURL().toString();
+
+                Authentication principal = SecurityContextHolder.getContext().getAuthentication();
+                if (principal == null) {
+                    principal = ANONYMOUS_AUTHENTICATION;
+                }
+                //重定向地址未配置
+                if (CollectionUtils.isEmpty(config.getRedirectUris())){
+                    OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST, "OAuth 2.0 Parameter: " + OAuth2ParameterNames.REDIRECT_URI,null);
+                    throw new OAuth2AuthorizationCodeRequestAuthenticationException(error, null);
+                }
+                return new OAuth2AuthorizationCodeRequestAuthenticationToken(authorizationUri, clientId, principal, new ArrayList<>(config.getRedirectUris()).get(0), RandomStringUtils.randomAlphanumeric(32).toLowerCase(), config.getGrantScopes(),null);
+            }
             try {
-                //先走授权码模式转换器
+                //step2: 如果step1返回值为null，尝试走授权码模式转换器（此为Spring授权服务器内置）
                 return new OAuth2AuthorizationCodeRequestAuthenticationConverter().convert(request);
             } catch (OAuth2AuthorizationCodeRequestAuthenticationException e) {
-                //不支持响应类型异常：unsupported_response_type，尝试走简化模式转换器
+                //step3: 抛出不支持响应类型异常：unsupported_response_type，尝试走简化模式转换器
                 if (UNSUPPORTED_RESPONSE_TYPE.equals(e.getError().getErrorCode())) {
-                    return new OAuth2AuthorizationImplicitRequestAuthenticationConverter()
-                        .convert(request);
+                    return new OAuth2AuthorizationImplicitRequestAuthenticationConverter().convert(request);
                 }
                 throw e;
             }
+            //@formatter:on
         };
     }
 
@@ -141,14 +180,18 @@ public final class OAuth2AuthorizationEndpointFilter extends OncePerRequestFilte
      * @return {@link RequestMatcher}
      */
     private static RequestMatcher createDefaultRequestMatcher(String authorizationEndpointUri) {
+        //Get 请求
         RequestMatcher authorizationRequestGetMatcher = new AntPathRequestMatcher(
             authorizationEndpointUri, HttpMethod.GET.name());
+        //Post 请求
         RequestMatcher authorizationRequestPostMatcher = new AntPathRequestMatcher(
             authorizationEndpointUri, HttpMethod.POST.name());
+        //openid scope 匹配
         RequestMatcher openidScopeMatcher = request -> {
             String scope = request.getParameter(OAuth2ParameterNames.SCOPE);
             return StringUtils.isNotBlank(scope) && scope.contains(OidcScopes.OPENID);
         };
+        //response_type 参数匹配
         RequestMatcher responseTypeParameterMatcher = request -> request
             .getParameter(OAuth2ParameterNames.RESPONSE_TYPE) != null;
 
@@ -227,7 +270,7 @@ public final class OAuth2AuthorizationEndpointFilter extends OncePerRequestFilte
         //授权码请求
         if (authentication instanceof OAuth2AuthorizationCodeRequestAuthenticationToken authenticationToken) {
             UriComponentsBuilder uriBuilder = UriComponentsBuilder
-                .fromUriString(StringUtils.defaultString(authenticationToken.getRedirectUri()))
+                .fromUriString(Objects.toString(authenticationToken.getRedirectUri()))
                 .queryParam(OAuth2ParameterNames.CODE,
                     ObjectUtils.isNotEmpty(authenticationToken.getAuthorizationCode())
                         ? authenticationToken.getAuthorizationCode().getTokenValue()
@@ -274,7 +317,16 @@ public final class OAuth2AuthorizationEndpointFilter extends OncePerRequestFilte
             if (org.springframework.util.StringUtils.hasText(state)) {
                 vars.put(OAuth2ParameterNames.STATE, state);
             }
-            redirectUri = appendUrl(redirectUri, vars, keys, true);
+            String responseMode = (String) authenticationToken.getAdditionalParameters()
+                .get(RESPONSE_MODE);
+            //如果该参数为空，或者值为 fragment，则将参数拼接到url后面
+            if (StringUtils.isBlank(responseMode) || StringUtils.equals(responseMode, FRAGMENT)) {
+                redirectUri = appendUrl(redirectUri, vars, keys, true);
+            }
+            //query 模式
+            else {
+                redirectUri = appendUrl(redirectUri, vars, keys, false);
+            }
             this.redirectStrategy.sendRedirect(request, response, redirectUri);
         }
     }
@@ -289,82 +341,86 @@ public final class OAuth2AuthorizationEndpointFilter extends OncePerRequestFilte
      */
     private void sendErrorResponse(HttpServletRequest request, HttpServletResponse response,
                                    AuthenticationException exception) throws IOException {
-
+        OAuth2Error error = null;
+        AbstractAuthenticationToken requestAuthenticationToken = null;
+        String redirectUri = null;
+        String state = null;
         //隐式授权模式
-        if (exception instanceof OAuth2AuthorizationImplicitRequestAuthenticationException authorizationImplicitRequestAuthenticationException) {
-            OAuth2Error error = authorizationImplicitRequestAuthenticationException.getError();
-            OAuth2Error responseError = new OAuth2Error(error.getErrorCode(),
-                error.getDescription(), "https://eiam.topiam.cn");
-            OAuth2AuthorizationImplicitRequestAuthenticationToken authorizationImplicitRequestAuthenticationToken = authorizationImplicitRequestAuthenticationException
+        if (exception instanceof OAuth2AuthorizationImplicitRequestAuthenticationException e) {
+            error = e.getError();
+            //获取请求对象
+            OAuth2AuthorizationImplicitRequestAuthenticationToken authenticationToken = e
                 .getAuthorizationImplicitRequestAuthenticationToken();
-            if (authorizationImplicitRequestAuthenticationToken == null || !StringUtils
-                .isNotBlank(authorizationImplicitRequestAuthenticationToken.getRedirectUri())) {
-                response.sendError(HttpStatus.BAD_REQUEST.value(), responseError.toString());
-                return;
+            if (!Objects.isNull(authenticationToken)) {
+                requestAuthenticationToken = authenticationToken;
+                //获取重定向地址
+                redirectUri = authenticationToken.getRedirectUri();
+                //获取state
+                state = authenticationToken.getState();
             }
-
-            if (this.logger.isTraceEnabled()) {
-                this.logger.trace("Redirecting to client with error");
-            }
-            UriComponentsBuilder uriBuilder = UriComponentsBuilder
-                .fromUriString(authorizationImplicitRequestAuthenticationToken.getRedirectUri())
-                .queryParam(OAuth2ParameterNames.ERROR, responseError.getErrorCode());
-            if (StringUtils.isNotBlank(responseError.getDescription())) {
-                uriBuilder.queryParam(OAuth2ParameterNames.ERROR_DESCRIPTION,
-                    UriUtils.encode(responseError.getDescription(), StandardCharsets.UTF_8));
-            }
-            if (StringUtils.isNotBlank(responseError.getUri())) {
-                uriBuilder.queryParam(OAuth2ParameterNames.ERROR_URI,
-                    UriUtils.encode(responseError.getUri(), StandardCharsets.UTF_8));
-            }
-            if (StringUtils
-                .isNotBlank(authorizationImplicitRequestAuthenticationToken.getState())) {
-                uriBuilder.queryParam(OAuth2ParameterNames.STATE,
-                    UriUtils.encode(authorizationImplicitRequestAuthenticationToken.getState(),
-                        StandardCharsets.UTF_8));
-            }
-            // build(true) -> Components are explicitly encoded
-            String redirectUri = uriBuilder.build(true).toUriString();
-            this.redirectStrategy.sendRedirect(request, response, redirectUri);
         }
         //授权码模式
-        if (exception instanceof OAuth2AuthorizationCodeRequestAuthenticationException authorizationCodeRequestAuthenticationException) {
-            OAuth2Error error = authorizationCodeRequestAuthenticationException.getError();
-            OAuth2Error responseError = new OAuth2Error(error.getErrorCode(),
-                error.getDescription(), "https://eiam.topiam.cn");
-            OAuth2AuthorizationCodeRequestAuthenticationToken authorizationCodeRequestAuthentication = authorizationCodeRequestAuthenticationException
+        if (exception instanceof OAuth2AuthorizationCodeRequestAuthenticationException e) {
+            error = e.getError();
+
+            //获取请求对象
+            OAuth2AuthorizationCodeRequestAuthenticationToken authenticationToken = e
                 .getAuthorizationCodeRequestAuthentication();
-            if (authorizationCodeRequestAuthentication == null || !StringUtils
-                .isNotBlank(authorizationCodeRequestAuthentication.getRedirectUri())) {
-                response.sendError(HttpStatus.BAD_REQUEST.value(), responseError.toString());
-                return;
+            if (!Objects.isNull(authenticationToken)) {
+                requestAuthenticationToken = authenticationToken;
+                //获取重定向地址
+                redirectUri = authenticationToken.getRedirectUri();
+                //获取state
+                state = authenticationToken.getState();
             }
 
-            if (this.logger.isTraceEnabled()) {
-                this.logger.trace("Redirecting to client with error");
-            }
-            UriComponentsBuilder uriBuilder = UriComponentsBuilder
-                .fromUriString(authorizationCodeRequestAuthentication.getRedirectUri())
-                .queryParam(OAuth2ParameterNames.ERROR, responseError.getErrorCode());
-            if (StringUtils.isNotBlank(responseError.getDescription())) {
-                uriBuilder.queryParam(OAuth2ParameterNames.ERROR_DESCRIPTION,
-                    UriUtils.encode(responseError.getDescription(), StandardCharsets.UTF_8));
-            }
-            if (StringUtils.isNotBlank(responseError.getUri())) {
-                uriBuilder.queryParam(OAuth2ParameterNames.ERROR_URI,
-                    UriUtils.encode(responseError.getUri(), StandardCharsets.UTF_8));
-            }
-            if (StringUtils.isNotBlank(authorizationCodeRequestAuthentication.getState())) {
-                uriBuilder.queryParam(OAuth2ParameterNames.STATE, UriUtils.encode(
-                    authorizationCodeRequestAuthentication.getState(), StandardCharsets.UTF_8));
-            }
-            // build(true) -> Components are explicitly encoded
-            String redirectUri = uriBuilder.build(true).toUriString();
-            this.redirectStrategy.sendRedirect(request, response, redirectUri);
         }
+
+        if (Objects.isNull(error)) {
+            return;
+        }
+
+        // 包装错误响应
+        OAuth2Error responseError = new OAuth2Error(error.getErrorCode(), error.getDescription(),
+            OIDC_ERROR_URI);
+
+        if (Objects.isNull(requestAuthenticationToken) || !StringUtils.isNotBlank(redirectUri)) {
+            response.sendError(HttpStatus.BAD_REQUEST.value(), responseError.toString());
+            return;
+        }
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace("Redirecting to client with error");
+        }
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(redirectUri)
+            .queryParam(OAuth2ParameterNames.ERROR, responseError.getErrorCode());
+        if (StringUtils.isNotBlank(responseError.getDescription())) {
+            uriBuilder.queryParam(OAuth2ParameterNames.ERROR_DESCRIPTION,
+                UriUtils.encode(responseError.getDescription(), StandardCharsets.UTF_8));
+        }
+        if (StringUtils.isNotBlank(responseError.getUri())) {
+            uriBuilder.queryParam(OAuth2ParameterNames.ERROR_URI,
+                UriUtils.encode(responseError.getUri(), StandardCharsets.UTF_8));
+        }
+        if (StringUtils.isNotBlank(state)) {
+            uriBuilder.queryParam(OAuth2ParameterNames.STATE,
+                UriUtils.encode(state, StandardCharsets.UTF_8));
+        }
+        // build(true) -> Components are explicitly encoded
+        redirectUri = uriBuilder.build(true).toUriString();
+        this.redirectStrategy.sendRedirect(request, response, redirectUri);
 
     }
 
+    private boolean isRequestWithoutParams(HttpServletRequest request) {
+        Map<String, String[]> paramMap = request.getParameterMap();
+        return paramMap.isEmpty();
+    }
+
+    /**
+     * OAuth2AuthorizationService
+     */
     private final OAuth2AuthorizationService                   authorizationService;
 
     /**

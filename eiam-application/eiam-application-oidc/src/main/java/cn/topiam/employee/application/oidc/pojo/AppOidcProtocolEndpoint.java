@@ -22,14 +22,13 @@ import java.io.Serializable;
 
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 协议端点域
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/4 23:37
+ * Created by support@topiam.cn on 2022/6/4 23:37
  */
 @Data
 @Schema(description = "协议端点")
@@ -40,48 +39,48 @@ public class AppOidcProtocolEndpoint implements Serializable {
     /**
      * oidcIssuer
      */
-    @Parameter(description = "Issuer")
+    @Schema(description = "Issuer")
     private String            issuer;
 
     /**
      * discoveryEndpoint
      */
-    @Parameter(description = "Discovery Endpoint")
+    @Schema(description = "Discovery Endpoint")
     private String            discoveryEndpoint;
 
     /**
      * UserinfoEndpoint
      */
-    @Parameter(description = "UserInfo Endpoint")
+    @Schema(description = "UserInfo Endpoint")
     private String            userinfoEndpoint;
 
     /**
      * jwksEndpoint
      */
-    @Parameter(description = "Jwks Endpoint")
+    @Schema(description = "Jwks Endpoint")
     private String            jwksEndpoint;
 
     /**
      * revokeEndpoint
      */
-    @Parameter(description = "Revoke Endpoint")
+    @Schema(description = "Revoke Endpoint")
     private String            revokeEndpoint;
 
     /**
      * tokenEndpoint
      */
-    @Parameter(description = "Token Endpoint")
+    @Schema(description = "Token Endpoint")
     private String            tokenEndpoint;
 
     /**
      * authorizationEndpoint
      */
-    @Parameter(description = "Authorization Endpoint")
+    @Schema(description = "Authorization Endpoint")
     private String            authorizationEndpoint;
 
     /**
      * endSessionEndpoint
      */
-    @Parameter(description = "End Session Endpoint")
+    @Schema(description = "End Session Endpoint")
     private String            endSessionEndpoint;
 }

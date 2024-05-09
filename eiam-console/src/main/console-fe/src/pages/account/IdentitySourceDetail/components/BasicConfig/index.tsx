@@ -22,8 +22,8 @@ import type { RefObject } from 'react';
 import { BASIC_CONFIG_FROM_PARAM } from '../../constant';
 import DingTalkConfig from './DingTalkConfig';
 import FeiShuConfig from './FeiShuConfig';
-import WeChatWorkConfig from './WeChatWorkConfig';
 import { IdentitySourceProvider } from '@/constant';
+import { useIntl } from '@@/exports';
 
 const { Paragraph } = Typography;
 export interface BasicConfigInstance {
@@ -40,21 +40,13 @@ type BasicConfigProps = {
 };
 
 export default (props: BasicConfigProps) => {
+  const intl = useIntl();
   const { provider, configured, basicConfigRef, onConfigValidator, formRef } = props;
   return (
     <>
       {/*钉钉*/}
       {provider === IdentitySourceProvider.dingtalk && (
         <DingTalkConfig
-          configured={configured}
-          basicConfigRef={basicConfigRef}
-          onConfigValidator={onConfigValidator}
-          formRef={formRef}
-        />
-      )}
-      {/*微信*/}
-      {provider === IdentitySourceProvider.wework && (
-        <WeChatWorkConfig
           configured={configured}
           basicConfigRef={basicConfigRef}
           onConfigValidator={onConfigValidator}
@@ -70,29 +62,29 @@ export default (props: BasicConfigProps) => {
           formRef={formRef}
         />
       )}
-      {provider !== IdentitySourceProvider.ldap && provider !== IdentitySourceProvider.ad && (
-        <ProFormText
-          label="回调地址"
-          name={BASIC_CONFIG_FROM_PARAM.callbackUrl}
-          proFieldProps={{
-            render: (value: string) => {
-              return (
-                value && (
-                  <Paragraph copyable={{ text: value }} style={{ marginBottom: '0' }}>
-                    <span
-                      dangerouslySetInnerHTML={{
-                        __html: `<span>${value}</span>`,
-                      }}
-                    />
-                  </Paragraph>
-                )
-              );
-            },
-          }}
-          readonly
-          fieldProps={{ autoComplete: 'off' }}
-        />
-      )}
+      <ProFormText
+        label={intl.formatMessage({
+          id: 'pages.account.identity_source_detail.common.callback_uri',
+        })}
+        name={BASIC_CONFIG_FROM_PARAM.callbackUrl}
+        proFieldProps={{
+          render: (value: string) => {
+            return (
+              value && (
+                <Paragraph copyable={{ text: value }} style={{ marginBottom: '0' }}>
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html: `<span>${value}</span>`,
+                    }}
+                  />
+                </Paragraph>
+              )
+            );
+          },
+        }}
+        readonly
+        fieldProps={{ autoComplete: 'off' }}
+      />
     </>
   );
 };

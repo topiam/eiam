@@ -21,12 +21,11 @@ import java.io.Serial;
 import java.util.Objects;
 
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SoftDelete;
 
-import cn.topiam.employee.common.enums.DataOrigin;
 import cn.topiam.employee.common.enums.account.OrganizationType;
-import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
+import cn.topiam.employee.support.repository.SoftDeleteConverter;
+import cn.topiam.employee.support.repository.base.BaseEntity;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -35,8 +34,7 @@ import lombok.ToString;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
+import static cn.topiam.employee.support.repository.base.BaseEntity.IS_DELETED_COLUMN;
 
 /**
  * <p>
@@ -44,16 +42,15 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
  * </p>
  *
  * @author TopIAM Automatic generated
- * Created by support@topiam.cn on  2020-08-09
+ * Created by support@topiam.cn on 2020-08-09
  */
 @Getter
 @Setter
 @ToString
 @Entity
-@Table(name = "organization")
-@SQLDelete(sql = "update organization set " + SOFT_DELETE_SET + " where id_ = ?")
-@Where(clause = SOFT_DELETE_WHERE)
-public class OrganizationEntity extends LogicDeleteEntity<String> {
+@Table(name = "eiam_organization")
+@SoftDelete(columnName = IS_DELETED_COLUMN, converter = SoftDeleteConverter.class)
+public class OrganizationEntity extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = 8143944323232082295L;
@@ -104,13 +101,13 @@ public class OrganizationEntity extends LogicDeleteEntity<String> {
      * 数据来源
      */
     @Column(name = "data_origin")
-    private DataOrigin        dataOrigin;
+    private String            dataOrigin;
 
     /**
      * 身份源id
      */
     @Column(name = "identity_source_id")
-    private Long              identitySourceId;
+    private String            identitySourceId;
 
     /**
      * 排序

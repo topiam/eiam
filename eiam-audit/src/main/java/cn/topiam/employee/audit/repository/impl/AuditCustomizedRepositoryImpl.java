@@ -19,8 +19,10 @@ package cn.topiam.employee.audit.repository.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.audit.event.type.EventType;
@@ -35,58 +37,69 @@ import lombok.RequiredArgsConstructor;
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/10/2 02:54
+ * Created by support@topiam.cn on 2022/10/2 02:54
  */
 @Repository
 @RequiredArgsConstructor
 public class AuditCustomizedRepositoryImpl implements AuditCustomizedRepository {
 
     /**
-     * JdbcTemplate
+     * NamedParameterJdbcTemplate
      */
-    private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Override
-    public List<AuditStatisticsResult> authnHotProvider(EventType type, LocalDateTime startTime,
+    public List<AuditStatisticsResult> authnHotProvider(List<EventType> types,
+                                                        LocalDateTime startTime,
                                                         LocalDateTime endTime) {
         String sql = """
                         SELECT
                             actor_auth_type AS key_,
                             COUNT(*) AS count_
                         FROM
-                            audit
+                            eiam_audit
                         WHERE
-                            event_type = ?
-                            AND event_time BETWEEN ?
-                            AND ?
+                            event_type IN (:types)
+                            AND event_time BETWEEN :startTime
+                            AND :endTime
                         GROUP BY
                             actor_auth_type
+                        ORDER BY count_
                 """;
-        return jdbcTemplate.query(sql, new AuditStatisticsResultMapper(), type.getCode(), startTime,
-            endTime);
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("types",
+            types.stream().map(EventType::getCode).collect(Collectors.toList()));
+        params.addValue("startTime", startTime);
+        params.addValue("endTime", endTime);
+        return namedParameterJdbcTemplate.query(sql, params, new AuditStatisticsResultMapper());
     }
 
     @Override
-    public List<AuthnQuantityResult> authnQuantity(EventType type, LocalDateTime startTime,
+    public List<AuthnQuantityResult> authnQuantity(List<EventType> types, LocalDateTime startTime,
                                                    LocalDateTime endTime, String dateFormat) {
         String sql = """
                         SELECT
-                            DATE_FORMAT( event_time, ? ) AS name_,
+                            DATE_FORMAT( event_time, :dateFormat ) AS name_,
                             COUNT(*) AS count_,
                             event_status AS status_
                          FROM
-                            audit
+                            eiam_audit
                          WHERE
-                            event_type = ?
-                            AND event_time BETWEEN ?
-                            AND ?
+                            event_type IN (:types)
+                            AND event_time BETWEEN :startTime
+                            AND :endTime
                          GROUP BY
-                            DATE_FORMAT( event_time, ? ),
+                            DATE_FORMAT( event_time, :dateFormat ),
                             event_status
+                        ORDER BY name_
                 """;
-
-        return jdbcTemplate.query(sql, new AuthnQuantityResultMapper(), dateFormat, type.getCode(),
-            startTime, endTime, dateFormat);
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("types",
+            types.stream().map(EventType::getCode).collect(Collectors.toList()));
+        params.addValue("startTime", startTime);
+        params.addValue("endTime", endTime);
+        params.addValue("dateFormat", dateFormat);
+        return namedParameterJdbcTemplate.query(sql, params, new AuthnQuantityResultMapper());
     }
 
     @Override
@@ -97,41 +110,49 @@ public class AuditCustomizedRepositoryImpl implements AuditCustomizedRepository 
                             JSON_EXTRACT( target_, '$[0].id' ) AS key_,
                             COUNT(*) AS count_
                          FROM
-                            audit
+                            eiam_audit
                          WHERE
-                            event_type = ?
-                            AND event_time BETWEEN ?
-                            AND ?
+                            event_type = :type
+                            AND event_time BETWEEN :startTime
+                            AND :endTime
                          GROUP BY
                             JSON_EXTRACT(
                                 target_,
                             '$[0].id'
                             )
+                        ORDER BY count_
                 """;
-        return jdbcTemplate.query(sql, new AuditStatisticsResultMapper(), type.getCode(), startTime,
-            endTime);
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("type", type.getCode());
+        params.addValue("startTime", startTime);
+        params.addValue("endTime", endTime);
+        return namedParameterJdbcTemplate.query(sql, params, new AuditStatisticsResultMapper());
     }
 
     @Override
-    public List<AuditStatisticsResult> authnZone(EventType type, LocalDateTime startTime,
+    public List<AuditStatisticsResult> authnZone(List<EventType> types, LocalDateTime startTime,
                                                  LocalDateTime endTime) {
         String sql = """
                         SELECT
-                            JSON_EXTRACT( target_, '$.provinceCode' ) AS key_,
+                            JSON_EXTRACT( geo_location, '$.provinceCode' ) AS key_,
                             COUNT(*) AS count_
                          FROM
-                            audit
+                            eiam_audit
                          WHERE
-                            event_type = ?
-                            AND event_time BETWEEN ?
-                            AND ?
+                            event_type IN (:types)
+                            AND event_time BETWEEN :startTime
+                            AND :endTime
                          GROUP BY
                          	JSON_EXTRACT(
-                         		target_,
+                         	geo_location,
                          	'$.provinceCode'
                          	)
                 """;
-        return jdbcTemplate.query(sql, new AuditStatisticsResultMapper(), type.getCode(), startTime,
-            endTime);
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("types",
+            types.stream().map(EventType::getCode).collect(Collectors.toList()));
+        params.addValue("startTime", startTime);
+        params.addValue("endTime", endTime);
+        return namedParameterJdbcTemplate.query(sql, params, new AuditStatisticsResultMapper());
     }
 }

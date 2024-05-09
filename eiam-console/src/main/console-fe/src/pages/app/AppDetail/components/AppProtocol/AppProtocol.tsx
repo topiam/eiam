@@ -16,8 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { AppProtocolType } from '@/constant';
-import { getApp } from '../../service';
-import { ProCard } from '@ant-design/pro-components';
 
 import { useAsyncEffect } from 'ahooks';
 import { Skeleton } from 'antd';
@@ -26,19 +24,16 @@ import FromConfig from './FromProtocolConfig';
 import JwtConfig from './JwtProtocolConfig';
 import OidcConfig from './OidcProtocolConfig';
 import { GetApp } from '../../data.d';
+import { useModel } from '@@/exports';
 
-export default (props: { appId: string }) => {
-  const { appId } = props;
+export default () => {
+  const { app } = useModel('app.AppDetail.model');
   const [loading, setLoading] = useState<boolean>(true);
-  const [app, setApp] = useState<GetApp>();
   useAsyncEffect(async () => {
     setLoading(true);
-    const { result, success } = await getApp(appId);
-    if (success && result) {
-      setApp(result);
-    }
+
     setLoading(false);
-  }, []);
+  }, [app]);
 
   const ComponentByKey = ({ key, app }: { key: string; app: GetApp }) => {
     const components = {
@@ -50,10 +45,8 @@ export default (props: { appId: string }) => {
     return <Component app={app} />;
   };
   return (
-    <ProCard>
-      <Skeleton loading={loading} active={true} paragraph={{ rows: 5 }}>
-        {app && ComponentByKey({ key: app?.protocol, app: app })}
-      </Skeleton>
-    </ProCard>
+    <Skeleton loading={loading} active={true} paragraph={{ rows: 5 }}>
+      {app && ComponentByKey({ key: app?.protocol, app: app })}
+    </Skeleton>
   );
 };

@@ -20,6 +20,7 @@ package cn.topiam.employee.audit.enums;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import cn.topiam.employee.audit.event.type.EventType;
+import cn.topiam.employee.support.exception.BadParamsException;
 import cn.topiam.employee.support.web.converter.EnumConvert;
 
 import lombok.Getter;
@@ -28,7 +29,7 @@ import lombok.Getter;
  * 目标类型
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/10/27 23:46
+ * Created by support@topiam.cn on 2022/10/27 23:46
  */
 @Getter
 public enum TargetType {
@@ -126,7 +127,11 @@ public enum TargetType {
                         /**
                          * 门户端
                          */
-                        PORTAL("portal", "门户端");
+                        PORTAL("portal", "门户端"),
+                        /**
+                         * 用户绑定三方用户
+                         */
+                        USER_IDP("user_idp", "用户绑定三方用户");
 
     @JsonValue
     private final String code;
@@ -151,7 +156,7 @@ public enum TargetType {
                 return status;
             }
         }
-        return null;
+        throw new BadParamsException("无效的目标类型");
     }
 
 }

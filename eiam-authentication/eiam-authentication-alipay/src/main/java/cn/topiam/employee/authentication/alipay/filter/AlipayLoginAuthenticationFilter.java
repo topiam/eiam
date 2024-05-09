@@ -33,20 +33,19 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.alipay.easysdk.kernel.Client;
 import com.alipay.easysdk.kernel.Config;
 import com.alipay.easysdk.kernel.Context;
 
-import cn.topiam.employee.authentication.alipay.AlipayIdpOAuth2Config;
+import cn.topiam.employee.authentication.alipay.AlipayIdentityProviderOAuth2Config;
 import cn.topiam.employee.authentication.alipay.client.AlipayClient;
 import cn.topiam.employee.authentication.alipay.client.AlipaySystemOauthTokenResponse;
-import cn.topiam.employee.authentication.common.authentication.IdpUserDetails;
-import cn.topiam.employee.authentication.common.filter.AbstractIdpAuthenticationProcessingFilter;
-import cn.topiam.employee.authentication.common.service.UserIdpService;
-import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
-import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
-import cn.topiam.employee.core.help.ServerHelp;
+import cn.topiam.employee.authentication.common.IdentityProviderAuthenticationService;
+import cn.topiam.employee.authentication.common.authentication.IdentityProviderUserDetails;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClient;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClientRepository;
+import cn.topiam.employee.authentication.common.filter.AbstractIdentityProviderAuthenticationProcessingFilter;
+import cn.topiam.employee.core.context.ContextService;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.support.util.UrlUtils;
@@ -54,21 +53,19 @@ import cn.topiam.employee.support.util.UrlUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import static com.taobao.api.Constants.SDK_VERSION;
-
 import static cn.topiam.employee.authentication.alipay.constant.AlipayAuthenticationConstants.AUTH_CODE;
 import static cn.topiam.employee.authentication.common.IdentityProviderType.ALIPAY_OAUTH;
 import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.*;
-import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.INVALID_STATE_PARAMETER_ERROR_CODE;
 
 /**
  * 支付宝 登录过滤器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/8/19 17:58
+ * Created by support@topiam.cn on 2023/8/19 17:58
  */
 @SuppressWarnings("DuplicatedCode")
-public class AlipayLoginAuthenticationFilter extends AbstractIdpAuthenticationProcessingFilter {
+public class AlipayLoginAuthenticationFilter extends
+                                             AbstractIdentityProviderAuthenticationProcessingFilter {
     public final static String                DEFAULT_FILTER_PROCESSES_URI = ALIPAY_OAUTH
         .getLoginPathPrefix() + "/" + "{" + PROVIDER_CODE + "}";
     public static final AntPathRequestMatcher REQUEST_MATCHER              = new AntPathRequestMatcher(
@@ -77,12 +74,13 @@ public class AlipayLoginAuthenticationFilter extends AbstractIdpAuthenticationPr
     /**
      * Creates a new instance
      *
-     * @param userIdpService             {@link  UserIdpService}
-     * @param identityProviderRepository {@link IdentityProviderRepository}
+     * @param identityProviderAuthenticationService             {@link  IdentityProviderAuthenticationService}
+     * @param registeredIdentityProviderClientRepository {@link RegisteredIdentityProviderClientRepository}
      */
-    public AlipayLoginAuthenticationFilter(UserIdpService userIdpService,
-                                           IdentityProviderRepository identityProviderRepository) {
-        super(REQUEST_MATCHER, userIdpService, identityProviderRepository);
+    public AlipayLoginAuthenticationFilter(IdentityProviderAuthenticationService identityProviderAuthenticationService,
+                                           RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository) {
+        super(REQUEST_MATCHER, identityProviderAuthenticationService,
+            registeredIdentityProviderClientRepository);
     }
 
     @Override
@@ -118,9 +116,9 @@ public class AlipayLoginAuthenticationFilter extends AbstractIdpAuthenticationPr
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
         }
         //获取身份提供商
-        IdentityProviderEntity provider = getIdentityProviderEntity(providerCode);
-        AlipayIdpOAuth2Config idpOauthConfig = JSONObject.parseObject(provider.getConfig(),
-            AlipayIdpOAuth2Config.class);
+        RegisteredIdentityProviderClient<AlipayIdentityProviderOAuth2Config> provider = getRegisteredIdentityProviderClient(
+            providerCode);
+        AlipayIdentityProviderOAuth2Config idpOauthConfig = provider.getConfig();
         if (Objects.isNull(idpOauthConfig)) {
             logger.error("未查询到支付宝登录配置");
             //无效身份提供商
@@ -129,23 +127,23 @@ public class AlipayLoginAuthenticationFilter extends AbstractIdpAuthenticationPr
         }
         try {
             AlipayClient client = new AlipayClient(
-                new Client(new Context(getConfig(idpOauthConfig), SDK_VERSION)));
+                new Client(new Context(getConfig(idpOauthConfig), "topiam")));
             AlipaySystemOauthTokenResponse token = client.getOauthToken(code);
             if (!StringUtils.isBlank(token.getCode())) {
                 logger.error("支付宝认证获取 access_token 失败: [" + token.getHttpBody() + "]");
                 throw new TopIamException(token.getSubMsg());
             }
             //执行逻辑
-            IdpUserDetails idpUserDetails = IdpUserDetails.builder().openId(token.getOpenId())
-                .providerType(ALIPAY_OAUTH).providerCode(providerCode).providerId(providerId)
-                .build();
-            return attemptAuthentication(request, response, idpUserDetails);
+            IdentityProviderUserDetails identityProviderUserDetails = IdentityProviderUserDetails
+                .builder().openId(token.getOpenId()).providerType(ALIPAY_OAUTH)
+                .providerCode(providerCode).providerId(providerId).build();
+            return attemptAuthentication(request, response, identityProviderUserDetails);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static Config getConfig(AlipayIdpOAuth2Config idpOauthConfig) {
+    public static Config getConfig(AlipayIdentityProviderOAuth2Config idpOauthConfig) {
         Config config = new Config();
         config.protocol = "https";
         config.gatewayHost = "openapi.alipay.com";
@@ -157,8 +155,8 @@ public class AlipayLoginAuthenticationFilter extends AbstractIdpAuthenticationPr
     }
 
     public static String getLoginUrl(String providerId) {
-        String url = ServerHelp.getPortalPublicBaseUrl() + ALIPAY_OAUTH.getLoginPathPrefix() + "/"
-                     + providerId;
+        String url = ContextService.getPortalPublicBaseUrl() + ALIPAY_OAUTH.getLoginPathPrefix()
+                     + "/" + providerId;
         return UrlUtils.format(url);
     }
 

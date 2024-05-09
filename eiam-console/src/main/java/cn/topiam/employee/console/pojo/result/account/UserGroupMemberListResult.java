@@ -17,12 +17,10 @@
  */
 package cn.topiam.employee.console.pojo.result.account;
 
-import java.io.Serial;
 import java.io.Serializable;
 
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
@@ -34,47 +32,45 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Data
 @Schema(description = "查询用户详情响应")
 public class UserGroupMemberListResult implements Serializable {
-    @Serial
-    private static final long serialVersionUID = -5144879825451360221L;
     /**
      * ID
      */
-    @Parameter(description = "ID")
-    private String            id;
+    @Schema(description = "ID")
+    private String id;
 
     /**
      * 用户名
      */
-    @Parameter(description = "用户名")
-    private String            username;
+    @Schema(description = "用户名")
+    private String username;
 
     /**
      * 姓名
      */
-    @Parameter(description = "姓名")
-    private String            fullName;
+    @Schema(description = "姓名")
+    private String fullName;
 
     /**
      * 邮箱
      */
-    @Parameter(description = "邮箱")
-    private String            email;
+    @Schema(description = "邮箱")
+    private String email;
 
     /**
      * 手机号
      */
-    @Parameter(description = "手机号")
-    private String            phone;
+    @Schema(description = "手机号")
+    private String phone;
 
     /**
      * 头像URL
      */
-    @Parameter(description = "头像URL")
-    private String            avatar;
+    @Schema(description = "头像URL")
+    private String avatar;
 
     /**
      * 组织显示目录
      */
-    @Parameter(description = "组织显示目录")
-    private String            orgDisplayPath;
+    @Schema(description = "组织显示目录")
+    private String orgDisplayPath;
 }

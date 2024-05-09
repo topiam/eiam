@@ -18,8 +18,8 @@
 package cn.topiam.employee.console.authentication;
 
 import java.io.IOException;
+import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
@@ -62,12 +62,12 @@ public class ConsoleAuthenticationEntryPoint extends AbstractAuthenticationEntry
      */
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
-                         AuthenticationException authException) throws IOException,
-                                                                ServletException {
+                         AuthenticationException authException) throws ServletException,
+                                                                IOException {
         super.commence(request, response, authException);
         ApiRestResult<Object> result = ApiRestResult.builder()
-            .status(String.valueOf(UNAUTHORIZED.value())).message(StringUtils
-                .defaultString(authException.getMessage(), UNAUTHORIZED.getReasonPhrase()))
+            .status(String.valueOf(UNAUTHORIZED.value()))
+            .message(Objects.toString(authException.getMessage(), UNAUTHORIZED.getReasonPhrase()))
             .build();
         HttpResponseUtils.flushResponseJson(response, UNAUTHORIZED.value(), result);
     }

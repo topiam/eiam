@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { App, Avatar, Image, Popconfirm, Skeleton } from 'antd';
+import { App, Avatar, Image, Skeleton, Space } from 'antd';
 import {
   ActionType,
   ProCard,
@@ -26,11 +26,11 @@ import {
 import React, { useRef, useState } from 'react';
 import { useAsyncEffect } from 'ahooks';
 import { getUser, getUserIdpBind, unbindIdp, updateUser, userParamCheck } from '@/services/account';
-import { QuestionCircleOutlined } from '@ant-design/icons';
 
 import { omit } from 'lodash';
 import classNames from 'classnames';
 import { ParamCheckType } from '@/constant';
+import AccessStrategy from '../AccessStrategy';
 import { useIntl } from '@umijs/max';
 
 const prefixCls = 'user-detail-info';
@@ -41,7 +41,7 @@ export default (props: { userId: string }) => {
   const [user, setUser] = useState<AccountAPI.GetUser>();
   const actionRef = useRef<ActionType>();
   const intl = useIntl();
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
 
   useAsyncEffect(async () => {
     setLoading(true);
@@ -64,11 +64,14 @@ export default (props: { userId: string }) => {
       dataIndex: 'idpName',
       copyable: false,
       search: false,
+      width: 200,
     },
     {
       title: intl.formatMessage({ id: 'pages.account.user_detail.user_info.columns.date_time' }),
       dataIndex: 'bindTime',
       valueType: 'dateTime',
+      align: 'center',
+      width: 200,
       copyable: false,
       search: false,
     },
@@ -77,36 +80,48 @@ export default (props: { userId: string }) => {
       align: 'center',
       valueType: 'option',
       fixed: 'right',
-      width: 100,
+      width: 120,
       render: (_text, row) => {
-        return [
-          <Popconfirm
-            title={intl.formatMessage({
-              id: 'pages.account.user_detail.user_info.columns.option.popconfirm.title',
-            })}
-            placement="bottomRight"
-            icon={
-              <QuestionCircleOutlined
-                style={{
-                  color: 'red',
-                }}
-              />
-            }
-            onConfirm={async () => {
-              await unbindIdp(row.id);
-              actionRef.current?.reload();
-            }}
-            okText={intl.formatMessage({ id: 'app.yes' })}
-            cancelText={intl.formatMessage({ id: 'app.no' })}
-            key="delete"
-          >
-            <a target="_blank" style={{ color: 'red' }} key="remove">
+        return (
+          <Space>
+            <a
+              target="_blank"
+              key="remove"
+              style={{
+                color: 'red',
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                const confirmed = modal.warning({
+                  title: intl.formatMessage({
+                    id: 'pages.account.user_detail.user_info.columns.option.unbind_title',
+                  }),
+                  content: intl.formatMessage({
+                    id: 'pages.account.user_detail.user_info.columns.option.unbind_content',
+                  }),
+                  okText: intl.formatMessage({ id: 'app.confirm' }),
+                  centered: true,
+                  okType: 'primary',
+                  okCancel: true,
+                  cancelText: intl.formatMessage({ id: 'app.cancel' }),
+                  onOk: async () => {
+                    const { success } = await unbindIdp(row.id);
+                    if (success) {
+                      confirmed.destroy();
+                      message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                      actionRef.current?.reload();
+                      return;
+                    }
+                  },
+                });
+              }}
+            >
               {intl.formatMessage({
-                id: 'pages.account.user_detail.user_info.columns.option.popconfirm.remove',
+                id: 'pages.account.user_detail.user_info.columns.option.unbind',
               })}
             </a>
-          </Popconfirm>,
-        ];
+          </Space>
+        );
       },
     },
   ];
@@ -278,11 +293,6 @@ export default (props: { userId: string }) => {
                       id: 'pages.account.user_detail.user_info.data_origin.value_enum.dingtalk',
                     }),
                   },
-                  wechat: {
-                    text: intl.formatMessage({
-                      id: 'pages.account.user_detail.user_info.data_origin.value_enum.wechat',
-                    }),
-                  },
                   feishu: {
                     text: intl.formatMessage({
                       id: 'pages.account.user_detail.user_info.data_origin.value_enum.feishu',
@@ -327,10 +337,10 @@ export default (props: { userId: string }) => {
                           userId,
                         );
                         if (!success) {
-                          return Promise.reject<any>();
+                          return Promise.reject<Error>();
                         }
                         if (!result) {
-                          return Promise.reject<any>(
+                          return Promise.reject<Error>(
                             new Error(
                               intl.formatMessage({
                                 id: 'pages.account.user_detail.user_info.phone.rule.1.message',
@@ -367,7 +377,7 @@ export default (props: { userId: string }) => {
                           userId,
                         );
                         if (success && !result) {
-                          return Promise.reject<any>(
+                          return Promise.reject<Error>(
                             new Error(
                               intl.formatMessage({
                                 id: 'pages.account.user_detail.user_info.email.rule.1.message',
@@ -474,6 +484,8 @@ export default (props: { userId: string }) => {
           toolbar={{ settings: [] }}
         />
       </ProCard>
+      <br />
+      <AccessStrategy userId={userId} />
     </div>
   );
 };

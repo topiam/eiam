@@ -39,7 +39,7 @@ import cn.topiam.employee.core.message.sms.SmsMsgEventPublish;
 import cn.topiam.employee.support.exception.TopIamException;
 
 import lombok.extern.slf4j.Slf4j;
-import static cn.topiam.employee.core.help.SettingHelp.getCodeValidTime;
+import static cn.topiam.employee.core.context.ContextService.getCodeValidTime;
 import static cn.topiam.employee.core.message.MsgVariable.TIME_TO_LIVE;
 import static cn.topiam.employee.support.constant.EiamConstants.COLON;
 
@@ -47,7 +47,7 @@ import static cn.topiam.employee.support.constant.EiamConstants.COLON;
  * OtpUtils
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/8/16 22:21
+ * Created by support@topiam.cn on 2022/8/16 22:21
  */
 @Slf4j
 @Component

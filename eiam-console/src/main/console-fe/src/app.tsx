@@ -15,8 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { isLoginPath, isSessionExpiredPath, LOGIN_PATH } from '@/utils/utils';
+import { isLoginPath, isResetPasswordPath, isSessionExpiredPath, LOGIN_PATH } from '@/utils/utils';
 import type { MenuDataItem, Settings as LayoutSettings } from '@ant-design/pro-components';
+import { ProLayoutProps } from '@ant-design/pro-components';
 import queryString from 'query-string';
 import { history, RunTimeLayoutConfig, SelectLang } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
@@ -28,10 +29,8 @@ import Banner from '@/components/Banner';
 import { AvatarProps } from 'antd';
 import { GithubFilled, QuestionCircleFilled } from '@ant-design/icons';
 import About from '@/components/About';
-import { AvatarName, AvatarDropdown } from '@/components/RightContent/AvatarDropdown';
-import { ProLayoutProps } from '@ant-design/pro-components';
-
-const showBanner = process.env.PREVIEW_ENV || process.env.NODE_ENV === 'development';
+import { AvatarDropdown, AvatarName } from '@/components/RightContent/AvatarDropdown';
+import PageContainer from '@/components/PageContainer';
 
 /**
  * 跳转登录页面
@@ -65,13 +64,10 @@ export async function getInitialState(): Promise<{
   settings: Partial<LayoutSettings>;
   currentUser: API.CurrentUser | undefined;
 }> {
-  /**
-   * 控制台打印
-   */
   console.log('%c欢迎使用 TOPIAM 企业数字身份管控平台', 'font-size: 24px;');
   return {
     fetchUserInfo,
-    currentUser: isLoginPath() ? undefined : await fetchUserInfo(),
+    currentUser: isLoginPath() || isResetPasswordPath() ? undefined : await fetchUserInfo(),
     settings: {
       ...defaultSettings,
     } as Partial<LayoutSettings>,
@@ -110,7 +106,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, loading }) => {
       },
       header: {
         colorBgHeader: '#fff',
-        heightLayoutHeader: showBanner ? 78 : 56,
+        heightLayoutHeader: 78,
       },
       pageContainer: {
         paddingBlockPageContainerContent: 12,
@@ -118,7 +114,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, loading }) => {
       },
     },
     headerRender: (props: ProLayoutProps, defaultDom: React.ReactNode) => {
-      return showBanner ? (
+      return (
         <>
           <Banner play={props.isMobile} />
           {React.cloneElement(defaultDom as any, {
@@ -128,15 +124,13 @@ export const layout: RunTimeLayoutConfig = ({ initialState, loading }) => {
             },
           })}
         </>
-      ) : (
-        defaultDom
       );
     },
     avatarProps: {
       src: initialState?.currentUser?.avatar,
       size: 'small',
       title: <AvatarName />,
-      render: (props: AvatarProps, defaultDom: React.ReactNode) => {
+      render: (_props: AvatarProps, defaultDom: React.ReactNode) => {
         return <AvatarDropdown>{defaultDom}</AvatarDropdown>;
       },
     },
@@ -167,7 +161,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, loading }) => {
       if (loading) {
         return <PageLoading />;
       }
-      return <>{dom}</>;
+      return <PageContainer>{dom}</PageContainer>;
     },
     menuDataRender: (menuData: MenuDataItem[]) => {
       return menuData;
@@ -180,7 +174,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, loading }) => {
       }
       // 上述判断需要登录、路径为登录路径，会话过期路径不拦截
       // prettier-ignore
-      if (gotoLogin && (isLoginPath() || isSessionExpiredPath())) {
+      if (gotoLogin && (isLoginPath() || isSessionExpiredPath() || isResetPasswordPath())) {
         return;
       }
       //登录页面

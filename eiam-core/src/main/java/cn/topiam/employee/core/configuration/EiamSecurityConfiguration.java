@@ -25,7 +25,7 @@ import cn.topiam.employee.core.security.access.SecurityAccessExpression;
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/3/22 21:05
+ * Created by support@topiam.cn on 2023/3/22 21:05
  */
 @Configuration
 public class EiamSecurityConfiguration {

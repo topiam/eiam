@@ -37,23 +37,23 @@ public class OverviewResult implements Serializable {
      * 今日认证量
      */
     @Schema(description = "今日认证量")
-    private Long todayAuthnCount;
+    private String todayAuthnCount;
 
     /**
      * 认证源总数
      */
     @Schema(description = "认证源总数")
-    private Long idpCount;
+    private String idpCount;
 
     /**
      * 用户数量
      */
     @Schema(description = "用户数量")
-    private Long userCount;
+    private String userCount;
 
     /**
      * 应用数量
      */
     @Schema(description = "应用数量")
-    private Long appCount;
+    private String appCount;
 }

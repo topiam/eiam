@@ -39,11 +39,9 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.alibaba.fastjson2.JSONObject;
-
-import cn.topiam.employee.authentication.qq.QqIdpOauthConfig;
-import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
-import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClient;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClientRepository;
+import cn.topiam.employee.authentication.qq.QqIdentityProviderOAuth2Config;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -58,7 +56,7 @@ import static cn.topiam.employee.authentication.qq.filter.QqOAuth2LoginAuthentic
  * 微信扫码登录请求重定向过滤器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/20 21:22
+ * Created by support@topiam.cn on 2022/6/20 21:22
  */
 @SuppressWarnings("ALL")
 public class QqOAuth2AuthorizationRequestRedirectFilter extends OncePerRequestFilter {
@@ -85,10 +83,10 @@ public class QqOAuth2AuthorizationRequestRedirectFilter extends OncePerRequestFi
 
     private static final StringKeyGenerator                                  DEFAULT_STATE_GENERATOR        = new Base64StringKeyGenerator(
         Base64.getUrlEncoder());
-    private final IdentityProviderRepository                                 identityProviderRepository;
+    private final RegisteredIdentityProviderClientRepository                 registeredIdentityProviderClientRepository;
 
-    public QqOAuth2AuthorizationRequestRedirectFilter(IdentityProviderRepository identityProviderRepository) {
-        this.identityProviderRepository = identityProviderRepository;
+    public QqOAuth2AuthorizationRequestRedirectFilter(RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository) {
+        this.registeredIdentityProviderClientRepository = registeredIdentityProviderClientRepository;
     }
 
     @Override
@@ -103,14 +101,13 @@ public class QqOAuth2AuthorizationRequestRedirectFilter extends OncePerRequestFi
         }
         Map<String, String> variables = matcher.getVariables();
         String providerCode = variables.get(PROVIDER_CODE);
-        Optional<IdentityProviderEntity> optional = identityProviderRepository
-            .findByCodeAndEnabledIsTrue(providerCode);
+        Optional<RegisteredIdentityProviderClient<QqIdentityProviderOAuth2Config>> optional = registeredIdentityProviderClientRepository
+            .findByCode(providerCode);
         if (optional.isEmpty()) {
             throw new NullPointerException("未查询到身份提供商信息");
         }
-        IdentityProviderEntity entity = optional.get();
-        QqIdpOauthConfig config = JSONObject.parseObject(entity.getConfig(),
-            QqIdpOauthConfig.class);
+        RegisteredIdentityProviderClient<QqIdentityProviderOAuth2Config> entity = optional.get();
+        QqIdentityProviderOAuth2Config config = entity.getConfig();
         Assert.notNull(config, "QQ登录配置不能为空");
         //构建授权请求
         OAuth2AuthorizationRequest.Builder builder = OAuth2AuthorizationRequest.authorizationCode()

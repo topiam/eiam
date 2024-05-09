@@ -29,7 +29,8 @@ import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.EventStatus;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.audit.event.AuditEventPublish;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.context.ApplicationContextService;
+import cn.topiam.employee.support.security.userdetails.UserDetails;
 import static cn.topiam.employee.audit.event.type.EventType.LOGOUT_CONSOLE;
 
 /**
@@ -47,11 +48,12 @@ public class ConsoleLogoutSuccessEventListener implements ApplicationListener<Lo
      */
     @Override
     public void onApplicationEvent(@NonNull LogoutSuccessEvent event) {
-        AuditEventPublish auditEventPublish = ApplicationContextHelp
+        AuditEventPublish auditEventPublish = ApplicationContextService
             .getBean(AuditEventPublish.class);
         // 审计事件
         //@formatter:off
-        List<Target> targets= Lists.newArrayList(Target.builder().type(TargetType.CONSOLE).build());
+        UserDetails principal = (UserDetails) event.getAuthentication().getPrincipal();
+        List<Target> targets= Lists.newArrayList(Target.builder().type(TargetType.CONSOLE).name(principal.getUsername()).id(principal.getId()).build());
         auditEventPublish.publish(LOGOUT_CONSOLE, event.getAuthentication(), EventStatus.SUCCESS,targets);
         //@formatter:on
     }

@@ -23,7 +23,7 @@ import cn.topiam.employee.openapi.constant.OpenApiStatus;
  * OpenApiException
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/25 03:40
+ * Created by support@topiam.cn on 2023/6/25 03:40
  */
 public class OpenApiException extends RuntimeException {
 

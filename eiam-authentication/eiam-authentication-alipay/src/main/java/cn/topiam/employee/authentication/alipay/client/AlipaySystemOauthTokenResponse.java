@@ -17,7 +17,9 @@
  */
 package cn.topiam.employee.authentication.alipay.client;
 
-import com.aliyun.tea.*;
+import com.aliyun.tea.NameInMap;
+import com.aliyun.tea.TeaModel;
+import com.aliyun.tea.Validation;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -25,7 +27,7 @@ import lombok.Setter;
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/8/25 22:26
+ * Created by support@topiam.cn on 2023/8/25 22:26
  */
 @Getter
 @Setter

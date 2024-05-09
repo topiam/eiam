@@ -28,19 +28,19 @@ import cn.topiam.employee.audit.repository.result.AuthnQuantityResult;
  * 组织成员
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/10/2 02:53
+ * Created by support@topiam.cn on 2022/10/2 02:53
  */
 public interface AuditCustomizedRepository {
 
-    List<AuditStatisticsResult> authnHotProvider(EventType type, LocalDateTime startTime,
+    List<AuditStatisticsResult> authnHotProvider(List<EventType> types, LocalDateTime startTime,
                                                  LocalDateTime endTime);
 
-    List<AuthnQuantityResult> authnQuantity(EventType type, LocalDateTime startTime,
+    List<AuthnQuantityResult> authnQuantity(List<EventType> types, LocalDateTime startTime,
                                             LocalDateTime endTime, String dateFormat);
 
     List<AuditStatisticsResult> appVisitRank(EventType type, LocalDateTime startTime,
                                              LocalDateTime endTime);
 
-    List<AuditStatisticsResult> authnZone(EventType type, LocalDateTime startTime,
+    List<AuditStatisticsResult> authnZone(List<EventType> types, LocalDateTime startTime,
                                           LocalDateTime endTime);
 }

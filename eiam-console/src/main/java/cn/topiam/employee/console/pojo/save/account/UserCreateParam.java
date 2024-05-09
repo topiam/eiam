@@ -24,8 +24,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import cn.topiam.employee.common.enums.ListEnumDeserializer;
 import cn.topiam.employee.common.enums.MessageNoticeChannel;
+import cn.topiam.employee.support.enums.ListEnumDeserializer;
 
 import lombok.Data;
 

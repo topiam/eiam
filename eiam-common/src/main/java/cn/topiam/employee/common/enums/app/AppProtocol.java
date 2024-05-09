@@ -32,22 +32,17 @@ public enum AppProtocol implements BaseEnum {
                                              /**
                                               * OIDC
                                               */
-                                             OIDC("oidc", "OIDC"),
+                                             OIDC("OIDC", "OIDC"),
 
                                              /**
                                               * JWT
                                               */
-                                             JWT("jwt", "JWT"),
+                                             JWT("JWT", "JWT"),
 
                                              /**
                                               * FORM表单
                                               */
-                                             FORM("form", "表单代填"),
-
-                                             /**
-                                              * TSA
-                                              */
-                                             TSA("tsa", "TSA");
+                                             FORM("FORM", "表单代填");
 
     @JsonValue
     private final String code;

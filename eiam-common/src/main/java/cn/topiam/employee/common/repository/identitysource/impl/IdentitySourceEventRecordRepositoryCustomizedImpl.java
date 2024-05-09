@@ -34,7 +34,7 @@ import cn.topiam.employee.common.repository.identitysource.IdentitySourceEventRe
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/10/10 23:33
+ * Created by support@topiam.cn on 2022/10/10 23:33
  */
 @SuppressWarnings("DuplicatedCode")
 @Repository
@@ -44,14 +44,14 @@ public class IdentitySourceEventRecordRepositoryCustomizedImpl implements
     @Override
     public void batchSave(List<IdentitySourceEventRecordEntity> list) {
         jdbcTemplate.batchUpdate(
-            "INSERT INTO identity_source_event_record (id_, identity_source_id, action_type, object_id, object_name, object_type, status_,event_time,desc_,create_by,create_time,update_by,update_time,remark_,is_deleted) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            "INSERT INTO eiam_identity_source_event_record (id_, identity_source_id, action_type, object_id, object_name, object_type, status_,event_time,desc_,create_by,create_time,update_by,update_time,remark_,is_deleted) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(@NotNull PreparedStatement ps, int i) throws SQLException {
             //@formatter:off
                         IdentitySourceEventRecordEntity entity = list.get(i);
-                        ps.setLong(1, entity.getId());
-                        ps.setLong(2, entity.getIdentitySourceId());
+                        ps.setString(1, entity.getId());
+                        ps.setString(2, entity.getIdentitySourceId());
                         ps.setString(3, Objects.isNull(entity.getActionType()) ? null : entity.getActionType().getCode());
                         ps.setString(4, entity.getObjectId());
                         ps.setString(5, entity.getObjectName());

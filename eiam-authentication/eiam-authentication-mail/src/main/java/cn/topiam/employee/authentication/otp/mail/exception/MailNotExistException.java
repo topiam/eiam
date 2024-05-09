@@ -23,7 +23,7 @@ import cn.topiam.employee.support.exception.TopIamException;
  * 邮箱不存在异常
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/1/2 21:59
+ * Created by support@topiam.cn on 2023/1/2 21:59
  */
 public class MailNotExistException extends TopIamException {
     public MailNotExistException() {

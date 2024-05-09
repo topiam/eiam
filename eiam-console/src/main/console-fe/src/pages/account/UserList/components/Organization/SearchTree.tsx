@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { getChildOrganization, getFilterOrganizationTree } from '@/services/account';
+import { getChildOrganization, getSearchOrganizationTree } from '@/services/account';
 import type { DataNode } from '@/utils/tree';
 import { getTreeAllKeys, updateTreeData } from '@/utils/tree';
 import { DownOutlined } from '@ant-design/icons';
@@ -57,9 +57,9 @@ export default (props: SearchTreeProps) => {
    */
   const searchOrganizationTree = async (
     keyWord: string,
-  ): Promise<AccountAPI.FilterOrganizationTree[]> => {
+  ): Promise<AccountAPI.SearchOrganizationTree[]> => {
     // 查询子节点
-    const { success, result } = await getFilterOrganizationTree(keyWord);
+    const { success, result } = await getSearchOrganizationTree(keyWord);
     if (success) {
       setSearchOrganizationData(result);
       setAutoExpandParent(true);

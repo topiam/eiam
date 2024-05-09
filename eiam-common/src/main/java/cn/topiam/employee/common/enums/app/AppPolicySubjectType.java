@@ -27,7 +27,7 @@ import cn.topiam.employee.support.web.converter.EnumConvert;
  * 用户、角色、组织机构
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/4 21:05
+ * Created by support@topiam.cn on 2021/11/4 21:05
  */
 public enum AppPolicySubjectType implements BaseEnum {
                                                       /**

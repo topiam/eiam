@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import cn.topiam.employee.audit.annotation.Audit;
 import cn.topiam.employee.audit.event.type.EventType;
-import cn.topiam.employee.common.entity.app.query.AppQuery;
+import cn.topiam.employee.console.pojo.query.app.AppQuery;
 import cn.topiam.employee.console.pojo.result.app.AppCreateResult;
 import cn.topiam.employee.console.pojo.result.app.AppGetResult;
 import cn.topiam.employee.console.pojo.result.app.AppListResult;
@@ -67,7 +67,8 @@ public class AppController {
     @Operation(summary = "获取应用列表")
     @GetMapping(value = "/list")
     @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
-    public ApiRestResult<Page<AppListResult>> getAppList(PageModel page, AppQuery query) {
+    public ApiRestResult<Page<AppListResult>> getAppList(PageModel page,
+                                                         cn.topiam.employee.console.pojo.query.app.AppQuery query) {
         Page<AppListResult> list = appService.getAppList(page, query);
         return ApiRestResult.<Page<AppListResult>> builder().result(list).build();
     }
@@ -148,8 +149,7 @@ public class AppController {
     @DeleteMapping(value = "/delete/{id}")
     @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> deleteApp(@PathVariable(value = "id") String id) {
-        return ApiRestResult.<Boolean> builder().result(appService.deleteApp(Long.valueOf(id)))
-            .build();
+        return ApiRestResult.<Boolean> builder().result(appService.deleteApp(id)).build();
     }
 
     /**
@@ -162,7 +162,7 @@ public class AppController {
     @GetMapping(value = "/get/{id}")
     @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<AppGetResult> getApp(@PathVariable(value = "id") String id) {
-        AppGetResult result = appService.getApp(Long.valueOf(id));
+        AppGetResult result = appService.getApp(id);
         return ApiRestResult.<AppGetResult> builder().result(result).build();
     }
 

@@ -16,26 +16,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import UserSelect from '@/components/UserSelect';
-import { createAccount, getAppAccountList, removeAccount } from '@/services/app';
-import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import {
+  createAccount,
+  removeAccount,
+  updateAppAccountActivateDefault,
+  updateAppAccountDeactivateDefault,
+} from '../../service';
+import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { ModalForm, ProFormText, ProTable } from '@ant-design/pro-components';
+import {
+  ModalForm,
+  ProFormItem,
+  ProFormSwitch,
+  ProFormText,
+  ProTable,
+} from '@ant-design/pro-components';
 
-import { App, Button, Form, Popconfirm, Table } from 'antd';
-import { useRef } from 'react';
+import { App, Button, Form, Space, Switch, Table } from 'antd';
+import React, { useRef, useState } from 'react';
 import { AppProtocolType } from '@/constant';
 import { Base64 } from 'js-base64';
 import { useIntl } from '@umijs/max';
+import { getAppAccountList } from '@/services/app';
+import { useModel } from '@@/exports';
 
-export default (props: { appId: string; protocol: AppProtocolType | string }) => {
+export default () => {
   const actionRef = useRef<ActionType>();
   const intl = useIntl();
-  const { message } = App.useApp();
-  const { appId, protocol } = props;
+  const { app } = useModel('app.AppDetail.model');
+  const { message, modal } = App.useApp();
+  const [loading, setLoading] = useState(false);
   const columns: ProColumns<AppAPI.AppAccountList>[] = [
     {
       title: intl.formatMessage({
-        id: 'pages.app.config.detail.items.login_access.app_account.columns.username',
+        id: 'pages.app.config.detail.protocol_config.app_account.columns.username',
       }),
       dataIndex: 'username',
       ellipsis: true,
@@ -43,65 +57,108 @@ export default (props: { appId: string; protocol: AppProtocolType | string }) =>
     },
     {
       title: intl.formatMessage({
-        id: 'pages.app.config.detail.items.login_access.app_account.columns.account',
+        id: 'pages.app.config.detail.protocol_config.app_account.columns.account',
       }),
       dataIndex: 'account',
       ellipsis: true,
     },
     {
       title: intl.formatMessage({
-        id: 'pages.app.config.detail.items.login_access.app_account.columns.create_time',
+        id: 'pages.app.config.detail.protocol_config.app_account.columns.is_default',
+      }),
+      dataIndex: 'defaulted',
+      align: 'center',
+      width: 100,
+      render: (_: React.ReactNode, row) => {
+        return (
+          <Switch
+            checked={row.defaulted}
+            onChange={async (checked: boolean, event) => {
+              event.stopPropagation();
+              setLoading(true);
+              let success: boolean;
+              try {
+                if (checked) {
+                  const result = await updateAppAccountActivateDefault(row.id).finally(() => {
+                    setLoading(false);
+                  });
+                  success = result?.success;
+                } else {
+                  const result = await updateAppAccountDeactivateDefault(row.id).finally(() => {
+                    setLoading(false);
+                  });
+                  success = result?.success;
+                }
+                if (success) {
+                  message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                  actionRef.current?.reload();
+                }
+              } catch (e) {
+                row.defaulted = !checked;
+              }
+            }}
+          />
+        );
+      },
+    },
+    {
+      title: intl.formatMessage({
+        id: 'pages.app.config.detail.protocol_config.app_account.columns.create_time',
       }),
       dataIndex: 'createTime',
       valueType: 'dateTime',
+      align: 'center',
       search: false,
       ellipsis: true,
     },
     {
       title: intl.formatMessage({
-        id: 'pages.app.config.detail.items.login_access.app_account.columns.option',
+        id: 'pages.app.config.detail.protocol_config.app_account.columns.option',
       }),
       valueType: 'option',
       key: 'option',
       width: 80,
       align: 'center',
-      fixed: 'right',
-      render: (_text, record) => [
-        <Popconfirm
-          title={intl.formatMessage({
-            id: 'pages.app.config.detail.items.login_access.app_account.columns.option.popconfirm.title',
-          })}
-          placement="bottomRight"
-          icon={
-            <QuestionCircleOutlined
+      render: (_text, record) => {
+        return (
+          <Space>
+            <a
+              key="remove"
               style={{
                 color: 'red',
               }}
-            />
-          }
-          onConfirm={async () => {
-            const { success } = await removeAccount(record.id);
-            if (success) {
-              message.success(intl.formatMessage({ id: 'app.operation_success' }));
-              actionRef.current?.reload();
-              return;
-            }
-          }}
-          okText={intl.formatMessage({ id: 'app.yes' })}
-          cancelText={intl.formatMessage({ id: 'app.no' })}
-          key="delete"
-        >
-          <a
-            target="_blank"
-            key="remove"
-            style={{
-              color: 'red',
-            }}
-          >
-            {intl.formatMessage({ id: 'app.delete' })}
-          </a>
-        </Popconfirm>,
-      ],
+              onClick={() => {
+                modal.error({
+                  title: intl.formatMessage({
+                    id: 'pages.app.config.detail.protocol_config.app_account.columns.remove_title',
+                  }),
+                  content: intl.formatMessage({
+                    id: 'pages.app.config.detail.protocol_config.app_account.columns.remove_content',
+                  }),
+                  okText: intl.formatMessage({ id: 'app.confirm' }),
+                  okType: 'primary',
+                  cancelText: intl.formatMessage({ id: 'app.cancel' }),
+                  centered: true,
+                  okCancel: true,
+                  onOk: async () => {
+                    setLoading(true);
+                    const { success } = await removeAccount(record.id).finally(() => {
+                      setLoading(false);
+                    });
+                    if (success) {
+                      message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                      actionRef.current?.reload();
+                      return;
+                    }
+                  },
+                });
+              }}
+            >
+              {intl.formatMessage({ id: 'app.delete' })}
+            </a>
+          </Space>
+        );
+      },
     },
   ];
 
@@ -114,129 +171,157 @@ export default (props: { appId: string; protocol: AppProtocolType | string }) =>
     const [form] = Form.useForm();
 
     return (
-      <>
-        <ModalForm
-          title={intl.formatMessage({
-            id: 'pages.app.config.detail.items.login_access.app_account.create_app_account',
-          })}
-          width={500}
-          form={form}
-          scrollToFirstError
-          trigger={
-            <Button key="button" icon={<PlusOutlined />} type="primary">
-              {intl.formatMessage({
-                id: 'pages.app.config.detail.items.login_access.app_account.create_app_account',
-              })}
-            </Button>
-          }
-          layout={'vertical'}
-          autoFocusFirstInput
-          preserve={false}
-          modalProps={{
-            destroyOnClose: true,
-            onCancel: () => {
-              form.resetFields();
-            },
-          }}
-          onFinish={async (values: Record<string, string>) => {
-            let formData = values;
-            if (formData?.password) {
-              formData = { ...formData, password: Base64.encode(values.password, true) };
-            }
-            const { success } = await createAccount({ appId, ...formData });
-            if (success) {
-              message.success(intl.formatMessage({ id: 'app.add_success' }));
-              actionRef.current?.reload();
-              return true;
-            }
-            message.error(intl.formatMessage({ id: 'app.add_fail' }));
-            return false;
-          }}
-        >
-          <Form.Item
-            label={intl.formatMessage({
-              id: 'pages.app.config.detail.items.login_access.app_account.columns.username',
+      app && (
+        <>
+          <ModalForm
+            title={intl.formatMessage({
+              id: 'pages.app.config.detail.protocol_config.app_account.create_app_account',
             })}
-            name={'userId'}
-            rules={[
-              {
-                required: true,
-                message: intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.user_id.rule.0.message',
-                }),
+            width={500}
+            form={form}
+            scrollToFirstError
+            trigger={
+              <Button key="button" icon={<PlusOutlined />} type="primary">
+                {intl.formatMessage({
+                  id: 'pages.app.config.detail.protocol_config.app_account.create_app_account',
+                })}
+              </Button>
+            }
+            layout={'vertical'}
+            autoFocusFirstInput
+            preserve={false}
+            modalProps={{
+              destroyOnClose: true,
+              onCancel: () => {
+                form.resetFields();
               },
-            ]}
+              afterOpenChange: (open) => {
+                if (open) {
+                  form.setFieldValue('defaulted', false);
+                  form.setFieldValue('appId', app.id);
+                } else {
+                  form.resetFields();
+                }
+              },
+            }}
+            onFinish={async (values: Record<string, string>) => {
+              let formData = values;
+              if (formData?.password) {
+                formData = { ...formData, password: Base64.encode(values.password, true) };
+              }
+              const { success } = await createAccount({ ...formData });
+              if (success) {
+                message.success(intl.formatMessage({ id: 'app.add_success' }));
+                actionRef.current?.reload();
+                return true;
+              }
+              message.error(intl.formatMessage({ id: 'app.add_fail' }));
+              return false;
+            }}
           >
-            <UserSelect
-              placeholder={intl.formatMessage({
-                id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.user_id.placeholder',
+            <ProFormText hidden name={'appId'} />
+            <ProFormItem
+              label={intl.formatMessage({
+                id: 'pages.app.config.detail.protocol_config.app_account.columns.username',
               })}
-            />
-          </Form.Item>
-          {/*FORM 协议*/}
-          {protocol === AppProtocolType.form ? (
-            <>
+              name={'userId'}
+              rules={[
+                {
+                  required: true,
+                  message: intl.formatMessage({
+                    id: 'pages.app.config.detail.protocol_config.app_account.create_app_account.modal_form.user_id.rule.0.message',
+                  }),
+                },
+              ]}
+            >
+              <UserSelect
+                placeholder={intl.formatMessage({
+                  id: 'pages.app.config.detail.protocol_config.app_account.create_app_account.modal_form.user_id.placeholder',
+                })}
+              />
+            </ProFormItem>
+            {/*FORM 协议*/}
+            {app.protocol === AppProtocolType.form ? (
+              <>
+                <ProFormText
+                  label={intl.formatMessage({
+                    id: 'pages.app.config.detail.protocol_config.app_account.create_app_account.modal_form.account',
+                  })}
+                  name={'account'}
+                  placeholder={intl.formatMessage({
+                    id: 'pages.app.config.detail.protocol_config.app_account.create_app_account.modal_form.account.rule.0.message',
+                  })}
+                  rules={[
+                    {
+                      required: true,
+                      message: intl.formatMessage({
+                        id: 'pages.app.config.detail.protocol_config.app_account.create_app_account.modal_form.account.rule.0.message',
+                      }),
+                    },
+                  ]}
+                />
+                <ProFormText.Password
+                  label={intl.formatMessage({
+                    id: 'pages.app.config.detail.protocol_config.app_account.create_app_account.modal_form.password',
+                  })}
+                  name={'password'}
+                  placeholder={intl.formatMessage({
+                    id: 'pages.app.config.detail.protocol_config.app_account.create_app_account.modal_form.password.rule.0.message',
+                  })}
+                  rules={[
+                    {
+                      required: true,
+                      message: intl.formatMessage({
+                        id: 'pages.app.config.detail.protocol_config.app_account.create_app_account.modal_form.password.rule.0.message',
+                      }),
+                    },
+                  ]}
+                />
+              </>
+            ) : (
+              //非Form协议
               <ProFormText
                 label={intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.account',
+                  id: 'pages.app.config.detail.protocol_config.app_account.create_app_account.modal_form.app_identity',
                 })}
                 name={'account'}
                 placeholder={intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.account.rule.0.message',
+                  id: 'pages.app.config.detail.protocol_config.app_account.create_app_account.modal_form.app_identity.rule.0.message',
                 })}
                 rules={[
                   {
                     required: true,
                     message: intl.formatMessage({
-                      id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.account.rule.0.message',
+                      id: 'pages.app.config.detail.protocol_config.app_account.create_app_account.modal_form.app_identity.rule.0.message',
                     }),
                   },
                 ]}
               />
-              <ProFormText.Password
-                label={intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.password',
-                })}
-                name={'password'}
-                placeholder={intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.password.rule.0.message',
-                })}
-                rules={[
-                  {
-                    required: true,
-                    message: intl.formatMessage({
-                      id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.password.rule.0.message',
-                    }),
-                  },
-                ]}
-              />
-            </>
-          ) : (
-            //非Form协议
-            <ProFormText
+            )}
+            <ProFormSwitch
               label={intl.formatMessage({
-                id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.app_identity',
+                id: 'pages.app.config.detail.protocol_config.app_account.create_app_account.modal_form.is_default',
               })}
-              name={'account'}
-              placeholder={intl.formatMessage({
-                id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.app_identity.rule.0.message',
+              name={'defaulted'}
+              extra={intl.formatMessage({
+                id: 'pages.app.config.detail.protocol_config.app_account.create_app_account.modal_form.is_default.check',
               })}
               rules={[
                 {
                   required: true,
                   message: intl.formatMessage({
-                    id: 'pages.app.config.detail.items.login_access.app_account.create_app_account.modal_form.app_identity.rule.0.message',
+                    id: 'pages.app.config.detail.protocol_config.app_account.create_app_account.modal_form.is_default.rule.0.message',
                   }),
                 },
               ]}
             />
-          )}
-        </ModalForm>
-      </>
+          </ModalForm>
+        </>
+      )
     );
   };
   return (
-    <>
+    app && (
       <ProTable<AppAPI.AppAccountList>
         columns={columns}
         actionRef={actionRef}
@@ -247,10 +332,16 @@ export default (props: { appId: string; protocol: AppProtocolType | string }) =>
           selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
         }}
         request={getAppAccountList}
-        params={{ appId: appId }}
+        params={{ appId: app.id }}
         rowKey="id"
         search={{}}
         options={false}
+        loading={loading}
+        onLoadingChange={(loading) => {
+          if (typeof loading === 'boolean') {
+            setLoading(loading);
+          }
+        }}
         pagination={{
           defaultPageSize: 5,
           size: 'small',
@@ -259,6 +350,6 @@ export default (props: { appId: string; protocol: AppProtocolType | string }) =>
         dateFormatter="string"
         toolBarRender={() => [<CreateAccount key={'create'} />]}
       />
-    </>
+    )
   );
 };

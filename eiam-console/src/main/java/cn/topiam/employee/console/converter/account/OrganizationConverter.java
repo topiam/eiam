@@ -62,13 +62,13 @@ public interface OrganizationConverter {
      * @param parentId {@link String}
      * @return {@link List}
      */
-    default List<OrganizationTreeResult> entityConvertToChildOrgTreeListResult(String parentId,
-                                                                               List<OrganizationEntity> data) {
-        List<OrganizationTreeResult> list = new ArrayList<>();
+    default List<SearchOrganizationTreeResult> entityConvertToChildOrgTreeListResult(String parentId,
+                                                                                     List<OrganizationEntity> data) {
+        List<SearchOrganizationTreeResult> list = new ArrayList<>();
         List<OrganizationEntity> entityList = data.stream()
             .filter(one -> Objects.equals(parentId, one.getParentId())).toList();
         for (OrganizationEntity organizationEntity : entityList) {
-            OrganizationTreeResult result = entityConvertToChildOrgTreeListResult(
+            SearchOrganizationTreeResult result = entityConvertToChildOrgTreeListResult(
                 organizationEntity);
             result.setChildren(
                 entityConvertToChildOrgTreeListResult(organizationEntity.getId(), data));
@@ -84,7 +84,7 @@ public interface OrganizationConverter {
      * @return {@link OrganizationResult}
      */
     @Mapping(target = "type", source = "type.desc")
-    @Mapping(target = "dataOrigin", source = "dataOrigin.desc")
+    @Mapping(target = "dataOrigin", source = "dataOrigin")
     OrganizationChildResult entityConvertToChildOrgListResult(OrganizationEntity data);
 
     /**
@@ -95,8 +95,8 @@ public interface OrganizationConverter {
      */
     @Mapping(target = "children", ignore = true)
     @Mapping(target = "type", source = "type.desc")
-    @Mapping(target = "dataOrigin", source = "dataOrigin.desc")
-    OrganizationTreeResult entityConvertToChildOrgTreeListResult(OrganizationEntity data);
+    @Mapping(target = "dataOrigin", source = "dataOrigin")
+    SearchOrganizationTreeResult entityConvertToChildOrgTreeListResult(OrganizationEntity data);
 
     /**
      * 组织实体转换为组织分页结果
@@ -105,7 +105,7 @@ public interface OrganizationConverter {
      * @return {@link OrganizationResult}
      */
     @Mapping(target = "type", source = "type.desc")
-    @Mapping(target = "dataOrigin", source = "dataOrigin.desc")
+    @Mapping(target = "dataOrigin", source = "dataOrigin")
     OrganizationRootResult entityConvertToRootOrgListResult(OrganizationEntity data);
 
     /**
@@ -114,12 +114,12 @@ public interface OrganizationConverter {
      * @param param {@link OrganizationCreateParam}
      * @return {@link OrganizationEntity}
      */
-    @Mapping(target = "deleted", ignore = true)
+
     @Mapping(target = "identitySourceId", ignore = true)
     @Mapping(target = "path", ignore = true)
     @Mapping(target = "displayPath", ignore = true)
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "dataOrigin", expression = "java(cn.topiam.employee.common.enums.DataOrigin.INPUT)")
+    @Mapping(target = "dataOrigin", expression = "java(cn.topiam.employee.support.security.userdetails.DataOrigin.INPUT.getType())")
     @Mapping(target = "remark", ignore = true)
     @Mapping(target = "leaf", expression = "java(Boolean.TRUE)")
     @Mapping(target = "enabled", expression = "java(Boolean.TRUE)")
@@ -138,7 +138,7 @@ public interface OrganizationConverter {
      * @param param {@link OrganizationUpdateParam}
      * @return {@link OrganizationEntity}
      */
-    @Mapping(target = "deleted", ignore = true)
+
     @Mapping(target = "identitySourceId", ignore = true)
     @Mapping(target = "path", ignore = true)
     @Mapping(target = "displayPath", ignore = true)
@@ -179,4 +179,12 @@ public interface OrganizationConverter {
     default List<BatchOrganizationResult> entityConvertToBatchGetOrganizationResult(List<OrganizationEntity> list) {
         return list.stream().map(this::entityConvertToBatchGetOrganizationResult).toList();
     }
+
+    /**
+     * 实体转搜索组织结果
+     *
+     * @param list {@link OrganizationEntity}
+     * @return {@link List}
+     */
+    List<SearchOrganizationResult> entityConvertToSearchOrganizationResult(List<OrganizationEntity> list);
 }

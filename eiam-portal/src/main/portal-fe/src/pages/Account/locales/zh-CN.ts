@@ -42,7 +42,7 @@ export default {
   'page.account.common.form.code.rule.0': '请输入验证码',
   'page.account.please_send_code.message': '请发送验证码',
   'page.account.unbind': '解绑',
-  'pages.account.unbind.confirm': '您确定要解除该平台绑定吗？',
+  'page.account.unbind_confirm_content': '确定要解除与该身份提供商绑定吗？',
   'page.account.bind': '绑定',
   'page.account.bind.success': '绑定成功',
   'page.account.bind.totp': '绑定动态口令',

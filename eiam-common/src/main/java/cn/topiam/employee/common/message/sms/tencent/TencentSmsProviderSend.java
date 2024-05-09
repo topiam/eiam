@@ -36,7 +36,7 @@ import cn.topiam.employee.common.message.sms.SmsResponse;
  * 腾讯短信发送
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/4/14 23:04
+ * Created by support@topiam.cn on 2022/4/14 23:04
  */
 public class TencentSmsProviderSend implements SmsProviderSend {
     private final TencentSmsProviderConfig config;

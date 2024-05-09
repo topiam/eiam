@@ -40,8 +40,7 @@
                     converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
     <conversionRule conversionWord="wEx"
                     converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
-    <conversionRule conversionWord="msg"
-                    converterClass="cn.topiam.employee.support.logback.DesensitizationMessageConverter"/>
+
 
     <!-- 日志格式 -->
     <property name="CONSOLE_LOG_PATTERN"
@@ -154,7 +153,7 @@
     <logger name="org.springframework.security.web.access" level="TRACE"/>
     <logger name="org.springframework.security.oauth2.server" level="TRACE"/>
     <logger name="cn.topiam.eiam.protocol.oidc" level="TRACE"/>
-    <logger name="cn.topiam.support" level="DEBUG"/>
+    <logger name="cn.topiam.employee.support" level="DEBUG"/>
     <logger name="cn.topiam" level="INFO">
         <appender-ref ref="ERROR-OUT"/>
         <appender-ref ref="WARN-OUT"/>

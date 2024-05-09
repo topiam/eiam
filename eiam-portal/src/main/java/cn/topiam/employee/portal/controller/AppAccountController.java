@@ -17,6 +17,8 @@
  */
 package cn.topiam.employee.portal.controller;
 
+import java.util.List;
+
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -41,7 +43,7 @@ import static cn.topiam.employee.common.constant.AppConstants.APP_PATH;
  * 应用账户资源
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/4 21:06
+ * Created by support@topiam.cn on 2022/6/4 21:06
  */
 @Validated
 @Tag(name = "应用账户")
@@ -51,16 +53,16 @@ import static cn.topiam.employee.common.constant.AppConstants.APP_PATH;
 public class AppAccountController {
 
     /**
-     * 获取应用账户列表
+     * 获取当前登陆者应用账户列表
      *
      * @param appId  {@link String}
      * @return {@link }
      */
-    @Operation(summary = "获取应用账户")
-    @GetMapping("/appId/{appId}")
-    public ApiRestResult<AppAccount> getAppAccountList(@PathVariable String appId) {
-        AppAccount appAccount = appAccountService.getAppAccount(Long.valueOf(appId));
-        return ApiRestResult.ok(appAccount);
+    @Operation(summary = "获取当前登陆者应用账户")
+    @GetMapping("/{appId}")
+    public ApiRestResult<List<AppAccount>> getAppAccountList(@PathVariable String appId) {
+        List<AppAccount> appAccounts = appAccountService.getAppAccountList(appId);
+        return ApiRestResult.ok(appAccounts);
     }
 
     /**
@@ -74,10 +76,43 @@ public class AppAccountController {
     @Operation(summary = "创建应用账户")
     @Audit(type = EventType.ADD_APP_ACCOUNT)
     @PostMapping(value = "/create")
-    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> createAppAccount(@RequestBody @Validated AppAccountRequest param) {
         return ApiRestResult.<Boolean> builder().result(appAccountService.createAppAccount(param))
             .build();
+    }
+
+    /**
+     * 设置应用账户是否默认
+     *
+     * @param id {@link String}
+     * @return {@link Boolean}
+     */
+    @Lock
+    @Preview
+    @Operation(summary = "设置应用账户为默认")
+    @Audit(type = EventType.UPDATE_DEFAULT_APP_ACCOUNT)
+    @PutMapping(value = "/activate_default/{id}")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
+    public ApiRestResult<Boolean> updateAppAccountSetDefault(@PathVariable(value = "id") String id) {
+        return ApiRestResult.<Boolean> builder()
+            .result(appAccountService.updateAppAccountDefault(id, true)).build();
+    }
+
+    /**
+     * 设置应用账户是否默认
+     *
+     * @param id {@link String}
+     * @return {@link Boolean}
+     */
+    @Lock
+    @Preview
+    @Operation(summary = "取消应用账户为默认")
+    @Audit(type = EventType.UPDATE_DEFAULT_APP_ACCOUNT)
+    @PutMapping(value = "/deactivate_default/{id}")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
+    public ApiRestResult<Boolean> updateAppAccountUnsetDefault(@PathVariable(value = "id") String id) {
+        return ApiRestResult.<Boolean> builder()
+            .result(appAccountService.updateAppAccountDefault(id, false)).build();
     }
 
     /**
@@ -91,7 +126,6 @@ public class AppAccountController {
     @Operation(summary = "删除应用账户")
     @Audit(type = EventType.DELETE_APP_ACCOUNT)
     @DeleteMapping(value = "/delete/{id}")
-    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Boolean> deleteAppAccount(@PathVariable(value = "id") String id) {
         return ApiRestResult.<Boolean> builder().result(appAccountService.deleteAppAccount(id))
             .build();

@@ -123,7 +123,7 @@ public class SmsProviderController {
             LinkedHashMap<String, String> parameter = new LinkedHashMap<>(16);
             boolean flag = SmsType.WELCOME_SMS == smsType || SmsType.RESET_PASSWORD == smsType
                            || SmsType.RESET_PASSWORD_SUCCESS == smsType;
-            if (SmsType.WARING == smsType || flag) {
+            if (flag) {
                 parameter.put(USERNAME, "test");
             }
             if (flag) {

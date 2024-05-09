@@ -17,27 +17,28 @@
  */
 package cn.topiam.employee.common.repository.app.impl;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.common.entity.account.query.UserGroupMemberListQuery;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.query.AppGroupAssociationListQuery;
 import cn.topiam.employee.common.repository.app.AppGroupAssociationRepositoryCustomized;
-import cn.topiam.employee.common.repository.app.impl.mapper.AppEntityMapper;
 
 import lombok.AllArgsConstructor;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2023/9/7 21:27
+ * Created by support@topiam.cn on 2023/9/7 21:27
  */
 @Repository
 @AllArgsConstructor
@@ -55,31 +56,47 @@ public class AppGroupAssociationRepositoryCustomizedImpl implements
     @Override
     public Page<AppEntity> getAppGroupAssociationList(AppGroupAssociationListQuery query,
                                                       Pageable pageable) {
+        Map<String, Object> args = new HashMap<>();
         //@formatter:off
-        StringBuilder builder = new StringBuilder("""
-                SELECT
-                  app.*
+        String hql = """
+                SELECT DISTINCT
+                	 app
                 FROM
-                	app app LEFT JOIN app_group_association ass ON app.id_ = ass.app_id AND app.is_deleted = 0 AND ass.is_deleted = 0
-                WHERE ass.group_id = '%s'
-                """.formatted(query.getId()));
-        //应用名称
+                	AppEntity app
+                	LEFT JOIN AppGroupAssociationEntity ass ON app.id = ass.app.id
+                WHERE
+                	ass.groupId = :groupId
+                """;
+        //@formatter:on
+        String whereSql = "";
+        //用户名
         if (StringUtils.isNoneBlank(query.getAppName())) {
-            builder.append(" AND app.name_ like '%").append(query.getAppName()).append("%'");
+            whereSql += " AND app.name LIKE :name ";
+            args.put("name", "%" + query.getAppName() + "%");
         }
-        builder.append(" ORDER BY `app`.create_time DESC");
-        //@formatter:on
-        String sql = builder.toString();
-        List<AppEntity> list = jdbcTemplate.query(
-            builder.append(" LIMIT ").append(pageable.getPageNumber() * pageable.getPageSize())
-                .append(",").append(pageable.getPageSize()).toString(),
-            new AppEntityMapper());
-        //@formatter:off
-        String countSql = "SELECT count(*) FROM (" + sql + ") app_";
-        //@formatter:on
-        Integer count = jdbcTemplate.queryForObject(countSql, Integer.class);
-        return new PageImpl<>(list, pageable, Objects.requireNonNull(count).longValue());
+        //按照创建时间倒序
+        TypedQuery<AppEntity> listQuery = entityManager
+            .createQuery(hql + whereSql + " ORDER BY app.createTime DESC", AppEntity.class);
+        args.put("groupId", query.getId());
+        args.forEach(listQuery::setParameter);
+        listQuery.setFirstResult((int) pageable.getOffset());
+        listQuery.setMaxResults(pageable.getPageSize());
+        String countSql = """
+                SELECT
+                	COUNT(DISTINCT app.id)
+                FROM
+                	AppEntity app
+                	LEFT JOIN AppGroupAssociationEntity ass ON app.id = ass.app.id
+                WHERE
+                	ass.groupId = :groupId
+                """;
+        TypedQuery<Long> countQuery = entityManager.createQuery(countSql + whereSql, Long.class);
+        args.forEach(countQuery::setParameter);
+        return new PageImpl<>(listQuery.getResultList(), pageable, countQuery.getSingleResult());
     }
 
-    private final JdbcTemplate jdbcTemplate;
+    /**
+     * EntityManager
+     */
+    private final EntityManager entityManager;
 }

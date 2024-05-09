@@ -28,13 +28,13 @@ import {
 } from '@ant-design/pro-components';
 import { App, ConfigProvider, Spin } from 'antd';
 import { omit } from 'lodash';
+import * as React from 'react';
 import { useContext, useEffect, useRef, useState } from 'react';
 import classnames from 'classnames';
 import { ConfigContext } from 'antd/es/config-provider';
 import { useIntl } from '@@/exports';
 import FormPhoneAreaCodeSelect from '@/components/FormPhoneAreaCodeSelect';
 import { FieldNames, ServerExceptionStatus } from '../constant';
-import * as React from 'react';
 
 function useStyle(prefixCls: string) {
   const { getPrefixCls } = useContext(ConfigContext || ConfigProvider.ConfigContext);
@@ -157,7 +157,7 @@ export default (props: {
                       //校验手机号格式
                       const isValidNumber = await phoneIsValidNumber(value, phoneAreaCode);
                       if (!isValidNumber) {
-                        return Promise.reject<any>(
+                        return Promise.reject<Error>(
                           new Error(
                             intl.formatMessage({
                               id: 'page.user.profile.common.form.phone.rule.1',

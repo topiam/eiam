@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { defineConfig } from '@umijs/max';
+import {defineConfig} from '@umijs/max';
 
 export default defineConfig({
   define: {

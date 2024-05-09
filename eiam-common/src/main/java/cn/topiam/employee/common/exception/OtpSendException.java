@@ -23,7 +23,7 @@ import cn.topiam.employee.support.exception.TopIamException;
  * OTP 发送异常
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/8/7 23:03
+ * Created by support@topiam.cn on 2022/8/7 23:03
  */
 public class OtpSendException extends TopIamException {
 

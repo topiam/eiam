@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.topiam.employee.common.entity.account.UserEntity;
-import cn.topiam.employee.common.enums.PasswordStrength;
 import cn.topiam.employee.core.security.util.UserUtils;
 import cn.topiam.employee.support.result.ApiRestResult;
 import cn.topiam.employee.support.util.DesensitizationUtil;
@@ -43,7 +42,7 @@ import static cn.topiam.employee.support.util.ImageAvatarUtils.generateAvatarImg
  * 当前用户
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020/12/23 21:49
+ * Created by support@topiam.cn on 2020/12/23 21:49
  */
 @Slf4j
 @RestController
@@ -56,7 +55,7 @@ public class CurrentUserEndpoint {
         UserEntity user = UserUtils.getUser();
         CurrentUserResult result = new CurrentUserResult();
         //用户ID
-        result.setAccountId(user.getId().toString());
+        result.setAccountId(user.getId());
         //用户名
         result.setUsername(user.getUsername());
         //姓名
@@ -74,8 +73,6 @@ public class CurrentUserEndpoint {
         result.setEmail(DesensitizationUtil.emailEncrypt(user.getEmail()));
         //手机号
         result.setPhone(DesensitizationUtil.phoneEncrypt(user.getPhone()));
-        //密码强度
-        result.setPasswordStrength(PasswordStrength.HIGHER);
         return ApiRestResult.ok(result);
     }
 
@@ -92,48 +89,42 @@ public class CurrentUserEndpoint {
          * 帐户ID
          */
         @Schema(description = "帐户ID")
-        private String           accountId;
+        private String accountId;
 
         /**
          * 用户名
          */
         @Schema(description = "用户名")
-        private String           username;
+        private String username;
 
         /**
          * 姓名
          */
         @Schema(description = "姓名")
-        private String           fullName;
+        private String fullName;
 
         /**
          * 昵称
          */
         @Schema(description = "昵称")
-        private String           nickName;
+        private String nickName;
 
         /**
          * 头像
          */
         @Schema(description = "头像")
-        private String           avatar;
+        private String avatar;
 
         /**
          * 邮箱
          */
         @Schema(description = "邮箱")
-        private String           email;
+        private String email;
 
         /**
          * 手机号
          */
         @Schema(description = "手机号")
-        private String           phone;
-
-        /**
-         * 密码强度
-         */
-        @Schema(description = "密码强度")
-        private PasswordStrength passwordStrength;
+        private String phone;
     }
 }

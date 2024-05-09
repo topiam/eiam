@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/23 21:19
+ * Created by support@topiam.cn on 2023/6/23 21:19
  */
 @Data
 @Schema(description = "获取 access_token 响应")

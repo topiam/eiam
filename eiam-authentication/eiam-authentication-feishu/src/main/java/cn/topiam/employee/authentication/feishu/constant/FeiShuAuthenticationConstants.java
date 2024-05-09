@@ -21,7 +21,7 @@ package cn.topiam.employee.authentication.feishu.constant;
  * 飞书认证常量
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/12/19 23:19
+ * Created by support@topiam.cn on 2021/12/19 23:19
  */
 public final class FeiShuAuthenticationConstants {
 

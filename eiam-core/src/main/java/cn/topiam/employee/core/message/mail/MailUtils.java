@@ -34,7 +34,7 @@ import cn.topiam.employee.common.exception.MailTemplateException;
  * 邮件工具类
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/10/4 21:30
+ * Created by support@topiam.cn on 2021/10/4 21:30
  */
 public class MailUtils {
     /**

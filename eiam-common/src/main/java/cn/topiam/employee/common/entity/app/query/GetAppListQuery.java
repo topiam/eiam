@@ -31,7 +31,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * 查询应用列表
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/7/6 22:38
+ * Created by support@topiam.cn on 2022/7/6 22:38
  */
 @Data
 @Schema(description = "查询应用列表")
@@ -51,6 +51,6 @@ public class GetAppListQuery implements Serializable {
      * 应用分组ID
      */
     @Parameter(description = "应用分组ID")
-    private Long              groupId;
+    private String            groupId;
 
 }

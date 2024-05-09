@@ -27,20 +27,22 @@ import org.mapstruct.Mapping;
 
 import com.alibaba.fastjson2.JSONObject;
 
-import cn.topiam.employee.authentication.common.authentication.IdpUserDetails;
+import cn.topiam.employee.authentication.common.IdentityProviderType;
+import cn.topiam.employee.authentication.common.authentication.IdentityProviderUserDetails;
+import cn.topiam.employee.common.entity.account.ThirdPartyUserEntity;
 import cn.topiam.employee.common.entity.account.UserDetailEntity;
 import cn.topiam.employee.common.entity.account.UserEntity;
-import cn.topiam.employee.common.entity.account.UserIdpBindEntity;
 import cn.topiam.employee.common.entity.account.po.UserIdpBindPO;
 import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
 import cn.topiam.employee.portal.pojo.request.UpdateUserInfoRequest;
 import cn.topiam.employee.portal.pojo.result.BoundIdpListResult;
+import cn.topiam.employee.support.security.util.SecurityUtils;
 
 /**
  * AccountConverter
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/3/25 21:52
+ * Created by support@topiam.cn on 2022/3/25 21:52
  */
 @Mapper(componentModel = "spring")
 public interface AccountConverter {
@@ -51,8 +53,9 @@ public interface AccountConverter {
      * @param param {@link UpdateUserInfoRequest} 更新参数
      * @return {@link UserEntity} 用户实体
      */
+    @Mapping(target = "needChangePassword", ignore = true)
+    @Mapping(target = "lockExpiredTime", ignore = true)
     @Mapping(target = "passwordPlainText", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "identitySourceId", ignore = true)
     @Mapping(target = "phoneVerified", ignore = true)
     @Mapping(target = "phoneAreaCode", ignore = true)
@@ -84,7 +87,7 @@ public interface AccountConverter {
      * @param param {@link UpdateUserInfoRequest}
      * @return {@link UserDetailEntity}
      */
-    @Mapping(target = "deleted", ignore = true)
+
     @Mapping(target = "website", ignore = true)
     @Mapping(target = "idType", ignore = true)
     @Mapping(target = "userId", ignore = true)
@@ -99,28 +102,6 @@ public interface AccountConverter {
     UserDetailEntity userUpdateParamConvertToUserDetailsEntity(UpdateUserInfoRequest param);
 
     /**
-     * 绑定参数入参转entity
-     *
-     * @param userId {@link String}
-     * @param idpUserDetails {@link IdpUserDetails}
-     * @return {@link  UserIdpBindEntity}
-     */
-    default UserIdpBindEntity accountBindIdpRequestConverterToEntity(String userId,
-                                                                     IdpUserDetails idpUserDetails) {
-        UserIdpBindEntity entity = new UserIdpBindEntity();
-        //封装参数
-        entity.setBindTime(LocalDateTime.now());
-        entity.setUserId(Long.valueOf(userId));
-        entity.setOpenId(idpUserDetails.getOpenId());
-        entity.setIdpId(idpUserDetails.getProviderId());
-        entity.setIdpType(idpUserDetails.getProviderType().value());
-        if (MapUtils.isNotEmpty(idpUserDetails.getAdditionalInfo())) {
-            entity.setAdditionInfo(JSONObject.toJSONString(idpUserDetails.getAdditionalInfo()));
-        }
-        return entity;
-    }
-
-    /**
      * 账号绑定entity转result
      *
      * @param identityProviderList {@link List<IdentityProviderEntity>}
@@ -130,22 +111,52 @@ public interface AccountConverter {
     default List<BoundIdpListResult> entityConverterToBoundIdpListResult(List<IdentityProviderEntity> identityProviderList,
                                                                          Iterable<UserIdpBindPO> userIdpBindList) {
         List<BoundIdpListResult> boundIdpListResultList = new ArrayList<>();
-        for (IdentityProviderEntity identityProviderEntity : identityProviderList) {
-            BoundIdpListResult boundIdpListResult = new BoundIdpListResult();
-            boundIdpListResult.setIdpId(identityProviderEntity.getId().toString());
-            boundIdpListResult.setCode(identityProviderEntity.getCode());
-            boundIdpListResult.setName(identityProviderEntity.getName());
-            boundIdpListResult.setType(identityProviderEntity.getType());
-            boundIdpListResult.setCategory(identityProviderEntity.getCategory());
-            boundIdpListResult.setBound(false);
+        for (IdentityProviderEntity provider : identityProviderList) {
+            BoundIdpListResult result = new BoundIdpListResult();
+            result.setIdpId(provider.getId());
+            result.setCode(provider.getCode());
+            result.setName(provider.getName());
+            result.setType(provider.getType());
+            result.setCategory(provider.getCategory());
+            result.setAuthorizationUri(
+                IdentityProviderType.getIdentityProviderType(provider.getType())
+                    .getAuthorizationPathPrefix() + "/" + provider.getCode());
+            result.setBound(false);
             for (UserIdpBindPO userIdpBindPo : userIdpBindList) {
-                if (userIdpBindPo.getIdpId()
-                    .equals(String.valueOf(identityProviderEntity.getId()))) {
-                    boundIdpListResult.setBound(true);
+                if (userIdpBindPo.getIdpId().equals(String.valueOf(provider.getId()))) {
+                    result.setBound(true);
+                    result.setId(userIdpBindPo.getId());
                 }
             }
-            boundIdpListResultList.add(boundIdpListResult);
+            boundIdpListResultList.add(result);
         }
         return boundIdpListResultList;
+    }
+
+    /**
+     * 三方用户参数入参转entity
+     *
+     * @param details {@link IdentityProviderUserDetails}
+     * @return {@link ThirdPartyUserEntity}
+     */
+    default ThirdPartyUserEntity thirdPartyUserConverterToEntity(IdentityProviderUserDetails details) {
+        ThirdPartyUserEntity entity = new ThirdPartyUserEntity();
+        entity.setEmail(details.getEmail());
+        entity.setStateCode(details.getStateCode());
+        entity.setMobile(details.getMobile());
+        entity.setNickName(details.getNickName());
+        entity.setUnionId(details.getUnionId());
+        entity.setOpenId(details.getOpenId());
+        entity.setAvatarUrl(details.getAvatarUrl());
+        entity.setIdpId(details.getProviderId());
+        entity.setIdpType(details.getProviderType().value());
+        entity.setCreateBy(SecurityUtils.getCurrentUserId());
+        entity.setCreateTime(LocalDateTime.now());
+        entity.setUpdateBy(SecurityUtils.getCurrentUserId());
+        entity.setUpdateTime(LocalDateTime.now());
+        if (MapUtils.isNotEmpty(details.getAdditionalInfo())) {
+            entity.setAdditionInfo(JSONObject.toJSONString(details.getAdditionalInfo()));
+        }
+        return entity;
     }
 }

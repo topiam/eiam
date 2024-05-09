@@ -17,8 +17,10 @@
  */
 package cn.topiam.employee.common.repository.account;
 
+import java.util.Collection;
 import java.util.List;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,47 +28,28 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.account.OrganizationMemberEntity;
-import cn.topiam.employee.support.repository.LogicDeleteRepository;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
+import cn.topiam.employee.common.entity.account.po.OrganizationMemberPO;
 
 /**
  * 组织机构成员
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/30 03:06
+ * Created by support@topiam.cn on 2021/11/30 03:06
  */
 @Repository
 public interface OrganizationMemberRepository extends
-                                              LogicDeleteRepository<OrganizationMemberEntity, Long>,
+                                              JpaRepository<OrganizationMemberEntity, String>,
                                               OrganizationMemberCustomizedRepository {
 
     /**
      * 根据组织机构ID和用户ID删除
      *
-     * @param orgId  {@link Long}
-     * @param userId {@link Long}
+     * @param orgId  {@link String}
+     * @param userId {@link String}
      */
     @Modifying
     @Transactional(rollbackFor = Exception.class)
-    @Query(value = "UPDATE organization_member SET " + SOFT_DELETE_SET
-                   + " WHERE user_id = :userId AND org_id = :orgId", nativeQuery = true)
-    void deleteByOrgIdAndUserId(@Param("orgId") String orgId, @Param("userId") Long userId);
-
-    /**
-     * 根据根据用户id查询关联的组织
-     *
-     * @param userId {@link Long}
-     * @return {@link List}
-     */
-    List<OrganizationMemberEntity> findAllByUserId(@Param("userId") Long userId);
-
-    /**
-     * 根据根据用户id列表查询关联的组织
-     *
-     * @param userIds {@link List}
-     * @return {@link List}
-     */
-    List<OrganizationMemberEntity> findAllByUserIdIn(List<Long> userIds);
+    void deleteByOrgIdAndUserId(String orgId, String userId);
 
     /**
      * 根据根据组织id查询关联的用户
@@ -77,15 +60,21 @@ public interface OrganizationMemberRepository extends
     List<OrganizationMemberEntity> findAllByOrgId(String orgId);
 
     /**
+     * 根据根据用户id查询关联的用户
+     *
+     * @param userId {@link String}
+     * @return {@link List}
+     */
+    List<OrganizationMemberEntity> findAllByUserId(String userId);
+
+    /**
      * 根据用户ID 批量删除关联关系
      *
      * @param userIds {@link String}
      */
     @Modifying
     @Transactional(rollbackFor = Exception.class)
-    @Query(value = "UPDATE organization_member SET " + SOFT_DELETE_SET
-                   + " WHERE user_id IN (:userIds)", nativeQuery = true)
-    void deleteAllByUserId(@Param("userIds") Iterable<Long> userIds);
+    void deleteAllByUserIdIn(Collection<String> userIds);
 
     /**
      * 根据用户ID 删除关联关系
@@ -94,18 +83,14 @@ public interface OrganizationMemberRepository extends
      */
     @Modifying
     @Transactional(rollbackFor = Exception.class)
-    @Query(value = "UPDATE organization_member SET " + SOFT_DELETE_SET
-                   + " WHERE user_id = :id", nativeQuery = true)
-    void deleteByUserId(@Param("id") Long id);
+    void deleteByUserId(@Param("id") String id);
 
     /**
-     * 根据组织ID 删除关联关系
+     * 根据根据用户id查询关联的组织
      *
-     * @param orgId {@link String}
+     * @param userId {@link String}
+     * @return {@link List}
      */
-    @Modifying
-    @Transactional(rollbackFor = Exception.class)
-    @Query(value = "UPDATE organization_member SET " + SOFT_DELETE_SET
-                   + " WHERE org_id = :orgId", nativeQuery = true)
-    void deleteByOrgId(@Param("orgId") String orgId);
+    @Query(value = "SELECT NEW cn.topiam.employee.common.entity.account.po.OrganizationMemberPO(om.id,om.userId,om.orgId,o.name,o.displayPath) FROM OrganizationMemberEntity om LEFT JOIN OrganizationEntity o ON o.id= om.orgId WHERE om.userId =:userId")
+    List<OrganizationMemberPO> findAllPoByUserId(String userId);
 }

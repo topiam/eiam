@@ -23,7 +23,7 @@ import cn.topiam.employee.support.exception.TopIamException;
  * 应用账户已存在
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/7/8 22:49
+ * Created by support@topiam.cn on 2022/7/8 22:49
  */
 public class AppAccountExistException extends TopIamException {
 

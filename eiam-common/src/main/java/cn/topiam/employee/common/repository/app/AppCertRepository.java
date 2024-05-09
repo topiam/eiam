@@ -23,35 +23,33 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.app.AppCertEntity;
 import cn.topiam.employee.common.entity.app.AppOidcConfigEntity;
 import cn.topiam.employee.common.enums.app.AppCertUsingType;
-import cn.topiam.employee.support.repository.LogicDeleteRepository;
 import static cn.topiam.employee.common.constant.AppConstants.APP_CERT_CACHE_NAME;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 
 /**
  * AppCertificateRepository
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/5/31 21:52
+ * Created by support@topiam.cn on 2022/5/31 21:52
  */
 @CacheConfig(cacheNames = { APP_CERT_CACHE_NAME })
-public interface AppCertRepository extends LogicDeleteRepository<AppCertEntity, Long> {
+public interface AppCertRepository extends JpaRepository<AppCertEntity, String> {
     /**
      * 根据应用ID查询证书
      *
-     * @param appId     {@link Long}
+     * @param appId     {@link String}
      * @param usingType {@link AppCertUsingType}
      * @return {@link AppCertEntity}
      */
     @Cacheable(key = "#p1.code+':'+#p0", unless = "#result==null")
-    Optional<AppCertEntity> findByAppIdAndUsingType(Long appId, AppCertUsingType usingType);
+    Optional<AppCertEntity> findByAppIdAndUsingType(String appId, AppCertUsingType usingType);
 
     /**
      * save
@@ -72,19 +70,17 @@ public interface AppCertRepository extends LogicDeleteRepository<AppCertEntity, 
      */
     @CacheEvict(allEntries = true)
     @Override
-    void deleteById(@NotNull Long id);
+    void deleteById(@NotNull String id);
 
     /**
      * 根据应用ID删除应用
      *
-     * @param appId {@link Long}
+     * @param appId {@link String}
      */
     @CacheEvict(allEntries = true)
     @Modifying
     @Transactional(rollbackFor = Exception.class)
-    @Query(value = "UPDATE app_cert SET " + SOFT_DELETE_SET
-                   + " WHERE app_id = :appId", nativeQuery = true)
-    void deleteByAppId(@Param("appId") Long appId);
+    void deleteByAppId(@Param("appId") String appId);
 
     /**
      * find by id
@@ -95,5 +91,5 @@ public interface AppCertRepository extends LogicDeleteRepository<AppCertEntity, 
     @NotNull
     @Override
     @Cacheable
-    Optional<AppCertEntity> findById(@NotNull Long id);
+    Optional<AppCertEntity> findById(@NotNull String id);
 }

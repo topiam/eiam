@@ -17,13 +17,15 @@
  */
 package cn.topiam.employee.common.entity.app;
 
+import java.time.Duration;
 import java.util.Set;
 
-import org.hibernate.annotations.*;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.SoftDelete;
 import org.hibernate.type.SqlTypes;
 
-import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
+import cn.topiam.employee.support.repository.SoftDeleteConverter;
+import cn.topiam.employee.support.repository.base.BaseEntity;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -33,30 +35,28 @@ import lombok.experimental.Accessors;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
+import static cn.topiam.employee.support.repository.base.BaseEntity.IS_DELETED_COLUMN;
 
 /**
  * APP OIDC 配置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/5/22 22:31
+ * Created by support@topiam.cn on 2022/5/22 22:31
  */
 @Getter
 @Setter
 @ToString
 @Entity
 @Accessors(chain = true)
-@Table(name = "app_oidc_config")
-@SQLDelete(sql = "update app_oidc_config set " + SOFT_DELETE_SET + " where id_ = ?")
-@Where(clause = SOFT_DELETE_WHERE)
-public class AppOidcConfigEntity extends LogicDeleteEntity<Long> {
+@Table(name = "eiam_app_oidc_config")
+@SoftDelete(columnName = IS_DELETED_COLUMN, converter = SoftDeleteConverter.class)
+public class AppOidcConfigEntity extends BaseEntity {
 
     /**
      * APP ID
      */
     @Column(name = "app_id")
-    private Long        appId;
+    private String      appId;
 
     /**
      * 客户端认证方式
@@ -122,19 +122,31 @@ public class AppOidcConfigEntity extends LogicDeleteEntity<Long> {
      * 刷新 Token生存时间（分钟）
      */
     @Column(name = "refresh_token_time_to_live")
-    private Integer     refreshTokenTimeToLive;
+    private Duration    refreshTokenTimeToLive;
+
+    /**
+     * 授权码 生存时间（分钟）
+     */
+    @Column(name = "authorization_code_time_to_live")
+    private Duration    authorizationCodeTimeToLive;
+
+    /**
+     * 设备CODE 生存时间（分钟）
+     */
+    @Column(name = "device_code_time_to_live")
+    private Duration    deviceCodeTimeToLive;
 
     /**
      * ID Token生存时间（分钟）
      */
     @Column(name = "id_token_time_to_live")
-    private Integer     idTokenTimeToLive;
+    private Duration    idTokenTimeToLive;
 
     /**
      * 访问 Token生存时间（分钟）
      */
     @Column(name = "access_token_time_to_live")
-    private Integer     accessTokenTimeToLive;
+    private Duration    accessTokenTimeToLive;
 
     /**
      * Id Token 签名算法

@@ -40,7 +40,7 @@ import static cn.topiam.employee.support.util.HttpRequestUtils.*;
  * 密码模式认证转换器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/26 22:20
+ * Created by support@topiam.cn on 2023/6/26 22:20
  */
 @SuppressWarnings("AlibabaClassNamingShouldBeCamel")
 public final class OAuth2AuthorizationResourceOwnerPasswordAuthenticationConverter implements

@@ -29,7 +29,6 @@ import { useLocation } from '@umijs/max';
 import { useIntl } from '@@/exports';
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import { removeUser } from '@/services/account';
-import AppAccess from './components/AppAccess';
 
 export default () => {
   const location = useLocation();
@@ -74,10 +73,6 @@ export default () => {
         {
           key: UserDetailTabs.user_info,
           tab: intl.formatMessage({ id: 'pages.account.user_detail.tabs.user_info' }),
-        },
-        {
-          key: UserDetailTabs.app_access,
-          tab: intl.formatMessage({ id: 'pages.account.user_detail.tabs.app_access' }),
         },
         {
           key: UserDetailTabs.login_audit,
@@ -128,8 +123,6 @@ export default () => {
     >
       {/*用户信息*/}
       {UserDetailTabs.user_info === tabActiveKey && <UserInfo userId={id} />}
-      {/*应用授权*/}
-      {UserDetailTabs.app_access === tabActiveKey && <AppAccess userId={id} />}
       {/*登录日志*/}
       {UserDetailTabs.login_audit === tabActiveKey && <LoginAudit userId={id} />}
     </PageContainer>

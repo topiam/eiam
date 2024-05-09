@@ -20,10 +20,6 @@ package cn.topiam.employee.core.configuration;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import cn.topiam.employee.common.constant.AuditConstants;
-import static cn.topiam.employee.common.constant.StorageConstants.STORAGE_GROUP_NAME;
-import static cn.topiam.employee.common.constant.StorageConstants.STORAGE_PATH;
 import static cn.topiam.employee.support.constant.EiamConstants.CONTEXT_ENDPOINT;
 import static cn.topiam.employee.support.constant.EiamConstants.CONTEXT_ENDPOINT_GROUP_NAME;
 
@@ -35,28 +31,6 @@ import static cn.topiam.employee.support.constant.EiamConstants.CONTEXT_ENDPOINT
  */
 @Configuration
 public class EiamApiConfiguration {
-
-    /**
-     * 存储 RestAPI
-     *
-     * @return {@link GroupedOpenApi}
-     */
-    @Bean
-    public GroupedOpenApi storageRestApi() {
-        return GroupedOpenApi.builder().group(STORAGE_GROUP_NAME).pathsToMatch(STORAGE_PATH + "/**")
-            .build();
-    }
-
-    /**
-     * 审计 RestAPI
-     *
-     * @return {@link GroupedOpenApi}
-     */
-    @Bean
-    public GroupedOpenApi auditRestApi() {
-        return GroupedOpenApi.builder().group(AuditConstants.AUDIT_GROUP_NAME)
-            .pathsToMatch(AuditConstants.AUDIT_PATH + "/**").build();
-    }
 
     /**
      * 系统上下文

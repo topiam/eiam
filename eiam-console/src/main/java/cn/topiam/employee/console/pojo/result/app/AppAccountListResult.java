@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * AppAccountCreateParam 应用账户查询结果
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/5/24 22:13
+ * Created by support@topiam.cn on 2022/5/24 22:13
  */
 @Data
 @Schema(description = "应用账户列表查询响应")
@@ -43,7 +43,7 @@ public class AppAccountListResult {
      * 应用ID
      */
     @Schema(description = "应用ID")
-    private Long          appId;
+    private String        appId;
 
     /**
      * 应用名称
@@ -73,7 +73,7 @@ public class AppAccountListResult {
      * 用户ID
      */
     @Schema(description = "用户ID")
-    private Long          userId;
+    private String        userId;
 
     /**
      * 用户名称
@@ -92,4 +92,10 @@ public class AppAccountListResult {
      */
     @Schema(description = "添加时间")
     private LocalDateTime createTime;
+
+    /**
+     * 是否默认
+     */
+    @Schema(description = "是否默认")
+    private Boolean       defaulted;
 }

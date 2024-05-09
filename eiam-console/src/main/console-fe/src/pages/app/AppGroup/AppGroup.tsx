@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
-import { App, Button, Popconfirm, Tag } from 'antd';
+import { App, Button, Space, Tag } from 'antd';
 import { useRef, useState } from 'react';
 import CreateModal from './components/CreateModal';
 import UpdateModal from './components/UpdateModal';
@@ -32,7 +32,7 @@ export default () => {
   const [createModalOpen, setCreateModalOpen] = useState<boolean>(false);
   const [updateModalOpen, setUpdateModalOpen] = useState<boolean>(false);
   const [id, setId] = useState<string>();
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   const columns: ProColumns<AppAPI.AppGroupList>[] = [
     {
       title: intl.formatMessage({ id: 'pages.app_group.list.column.name' }),
@@ -99,60 +99,62 @@ export default () => {
       title: intl.formatMessage({ id: 'pages.app_group.list.column.option' }),
       valueType: 'option',
       key: 'option',
-      width: 100,
+      width: 110,
       align: 'center',
-      render: (_text, record) => [
-        <a
-          key="editable"
-          onClick={() => {
-            setId(record.id);
-            setUpdateModalOpen(true);
-          }}
-          style={{
-            pointerEvents: record.type === 'default' ? 'none' : 'auto',
-            ...(record.type === 'default' ? { opacity: 0.2 } : {}),
-          }}
-        >
-          {intl.formatMessage({ id: 'app.update' })}
-        </a>,
-        <Popconfirm
-          disabled={record.type === 'default'}
-          title={intl.formatMessage({
-            id: 'pages.app_group.list.actions.popconfirm.delete',
-          })}
-          placement="bottomRight"
-          icon={
-            <QuestionCircleOutlined
+      render: (_text, record) => {
+        return (
+          <Space>
+            <a
+              key="editable"
+              onClick={() => {
+                setId(record.id);
+                setUpdateModalOpen(true);
+              }}
+              style={{
+                pointerEvents: record.type === 'default' ? 'none' : 'auto',
+                ...(record.type === 'default' ? { opacity: 0.2 } : {}),
+              }}
+            >
+              {intl.formatMessage({ id: 'app.update' })}
+            </a>
+            <a
+              target="_blank"
+              key="remove"
               style={{
                 color: 'red',
+                pointerEvents: record.type === 'default' ? 'none' : 'auto',
+                ...(record.type === 'default' ? { opacity: 0.2 } : {}),
               }}
-            />
-          }
-          onConfirm={async () => {
-            const { success } = await removeAppGroup(record.id);
-            if (success) {
-              message.success(intl.formatMessage({ id: 'app.operation_success' }));
-              actionRef.current?.reload();
-              return;
-            }
-          }}
-          okText={intl.formatMessage({ id: 'app.yes' })}
-          cancelText={intl.formatMessage({ id: 'app.no' })}
-          key="delete"
-        >
-          <a
-            target="_blank"
-            key="remove"
-            style={{
-              color: 'red',
-              pointerEvents: record.type === 'default' ? 'none' : 'auto',
-              ...(record.type === 'default' ? { opacity: 0.2 } : {}),
-            }}
-          >
-            {intl.formatMessage({ id: 'app.delete' })}
-          </a>
-        </Popconfirm>,
-      ],
+              onClick={() => {
+                const confirmed = modal.error({
+                  centered: true,
+                  title: intl.formatMessage({
+                    id: 'pages.app_group.list.actions.delete.title',
+                  }),
+                  icon: <ExclamationCircleFilled />,
+                  content: intl.formatMessage({
+                    id: 'pages.app_group.list.actions.delete.content',
+                  }),
+                  okText: intl.formatMessage({ id: 'app.confirm' }),
+                  okType: 'primary',
+                  okCancel: true,
+                  cancelText: intl.formatMessage({ id: 'app.cancel' }),
+                  onOk: async () => {
+                    const { success } = await removeAppGroup(record.id);
+                    if (success) {
+                      message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                      confirmed.destroy();
+                      actionRef.current?.reload();
+                    }
+                  },
+                });
+              }}
+            >
+              {intl.formatMessage({ id: 'app.delete' })}
+            </a>
+          </Space>
+        );
+      },
     },
   ];
 
@@ -225,7 +227,9 @@ export default () => {
             }
             actionRef.current?.reload();
             setUpdateModalOpen(false);
-            return true;
+          }}
+          afterClose={() => {
+            setId(undefined);
           }}
         />
       )}

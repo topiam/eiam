@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -32,16 +33,16 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.setting.AdministratorEntity;
-import cn.topiam.employee.support.repository.LogicDeleteRepository;
+import cn.topiam.employee.common.enums.UserStatus;
 import static cn.topiam.employee.common.constant.SettingConstants.ADMIN_CACHE_NAME;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/13 22:09
+ * Created by support@topiam.cn on 2021/11/13 22:09
  */
 @Repository
 @CacheConfig(cacheNames = { ADMIN_CACHE_NAME })
-public interface AdministratorRepository extends LogicDeleteRepository<AdministratorEntity, Long>,
+public interface AdministratorRepository extends JpaRepository<AdministratorEntity, String>,
                                          JpaSpecificationExecutor<AdministratorEntity> {
 
     /**
@@ -53,18 +54,7 @@ public interface AdministratorRepository extends LogicDeleteRepository<Administr
     @NotNull
     @Override
     @Cacheable
-    Optional<AdministratorEntity> findById(@NotNull @Param(value = "id") Long id);
-
-    /**
-     * findById
-     *
-     * @param id must not be {@literal null}.
-     * @return {@link AdministratorEntity}
-     */
-    @NotNull
-    @Cacheable
-    @Query(value = "SELECT AdministratorEntity FROM AdministratorEntity WHERE id = :id")
-    Optional<AdministratorEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") Long id);
+    Optional<AdministratorEntity> findById(@NotNull @Param(value = "id") String id);
 
     /**
      * findById
@@ -73,7 +63,7 @@ public interface AdministratorRepository extends LogicDeleteRepository<Administr
      */
     @Override
     @CacheEvict(allEntries = true)
-    void deleteById(@NotNull Long id);
+    void deleteById(@NotNull String id);
 
     /**
      * findById
@@ -82,7 +72,7 @@ public interface AdministratorRepository extends LogicDeleteRepository<Administr
      */
     @Override
     @CacheEvict(allEntries = true)
-    void deleteAllById(@NotNull Iterable<? extends Long> ids);
+    void deleteAllById(@NotNull Iterable<? extends String> ids);
 
     /**
      * save
@@ -127,20 +117,23 @@ public interface AdministratorRepository extends LogicDeleteRepository<Administr
     @Transactional(rollbackFor = Exception.class)
     @Modifying
     @CacheEvict(allEntries = true)
-    @Query(value = "update AdministratorEntity set status = :status where id = :id")
-    void updateStatus(@Param(value = "id") String id, @Param(value = "status") String status);
+    @Query(value = "UPDATE AdministratorEntity set status = :status where id = :id")
+    void updateStatus(@Param(value = "id") String id, @Param(value = "status") UserStatus status);
 
     /**
-     * 更新代码
+     * 更新用户密码
      *
-     * @param id       {@link String}
-     * @param password {@link String}
+     * @param id                     {@link  String}
+     * @param password               {@link  String}
+     * @param lastUpdatePasswordTime {@link LocalDateTime}
+     * @return {@link  Integer}
      */
     @Transactional(rollbackFor = Exception.class)
     @Modifying
     @CacheEvict(allEntries = true)
-    @Query(value = "update AdministratorEntity set password =:password,lastUpdatePasswordTime = :lastUpdatePasswordTime where id=:id")
-    Integer updatePassword(@Param(value = "id") Long id, @Param(value = "password") String password,
+    @Query(value = "update AdministratorEntity set password =:password, lastUpdatePasswordTime = :lastUpdatePasswordTime where id=:id")
+    Integer updatePassword(@Param(value = "id") String id,
+                           @Param(value = "password") String password,
                            @Param(value = "lastUpdatePasswordTime") LocalDateTime lastUpdatePasswordTime);
 
     /**
@@ -153,8 +146,9 @@ public interface AdministratorRepository extends LogicDeleteRepository<Administr
     @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     @Modifying
-    @Query(value = "UPDATE administrator SET auth_total = (IFNULL(auth_total,0) +1),last_auth_ip = ?2,last_auth_time = ?3 WHERE id_ = ?1", nativeQuery = true)
-    void updateAuthSucceedInfo(String id, String ip, LocalDateTime loginTime);
+    @Query(value = "UPDATE AdministratorEntity SET authTotal = (COALESCE(authTotal,0) +1),lastAuthIp = :ip,lastAuthTime = :loginTime WHERE id = :id")
+    void updateAuthSucceedInfo(@Param("id") String id, @Param("ip") String ip,
+                               @Param("loginTime") LocalDateTime loginTime);
 
     /**
      * 更新邮箱
@@ -166,7 +160,8 @@ public interface AdministratorRepository extends LogicDeleteRepository<Administr
     @Modifying
     @CacheEvict(allEntries = true)
     @Query(value = "UPDATE AdministratorEntity SET email =:email WHERE id=:id")
-    Integer updateEmail(@Param(value = "id") Long id, @Param(value = "email") String email);
+    Integer updateByIdAndEmail(@Param(value = "id") String id,
+                               @Param(value = "email") String email);
 
     /**
      * 更新用户手机号
@@ -178,6 +173,7 @@ public interface AdministratorRepository extends LogicDeleteRepository<Administr
     @Transactional(rollbackFor = Exception.class)
     @Modifying
     @CacheEvict(allEntries = true)
-    @Query(value = "update AdministratorEntity set phone =:phone where id=:id")
-    Integer updatePhone(@Param(value = "id") Long id, @Param(value = "phone") String phone);
+    @Query(value = "UPDATE AdministratorEntity set phone =:phone where id=:id")
+    Integer updateByIdAndPhone(@Param(value = "id") String id,
+                               @Param(value = "phone") String phone);
 }

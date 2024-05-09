@@ -20,12 +20,12 @@ package cn.topiam.employee.common.entity.account;
 import java.io.Serial;
 import java.time.LocalDateTime;
 
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SoftDelete;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
+import cn.topiam.employee.support.repository.SoftDeleteConverter;
+import cn.topiam.employee.support.repository.base.BaseEntity;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -35,8 +35,7 @@ import lombok.experimental.Accessors;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
+import static cn.topiam.employee.support.repository.base.BaseEntity.IS_DELETED_COLUMN;
 
 /**
  * <p>
@@ -44,17 +43,16 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-07-31
+ * Created by support@topiam.cn on 2020-07-31
  */
 @Getter
 @Setter
 @ToString
 @Accessors(chain = true)
 @Entity
-@Table(name = "user_history_password")
-@SQLDelete(sql = "update user_history_password set " + SOFT_DELETE_SET + " where id_ = ?")
-@Where(clause = SOFT_DELETE_WHERE)
-public class UserHistoryPasswordEntity extends LogicDeleteEntity<Long> {
+@Table(name = "eiam_user_history_password")
+@SoftDelete(columnName = IS_DELETED_COLUMN, converter = SoftDeleteConverter.class)
+public class UserHistoryPasswordEntity extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = -2619231849746900857L;

@@ -24,7 +24,7 @@ import cn.topiam.employee.application.form.model.FormProtocolConfig;
  * 应用接口
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/8/20 23:20
+ * Created by support@topiam.cn on 2022/8/20 23:20
  */
 public interface FormApplicationService extends ApplicationService {
 

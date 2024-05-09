@@ -20,7 +20,6 @@ package cn.topiam.eiam.protocol.oidc.authorization.token;
 import java.security.Principal;
 import java.util.*;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.core.oidc.endpoint.OidcParameterNames;
@@ -30,6 +29,9 @@ import org.springframework.security.oauth2.server.authorization.token.JwtEncodin
 import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.support.security.userdetails.UserDetails;
+import cn.topiam.employee.support.util.BeanUtils;
+
+import lombok.Setter;
 import static org.springframework.security.oauth2.core.oidc.OidcScopes.*;
 
 import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIME_FORMATTER;
@@ -38,16 +40,12 @@ import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIM
  * 令牌定制器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/12/26 21:44
+ * Created by support@topiam.cn on 2022/12/26 21:44
  */
+@Setter
 @SuppressWarnings({ "AlibabaClassNamingShouldBeCamel" })
 public class OAuth2TokenCustomizer implements
                                    org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer<JwtEncodingContext> {
-    private final UserRepository userRepository;
-
-    public OAuth2TokenCustomizer(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     public void customize(JwtEncodingContext context) {
@@ -58,23 +56,26 @@ public class OAuth2TokenCustomizer implements
             if (!Objects.isNull(authorization)){
                 Authentication authentication = authorization.getAttribute(Principal.class.getName());
                 if (!Objects.isNull(authentication)){
-                    UserDetails principal = (UserDetails) authentication.getPrincipal();
-                    Optional<UserEntity> optional = userRepository.findById(Long.valueOf(principal.getId()));
-                    if (optional.isPresent()){
-                        UserEntity user = optional.get();
+                    //存在 UserRepository 实时查询用户信息
+                    if (!Objects.isNull(userRepository)){
+                        UserDetails principal = (UserDetails) authentication.getPrincipal();
+                        Optional<UserEntity> optional = userRepository.findById(principal.getId());
+                        optional.ifPresent(user->BeanUtils.merge(user.toUserDetails(principal.getAuthorities()),principal));
+                    }
+                    UserDetails user = (UserDetails) authentication.getPrincipal();
                         boolean hasCustomClaims=false;
                         OidcUserInfo.Builder userInfoBuilder = OidcUserInfo.builder();
                         // Customize headers/claims for id_token
                         // 用户主体
-                        userInfoBuilder.subject(user.getId().toString());
+                        userInfoBuilder.subject(user.getId());
                         if (authorizedScopes.contains(EMAIL)) {
                             hasCustomClaims=true;
-                            userInfoBuilder.email(StringUtils.defaultString(user.getEmail(), ""));
+                            userInfoBuilder.email(Objects.toString(user.getEmail(), ""));
                             userInfoBuilder.emailVerified(!Objects.isNull(user.getEmailVerified()) && user.getEmailVerified());
                         }
                         if (authorizedScopes.contains(PHONE)) {
                             hasCustomClaims=true;
-                            userInfoBuilder.phoneNumber(StringUtils.defaultString(user.getPhone(), ""));
+                            userInfoBuilder.phoneNumber(Objects.toString(user.getPhone(), ""));
                             userInfoBuilder.phoneNumberVerified(!Objects.isNull(user.getPhoneVerified()) && user.getPhoneVerified());
                         }
                         if (authorizedScopes.contains(PROFILE)) {
@@ -82,7 +83,7 @@ public class OAuth2TokenCustomizer implements
                             //用户名
                             userInfoBuilder.preferredUsername(user.getUsername());
                             //昵称
-                            userInfoBuilder.nickname(StringUtils.defaultString(user.getNickName(), ""));
+                            userInfoBuilder.nickname(Objects.toString(user.getNickName(), ""));
                             userInfoBuilder.picture(user.getAvatar());
                             userInfoBuilder.updatedAt(user.getUpdateTime().format(DEFAULT_DATE_TIME_FORMATTER));
                         }
@@ -90,10 +91,12 @@ public class OAuth2TokenCustomizer implements
                             context.getClaims().claims(claims ->
                                     claims.putAll(userInfoBuilder.build().getClaims()));
                         }
-                    }
                 }
             }
         }
         //@formatter:on
     }
+
+    private UserRepository userRepository;
+
 }

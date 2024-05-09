@@ -26,19 +26,19 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
-import cn.topiam.employee.application.ApplicationServiceLoader;
+import cn.topiam.employee.protocol.code.EndpointMatcher;
 import cn.topiam.employee.protocol.code.configurer.AbstractConfigurer;
+import cn.topiam.employee.protocol.code.configurer.AuthenticationUtils;
+import cn.topiam.employee.protocol.form.FormAuthorizationService;
 import cn.topiam.employee.protocol.form.authentication.FormAuthenticationTokenProvider;
-import cn.topiam.employee.protocol.form.authorization.FormAuthorizationService;
 import cn.topiam.employee.protocol.form.endpoint.FormAuthenticationEndpointFilter;
 import static cn.topiam.employee.common.constant.ProtocolConstants.FormEndpointConstants.FORM_SSO_PATH;
 import static cn.topiam.employee.common.constant.ProtocolConstants.FormEndpointConstants.IDP_FORM_SSO_INITIATOR;
-import static cn.topiam.employee.protocol.code.util.ProtocolConfigUtils.getApplicationServiceLoader;
 
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/5 21:59
+ * Created by support@topiam.cn on 2023/7/5 21:59
  */
 public class FormAuthenticationEndpointConfigurer extends AbstractConfigurer {
     private RequestMatcher requestMatcher;
@@ -54,14 +54,15 @@ public class FormAuthenticationEndpointConfigurer extends AbstractConfigurer {
      */
     @Override
     public void init(HttpSecurity httpSecurity) {
-        ApplicationServiceLoader applicationServiceLoader = getApplicationServiceLoader(
-            httpSecurity);
+        FormAuthorizationService authorizationService = FormAuthenticationUtils
+            .getAuthorizationService(httpSecurity);
         requestMatcher = new OrRequestMatcher(
             new AntPathRequestMatcher(IDP_FORM_SSO_INITIATOR, HttpMethod.POST.name()),
+            new AntPathRequestMatcher(IDP_FORM_SSO_INITIATOR, HttpMethod.GET.name()),
             new AntPathRequestMatcher(FORM_SSO_PATH, HttpMethod.POST.name()),
             new AntPathRequestMatcher(FORM_SSO_PATH, HttpMethod.GET.name()));
         httpSecurity
-            .authenticationProvider(new FormAuthenticationTokenProvider(applicationServiceLoader));
+            .authenticationProvider(new FormAuthenticationTokenProvider(authorizationService));
     }
 
     /**
@@ -73,21 +74,16 @@ public class FormAuthenticationEndpointConfigurer extends AbstractConfigurer {
     public void configure(HttpSecurity httpSecurity) {
         AuthenticationManager authenticationManager = httpSecurity
             .getSharedObject(AuthenticationManager.class);
-        FormAuthorizationService authorizationService = FormAuthenticationUtils
-            .getAuthorizationService(httpSecurity);
         FormAuthenticationEndpointFilter singleSignOnEndpointFilter = new FormAuthenticationEndpointFilter(
-            requestMatcher, authenticationManager, authorizationService);
+            requestMatcher, authenticationManager);
+        singleSignOnEndpointFilter.setAuthenticationDetailsSource(
+            AuthenticationUtils.getAuthenticationDetailsSource(httpSecurity));
         httpSecurity.addFilterBefore(postProcess(singleSignOnEndpointFilter),
             AuthorizationFilter.class);
     }
 
-    /**
-     * 获取请求匹配器
-     *
-     * @return {@link RequestMatcher}
-     */
     @Override
-    public RequestMatcher getRequestMatcher() {
-        return requestMatcher;
+    public EndpointMatcher getEndpointMatcher() {
+        return new EndpointMatcher(this.requestMatcher, true);
     }
 }

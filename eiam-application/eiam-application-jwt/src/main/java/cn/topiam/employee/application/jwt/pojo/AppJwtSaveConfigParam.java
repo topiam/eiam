@@ -20,7 +20,6 @@ package cn.topiam.employee.application.jwt.pojo;
 import java.io.Serial;
 import java.io.Serializable;
 
-import cn.topiam.employee.common.enums.app.AuthorizationType;
 import cn.topiam.employee.common.enums.app.JwtBindingType;
 import cn.topiam.employee.common.enums.app.JwtIdTokenSubjectType;
 
@@ -34,7 +33,7 @@ import jakarta.validation.constraints.NotNull;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2023/02/12 22:45
+ * Created by support@topiam.cn on 2023/02/12 22:45
  */
 @Data
 @Schema(description = "保存 JWT 应用配置参数")
@@ -44,11 +43,10 @@ public class AppJwtSaveConfigParam implements Serializable {
     private static final long     serialVersionUID = 7257798528680745281L;
 
     /**
-     * SSO范围
+     * 登录发起登录URL
      */
-    @NotNull(message = "SSO范围不能为空")
-    @Schema(description = "SSO范围")
-    private AuthorizationType     authorizationType;
+    @Schema(description = "登录发起登录URL")
+    private String                initLoginUrl;
 
     /**
      * 业务系统中（或PC程序）的JWT SSO地址，在单点登录时本系统将向该地址用[GET]方式发送id_token信息，参数名为id_token，

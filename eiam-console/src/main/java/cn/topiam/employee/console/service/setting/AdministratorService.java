@@ -17,8 +17,9 @@
  */
 package cn.topiam.employee.console.service.setting;
 
-import java.time.LocalDateTime;
+import java.util.Optional;
 
+import cn.topiam.employee.common.entity.setting.AdministratorEntity;
 import cn.topiam.employee.common.enums.CheckValidityType;
 import cn.topiam.employee.common.enums.UserStatus;
 import cn.topiam.employee.console.pojo.query.setting.AdministratorListQuery;
@@ -28,12 +29,13 @@ import cn.topiam.employee.console.pojo.save.setting.AdministratorCreateParam;
 import cn.topiam.employee.console.pojo.update.setting.AdministratorUpdateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
+import cn.topiam.employee.support.security.userdetails.UserDetails;
 
 /**
  * 管理员
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/13 23:12
+ * Created by support@topiam.cn on 2021/11/13 23:12
  */
 public interface AdministratorService {
     /**
@@ -97,6 +99,29 @@ public interface AdministratorService {
     Boolean resetAdministratorPassword(String id, String password);
 
     /**
+     * 强制重置当前登录管理员密码
+     *
+     * @param username {@link String}
+     * @param password {@link String}
+     */
+    void forceResetAdministratorPassword(String username, String password);
+
+    /**
+     * 强制重置当前登录管理员密码
+     *
+     * @param adminEntity {@link AdministratorEntity}
+     * @param password {@link String}
+     */
+    void forceResetAdministratorPassword(AdministratorEntity adminEntity, String password);
+
+    /**
+     * 根据用户名查询管理员
+     * @param username {@link String}
+     * @return {@link AdministratorEntity}
+     */
+    AdministratorEntity getAdministratorByUsername(String username);
+
+    /**
      * 参数有效性验证
      *
      * @param type  {@link CheckValidityType}
@@ -104,15 +129,28 @@ public interface AdministratorService {
      * @param id    {@link Long}
      * @return {@link Boolean}
      */
-    Boolean administratorParamCheck(CheckValidityType type, String value, Long id);
+    Boolean administratorParamCheck(CheckValidityType type, String value, String id);
 
     /**
-     * 更新认证成功信息
+     * 根据用户名、手机号、邮箱查询用户
      *
-     * @param id {@link String}
-     * @param ip {@link String}
-     * @param loginTime {@link LocalDateTime}
-     * @return {@link Boolean}
+     * @return {@link AdministratorEntity}
      */
-    Boolean updateAuthSucceedInfo(String id, String ip, LocalDateTime loginTime);
+    Optional<AdministratorEntity> findByUsernameOrPhoneOrEmail(String keyword);
+
+    /**
+     * 获取用户详情
+     *
+     * @param userId {@link String}
+     * @return {@link UserDetails}
+     */
+    UserDetails getUserDetails(String userId);
+
+    /**
+     * 获取用户详情
+     *
+     * @param user {@link AdministratorEntity}
+     * @return {@link UserDetails}
+     */
+    UserDetails getUserDetails(AdministratorEntity user);
 }

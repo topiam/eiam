@@ -18,48 +18,28 @@
 package cn.topiam.employee.audit.repository;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.audit.entity.AuditEntity;
-import cn.topiam.employee.support.repository.LogicDeleteRepository;
+import cn.topiam.employee.audit.event.type.EventType;
 
 /**
  * 行为审计repository
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/11 22:32
+ * Created by support@topiam.cn on 2021/9/11 22:32
  */
 @Repository
-public interface AuditRepository extends LogicDeleteRepository<AuditEntity, Long>,
+public interface AuditRepository extends JpaRepository<AuditEntity, String>,
                                  AuditCustomizedRepository, JpaSpecificationExecutor<AuditEntity> {
 
-    /**
-     * 统计指定时间范围内用户登录失败次数
-     *
-     * @param startTime {@link LocalDateTime}
-     * @param endTime {@link LocalDateTime}
-     * @param userId {@link Long}
-     * @return {@link Integer}
-     */
-    @Query(value = "SELECT count(*) FROM `audit` WHERE event_time BETWEEN :startTime AND :endTime AND actor_id  = :userId AND event_type = 'eiam:event:login:portal' AND event_status = 'fail'", nativeQuery = true)
-    Integer countLoginFailByUserId(@Param("startTime") LocalDateTime startTime,
-                                   @Param("endTime") LocalDateTime endTime,
-                                   @Param("userId") Long userId);
-
-    /**
-     * 根据requestId查询审计是否已存在
-     *
-     * @param requestId {@link String}
-     * @return {@link AuditEntity}
-     */
-    Optional<AuditEntity> findByRequestId(String requestId);
-
-    @Query(value = "SELECT COUNT(*) FROM audit WHERE event_type = :type AND event_time BETWEEN :startTime AND :endTime", nativeQuery = true)
-    Long countByTypeAndTime(@Param("type") String type, @Param("startTime") LocalDateTime startTime,
+    @Query(value = "SELECT COUNT(*) FROM AuditEntity WHERE eventType = :type AND eventTime BETWEEN :startTime AND :endTime")
+    Long countByTypeAndTime(@Param("type") EventType type,
+                            @Param("startTime") LocalDateTime startTime,
                             @Param("endTime") LocalDateTime endTime);
 }

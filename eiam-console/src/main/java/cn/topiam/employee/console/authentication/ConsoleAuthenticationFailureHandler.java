@@ -17,19 +17,21 @@
  */
 package cn.topiam.employee.console.authentication;
 
-import org.apache.commons.lang3.StringUtils;
+import java.util.Objects;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
 import cn.topiam.employee.support.enums.SecretType;
-import cn.topiam.employee.support.exception.enums.ExceptionStatus;
 import cn.topiam.employee.support.result.ApiRestResult;
+import cn.topiam.employee.support.security.exception.SecretInvalidException;
 import cn.topiam.employee.support.util.HttpResponseUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import static cn.topiam.employee.support.constant.EiamConstants.CAPTCHA_CODE_SESSION;
+import static cn.topiam.employee.support.exception.enums.ExceptionStatus.*;
 
 /**
  * 认证失败
@@ -49,12 +51,15 @@ public class ConsoleAuthenticationFailureHandler implements AuthenticationFailur
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                                         AuthenticationException exception) {
-        ApiRestResult<Object> result = ApiRestResult.builder()
-            .status(ExceptionStatus.EX000101.getCode()).message(StringUtils
-                .defaultString(exception.getMessage(), ExceptionStatus.EX000101.getMessage()))
-            .build();
+        //@formatter:off
+        ApiRestResult.RestResultBuilder<String> builder = ApiRestResult.<String> builder().status(EX000101.getCode()).message(Objects.toString(exception.getMessage(),EX000101.getMessage()));
+        if (exception instanceof SecretInvalidException){
+            builder = ApiRestResult.<String> builder().status(EX900005.getCode());
+        }
+        //@formatter:on
         request.getSession().removeAttribute(SecretType.LOGIN.getKey());
         request.getSession().removeAttribute(CAPTCHA_CODE_SESSION);
-        HttpResponseUtils.flushResponseJson(response, HttpStatus.BAD_REQUEST.value(), result);
+        HttpResponseUtils.flushResponseJson(response, HttpStatus.BAD_REQUEST.value(),
+            builder.build());
     }
 }

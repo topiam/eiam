@@ -31,8 +31,8 @@ import cn.topiam.employee.application.form.pojo.AppFormProtocolEndpoint;
 import cn.topiam.employee.application.form.pojo.AppFormSaveConfigParam;
 import cn.topiam.employee.common.entity.app.AppFormConfigEntity;
 import cn.topiam.employee.common.entity.app.po.AppFormConfigPO;
-import cn.topiam.employee.core.help.ServerHelp;
-import static cn.topiam.employee.common.constant.AppConstants.APP_CODE;
+import cn.topiam.employee.core.context.ContextService;
+import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CODE;
 import static cn.topiam.employee.common.constant.ProtocolConstants.FormEndpointConstants.FORM_SSO_PATH;
 
 /**
@@ -50,7 +50,7 @@ public interface AppFormConfigConverter {
      * @param config {@link AppFormSaveConfigParam}
      * @return {@link AppFormConfigEntity}
      */
-    @Mapping(target = "deleted", ignore = true)
+
     @Mapping(target = "updateTime", ignore = true)
     @Mapping(target = "updateBy", ignore = true)
     @Mapping(target = "remark", ignore = true)
@@ -72,11 +72,9 @@ public interface AppFormConfigConverter {
         }
         AppFormConfigGetResult result = new AppFormConfigGetResult();
         if (po.getAppId() != null) {
-            result.setAppId(String.valueOf(po.getAppId()));
+            result.setAppId(po.getAppId());
         }
-        result.setInitLoginType(po.getInitLoginType());
         result.setInitLoginUrl(po.getInitLoginUrl());
-        result.setAuthorizationType(po.getAuthorizationType());
         result.setLoginUrl(po.getLoginUrl());
         result.setUsernameField(po.getUsernameField());
         result.setPasswordField(po.getPasswordField());
@@ -106,7 +104,7 @@ public interface AppFormConfigConverter {
         variables.put(APP_CODE,appCode);
         StringSubstitutor sub = new StringSubstitutor(variables, "{", "}");
         //IDP SSO 端点
-        domain.setIdpSsoEndpoint(sub.replace(ServerHelp.getPortalPublicBaseUrl()+FORM_SSO_PATH));
+        domain.setIdpSsoEndpoint(sub.replace(ContextService.getPortalPublicBaseUrl()+FORM_SSO_PATH));
         return domain;
         //@formatter:on
     }

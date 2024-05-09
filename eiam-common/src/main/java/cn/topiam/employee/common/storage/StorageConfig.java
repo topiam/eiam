@@ -25,17 +25,18 @@ import lombok.Builder;
 import lombok.Data;
 
 import jakarta.validation.constraints.NotEmpty;
-import static cn.topiam.employee.common.constant.StorageConstants.URL_REGEXP;
+import static cn.topiam.employee.common.storage.impl.AliYunOssStorage.URL_REGEXP;
 
 /**
  * 存储配置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/10/1 21:10
+ * Created by support@topiam.cn on 2021/10/1 21:10
  */
 @Data
 @Builder
 public class StorageConfig {
+
     public StorageConfig() {
     }
 
@@ -64,6 +65,7 @@ public class StorageConfig {
      */
     @Data
     public static class Config {
+
         /**
          * 域名
          */

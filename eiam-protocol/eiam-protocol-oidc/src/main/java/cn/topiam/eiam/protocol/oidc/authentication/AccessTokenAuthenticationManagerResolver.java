@@ -34,7 +34,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/29 21:56
+ * Created by support@topiam.cn on 2023/6/29 21:56
  */
 public class AccessTokenAuthenticationManagerResolver implements
                                                       AuthenticationManagerResolver<HttpServletRequest> {

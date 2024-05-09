@@ -29,7 +29,7 @@ import lombok.NoArgsConstructor;
  * 部门
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/28 23:03
+ * Created by support@topiam.cn on 2022/2/28 23:03
  */
 @Data
 @NoArgsConstructor

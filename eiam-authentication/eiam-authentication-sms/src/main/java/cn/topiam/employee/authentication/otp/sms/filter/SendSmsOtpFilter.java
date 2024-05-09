@@ -18,7 +18,7 @@
 package cn.topiam.employee.authentication.otp.sms.filter;
 
 import java.io.IOException;
-import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -42,15 +42,15 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import static cn.topiam.employee.common.constant.AuthorizeConstants.LOGIN_PATH;
 import static cn.topiam.employee.common.enums.MessageNoticeChannel.SMS;
+import static cn.topiam.employee.support.security.constant.SecurityConstants.LOGIN_PATH;
 import static cn.topiam.employee.support.util.PhoneNumberUtils.isPhoneValidate;
 
 /**
  * 发送OTP
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/1/1 22:01
+ * Created by support@topiam.cn on 2023/1/1 22:01
  */
 public class SendSmsOtpFilter extends OncePerRequestFilter {
     /**
@@ -84,9 +84,9 @@ public class SendSmsOtpFilter extends OncePerRequestFilter {
     public void sendOtp(HttpServletResponse response, String recipient) {
         if (isPhoneValidate(recipient)) {
             //判断是否存在用户
-            UserEntity user = userRepository
+            Optional<UserEntity> user = userRepository
                 .findByPhone(PhoneNumberUtils.getPhoneNumber(recipient));
-            if (Objects.nonNull(user)) {
+            if (user.isPresent()) {
                 otpContextHelp.sendOtp(recipient, SmsType.LOGIN.getCode(), SMS);
                 HttpResponseUtils.flushResponseJson(response, HttpStatus.OK.value(),
                     ApiRestResult.ok());

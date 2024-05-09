@@ -17,35 +17,34 @@
  */
 package cn.topiam.employee.common.repository.account;
 
+import java.util.Collection;
+
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import cn.topiam.employee.common.entity.account.ThirdPartyUserEntity;
 import cn.topiam.employee.common.entity.account.UserIdpBindEntity;
-import cn.topiam.employee.support.repository.LogicDeleteRepository;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
 
 /**
  * 用户身份绑定表
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/4/3 22:18
+ * Created by support@topiam.cn on 2022/4/3 22:18
  */
 @Repository
-public interface UserIdpRepository extends LogicDeleteRepository<UserIdpBindEntity, Long>,
+public interface UserIdpRepository extends JpaRepository<UserIdpBindEntity, String>,
                                    UserIdpRepositoryCustomized {
 
+    long countByThirdPartyUser(ThirdPartyUserEntity thirdPartyUserEntity);
+
     /**
-     * 删除idp绑定
+     * 根据用户id删除
      *
-     * @param userId {@link String}
-     * @param idpId {@link String}
+     * @param userIds {@link String}
      */
     @Modifying
     @Transactional(rollbackFor = Exception.class)
-    @Query(value = "UPDATE user_idp_bind SET " + SOFT_DELETE_SET
-                   + " WHERE user_id = :userId AND idp_id = :idpId", nativeQuery = true)
-    void deleteByUserIdAndIdpId(@Param("userId") String userId, @Param("idpId") String idpId);
+    void deleteAllByUserIdIn(Collection<String> userIds);
 }

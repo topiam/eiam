@@ -28,7 +28,7 @@ import cn.topiam.employee.console.pojo.result.setting.SmsTemplateListResult;
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-08-13
+ * Created by support@topiam.cn on 2020-08-13
  */
 public interface SmsTemplateService extends SettingService {
 

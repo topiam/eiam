@@ -16,86 +16,86 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { UploadOutlined } from '@ant-design/icons';
-import { ProForm, ProFormText, useStyle as useAntdStyle } from '@ant-design/pro-components';
-import { App, Avatar, Button, Form, Skeleton, Upload } from 'antd';
+import { ProForm, ProFormText } from '@ant-design/pro-components';
+import { App, Avatar, Button, Col, Form, Row, Skeleton, Spin, Upload } from 'antd';
 import { useState } from 'react';
 
-import { changeBaseInfo } from '@/pages/Account/service';
+import { changeBaseInfo } from '../service';
 import { aesEcbEncrypt } from '@/utils/aes';
 import { onGetEncryptSecret } from '@/utils/utils';
 import { useAsyncEffect } from 'ahooks';
 import ImgCrop from 'antd-img-crop';
 import { uploadFile } from '@/services/upload';
 import { useModel } from '@umijs/max';
-import classnames from 'classnames';
 import { useIntl } from '@@/exports';
+import { createStyles } from 'antd-style';
+import { omit } from 'lodash';
 
 const prefixCls = 'account-base';
 
-function useStyle() {
-  return useAntdStyle('AccountBaseComponent', (token) => {
-    return [
-      {
-        [`.${prefixCls}`]: {
+const useStyles = createStyles(({ prefixCls, token }, props) => {
+  const prefixClassName = `.${props}`;
+  return {
+    accountBase: {
+      display: 'flex',
+      paddingTop: '12px',
+      [`@media screen and (max-width: ${token.screenMD}px)`]: {
+        flexDirection: 'column-reverse',
+      },
+      [`${prefixClassName}-left`]: {
+        minWidth: '224px',
+        maxWidth: '448px',
+      },
+      [`${prefixClassName}-right`]: {
+        flex: '1',
+        paddingInlineStart: '104px',
+        [`@media screen and (max-width: ${token.screenMD}px)`]: {
           display: 'flex',
-          'padding-top': '12px',
-          [`&-left`]: {
-            minWidth: '224px',
-            maxWidth: '448px',
-          },
-          [`&-right`]: {
-            flex: 1,
-            'padding-inline-start': '104px',
-          },
-          [`&-avatar`]: {
-            marginBottom: '12px',
-            overflow: 'hidden',
-            img: {
-              width: '100%',
-            },
-            [`&-name`]: {
-              verticalAlign: 'middle',
-              backgroundColor: `${token.colorPrimary} !important`,
-            },
-            [`${token.antCls}-avatar`]: {
-              [`&-string`]: {
-                fontSize: '75px',
-              },
-            },
-            [`&-title`]: {
-              height: '22px',
-              marginBottom: '8px',
-              color: '@heading-color',
-              fontSize: '@font-size-base',
-              lineHeight: '22px',
-            },
-            [`&-button-view`]: {
-              width: '144px',
-              textAlign: 'center',
-            },
-          },
-        },
-        [`@media screen and (max-width: ${token.screenXL}px)`]: {
-          [`.${prefixCls}`]: {
-            flexDirection: 'column-reverse',
-            [`&-right`]: {
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              maxWidth: '448px',
-              padding: '20px',
-            },
-            ['&-avatar']: {
-              ['&-title']: {
-                display: 'none',
-              },
-            },
-          },
+          flexDirection: 'column',
+          alignItems: 'center',
+          maxWidth: '448px',
+          padding: '20px',
         },
       },
-    ];
-  });
-}
+      [`${prefixClassName}-avatar`]: {
+        marginBottom: '12px',
+        overflow: 'hidden',
+
+        img: {
+          width: '100%',
+        },
+
+        [`&-name`]: {
+          verticalAlign: 'middle',
+          backgroundColor: `${token.colorPrimary} !important`,
+        },
+
+        [`${prefixCls}-avatar`]: {
+          [`&-string`]: {
+            fontSize: '75px',
+          },
+        },
+
+        [`&-title`]: {
+          height: '22px',
+          marginBottom: '8px',
+          color: '@heading-color',
+          fontSize: '@font-size-base',
+          lineHeight: '22px',
+          [`@media screen and (max-width: ${token.screenMD}px)`]: {
+            display: 'none',
+          },
+        },
+
+        [`&-button-view`]: {
+          width: '144px',
+          textAlign: 'center',
+        },
+      },
+    },
+  };
+});
+
 export const FORM_ITEM_LAYOUT = {
   labelCol: {
     span: 5,
@@ -107,13 +107,16 @@ export const FORM_ITEM_LAYOUT = {
 
 const BaseView = () => {
   const intl = useIntl();
-  const useApp = App.useApp();
-  const { wrapSSR, hashId } = useStyle();
+  const { message } = App.useApp();
+  const { styles, cx } = useStyles(prefixCls);
   const [loading, setLoading] = useState<boolean>();
+  const [submitLoading, setSubmitLoading] = useState<boolean>(false);
   const { initialState } = useModel('@@initialState');
   const [avatarURL, setAvatarURL] = useState<string | undefined>(initialState?.currentUser?.avatar);
   const [avatarUploaded, setAvatarUploaded] = useState<boolean>(false);
   const [name, setName] = useState<string>();
+
+  const [form] = Form.useForm();
 
   useAsyncEffect(async () => {
     setLoading(true);
@@ -134,13 +137,14 @@ const BaseView = () => {
             fullName: values.fullName,
             nickName: values.nickName,
             personalProfile: values.personalProfile,
+            custom: values.custom,
             avatar: avatarUploaded ? avatarURL : undefined,
           }),
           publicSecret,
         ),
       );
       if (success) {
-        useApp.message.success(intl.formatMessage({ id: 'app.update_success' }));
+        message.success(intl.formatMessage({ id: 'app.update_success' }));
       }
     }
   };
@@ -163,18 +167,14 @@ const BaseView = () => {
     callBack: any;
   }) => (
     <>
-      <div className={classnames(`${prefixCls}-avatar-title`, hashId)}>
+      <div className={cx(`${prefixCls}-avatar-title`)}>
         {intl.formatMessage({ id: 'page.account.base.avatar_title' })}
       </div>
-      <div className={classnames(`${prefixCls}-avatar`, hashId)}>
+      <div className={cx(`${prefixCls}-avatar`)}>
         {avatar ? (
           <Avatar alt="avatar" shape={'circle'} size={144} src={avatar} />
         ) : (
-          <Avatar
-            shape={'circle'}
-            className={classnames(`${prefixCls}-avatar-name`, hashId)}
-            size={144}
-          >
+          <Avatar shape={'circle'} className={cx(`${prefixCls}-avatar-name`)} size={144}>
             {name?.substring(0, 1)}
           </Avatar>
         )}
@@ -193,15 +193,13 @@ const BaseView = () => {
             if (!files.file) {
               return;
             }
-            const { success, result, message } = await uploadFile(files.file);
+            const { success, result } = await uploadFile(files.file);
             if (success && result) {
               callBack(result);
-              return;
             }
-            useApp.message.error(message);
           }}
         >
-          <div className={classnames(`${prefixCls}-avatar-button-view`, hashId)}>
+          <div className={cx(`${prefixCls}-avatar-button-view`)}>
             <Button>
               <UploadOutlined />
               {intl.formatMessage({ id: 'page.account.base.avatar_change_title' })}
@@ -212,90 +210,93 @@ const BaseView = () => {
     </>
   );
 
-  return wrapSSR(
-    <div className={classnames(`${prefixCls}`, hashId)}>
-      {loading ? (
-        <Skeleton paragraph={{ rows: 8 }} />
-      ) : (
-        <>
-          <div className={classnames(`${prefixCls}-left`, hashId)}>
-            <ProForm
-              layout="horizontal"
-              labelAlign={'left'}
-              {...FORM_ITEM_LAYOUT}
-              onFinish={handleFinish}
-              submitter={{
-                render: (p, dom) => {
-                  return <Form.Item wrapperCol={{ span: 19, offset: 5 }}>{dom}</Form.Item>;
-                },
-                searchConfig: {
-                  submitText: intl.formatMessage({ id: 'app.save' }),
-                },
-                resetButtonProps: {
-                  style: {
-                    display: 'none',
-                  },
-                },
-              }}
-              initialValues={{
-                ...initialState?.currentUser,
-                phone: initialState?.currentUser?.phone?.split('-'),
-              }}
-              requiredMark={false}
-            >
-              <ProFormText
-                width="md"
-                name="username"
-                readonly
-                label={intl.formatMessage({ id: 'page.account.base.form.username' })}
+  return (
+    <>
+      <div className={styles.accountBase}>
+        {loading ? (
+          <Skeleton paragraph={{ rows: 8 }} />
+        ) : (
+          <>
+            <div className={cx(`${prefixCls}-left`)}>
+              <Spin spinning={submitLoading}>
+                <ProForm
+                  layout="horizontal"
+                  labelAlign={'left'}
+                  {...FORM_ITEM_LAYOUT}
+                  submitter={false}
+                  initialValues={{
+                    ...omit(initialState?.currentUser, 'custom'),
+                    phone: initialState?.currentUser?.phone?.split('-'),
+                  }}
+                  requiredMark={false}
+                  form={form}
+                >
+                  <ProFormText
+                    width="md"
+                    name="username"
+                    readonly
+                    label={intl.formatMessage({ id: 'page.account.base.form.username' })}
+                  />
+                  <ProFormText
+                    width="md"
+                    name="email"
+                    readonly
+                    label={intl.formatMessage({ id: 'page.account.base.form.email' })}
+                  />
+                  <ProFormText
+                    width="md"
+                    name="phone"
+                    readonly
+                    label={intl.formatMessage({ id: 'page.account.base.form.phone' })}
+                  />
+                  <ProFormText
+                    width="md"
+                    name="fullName"
+                    label={intl.formatMessage({ id: 'page.account.base.form.full_name' })}
+                    allowClear={false}
+                  />
+                  <ProFormText
+                    width="md"
+                    name="nickName"
+                    label={intl.formatMessage({ id: 'page.account.base.form.nick_name' })}
+                    allowClear={false}
+                  />
+                </ProForm>
+              </Spin>
+              <Row>
+                <Col offset={5} />
+                <Col span={19}>
+                  <Button
+                    type={'primary'}
+                    loading={submitLoading}
+                    onClick={async () => {
+                      await form.validateFields();
+                      let values = form.getFieldsValue();
+                      setSubmitLoading(true);
+                      await handleFinish(values).finally(() => {
+                        setSubmitLoading(false);
+                      });
+                    }}
+                  >
+                    {intl.formatMessage({ id: 'app.save' })}
+                  </Button>
+                </Col>
+              </Row>
+            </div>
+            <div className={cx(`${prefixCls}-right`)}>
+              <AvatarView
+                avatar={avatarURL}
+                callBack={(avatarUrl: string) => {
+                  setAvatarURL(avatarUrl);
+                  setAvatarUploaded(true);
+                }}
+                name={name}
               />
-              <ProFormText
-                width="md"
-                name="email"
-                readonly
-                label={intl.formatMessage({ id: 'page.account.base.form.email' })}
-              />
-              <ProFormText
-                width="md"
-                name="phone"
-                readonly
-                label={intl.formatMessage({ id: 'page.account.base.form.phone' })}
-              />
-              <ProFormText
-                width="md"
-                name="fullName"
-                label={intl.formatMessage({ id: 'page.account.base.form.full_name' })}
-                allowClear={false}
-              />
-              <ProFormText
-                width="md"
-                name="nickName"
-                label={intl.formatMessage({ id: 'page.account.base.form.nick_name' })}
-                allowClear={false}
-                rules={[
-                  {
-                    required: true,
-                    message: intl.formatMessage({
-                      id: 'page.account.base.form.nick_name.rule.0',
-                    }),
-                  },
-                ]}
-              />
-            </ProForm>
-          </div>
-          <div className={classnames(`${prefixCls}-right`, hashId)}>
-            <AvatarView
-              avatar={avatarURL}
-              callBack={(avatarUrl: string) => {
-                setAvatarURL(avatarUrl);
-                setAvatarUploaded(true);
-              }}
-              name={name}
-            />
-          </div>
-        </>
-      )}
-    </div>,
+            </div>
+          </>
+        )}
+      </div>
+    </>
   );
 };
 

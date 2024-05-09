@@ -34,25 +34,25 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.aliyun.dingtalkcontact_1_0.models.GetUserHeaders;
 import com.aliyun.dingtalkcontact_1_0.models.GetUserResponse;
+import com.aliyun.dingtalkcontact_1_0.models.GetUserResponseBody;
 import com.aliyun.dingtalkoauth2_1_0.Client;
 import com.aliyun.dingtalkoauth2_1_0.models.GetUserTokenRequest;
 import com.aliyun.dingtalkoauth2_1_0.models.GetUserTokenResponse;
 import com.aliyun.dingtalkoauth2_1_0.models.GetUserTokenResponseBody;
 import com.aliyun.teaopenapi.models.Config;
 import com.aliyun.teautil.models.RuntimeOptions;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 
-import cn.topiam.employee.authentication.common.authentication.IdpUserDetails;
-import cn.topiam.employee.authentication.common.filter.AbstractIdpAuthenticationProcessingFilter;
-import cn.topiam.employee.authentication.common.service.UserIdpService;
-import cn.topiam.employee.authentication.dingtalk.DingTalkIdpOauthConfig;
-import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
-import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
-import cn.topiam.employee.core.help.ServerHelp;
+import cn.topiam.employee.authentication.common.IdentityProviderAuthenticationService;
+import cn.topiam.employee.authentication.common.authentication.IdentityProviderUserDetails;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClient;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClientRepository;
+import cn.topiam.employee.authentication.common.filter.AbstractIdentityProviderAuthenticationProcessingFilter;
+import cn.topiam.employee.authentication.dingtalk.DingTalkIdentityProviderOAuth2Config;
+import cn.topiam.employee.core.context.ContextService;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.support.util.UrlUtils;
@@ -60,7 +60,6 @@ import cn.topiam.employee.support.util.UrlUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import static cn.topiam.employee.authentication.common.IdentityProviderType.DINGTALK_OAUTH;
-import static cn.topiam.employee.authentication.common.IdentityProviderType.DINGTALK_QR;
 import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.*;
 import static cn.topiam.employee.authentication.dingtalk.constant.DingTalkAuthenticationConstants.AUTH_CODE;
 
@@ -70,10 +69,11 @@ import static cn.topiam.employee.authentication.dingtalk.constant.DingTalkAuthen
  * https://open.dingtalk.com/document/orgapp-server/tutorial-obtaining-user-personal-information
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/12/8 21:11
+ * Created by support@topiam.cn on 2021/12/8 21:11
  */
 @SuppressWarnings("DuplicatedCode")
-public class DingtalkOauthAuthenticationFilter extends AbstractIdpAuthenticationProcessingFilter {
+public class DingtalkOauthAuthenticationFilter extends
+                                               AbstractIdentityProviderAuthenticationProcessingFilter {
     public final static String                DEFAULT_FILTER_PROCESSES_URI = DINGTALK_OAUTH
         .getLoginPathPrefix() + "/" + "{" + PROVIDER_CODE + "}";
     /**
@@ -85,12 +85,13 @@ public class DingtalkOauthAuthenticationFilter extends AbstractIdpAuthentication
     /**
      * Creates a new instance
      *
-     * @param identityProviderRepository the {@link IdentityProviderRepository}
-     * @param userIdpService  {@link  UserIdpService}
+     * @param registeredIdentityProviderClientRepository the {@link RegisteredIdentityProviderClientRepository}
+     * @param identityProviderAuthenticationService  {@link  IdentityProviderAuthenticationService}
      */
-    public DingtalkOauthAuthenticationFilter(IdentityProviderRepository identityProviderRepository,
-                                             UserIdpService userIdpService) {
-        super(REQUEST_MATCHER, userIdpService, identityProviderRepository);
+    public DingtalkOauthAuthenticationFilter(RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository,
+                                             IdentityProviderAuthenticationService identityProviderAuthenticationService) {
+        super(REQUEST_MATCHER, identityProviderAuthenticationService,
+            registeredIdentityProviderClientRepository);
     }
 
     /**
@@ -133,9 +134,9 @@ public class DingtalkOauthAuthenticationFilter extends AbstractIdpAuthentication
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
         }
         //获取身份提供商
-        IdentityProviderEntity provider = getIdentityProviderEntity(providerCode);
-        DingTalkIdpOauthConfig idpOauthConfig = JSONObject.parseObject(provider.getConfig(),
-            DingTalkIdpOauthConfig.class);
+        RegisteredIdentityProviderClient<DingTalkIdentityProviderOAuth2Config> provider = getRegisteredIdentityProviderClient(
+            providerCode);
+        DingTalkIdentityProviderOAuth2Config idpOauthConfig = provider.getConfig();
         if (Objects.isNull(idpOauthConfig)) {
             logger.error("未查询到钉钉登录配置");
             //无效身份提供商
@@ -159,19 +160,23 @@ public class DingtalkOauthAuthenticationFilter extends AbstractIdpAuthentication
             throw new TopIamException("钉钉认证获取用户信息失败", e);
         }
         //执行逻辑
-        IdpUserDetails idpUserDetails = IdpUserDetails.builder().openId(user.getBody().getOpenId())
-            .providerType(DINGTALK_QR).providerCode(providerCode).providerId(providerId).build();
-        return attemptAuthentication(request, response, idpUserDetails);
+        GetUserResponseBody body = user.getBody();
+        IdentityProviderUserDetails identityProviderUserDetails = IdentityProviderUserDetails
+            .builder().openId(body.getOpenId()).unionId(body.getUnionId()).email(body.getEmail())
+            .stateCode(body.getStateCode()).mobile(body.getMobile()).nickName(body.getNick())
+            .avatarUrl(body.getAvatarUrl()).providerType(DINGTALK_OAUTH).providerCode(providerCode)
+            .providerId(providerId).build();
+        return attemptAuthentication(request, response, identityProviderUserDetails);
     }
 
     /**
      * 获取token
      *
      * @param authCode {@link  String}
-     * @param config   {@link  DingTalkIdpOauthConfig}
+     * @param config   {@link  DingTalkIdentityProviderOAuth2Config}
      * @return {@link String}
      */
-    public String getToken(String authCode, DingTalkIdpOauthConfig config) {
+    public String getToken(String authCode, DingTalkIdentityProviderOAuth2Config config) {
         if (!Objects.isNull(cache)) {
             cache.getIfPresent(OAuth2ParameterNames.ACCESS_TOKEN);
         }
@@ -190,9 +195,8 @@ public class DingtalkOauthAuthenticationFilter extends AbstractIdpAuthentication
             GetUserTokenResponse getUserTokenResponse = client.getUserToken(getUserTokenRequest);
             GetUserTokenResponseBody body = getUserTokenResponse.getBody();
             //放入缓存
-            cache = CacheBuilder.newBuilder()
-                .concurrencyLevel(Runtime.getRuntime().availableProcessors())
-                .expireAfterWrite(body.getExpireIn(), TimeUnit.SECONDS).build();
+            cache = Caffeine.newBuilder().expireAfterWrite(body.getExpireIn(), TimeUnit.SECONDS)
+                .build();
             cache.put(OAuth2ParameterNames.ACCESS_TOKEN, body.getAccessToken());
             return cache.getIfPresent(OAuth2ParameterNames.ACCESS_TOKEN);
         } catch (Exception exception) {
@@ -206,8 +210,8 @@ public class DingtalkOauthAuthenticationFilter extends AbstractIdpAuthentication
     private Cache<String, String> cache;
 
     public static String getLoginUrl(String providerId) {
-        String url = ServerHelp.getPortalPublicBaseUrl() + DINGTALK_OAUTH.getLoginPathPrefix() + "/"
-                     + providerId;
+        String url = ContextService.getPortalPublicBaseUrl() + DINGTALK_OAUTH.getLoginPathPrefix()
+                     + "/" + providerId;
         return UrlUtils.format(url);
     }
 

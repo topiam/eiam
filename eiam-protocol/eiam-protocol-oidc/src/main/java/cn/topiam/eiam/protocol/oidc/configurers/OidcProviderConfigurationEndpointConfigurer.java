@@ -25,6 +25,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import cn.topiam.eiam.protocol.oidc.endpoint.OidcProviderConfigurationEndpointFilter;
+import cn.topiam.employee.protocol.code.EndpointMatcher;
 import cn.topiam.employee.protocol.code.configurer.AbstractConfigurer;
 import static cn.topiam.employee.common.constant.ProtocolConstants.OidcEndpointConstants.WELL_KNOWN_OPENID_CONFIGURATION;
 
@@ -32,7 +33,7 @@ import static cn.topiam.employee.common.constant.ProtocolConstants.OidcEndpointC
  * OIDC 服务配置端点配置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/27 21:09
+ * Created by support@topiam.cn on 2023/6/27 21:09
  */
 public final class OidcProviderConfigurationEndpointConfigurer extends AbstractConfigurer {
 
@@ -54,13 +55,13 @@ public final class OidcProviderConfigurationEndpointConfigurer extends AbstractC
     @Override
     public void configure(HttpSecurity httpSecurity) {
         OidcProviderConfigurationEndpointFilter oidcProviderConfigurationEndpointFilter = new OidcProviderConfigurationEndpointFilter(
-            getRequestMatcher());
+            this.requestMatcher);
         httpSecurity.addFilterBefore(postProcess(oidcProviderConfigurationEndpointFilter),
             AbstractPreAuthenticatedProcessingFilter.class);
     }
 
     @Override
-    public RequestMatcher getRequestMatcher() {
-        return this.requestMatcher;
+    public EndpointMatcher getEndpointMatcher() {
+        return new EndpointMatcher(this.requestMatcher, false);
     }
 }

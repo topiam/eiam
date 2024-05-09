@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react';
-import { Col, Image, Modal, Row, Space, Typography } from 'antd';
+import { Col, Divider, Image, Modal, Row, Space, Typography } from 'antd';
 import { CopyrightOutlined, InfoCircleFilled } from '@ant-design/icons';
 import { FormattedMessage } from '@umijs/max';
 import { useSafeState } from 'ahooks';
@@ -54,6 +54,9 @@ const About: React.FC = () => {
           <Row gutter={16}>
             <Col span={6} style={{ borderRight: '3px solid #f0f2f5' }}>
               <Image src={'/full-logo.svg'} preview={false} />
+              <Divider dashed style={{ marginBottom: 10, marginTop: 10 }} />
+              <Image src={'/ade5b70f.jpg'} preview={false} />
+              <Text style={{ textAlign: 'center', display: 'block' }}>微信公众号</Text>
             </Col>
             <Col span={18}>
               <Space direction="vertical" size={'middle'}>
@@ -66,8 +69,8 @@ const About: React.FC = () => {
                 <Text>
                   警告：本软件受著作权法和国际版权条约的保护，未经授权擅自复制修改分发本程序的全部或任何部分，将要承担一切由此导致的民事或刑事责任。
                 </Text>
-                <Link href="https://eiam.topiam.cn" target="_blank">
-                  https://eiam.topiam.cn
+                <Link href="https://topiam.cn" target="_blank">
+                  https://topiam.cn
                 </Link>
               </Space>
             </Col>

@@ -38,7 +38,7 @@ import { Container } from '@/components/Container';
 
 const layout = {
   labelCol: { span: 4 },
-  wrapperCol: { span: 19 },
+  wrapperCol: { span: 20 },
 };
 
 export default () => {
@@ -81,7 +81,7 @@ export default () => {
             }}
             submitter={{
               render: (_p, dom) => {
-                return <FooterToolbar>{dom}</FooterToolbar>;
+                return <FooterToolbar>{dom.map((item) => item)}</FooterToolbar>;
               },
               resetButtonProps: {
                 style: {

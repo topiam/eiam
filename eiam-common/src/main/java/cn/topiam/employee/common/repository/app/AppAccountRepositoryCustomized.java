@@ -28,7 +28,7 @@ import cn.topiam.employee.common.entity.app.query.AppAccountQuery;
  * 应用账户 Repository Customized
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/5/26 23:40
+ * Created by support@topiam.cn on 2022/5/26 23:40
  */
 public interface AppAccountRepositoryCustomized {
 

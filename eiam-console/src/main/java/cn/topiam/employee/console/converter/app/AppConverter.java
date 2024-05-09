@@ -17,23 +17,26 @@
  */
 package cn.topiam.employee.console.converter.app;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.data.jpa.domain.Specification;
 
 import com.google.common.collect.Lists;
 
 import cn.topiam.employee.application.ApplicationService;
 import cn.topiam.employee.application.ApplicationServiceLoader;
 import cn.topiam.employee.common.entity.app.AppEntity;
+import cn.topiam.employee.console.pojo.query.app.AppQuery;
 import cn.topiam.employee.console.pojo.result.app.AppGetResult;
 import cn.topiam.employee.console.pojo.result.app.AppListResult;
 import cn.topiam.employee.console.pojo.update.app.AppUpdateParam;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.context.ApplicationContextService;
 import cn.topiam.employee.support.repository.page.domain.Page;
+
+import jakarta.persistence.criteria.Predicate;
 
 /**
  * 应用映射
@@ -43,6 +46,32 @@ import cn.topiam.employee.support.repository.page.domain.Page;
  */
 @Mapper(componentModel = "spring")
 public interface AppConverter {
+
+    /**
+     * 查询应用列表参数转换为 Specification
+     *
+     * @param appQuery {@link AppQuery} query
+     * @return {@link AppEntity}
+     */
+    default Specification<AppEntity> queryAppListParamConvertToSpecification(AppQuery appQuery) {
+        //查询条件
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicateList = new ArrayList<>();
+            //名称
+            if (StringUtils.isNoneBlank(appQuery.getName())) {
+                predicateList
+                    .add(criteriaBuilder.like(root.get("name"), "%" + appQuery.getName() + "%"));
+            }
+            //分组
+            if (!Objects.isNull(appQuery.getProtocol())) {
+                predicateList
+                    .add(criteriaBuilder.equal(root.get("protocol"), appQuery.getProtocol()));
+            }
+            Predicate[] pre = new Predicate[predicateList.size()];
+            pre = predicateList.toArray(pre);
+            return query.where(pre).getRestriction();
+        };
+    }
 
     /**
      * 实体转换为应用列表结果
@@ -57,7 +86,7 @@ public interface AppConverter {
             AppListResult result = entityConvertToAppListResult(entity);
             // 如果备注为空、放置详情，由于 entityConvertToAppListResult 为共用，所以这里单独处理。
             if (StringUtils.isBlank(result.getRemark())) {
-                ApplicationServiceLoader loader = ApplicationContextHelp
+                ApplicationServiceLoader loader = ApplicationContextService
                     .getBean(ApplicationServiceLoader.class);
                 ApplicationService applicationService = loader
                     .getApplicationService(entity.getTemplate());
@@ -116,7 +145,7 @@ public interface AppConverter {
      * @param groupIds {@link List}
      * @return {@link AppGetResult}
      */
-    default AppGetResult entityConvertToAppResult(AppEntity entity, List<Long> groupIds) {
+    default AppGetResult entityConvertToAppResult(AppEntity entity, List<String> groupIds) {
         if (entity == null) {
             return null;
         }
@@ -126,6 +155,7 @@ public interface AppConverter {
             appGetResult.setId(String.valueOf(entity.getId()));
         }
         appGetResult.setName(entity.getName());
+        appGetResult.setCode(entity.getCode());
         appGetResult.setClientId(entity.getClientId());
         appGetResult.setClientSecret(entity.getClientSecret());
         appGetResult.setType(entity.getType());
@@ -140,6 +170,7 @@ public interface AppConverter {
         }
         appGetResult.setTemplate(entity.getTemplate());
         appGetResult.setProtocol(entity.getProtocol());
+        appGetResult.setAuthorizationType(entity.getAuthorizationType());
         appGetResult.setProtocolName(entity.getProtocol().getDesc());
         appGetResult.setEnabled(entity.getEnabled());
         appGetResult.setCreateTime(entity.getCreateTime());
@@ -153,13 +184,12 @@ public interface AppConverter {
      * @param param {@link AppUpdateParam}
      * @return {@link AppEntity}
      */
-    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "groups", ignore = true)
+    @Mapping(target = "configured", ignore = true)
     @Mapping(target = "code", ignore = true)
     @Mapping(target = "initLoginUrl", ignore = true)
     @Mapping(target = "clientSecret", ignore = true)
     @Mapping(target = "clientId", ignore = true)
-    @Mapping(target = "initLoginType", ignore = true)
-    @Mapping(target = "authorizationType", ignore = true)
     @Mapping(target = "template", ignore = true)
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "protocol", ignore = true)
@@ -176,6 +206,6 @@ public interface AppConverter {
      * @return {@link ApplicationServiceLoader}
      */
     private ApplicationServiceLoader getApplicationServiceLoader() {
-        return ApplicationContextHelp.getBean(ApplicationServiceLoader.class);
+        return ApplicationContextService.getBean(ApplicationServiceLoader.class);
     }
 }

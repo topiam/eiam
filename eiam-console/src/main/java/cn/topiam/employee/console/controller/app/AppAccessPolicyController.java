@@ -38,16 +38,14 @@ import cn.topiam.employee.support.result.ApiRestResult;
 import lombok.AllArgsConstructor;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.NotNull;
 import static cn.topiam.employee.common.constant.AppConstants.APP_PATH;
 
 /**
  * 应用访问授权策略
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/4 21:58
+ * Created by support@topiam.cn on 2022/6/4 21:58
  */
 @Validated
 @Tag(name = "应用访问授权策略")
@@ -107,20 +105,37 @@ public class AppAccessPolicyController {
     }
 
     /**
-     * 是否具有应用访问权限
+     * 启用应用访问授权
      *
-     * @param appId {@link Integer}
-     * @param userId {@link Integer}
+     * @param id {@link String}
      * @return {@link Boolean}
      */
+    @Lock
     @Preview
-    @Operation(summary = "是否具有应用访问权限")
-    @PostMapping(value = "/has_allow_access")
+    @Operation(summary = "启用应用访问授权")
+    @Audit(type = EventType.ENABLE_APP_ACCESS_POLICY)
+    @PutMapping(value = "/enable/{id}")
     @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
-    public ApiRestResult<Boolean> hasAllowAccess(@Parameter(description = "应用ID") @NotNull(message = "应用ID不能为空") Long appId,
-                                                 @Parameter(description = "用户ID") @NotNull(message = "用户ID不能为空") Long userId) {
-        return ApiRestResult.<Boolean> builder()
-            .result(appAccessPolicyService.hasAllowAccess(appId, userId)).build();
+    public ApiRestResult<Boolean> enableAppAccessPolicy(@PathVariable(value = "id") String id) {
+        Boolean result = appAccessPolicyService.enableAppAccessPolicy(id);
+        return ApiRestResult.<Boolean> builder().result(result).build();
+    }
+
+    /**
+     * 禁用应用访问授权
+     *
+     * @param id {@link String}
+     * @return {@link Boolean}
+     */
+    @Lock
+    @Preview
+    @Operation(summary = "禁用应用访问授权")
+    @Audit(type = EventType.DISABLE_APP_ACCESS_POLICY)
+    @PutMapping(value = "/disable/{id}")
+    @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
+    public ApiRestResult<Boolean> disableAppAccessPolicy(@PathVariable(value = "id") String id) {
+        Boolean result = appAccessPolicyService.disableAppAccessPolicy(id);
+        return ApiRestResult.<Boolean> builder().result(result).build();
     }
 
     /**

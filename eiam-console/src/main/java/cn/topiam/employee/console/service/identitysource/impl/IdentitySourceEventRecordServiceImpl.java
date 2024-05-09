@@ -36,7 +36,7 @@ import lombok.AllArgsConstructor;
  * 身份源事件记录
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/3/16 21:04
+ * Created by support@topiam.cn on 2022/3/16 21:04
  */
 @Service
 @AllArgsConstructor

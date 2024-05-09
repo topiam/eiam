@@ -25,17 +25,14 @@ import org.springframework.util.Assert;
 
 import cn.topiam.employee.application.form.model.FormProtocolConfig;
 
-import lombok.Getter;
-
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/8 00:08
+ * Created by support@topiam.cn on 2023/7/8 00:08
  */
 public class FormRequestAuthenticationToken extends AbstractAuthenticationToken {
     private final Authentication     principal;
 
-    @Getter
     private final FormProtocolConfig config;
 
     /**
@@ -82,4 +79,7 @@ public class FormRequestAuthenticationToken extends AbstractAuthenticationToken 
         return this.principal;
     }
 
+    public FormProtocolConfig getConfig() {
+        return config;
+    }
 }

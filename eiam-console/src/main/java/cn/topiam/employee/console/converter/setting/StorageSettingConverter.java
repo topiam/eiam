@@ -39,13 +39,13 @@ import cn.topiam.employee.console.pojo.save.setting.StorageConfigSaveParam;
 import cn.topiam.employee.support.validation.ValidationUtils;
 
 import jakarta.validation.ValidationException;
-import static cn.topiam.employee.core.setting.constant.StorageProviderSettingConstants.STORAGE_PROVIDER_KEY;
+import static cn.topiam.employee.core.setting.StorageProviderSettingConstants.STORAGE_PROVIDER_KEY;
 
 /**
  * 对象存储设置转换器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/10/1 23:18
+ * Created by support@topiam.cn on 2021/10/1 23:18
  */
 @Mapper(componentModel = "spring")
 public interface StorageSettingConverter {

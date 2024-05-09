@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -32,7 +33,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
-import cn.topiam.employee.support.repository.LogicDeleteRepository;
 
 /**
  * <p>
@@ -40,12 +40,11 @@ import cn.topiam.employee.support.repository.LogicDeleteRepository;
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-08-16
+ * Created by support@topiam.cn on 2020-08-16
  */
 @Repository
 @CacheConfig(cacheNames = "idp")
-public interface IdentityProviderRepository extends
-                                            LogicDeleteRepository<IdentityProviderEntity, Long>,
+public interface IdentityProviderRepository extends JpaRepository<IdentityProviderEntity, String>,
                                             JpaSpecificationExecutor<IdentityProviderEntity> {
     /**
      * 根据平台类型查询认证源配置
@@ -89,7 +88,7 @@ public interface IdentityProviderRepository extends
      */
     @Override
     @CacheEvict(allEntries = true)
-    void deleteById(@NotNull Long id);
+    void deleteById(@NotNull String id);
 
     /**
      * Retrieves an entity by its id.
@@ -101,24 +100,12 @@ public interface IdentityProviderRepository extends
     @NotNull
     @Override
     @Cacheable(key = "#a0")
-    Optional<IdentityProviderEntity> findById(@NotNull @Param(value = "id") Long id);
-
-    /**
-     * Retrieves an entity by its id.
-     *
-     * @param id must not be {@literal null}.
-     * @return the entity with the given id or {@literal Optional#empty()} if none found.
-     * @throws IllegalArgumentException if {@literal id} is {@literal null}.
-     */
-    @NotNull
-    @Cacheable(key = "#a0")
-    @Query(value = "SELECT * FROM identity_provider WHERE id_ = :id", nativeQuery = true)
-    Optional<IdentityProviderEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") Long id);
+    Optional<IdentityProviderEntity> findById(@NotNull @Param(value = "id") String id);
 
     /**
      * 更新社交认证源状态
      *
-     * @param id      {@link  Long}
+     * @param id {@link  String}
      * @param enabled {@link  Boolean}
      * @return {@link  Boolean}
      */
@@ -126,17 +113,17 @@ public interface IdentityProviderRepository extends
     @Modifying
     @CacheEvict(allEntries = true)
     @Query(value = "UPDATE IdentityProviderEntity SET enabled=:enabled where id=:id")
-    Integer updateIdentityProviderStatus(@Param(value = "id") Long id,
+    Integer updateIdentityProviderStatus(@Param(value = "id") String id,
                                          @Param(value = "enabled") Boolean enabled);
 
     /**
      * 根据ID查找，并且为启用
      *
-     * @param id {@link Long}
+     * @param id {@link String}
      * @return {@link IdentityProviderEntity}
      */
     @Cacheable(key = "#a0", unless = "#result == null")
-    Optional<IdentityProviderEntity> findByIdAndEnabledIsTrue(Long id);
+    Optional<IdentityProviderEntity> findByIdAndEnabledIsTrue(String id);
 
     /**
      * 根据code查找，并且为启用

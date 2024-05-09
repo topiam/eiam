@@ -29,7 +29,7 @@ import jakarta.validation.constraints.NotNull;
  *更新密码策略排序入参
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/11 22:03
+ * Created by support@topiam.cn on 2023/6/11 22:03
  */
 @Data
 @Schema(description = "更新密码策略排序入参")

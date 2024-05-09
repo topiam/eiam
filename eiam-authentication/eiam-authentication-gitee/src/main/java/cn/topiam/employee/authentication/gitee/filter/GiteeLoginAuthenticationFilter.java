@@ -36,13 +36,13 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 
-import cn.topiam.employee.authentication.common.authentication.IdpUserDetails;
-import cn.topiam.employee.authentication.common.filter.AbstractIdpAuthenticationProcessingFilter;
-import cn.topiam.employee.authentication.common.service.UserIdpService;
-import cn.topiam.employee.authentication.gitee.GiteeIdpOAuth2Config;
-import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
-import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
-import cn.topiam.employee.core.help.ServerHelp;
+import cn.topiam.employee.authentication.common.IdentityProviderAuthenticationService;
+import cn.topiam.employee.authentication.common.authentication.IdentityProviderUserDetails;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClient;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClientRepository;
+import cn.topiam.employee.authentication.common.filter.AbstractIdentityProviderAuthenticationProcessingFilter;
+import cn.topiam.employee.authentication.gitee.GiteeIdentityProviderOAuth2Config;
+import cn.topiam.employee.core.context.ContextService;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.util.HttpClientUtils;
 import cn.topiam.employee.support.util.UrlUtils;
@@ -53,7 +53,7 @@ import static org.springframework.security.oauth2.core.AuthorizationGrantType.AU
 import static org.springframework.security.oauth2.core.OAuth2TokenIntrospectionClaimNames.CLIENT_ID;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.CLIENT_SECRET;
 
-import static cn.topiam.employee.authentication.common.IdentityProviderType.*;
+import static cn.topiam.employee.authentication.common.IdentityProviderType.GITEE_OAUTH;
 import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.*;
 import static cn.topiam.employee.authentication.gitee.constant.GiteeAuthenticationConstants.*;
 
@@ -61,10 +61,11 @@ import static cn.topiam.employee.authentication.gitee.constant.GiteeAuthenticati
  * Gitee登录过滤器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/12/8 21:11
+ * Created by support@topiam.cn on 2021/12/8 21:11
  */
 @SuppressWarnings("DuplicatedCode")
-public class GiteeLoginAuthenticationFilter extends AbstractIdpAuthenticationProcessingFilter {
+public class GiteeLoginAuthenticationFilter extends
+                                            AbstractIdentityProviderAuthenticationProcessingFilter {
 
     public final static String                DEFAULT_FILTER_PROCESSES_URI = GITEE_OAUTH
         .getLoginPathPrefix() + "/" + "{" + PROVIDER_CODE + "}";
@@ -74,12 +75,13 @@ public class GiteeLoginAuthenticationFilter extends AbstractIdpAuthenticationPro
     /**
      * Creates a new instance
      *
-     * @param identityProviderRepository the {@link IdentityProviderRepository}
-     * @param userIdpService  {@link  UserIdpService}
+     * @param registeredIdentityProviderClientRepository the {@link RegisteredIdentityProviderClientRepository}
+     * @param identityProviderAuthenticationService  {@link  IdentityProviderAuthenticationService}
      */
-    public GiteeLoginAuthenticationFilter(IdentityProviderRepository identityProviderRepository,
-                                          UserIdpService userIdpService) {
-        super(REQUEST_MATCHER, userIdpService, identityProviderRepository);
+    public GiteeLoginAuthenticationFilter(RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository,
+                                          IdentityProviderAuthenticationService identityProviderAuthenticationService) {
+        super(REQUEST_MATCHER, identityProviderAuthenticationService,
+            registeredIdentityProviderClientRepository);
     }
 
     /**
@@ -120,14 +122,14 @@ public class GiteeLoginAuthenticationFilter extends AbstractIdpAuthenticationPro
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
         }
         //获取身份提供商
-        IdentityProviderEntity provider = getIdentityProviderEntity(providerCode);
-        GiteeIdpOAuth2Config config = JSONObject.parseObject(provider.getConfig(),
-            GiteeIdpOAuth2Config.class);
+        RegisteredIdentityProviderClient<GiteeIdentityProviderOAuth2Config> provider = getRegisteredIdentityProviderClient(
+            providerCode);
+        GiteeIdentityProviderOAuth2Config config = provider.getConfig();
         if (Objects.isNull(config)) {
             logger.error("未查询到 Gitee 登录配置");
             //无效身份提供商
             OAuth2Error oauth2Error = new OAuth2Error(
-                AbstractIdpAuthenticationProcessingFilter.INVALID_IDP_CONFIG);
+                AbstractIdentityProviderAuthenticationProcessingFilter.INVALID_IDP_CONFIG);
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
         }
         //获取access token
@@ -153,7 +155,7 @@ public class GiteeLoginAuthenticationFilter extends AbstractIdpAuthenticationPro
         }
         // 返回
         //@formatter:off
-        IdpUserDetails idpUserDetails = IdpUserDetails.builder()
+        IdentityProviderUserDetails identityProviderUserDetails = IdentityProviderUserDetails.builder()
                 .openId(param.get(ID))
                 .nickName((String) result.get("name"))
                 .avatarUrl((String) result.get("avatar_uri"))
@@ -164,12 +166,12 @@ public class GiteeLoginAuthenticationFilter extends AbstractIdpAuthenticationPro
                 .additionalInfo(new HashMap<>(result))
                 .build();
         //@formatter:on
-        return attemptAuthentication(request, response, idpUserDetails);
+        return attemptAuthentication(request, response, identityProviderUserDetails);
     }
 
     public static String getLoginUrl(String providerId) {
-        String url = ServerHelp.getPortalPublicBaseUrl() + GITEE_OAUTH.getLoginPathPrefix() + "/"
-                     + providerId;
+        String url = ContextService.getPortalPublicBaseUrl() + GITEE_OAUTH.getLoginPathPrefix()
+                     + "/" + providerId;
         return UrlUtils.format(url);
     }
 

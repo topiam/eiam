@@ -28,13 +28,13 @@ import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.exception.UserNotFoundException;
 import cn.topiam.employee.common.repository.account.UserDetailRepository;
 import cn.topiam.employee.common.repository.account.UserRepository;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.context.ApplicationContextService;
 
 /**
  * 用户工具
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/8/13 21:50
+ * Created by support@topiam.cn on 2022/8/13 21:50
  */
 public final class UserUtils {
     private static final Logger logger = LoggerFactory.getLogger(UserUtils.class);
@@ -44,8 +44,8 @@ public final class UserUtils {
     }
 
     public static UserEntity getUser(String userId) {
-        Optional<UserEntity> optional = ApplicationContextHelp.getBean(UserRepository.class)
-            .findById(Long.valueOf(userId));
+        Optional<UserEntity> optional = ApplicationContextService.getBean(UserRepository.class)
+            .findById(userId);
         if (optional.isPresent()) {
             return optional.get();
         }
@@ -60,8 +60,8 @@ public final class UserUtils {
     }
 
     public static UserDetailEntity getUserDetails(String userId) {
-        Optional<UserDetailEntity> optional = ApplicationContextHelp
-            .getBean(UserDetailRepository.class).findByUserId(Long.valueOf(userId));
+        Optional<UserDetailEntity> optional = ApplicationContextService
+            .getBean(UserDetailRepository.class).findByUserId(userId);
         if (optional.isPresent()) {
             return optional.get();
         }

@@ -31,7 +31,6 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cn.topiam.employee.common.constant.SettingConstants;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.geo.GeoLocationProviderConfig;
 import cn.topiam.employee.common.geo.NoneGeoLocationServiceImpl;
@@ -40,7 +39,7 @@ import cn.topiam.employee.common.geo.maxmind.MaxmindGeoLocationServiceImpl;
 import cn.topiam.employee.common.geo.maxmind.MaxmindProviderConfig;
 import cn.topiam.employee.common.jackjson.encrypt.EncryptionModule;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
-import cn.topiam.employee.core.setting.constant.GeoIpProviderConstants;
+import cn.topiam.employee.core.setting.GeoIpProviderConstants;
 import cn.topiam.employee.support.geo.GeoLocationService;
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.GEO_LOCATION;
 import static cn.topiam.employee.common.geo.ip2region.Ip2regionGeoLocationServiceImpl.IP2REGION;
@@ -50,7 +49,7 @@ import static cn.topiam.employee.common.geo.maxmind.MaxmindGeoLocationServiceImp
  * 地理位置库
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/27 01:58
+ * Created by support@topiam.cn on 2021/11/27 01:58
  */
 @Configuration
 public class EiamGeoLocationConfiguration {
@@ -68,8 +67,7 @@ public class EiamGeoLocationConfiguration {
             // 查询数据库是否开启地理位置服务
             SettingEntity setting = settingRepository
                 .findByName(GeoIpProviderConstants.IPADDRESS_SETTING_NAME);
-            if (!Objects.isNull(setting) && StringUtils.isNotBlank(setting.getValue())
-                && !SettingConstants.NOT_CONFIG.equals(setting.getValue())) {
+            if (!Objects.isNull(setting) && StringUtils.isNotBlank(setting.getValue())) {
                 GeoLocationProviderConfig provider = objectMapper.readValue(setting.getValue(),
                     GeoLocationProviderConfig.class);
                 // maxmind

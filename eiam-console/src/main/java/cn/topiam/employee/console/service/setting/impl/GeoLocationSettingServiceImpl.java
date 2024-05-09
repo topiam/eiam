@@ -26,19 +26,19 @@ import cn.topiam.employee.console.converter.setting.GeoLocationSettingConverter;
 import cn.topiam.employee.console.pojo.result.setting.GeoIpProviderResult;
 import cn.topiam.employee.console.pojo.save.setting.GeoIpProviderSaveParam;
 import cn.topiam.employee.console.service.setting.GeoLocationSettingService;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.context.ApplicationContextService;
 import cn.topiam.employee.support.geo.GeoLocation;
 import cn.topiam.employee.support.geo.GeoLocationService;
 
 import lombok.extern.slf4j.Slf4j;
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.GEO_LOCATION;
-import static cn.topiam.employee.core.setting.constant.GeoIpProviderConstants.IPADDRESS_SETTING_NAME;
+import static cn.topiam.employee.core.setting.GeoIpProviderConstants.IPADDRESS_SETTING_NAME;
 
 /**
  * ip设置接口
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/1 21:43
+ * Created by support@topiam.cn on 2021/11/1 21:43
  */
 @Slf4j
 @Service
@@ -57,7 +57,7 @@ public class GeoLocationSettingServiceImpl extends SettingServiceImpl
         SettingEntity settingEntity = geoLocationSettingsConverter
             .geoLocationProviderConfigToEntity(param);
         Boolean success = saveSetting(settingEntity);
-        ApplicationContextHelp.refresh(GEO_LOCATION);
+        ApplicationContextService.refresh(GEO_LOCATION);
         return success;
     }
 

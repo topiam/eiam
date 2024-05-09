@@ -28,12 +28,14 @@ export type AccountInfo = {
 };
 
 export interface GetBoundIdpList {
+  id: string;
   code: string;
   name: string;
   type: string;
   category: string;
   bound: boolean;
   idpId: string;
+  authorizationUri: string;
 }
 
 /**

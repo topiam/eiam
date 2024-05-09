@@ -33,7 +33,7 @@ import {
   StepsForm,
 } from '@ant-design/pro-components';
 import { useAsyncEffect, useMount } from 'ahooks';
-import type { FormInstance } from 'antd';
+import { Button, FormInstance } from 'antd';
 import { App, Skeleton, Spin } from 'antd';
 import { omit } from 'lodash';
 import React, { useRef, useState } from 'react';
@@ -48,8 +48,8 @@ import useStyles from './style';
 import queryString from 'query-string';
 import { useIntl, useLocation } from '@umijs/max';
 import dayjs from 'dayjs';
-import { IdentitySourceProvider } from '@/constant';
-import { getOrganization } from '@/services/account';
+import { deleteIdentitySource, getOrganization } from '@/services/account';
+import { ExclamationCircleFilled } from '@ant-design/icons';
 
 /**
  * 身份源详情
@@ -71,7 +71,7 @@ export default () => {
   const [configured, setConfigured] = useState<boolean>(false);
   const { styles } = useStyles();
   const intl = useIntl();
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
 
   useMount(async () => {
     if (!id) {
@@ -108,52 +108,58 @@ export default () => {
   useAsyncEffect(async () => {
     if (type === IdentitySourceDetailTabs.config) {
       setConfigLoading(true);
-      getIdentitySourceConfig(id).then(async ({ result }) => {
-        setConfigured(result?.configured);
-        const targetId = result.strategyConfig?.organization?.targetId;
-        let strategyConfig = result.strategyConfig;
-        if (targetId && result?.configured) {
-          const orgRes = await getOrganization(targetId);
-          let target: { value: string | undefined; label: string | undefined } = {
-            value: targetId,
-            label: undefined,
-          };
-          if (orgRes && orgRes.success && orgRes.result) {
-            target = { value: targetId, label: orgRes.result.name };
+      getIdentitySourceConfig(id)
+        .then(async ({ result }) => {
+          if (result) {
+            setConfigured(result?.configured);
+            let strategyConfig = result.strategyConfig;
+            const targetId = strategyConfig?.organization?.targetId;
+            if (targetId && result.configured) {
+              const { result, success } = await getOrganization(targetId);
+              let target: { value: string | undefined; label: string | undefined } = {
+                value: targetId,
+                label: undefined,
+              };
+              if (success && result) {
+                target = { value: targetId, label: result.name };
+              }
+              strategyConfig = {
+                ...strategyConfig,
+                organization: {
+                  targetId: target,
+                },
+              };
+            }
+            //提供商配置
+            baseFormRef.current?.setFieldsValue({ basicConfig: { ...result.basicConfig } });
+            //策略配置
+            strategyFormRef.current?.setFieldsValue({ strategyConfig: { ...strategyConfig } });
+            //任务配置
+            const jobConfig = result?.jobConfig;
+            const mode = jobConfig?.mode;
+            const value = jobConfig?.value;
+            jobFormRef.current?.setFieldsValue({
+              jobConfig: {
+                ...jobConfig,
+                interval: mode === JobMode.period ? value : undefined,
+                time: mode === JobMode.timed ? dayjs(value, 'HH:mm:ss') : undefined,
+              },
+            });
           }
-          strategyConfig = {
-            ...result.strategyConfig,
-            organization: {
-              targetId: target,
-            },
-          };
-        }
-        //提供商配置
-        baseFormRef.current?.setFieldsValue({ basicConfig: { ...result.basicConfig } });
-        //策略配置
-        strategyFormRef.current?.setFieldsValue({ strategyConfig: { ...strategyConfig } });
-        //任务配置
-        const mode = result.jobConfig?.mode;
-        const value = result.jobConfig?.value;
-        jobFormRef.current?.setFieldsValue({
-          jobConfig: {
-            ...result.jobConfig,
-            interval: mode === JobMode.period ? value : undefined,
-            time: mode === JobMode.timed ? dayjs(value, 'HH:mm:ss') : undefined,
-          },
+        })
+        .finally(() => {
+          setConfigLoading(false);
         });
-        setConfigLoading(false);
-      });
     }
   }, [type]);
   /**
    * onSave
    *
-   * @param key
+   * @param _key
    * @param record
    */
   const onSave = async (
-    key: React.Key | React.Key[],
+    _key: React.Key | React.Key[],
     record: AccountAPI.GetIdentitySource | Record<string, string>,
   ): Promise<any | void> => {
     //调用接口修改
@@ -193,6 +199,17 @@ export default () => {
               valueType={'textarea'}
               fieldProps={{ rows: 2, maxLength: 20 }}
             />
+            <ProDescriptions.Item
+              dataIndex="code"
+              editable={false}
+              copyable
+              label={intl.formatMessage({ id: 'pages.account.identity_source_detail.code' })}
+            />
+            <ProDescriptions.Item
+              dataIndex="createTime"
+              editable={false}
+              label={intl.formatMessage({ id: 'pages.account.identity_source_detail.create_time' })}
+            />
           </ProDescriptions>
         )
       }
@@ -225,15 +242,45 @@ export default () => {
             id: 'pages.account.identity_source_detail.page_container.tab_list.sync_history',
           }),
         },
-        detail?.provider !== IdentitySourceProvider.ldap &&
-        detail?.provider !== IdentitySourceProvider.ad
-          ? {
-              key: IdentitySourceDetailTabs.event_record,
-              tab: intl.formatMessage({
-                id: 'pages.account.identity_source_detail.page_container.tab_list.event_record',
+        {
+          key: IdentitySourceDetailTabs.event_record,
+          tab: intl.formatMessage({
+            id: 'pages.account.identity_source_detail.page_container.tab_list.event_record',
+          }),
+        },
+      ]}
+      extra={[
+        <Button
+          key="delete"
+          type="primary"
+          danger
+          onClick={() => {
+            const confirmed = modal.error({
+              centered: true,
+              title: intl.formatMessage({
+                id: 'pages.account.identity_source_detail.extra.delete_confirm_title',
               }),
-            }
-          : {},
+              icon: <ExclamationCircleFilled />,
+              content: intl.formatMessage({
+                id: 'pages.account.identity_source_detail.extra.delete_confirm_content',
+              }),
+              okText: intl.formatMessage({ id: 'app.confirm' }),
+              okType: 'danger',
+              okCancel: true,
+              cancelText: intl.formatMessage({ id: 'app.cancel' }),
+              onOk: async () => {
+                const { success } = await deleteIdentitySource(id);
+                if (success) {
+                  message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                  confirmed.destroy();
+                  history.push(`/account/identity-source`);
+                }
+              },
+            });
+          }}
+        >
+          {intl.formatMessage({ id: 'pages.account.identity_source_detail.extra.delete' })}
+        </Button>,
       ]}
       tabActiveKey={tabActiveKey}
       onTabChange={(key: string) => {
@@ -247,7 +294,7 @@ export default () => {
       {/*同步配置*/}
       {IdentitySourceDetailTabs.config === tabActiveKey && (
         <ProCard>
-          <Spin spinning={detailLoading}>
+          <Spin spinning={detailLoading || configLoading}>
             <StepsForm
               containerStyle={{ width: '100%' }}
               current={current}
@@ -280,7 +327,7 @@ export default () => {
               }}
               submitter={{
                 render: (_, dom) => {
-                  return <FooterToolbar>{dom}</FooterToolbar>;
+                  return <FooterToolbar>{dom.map((item) => item)}</FooterToolbar>;
                 },
               }}
             >
@@ -298,24 +345,22 @@ export default () => {
                   return Promise.resolve(connect);
                 }}
               >
-                <Spin spinning={configLoading}>
-                  <BasicConfig
-                    provider={detail?.provider}
-                    configured={configured}
-                    formRef={baseFormRef}
-                    basicConfigRef={basicConfigRef}
-                    onConfigValidator={async (config) => {
-                      setDetailLoading(true);
-                      const { result } = await identitySourceConfigValidator({
-                        provider: detail?.provider,
-                        config: config,
-                      }).finally(() => {
-                        setDetailLoading(false);
-                      });
-                      return result;
-                    }}
-                  />
-                </Spin>
+                <BasicConfig
+                  provider={detail?.provider}
+                  configured={configured}
+                  formRef={baseFormRef}
+                  basicConfigRef={basicConfigRef}
+                  onConfigValidator={async (config) => {
+                    setConfigLoading(true);
+                    const { result } = await identitySourceConfigValidator({
+                      provider: detail?.provider,
+                      config: config,
+                    }).finally(() => {
+                      setConfigLoading(false);
+                    });
+                    return result;
+                  }}
+                />
               </StepsForm.StepForm>
               {/*策略配置*/}
               <StepsForm.StepForm
@@ -348,11 +393,9 @@ export default () => {
         <SyncHistory identitySourceId={id} />
       )}
       {/*事件记录*/}
-      {IdentitySourceProvider.ldap !== detail?.provider &&
-        IdentitySourceProvider.ad !== detail?.provider &&
-        IdentitySourceDetailTabs.event_record === tabActiveKey && (
-          <EventRecord identitySourceId={id} />
-        )}
+      {IdentitySourceDetailTabs.event_record === tabActiveKey && (
+        <EventRecord identitySourceId={id} />
+      )}
     </PageContainer>
   );
 };

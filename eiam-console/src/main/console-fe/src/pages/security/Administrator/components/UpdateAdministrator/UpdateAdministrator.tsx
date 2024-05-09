@@ -36,7 +36,7 @@ import { createStyles } from 'antd-style';
 
 const layout = {
   labelCol: { span: 4 },
-  wrapperCol: { span: 19 },
+  wrapperCol: { span: 20 },
 };
 
 const useStyle = createStyles(({ prefixCls }) => {
@@ -72,7 +72,7 @@ export default (props: {
     return Promise.reject(
       new Error(
         intl.formatMessage({
-          id: 'pages.setting.administrator.create_modal.from.phone_email.required.message',
+          id: 'pages.setting.administrator.modal.from.phone_email.required.message',
         }),
       ),
     );
@@ -135,10 +135,10 @@ export default (props: {
           <ProFormText
             name="username"
             label={intl.formatMessage({
-              id: 'pages.setting.administrator.create_modal.from.username',
+              id: 'pages.setting.administrator.modal.from.username',
             })}
             placeholder={intl.formatMessage({
-              id: 'pages.setting.administrator.create_modal.from.username.placeholder',
+              id: 'pages.setting.administrator.modal.from.username.placeholder',
             })}
             readonly
           />
@@ -148,12 +148,19 @@ export default (props: {
                 <ProFormText
                   name={['phone']}
                   label={intl.formatMessage({
-                    id: 'pages.setting.administrator.create_modal.from.phone',
+                    id: 'pages.setting.administrator.modal.from.phone',
                   })}
                   placeholder={intl.formatMessage({
-                    id: 'pages.setting.administrator.create_modal.from.phone.placeholder',
+                    id: 'pages.setting.administrator.modal.from.phone.placeholder',
                   })}
+                  validateFirst
                   rules={[
+                    {
+                      pattern: new RegExp('^[0-9]*$'),
+                      message: intl.formatMessage({
+                        id: 'pages.account.user_list.user.form.phone.rule.0.message',
+                      }),
+                    },
                     {
                       validator: validatePhoneOrEmail,
                       validateTrigger: ['onBlur'],
@@ -175,7 +182,7 @@ export default (props: {
                           return Promise.reject<Error>(
                             new Error(
                               intl.formatMessage({
-                                id: 'pages.setting.administrator.create_modal.from.phone.rule.0.message',
+                                id: 'pages.setting.administrator.modal.from.phone.rule.0.message',
                               }),
                             ),
                           );
@@ -194,7 +201,7 @@ export default (props: {
                           return Promise.reject<Error>(
                             new Error(
                               intl.formatMessage({
-                                id: 'pages.setting.administrator.create_modal.from.phone.rule.1.message',
+                                id: 'pages.setting.administrator.modal.from.phone.rule.1.message',
                               }),
                             ),
                           );
@@ -225,7 +232,7 @@ export default (props: {
                     },
                   }}
                   extra={intl.formatMessage({
-                    id: 'pages.setting.administrator.create_modal.from.phone.extra',
+                    id: 'pages.setting.administrator.modal.from.phone.extra',
                   })}
                 />
               );
@@ -234,11 +241,12 @@ export default (props: {
           <ProFormText
             name="email"
             label={intl.formatMessage({
-              id: 'pages.setting.administrator.create_modal.from.email',
+              id: 'pages.setting.administrator.modal.from.email',
             })}
             placeholder={intl.formatMessage({
-              id: 'pages.setting.administrator.create_modal.from.email.placeholder',
+              id: 'pages.setting.administrator.modal.from.email.placeholder',
             })}
+            validateFirst
             rules={[
               {
                 validator: validatePhoneOrEmail,
@@ -247,7 +255,7 @@ export default (props: {
               {
                 type: 'email',
                 message: intl.formatMessage({
-                  id: 'pages.setting.administrator.create_modal.from.email.rule.0.message',
+                  id: 'pages.setting.administrator.modal.from.email.rule.0.message',
                 }),
               },
               {
@@ -261,13 +269,13 @@ export default (props: {
                     id,
                   );
                   if (!success) {
-                    return Promise.reject<any>();
+                    return Promise.reject<Error>();
                   }
                   if (!result) {
-                    return Promise.reject<any>(
+                    return Promise.reject<Error>(
                       new Error(
                         intl.formatMessage({
-                          id: 'pages.setting.administrator.create_modal.from.email.rule.1.message',
+                          id: 'pages.setting.administrator.modal.from.email.rule.1.message',
                         }),
                       ),
                     );
@@ -277,17 +285,17 @@ export default (props: {
               },
             ]}
             extra={intl.formatMessage({
-              id: 'pages.setting.administrator.create_modal.from.email.extra',
+              id: 'pages.setting.administrator.modal.from.email.extra',
             })}
           />
           <ProFormTextArea
             name="remark"
             fieldProps={{ rows: 2 }}
             placeholder={intl.formatMessage({
-              id: 'pages.setting.administrator.create_modal.from.remark.placeholder',
+              id: 'pages.setting.administrator.modal.from.remark.placeholder',
             })}
             label={intl.formatMessage({
-              id: 'pages.setting.administrator.create_modal.from.remark',
+              id: 'pages.setting.administrator.modal.from.remark',
             })}
           />
         </Spin>

@@ -58,7 +58,7 @@ public interface MailTemplateConverter {
      * @param param {@link EmailCustomTemplateSaveParam}
      * @return {@link MailTemplateEntity}
      */
-    @Mapping(target = "deleted", ignore = true)
+
     @Mapping(target = "updateTime", ignore = true)
     @Mapping(target = "updateBy", ignore = true)
     @Mapping(target = "type", ignore = true)

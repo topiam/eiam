@@ -25,7 +25,7 @@ import cn.topiam.employee.support.geo.GeoLocation;
  * ip设置接口
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/10/1 21:19
+ * Created by support@topiam.cn on 2021/10/1 21:19
  */
 public interface GeoLocationSettingService extends SettingService {
 

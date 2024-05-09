@@ -26,7 +26,7 @@ import cn.topiam.employee.support.web.converter.EnumConvert;
  * 权限策略客体类型
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/4 21:05
+ * Created by support@topiam.cn on 2021/11/4 21:05
  */
 public enum AppPolicyObjectType implements BaseEnum {
                                                      /**

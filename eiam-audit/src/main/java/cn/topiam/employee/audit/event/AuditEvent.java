@@ -30,7 +30,7 @@ import lombok.Getter;
  * 审计事件
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/8/1 21:56
+ * Created by support@topiam.cn on 2021/8/1 21:56
  */
 @Getter
 public class AuditEvent extends ApplicationEvent {

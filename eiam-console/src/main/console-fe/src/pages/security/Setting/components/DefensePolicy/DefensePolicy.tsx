@@ -76,7 +76,7 @@ export default () => {
         }}
         submitter={{
           render: (p, dom) => {
-            return <FooterToolbar>{dom}</FooterToolbar>;
+            return <FooterToolbar>{dom.map((item) => item)}</FooterToolbar>;
           },
           submitButtonProps: {
             loading: submitLoading,

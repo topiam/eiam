@@ -39,7 +39,7 @@ import static cn.topiam.employee.support.security.util.HttpSecurityFilterOrderRe
  * 认证配置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/10 22:58
+ * Created by support@topiam.cn on 2021/9/10 22:58
  */
 public class MailOtpAuthenticationConfigurer extends
                                              AbstractAuthenticationFilterConfigurer<HttpSecurity, MailOtpAuthenticationConfigurer, MailOtpAuthenticationFilter> {

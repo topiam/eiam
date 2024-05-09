@@ -26,7 +26,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import lombok.Data;
 import lombok.Getter;
 
-import co.elastic.clients.elasticsearch._types.aggregations.CalendarInterval;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIME_FORMATTER_PATTERN;
@@ -69,20 +68,20 @@ public class AnalysisQuery implements Serializable {
                           /**
                            * HOUR
                            */
-                          HOUR(CalendarInterval.Hour, "%h时"),
+                          HOUR("hour", "%H时"),
                           /**
                            * DAY
                            */
-                          DAY(CalendarInterval.Day, "%d日"),
+                          DAY("day", "%d日"),
                           /**
                            * MONTH
                            */
-                          MONTH(CalendarInterval.Month, "%m月");
+                          MONTH("month", "%m月");
 
-        private final CalendarInterval type;
-        private final String           format;
+        private final String type;
+        private final String format;
 
-        Interval(CalendarInterval type, String format) {
+        Interval(String type, String format) {
             this.type = type;
             this.format = format;
         }

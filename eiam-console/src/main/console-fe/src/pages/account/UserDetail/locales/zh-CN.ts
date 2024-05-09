@@ -18,7 +18,6 @@
 export default {
   'pages.account.user_detail.tabs.user_info': '用户信息',
   'pages.account.user_detail.tabs.login_audit': '登录日志',
-  'pages.account.user_detail.tabs.app_access': '应用权限',
   'pages.account.user_detail.extra.delete': '删除用户',
   'pages.account.user_detail.extra.delete.confirm_title': '您确定要删除此用户？',
   'pages.account.user_detail.extra.delete.confirm_content': '此操作不可恢复，请谨慎操作！',
@@ -28,8 +27,10 @@ export default {
   'pages.account.user_detail.user_info.columns.idp_name': '身份提供方',
   'pages.account.user_detail.user_info.columns.date_time': '绑定时间',
   'pages.account.user_detail.user_info.columns.option': '操作',
-  'pages.account.user_detail.user_info.columns.option.popconfirm.title': '您确定要解绑该账户吗',
-  'pages.account.user_detail.user_info.columns.option.popconfirm.remove': '解绑',
+  'pages.account.user_detail.user_info.columns.option.unbind': '解除绑定',
+  'pages.account.user_detail.user_info.columns.option.unbind_title': '确定要解除身份提供商绑定？',
+  'pages.account.user_detail.user_info.columns.option.unbind_content':
+    '解绑后将无法通过该身份提供商进行登录认证。',
   'pages.account.user_detail.user_info.avatar': '头像',
   'pages.account.user_detail.user_info.username': '用户名称',
   'pages.account.user_detail.user_info.nick_name': '昵称',
@@ -43,7 +44,6 @@ export default {
   'pages.account.user_detail.user_info.data_origin': '数据来源',
   'pages.account.user_detail.user_info.data_origin.value_enum.input': '自建',
   'pages.account.user_detail.user_info.data_origin.value_enum.dingtalk': '钉钉导入',
-  'pages.account.user_detail.user_info.data_origin.value_enum.wechat': '企业微信导入',
   'pages.account.user_detail.user_info.data_origin.value_enum.feishu': '飞书导入',
   'pages.account.user_detail.user_info.id': '账户 ID',
   'pages.account.user_detail.user_info.external_id': '外部 ID',
@@ -76,10 +76,9 @@ export default {
   'pages.account.user_detail.app_account.columns.account': '应用账户',
   'pages.account.user_detail.app_account.columns.create_time': '添加时间',
   'pages.account.user_detail.app_account.columns.option': '操作',
-  'pages.account.user_detail.app_account.columns.option.popconfirm.title':
-    '您确定要删除此应用账户？',
 
-  'pages.account.user_detail.app_access_title': '已授权应用',
-  'pages.account.user_detail.access_strategy.popconfirm.title': '您确定要取消应用授权？',
-  'pages.account.user_detail.access_strategy.popconfirm.remove': '取消授权',
+  'pages.account.user_detail.access_strategy': '已授权应用',
+  'pages.account.user_detail.access_strategy.remove': '取消授权',
+  'pages.account.user_detail.access_strategy.remove_title': '确定取消该应用授权？',
+  'pages.account.user_detail.access_strategy.remove_content': '取消后将失去应用访问权限。',
 };

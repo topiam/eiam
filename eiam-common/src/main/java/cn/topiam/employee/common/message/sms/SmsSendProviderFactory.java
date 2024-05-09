@@ -28,7 +28,7 @@ import cn.topiam.employee.common.message.sms.tencent.TencentSmsProviderSend;
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/10 21:40
+ * Created by support@topiam.cn on 2021/11/10 21:40
  */
 public class SmsSendProviderFactory {
 

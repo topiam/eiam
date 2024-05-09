@@ -22,12 +22,13 @@ export default {
   'pages.account.identity_source_list': '身份源列表',
   'pages.account.identity_source_list.tool_bar_render.button.add': '添加身份源',
   'pages.account.identity_source_list.metas.title': '身份源名称',
-  'pages.account.identity_source_list.metas.actions.popconfirm.title.disable':
-    '确定禁用该身份源吗？',
-  'pages.account.identity_source_list.metas.actions.popconfirm.title.enable':
-    '确定启用该身份源吗？',
-  'pages.account.identity_source_list.metas.actions.popconfirm.delete': '您确定要删除身份源吗？',
-
+  'pages.account.identity_source_list.metas.actions.disable_title': '确定要禁用该身份源吗？',
+  'pages.account.identity_source_list.metas.actions.disable_content': '禁用后该身份源将无法使用。',
+  'pages.account.identity_source_list.metas.actions.enable_title': '确定要启用该身份源吗？',
+  'pages.account.identity_source_list.metas.actions.enable_content': '启用后该身份源将恢复正常。',
+  'pages.account.identity_source_list.metas.actions.delete_title': '确定要删除该身份源吗？',
+  'pages.account.identity_source_list.metas.actions.delete_content':
+    '删除操作无法恢复，请谨慎操作！',
   'pages.account.identity_source_list.create_modal': '新增身份源',
   'pages.account.identity_source_list.create_modal.success.title': '添加成功',
   'pages.account.identity_source_list.create_modal.success.content':
@@ -36,7 +37,6 @@ export default {
   'pages.account.identity_source_list.create_modal.provider': '提供商',
   'pages.account.identity_source_list.create_modal.provider.placeholder': '请选择身份源提供商',
   'pages.account.identity_source_list.create_modal.provider.placeholder.options.dingtalk': '钉钉',
-  'pages.account.identity_source_list.create_modal.provider.placeholder.options.wework': '企业微信',
   'pages.account.identity_source_list.create_modal.provider.placeholder.options.feishu': '飞书',
   'pages.account.identity_source_list.create_modal.provider.placeholder.rule.0.message':
     '请选择身份源提供商',

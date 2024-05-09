@@ -34,13 +34,11 @@ import {
   Card,
   Checkbox,
   Divider,
-  Popconfirm,
   Skeleton,
   Space,
   Table,
   Tooltip,
   Typography,
-  Popover,
 } from 'antd';
 import React, { useRef, useState } from 'react';
 import CreateUser from '../CreateUser';
@@ -162,11 +160,6 @@ export default (props: UserListProps) => {
             id: 'pages.account.user_list.user.columns.data_origin.value_enum.dingtalk',
           }),
         },
-        wechat: {
-          text: intl.formatMessage({
-            id: 'pages.account.user_list.user.columns.data_origin.value_enum.wechat',
-          }),
-        },
         feishu: {
           text: intl.formatMessage({
             id: 'pages.account.user_list.user.columns.data_origin.value_enum.feishu',
@@ -175,45 +168,11 @@ export default (props: UserListProps) => {
       },
     },
     {
-      title: intl.formatMessage({ id: 'pages.account.user_list.user.columns.org_display_path' }),
+      title: intl.formatMessage({ id: 'pages.account.user_group_detail.common.org_display_path' }),
       dataIndex: 'orgDisplayPath',
+      width: 300,
       search: false,
       ellipsis: true,
-      render: (_, record) => {
-        return (
-          <Popover
-            key="pop"
-            title={intl.formatMessage({
-              id: 'pages.account.user_list.user.columns.org_display_path',
-            })}
-            content={
-              <>
-                {record.primaryOrgDisplayPath && (
-                  <span>主组织：{record.primaryOrgDisplayPath}</span>
-                )}
-                {record.orgDisplayPath && (
-                  <Space key="path" direction="vertical" size="small" style={{ display: 'flex' }}>
-                    {record.orgDisplayPath?.split(',')?.map((p: string) => {
-                      return p;
-                    })}
-                  </Space>
-                )}
-              </>
-            }
-          >
-            {record.primaryOrgDisplayPath && (
-              <Space key="primary_path">{record.primaryOrgDisplayPath}</Space>
-            )}
-            {record.orgDisplayPath && (
-              <Space key="path" direction="vertical" size="small" style={{ display: 'flex' }}>
-                {record.orgDisplayPath?.split(',')?.map((p: string) => {
-                  return p;
-                })}
-              </Space>
-            )}
-          </Popover>
-        );
-      },
     },
     {
       title: intl.formatMessage({ id: 'pages.account.user_list.user.columns.status' }),
@@ -247,7 +206,7 @@ export default (props: UserListProps) => {
     {
       title: intl.formatMessage({ id: 'pages.account.user_list.user.columns.option' }),
       valueType: 'option',
-      width: 120,
+      width: 130,
       align: 'center',
       fixed: 'right',
       render: (_text: any, row: AccountAPI.ListUser) => {
@@ -289,57 +248,69 @@ export default (props: UserListProps) => {
             )}
             {/*启用*/}
             {row.status === 'enabled' && (
-              <Popconfirm
-                title={intl.formatMessage({
-                  id: 'pages.account.user_list.user.columns.option.disable.popconfirm',
-                })}
-                key={'disable'}
-                placement="bottomRight"
-                icon={
-                  <QuestionCircleOutlined
-                    style={{
-                      color: 'red',
-                    }}
-                  />
-                }
-                onConfirm={async () => {
-                  const { success } = await disableUser(row.id);
-                  if (success) {
-                    message.success(intl.formatMessage({ id: 'app.operation_success' }));
-                    actionRef.current?.reload();
-                    return;
-                  }
+              <a
+                key="disabled"
+                onClick={() => {
+                  const confirmed = modal.warning({
+                    title: intl.formatMessage({
+                      id: 'pages.account.user_list.user.columns.option.disable_title',
+                    }),
+                    content: intl.formatMessage({
+                      id: 'pages.account.user_list.user.columns.option.disable_content',
+                    }),
+                    okText: intl.formatMessage({ id: 'app.confirm' }),
+                    centered: true,
+                    okType: 'primary',
+                    okCancel: true,
+                    cancelText: intl.formatMessage({ id: 'app.cancel' }),
+                    onOk: async () => {
+                      const { success } = await disableUser(row.id);
+                      if (success) {
+                        confirmed.destroy();
+                        message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                        actionRef.current?.reload();
+                        return;
+                      }
+                    },
+                  });
                 }}
-                okText={intl.formatMessage({ id: 'app.yes' })}
-                cancelText={intl.formatMessage({ id: 'app.no' })}
               >
-                <a key="disable" style={{ color: 'red' }}>
-                  {intl.formatMessage({ id: 'app.disable' })}
-                </a>
-              </Popconfirm>
+                {intl.formatMessage({
+                  id: 'pages.account.user_list.user.columns.option.disable',
+                })}
+              </a>
             )}
             {/*禁用*/}
             {row.status === 'disabled' && (
-              <Popconfirm
-                title={intl.formatMessage({
-                  id: 'pages.account.user_list.user.columns.option.enable.popconfirm',
-                })}
-                placement="bottomRight"
-                icon={<QuestionCircleOutlined />}
-                onConfirm={async () => {
-                  const { success } = await enableUser(row.id);
-                  if (success) {
-                    message.success(intl.formatMessage({ id: 'app.operation_success' }));
-                    actionRef.current?.reload();
-                    return;
-                  }
-                }}
-                okText={intl.formatMessage({ id: 'app.yes' })}
-                cancelText={intl.formatMessage({ id: 'app.no' })}
+              <a
                 key="enabled"
+                onClick={() => {
+                  const confirmed = modal.warning({
+                    title: intl.formatMessage({
+                      id: 'pages.account.user_list.user.columns.option.enable_title',
+                    }),
+                    content: intl.formatMessage({
+                      id: 'pages.account.user_list.user.columns.option.enable_content',
+                    }),
+                    okText: intl.formatMessage({ id: 'app.confirm' }),
+                    centered: true,
+                    okType: 'primary',
+                    okCancel: true,
+                    cancelText: intl.formatMessage({ id: 'app.cancel' }),
+                    onOk: async () => {
+                      const { success } = await enableUser(row.id);
+                      if (success) {
+                        confirmed.destroy();
+                        message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                        actionRef.current?.reload();
+                        return;
+                      }
+                    },
+                  });
+                }}
               >
-                <a key="enabled">{intl.formatMessage({ id: 'app.enable' })}</a>
-              </Popconfirm>
+                {intl.formatMessage({ id: 'pages.account.user_list.user.columns.option.enable' })}
+              </a>
             )}
             {/*更新*/}
             <a
@@ -364,36 +335,39 @@ export default (props: UserListProps) => {
                 {
                   key: 'delete',
                   name: (
-                    <Popconfirm
-                      title={intl.formatMessage({
-                        id: 'pages.account.user_list.user.columns.option.delete.popconfirm',
-                      })}
-                      placement="bottomRight"
-                      icon={
-                        <QuestionCircleOutlined
-                          style={{
-                            color: 'red',
-                          }}
-                        />
-                      }
-                      onConfirm={async () => {
-                        const { success } = await removeUser(row.id);
-                        if (success) {
-                          message.success(intl.formatMessage({ id: 'app.operation_success' }));
-                          actionRef.current?.reload();
-                          return;
-                        }
+                    <a
+                      target="_blank"
+                      key="remove"
+                      style={{ color: 'red' }}
+                      onClick={() => {
+                        const confirmed = modal.error({
+                          title: intl.formatMessage({
+                            id: 'pages.account.user_list.user.columns.option.delete_title',
+                          }),
+                          content: intl.formatMessage({
+                            id: 'pages.account.user_list.user.columns.option.delete_content',
+                          }),
+                          okText: intl.formatMessage({ id: 'app.confirm' }),
+                          centered: true,
+                          okType: 'primary',
+                          okCancel: true,
+                          cancelText: intl.formatMessage({ id: 'app.cancel' }),
+                          onOk: async () => {
+                            const { success } = await removeUser(row.id);
+                            if (success) {
+                              confirmed.destroy();
+                              message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                              actionRef.current?.reload();
+                              return;
+                            }
+                          },
+                        });
                       }}
-                      okText={intl.formatMessage({ id: 'app.yes' })}
-                      cancelText={intl.formatMessage({ id: 'app.no' })}
-                      key="delete"
                     >
-                      <a target="_blank" key="remove" style={{ color: 'red' }}>
-                        {intl.formatMessage({
-                          id: 'pages.account.user_list.user.columns.option.delete',
-                        })}
-                      </a>
-                    </Popconfirm>
+                      {intl.formatMessage({
+                        id: 'pages.account.user_list.user.columns.option.delete',
+                      })}
+                    </a>
                   ),
                 },
                 {
@@ -445,38 +419,41 @@ export default (props: UserListProps) => {
               </span>
             </Space>
           )}
-          tableAlertOptionRender={({ selectedRowKeys, onCleanSelected }) => {
-            if (selectedRowKeys.length > 1) {
+          tableAlertOptionRender={({ selectedRowKeys }) => {
+            if (selectedRowKeys.length > 0) {
               return (
                 <Space size={16}>
-                  <Popconfirm
-                    title={intl.formatMessage({
-                      id: 'pages.account.user_list.user.table_alert_option_render',
-                    })}
-                    placement="bottomRight"
-                    icon={
-                      <QuestionCircleOutlined
-                        style={{
-                          color: 'red',
-                        }}
-                      />
-                    }
-                    onConfirm={async () => {
-                      const { success } = await removeBatchUser(selectedRowKeys);
-                      if (success) {
-                        message.success(intl.formatMessage({ id: 'app.operation_success' }));
-                        onCleanSelected();
-                        actionRef.current?.reload();
-                      }
+                  <a
+                    target="_blank"
+                    key="remove"
+                    style={{ color: 'red' }}
+                    onClick={() => {
+                      const confirmed = modal.error({
+                        title: intl.formatMessage({
+                          id: 'pages.account.user_list.user.batch_delete_title',
+                        }),
+                        content: intl.formatMessage({
+                          id: 'pages.account.user_list.user.batch_delete_content',
+                        }),
+                        okText: intl.formatMessage({ id: 'app.confirm' }),
+                        centered: true,
+                        okType: 'primary',
+                        okCancel: true,
+                        cancelText: intl.formatMessage({ id: 'app.cancel' }),
+                        onOk: async () => {
+                          const { success } = await removeBatchUser(selectedRowKeys);
+                          if (success) {
+                            confirmed.destroy();
+                            message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                            actionRef.current?.reload();
+                            return;
+                          }
+                        },
+                      });
                     }}
-                    okText={intl.formatMessage({ id: 'app.yes' })}
-                    cancelText={intl.formatMessage({ id: 'app.no' })}
-                    key="offline"
                   >
-                    <a target="_blank" key="remove" style={{ color: 'red' }}>
-                      {intl.formatMessage({ id: 'app.batch_delete' })}
-                    </a>
-                  </Popconfirm>
+                    {intl.formatMessage({ id: 'app.batch_delete' })}
+                  </a>
                 </Space>
               );
             }
@@ -579,6 +556,9 @@ export default (props: UserListProps) => {
               actionRef.current?.reload();
             }
           }}
+          afterClose={() => {
+            setId(undefined);
+          }}
         />
       )}
 
@@ -589,6 +569,9 @@ export default (props: UserListProps) => {
           visible={resetPasswordVisible}
           onCancel={() => {
             setResetPasswordVisible(false);
+          }}
+          afterClose={() => {
+            setId(undefined);
           }}
         />
       )}

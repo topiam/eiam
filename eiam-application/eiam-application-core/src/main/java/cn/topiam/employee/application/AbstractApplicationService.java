@@ -30,7 +30,6 @@ import cn.topiam.employee.common.entity.app.AppAccountEntity;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.AppGroupAssociationEntity;
 import cn.topiam.employee.common.enums.app.AuthorizationType;
-import cn.topiam.employee.common.enums.app.InitLoginType;
 import cn.topiam.employee.common.exception.app.AppAccountNotExistException;
 import cn.topiam.employee.common.repository.app.AppAccountRepository;
 import cn.topiam.employee.common.repository.app.AppGroupAssociationRepository;
@@ -42,15 +41,24 @@ import lombok.extern.slf4j.Slf4j;
  * AbstractApplicationService
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/8/31 22:34
+ * Created by support@topiam.cn on 2022/8/31 22:34
  */
 @Slf4j
 public abstract class AbstractApplicationService implements ApplicationService {
+
     protected final ObjectMapper mapper = new ObjectMapper();
 
+    /**
+     * 获取默认应用账户
+     *
+     * @param appId {@link String}
+     * @param userId {@link String}
+     * @return {@link AppAccount} AppAccount
+     */
     @Override
-    public AppAccount getAppAccount(Long appId, Long userId) {
-        AppAccountEntity entity = appAccountRepository.findByAppIdAndUserId(appId, userId)
+    public AppAccount getDefaultAppAccount(String appId, String userId) {
+        AppAccountEntity entity = appAccountRepository
+            .findByAppIdAndUserIdAndDefaultedIsTrue(appId, userId)
             .orElseThrow(AppAccountNotExistException::new);
         AppAccount account = new AppAccount();
         account.setAppId(entity.getAppId());
@@ -65,12 +73,11 @@ public abstract class AbstractApplicationService implements ApplicationService {
      * @param name              {@link String}
      * @param icon              {@link String}
      * @param remark            {@link String}
-     * @param initLoginType     {@link InitLoginType}
      * @param authorizationType {@link AuthorizationType}
      * @return {@link AppEntity}
      */
     @Override
-    public AppEntity createApp(String name, String icon, String remark, InitLoginType initLoginType,
+    public AppEntity createApp(String name, String icon, String remark,
                                AuthorizationType authorizationType) {
         AppEntity appEntity = new AppEntity();
         appEntity.setName(name);
@@ -79,25 +86,25 @@ public abstract class AbstractApplicationService implements ApplicationService {
         appEntity.setTemplate(getCode());
         appEntity.setType(getType());
         appEntity.setEnabled(true);
+        appEntity.setConfigured(false);
         appEntity.setProtocol(getProtocol());
         appEntity.setClientId(idGenerator.generateId().toString().replace("-", ""));
         appEntity.setClientSecret(idGenerator.generateId().toString().replace("-", ""));
-        appEntity.setInitLoginType(initLoginType);
         appEntity.setAuthorizationType(authorizationType);
         appEntity.setRemark(remark);
         return appRepository.save(appEntity);
     }
 
     @Override
-    public AppEntity createApp(String name, String icon, String remark, List<String> groupIds,
-                               InitLoginType initLoginType, AuthorizationType authorizationType) {
+    public AppEntity createApp(String name, String icon, String remark, List<String> groups,
+                               AuthorizationType authorizationType) {
 
-        AppEntity appEntity = createApp(name, icon, remark, initLoginType, authorizationType);
+        AppEntity appEntity = createApp(name, icon, remark, authorizationType);
         List<AppGroupAssociationEntity> list = new ArrayList<>();
-        for (String id : groupIds) {
+        for (String id : groups) {
             AppGroupAssociationEntity appGroupAssociationEntity = new AppGroupAssociationEntity();
-            appGroupAssociationEntity.setGroupId(Long.valueOf(id));
-            appGroupAssociationEntity.setAppId(appEntity.getId());
+            appGroupAssociationEntity.setGroupId(id);
+            appGroupAssociationEntity.setApp(appEntity);
             list.add(appGroupAssociationEntity);
         }
         appGroupAssociationRepository.saveAll(list);
@@ -110,14 +117,14 @@ public abstract class AbstractApplicationService implements ApplicationService {
     protected final AppAccountRepository          appAccountRepository;
 
     /**
-     * AppGroupAssociationRepository
-     */
-    protected final AppGroupAssociationRepository appGroupAssociationRepository;
-
-    /**
      * ApplicationRepository
      */
     protected final AppRepository                 appRepository;
+
+    /**
+     * AppGroupAssociationRepository
+     */
+    protected final AppGroupAssociationRepository appGroupAssociationRepository;
 
     /**
      * IdGenerator
@@ -128,8 +135,8 @@ public abstract class AbstractApplicationService implements ApplicationService {
                                          AppGroupAssociationRepository appGroupAssociationRepository,
                                          AppRepository appRepository) {
         this.appAccountRepository = appAccountRepository;
-        this.appRepository = appRepository;
         this.appGroupAssociationRepository = appGroupAssociationRepository;
+        this.appRepository = appRepository;
         this.idGenerator = new AlternativeJdkIdGenerator();
     }
 }

@@ -27,7 +27,7 @@ import lombok.experimental.SuperBuilder;
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/13 21:32
+ * Created by support@topiam.cn on 2023/7/13 21:32
  */
 @Data
 @SuperBuilder
@@ -41,6 +41,12 @@ public class AbstractProtocolConfig implements Serializable {
      */
     @NonNull
     private String            appId;
+
+    /**
+     * 应用名称
+     */
+    @NonNull
+    private String            appName;
 
     /**
      * 客户端ID

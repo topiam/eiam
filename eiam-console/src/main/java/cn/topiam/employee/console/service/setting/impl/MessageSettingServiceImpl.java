@@ -27,17 +27,17 @@ import cn.topiam.employee.console.pojo.result.setting.SmsProviderConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.MailProviderSaveParam;
 import cn.topiam.employee.console.pojo.save.setting.SmsProviderSaveParam;
 import cn.topiam.employee.console.service.setting.MessageSettingService;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.context.ApplicationContextService;
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.MAIL_PROVIDER_SEND;
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.SMS_PROVIDER_SEND;
-import static cn.topiam.employee.core.setting.constant.MessageSettingConstants.MESSAGE_PROVIDER_EMAIL;
-import static cn.topiam.employee.core.setting.constant.MessageSettingConstants.MESSAGE_SMS_PROVIDER;
+import static cn.topiam.employee.core.setting.MessageSettingConstants.MESSAGE_PROVIDER_EMAIL;
+import static cn.topiam.employee.core.setting.MessageSettingConstants.MESSAGE_SMS_PROVIDER;
 
 /**
  * 消息设置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/10/1 21:19
+ * Created by support@topiam.cn on 2021/10/1 21:19
  */
 @Service
 public class MessageSettingServiceImpl extends SettingServiceImpl implements MessageSettingService {
@@ -52,7 +52,7 @@ public class MessageSettingServiceImpl extends SettingServiceImpl implements Mes
     public Boolean saveMailProviderConfig(MailProviderSaveParam param) {
         SettingEntity entity = messageSettingConverter.mailProviderConfigToEntity(param);
         Boolean setting = saveSetting(entity);
-        ApplicationContextHelp.refresh(MAIL_PROVIDER_SEND);
+        ApplicationContextService.refresh(MAIL_PROVIDER_SEND);
         return setting;
     }
 
@@ -66,7 +66,7 @@ public class MessageSettingServiceImpl extends SettingServiceImpl implements Mes
     public Boolean saveSmsProviderConfig(SmsProviderSaveParam param) {
         SettingEntity entity = messageSettingConverter.smsProviderConfigToEntity(param);
         Boolean setting = saveSetting(entity);
-        ApplicationContextHelp.refresh(SMS_PROVIDER_SEND);
+        ApplicationContextService.refresh(SMS_PROVIDER_SEND);
         return setting;
     }
 
@@ -79,7 +79,7 @@ public class MessageSettingServiceImpl extends SettingServiceImpl implements Mes
     public Boolean disableSmsProvider() {
         Boolean setting = removeSetting(MESSAGE_SMS_PROVIDER);
         // refresh
-        ApplicationContextHelp.refresh(SMS_PROVIDER_SEND);
+        ApplicationContextService.refresh(SMS_PROVIDER_SEND);
         return setting;
     }
 
@@ -92,7 +92,7 @@ public class MessageSettingServiceImpl extends SettingServiceImpl implements Mes
     public Boolean disableMailProvider() {
         Boolean setting = removeSetting(MESSAGE_PROVIDER_EMAIL);
         // refresh
-        ApplicationContextHelp.refresh(MAIL_PROVIDER_SEND);
+        ApplicationContextService.refresh(MAIL_PROVIDER_SEND);
         return setting;
     }
 

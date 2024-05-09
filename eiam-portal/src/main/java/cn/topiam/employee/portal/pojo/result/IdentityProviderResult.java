@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * 三方登录提供商
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/3/31 21:58
+ * Created by support@topiam.cn on 2023/3/31 21:58
  */
 @Data
 @Schema(description = "三方登录提供商")
@@ -59,4 +59,10 @@ public class IdentityProviderResult implements Serializable {
      */
     @Schema(description = "提供商类型")
     private String            category;
+
+    /**
+     * 认证地址
+     */
+    @Schema(description = "认证地址")
+    private String            authorizationUri;
 }

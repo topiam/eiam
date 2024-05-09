@@ -123,7 +123,7 @@ export default (props: CreateDrawerProps) => {
                 {
                   value: IdentityProviderType.wechat_qr,
                   label: intl.formatMessage({
-                    id: 'pages.authn.identity_provider.create_modal.form.type.wechat_qr',
+                    id: 'pages.authn.identity_provider.create_modal.form.type.wechat_oauth',
                   }),
                   icon: IdentityProviderType.wechat_qr,
                 },

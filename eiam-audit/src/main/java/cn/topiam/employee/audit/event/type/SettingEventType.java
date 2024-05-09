@@ -27,7 +27,7 @@ import static cn.topiam.employee.audit.event.ConsoleResource.*;
  * 系统设置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/24 22:58
+ * Created by support@topiam.cn on 2021/11/24 22:58
  */
 public class SettingEventType {
 

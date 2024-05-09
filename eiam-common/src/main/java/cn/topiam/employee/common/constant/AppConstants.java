@@ -31,61 +31,46 @@ public final class AppConstants {
     /**
      * 应用管理API路径
      */
-    public final static String APP_PATH               = V1_API_PATH + "/app";
-
-    /**
-     * 组名称
-     */
-    public static final String APP_GROUP_NAME         = "应用管理";
+    public final static String APP_PATH                    = V1_API_PATH + "/app";
 
     /**
      * APP 配置缓存前缀
      */
-    public static final String APP_CACHE_NAME_PREFIX  = "app" + COLON;
+    public static final String APP_CACHE_NAME_PREFIX       = "app" + COLON;
+
+    /**
+     * 分组配置缓存前缀
+     */
+    public static final String APP_GROUP_CACHE_NAME_PREFIX = "app_group" + COLON;
 
     /**
      * APP 应用基本信息
      */
-    public static final String APP_CACHE_NAME         = APP_CACHE_NAME_PREFIX + "basic";
-
-    /**
-     * 应用code
-     */
-    public static final String APP_CODE               = "appCode";
-
-    /**
-     * 提供商变量
-     */
-    public static final String APP_CODE_VARIABLE      = "{" + APP_CODE + "}";
+    public static final String APP_CACHE_NAME              = APP_CACHE_NAME_PREFIX + "basic";
 
     /**
      * 应用账户缓存名称
      */
-    public static final String APP_ACCOUNT_CACHE_NAME = APP_CACHE_NAME_PREFIX + "account";
+    public static final String APP_ACCOUNT_CACHE_NAME      = APP_CACHE_NAME_PREFIX + "account";
 
     /**
      * OIDC 配置缓存名称
      */
-    public static final String OIDC_CONFIG_CACHE_NAME = APP_CACHE_NAME_PREFIX + "oidc";
+    public static final String OIDC_CONFIG_CACHE_NAME      = APP_CACHE_NAME_PREFIX + "oidc";
 
     /**
      * APP Cert
      */
-    public static final String APP_CERT_CACHE_NAME    = APP_CACHE_NAME_PREFIX + "cert";
+    public static final String APP_CERT_CACHE_NAME         = APP_CACHE_NAME_PREFIX + "cert";
 
     /**
      * FORM 配置缓存名称
      */
-    public static final String FORM_CONFIG_CACHE_NAME = APP_CACHE_NAME_PREFIX + "form";
-
-    /**
-     * TSA 配置缓存名称
-     */
-    public static final String TSA_CONFIG_CACHE_NAME  = APP_CACHE_NAME_PREFIX + "tsa";
+    public static final String FORM_CONFIG_CACHE_NAME      = APP_CACHE_NAME_PREFIX + "form";
 
     /**
      * JWT 配置缓存名称
      */
-    public static final String JWT_CONFIG_CACHE_NAME  = APP_CACHE_NAME_PREFIX + "jwt";
+    public static final String JWT_CONFIG_CACHE_NAME       = APP_CACHE_NAME_PREFIX + "jwt";
 
 }

@@ -35,7 +35,7 @@ import cn.topiam.employee.support.repository.page.domain.PageModel;
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023-08-31
+ * Created by support@topiam.cn on 2023-08-31
  */
 public interface AppGroupService {
 
@@ -70,7 +70,7 @@ public interface AppGroupService {
      * @param id {@link  Long}
      * @return {@link Boolean}
      */
-    boolean deleteAppGroup(Long id);
+    boolean deleteAppGroup(String id);
 
     /**
      * 获取单个应用分组详情
@@ -78,7 +78,7 @@ public interface AppGroupService {
      * @param id {@link Long}
      * @return {@link AppGroupGetResult}
      */
-    AppGroupGetResult getAppGroup(Long id);
+    AppGroupGetResult getAppGroup(String id);
 
     /**
      * 批量移除应用

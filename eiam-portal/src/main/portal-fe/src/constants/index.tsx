@@ -29,17 +29,7 @@ export enum RESULT_STATE {
  */
 export enum IDP_TYPE {
   ACCOUNT = 'account',
-  CAPTCHA = 'captcha',
-  WECHAT_QR = 'wechat_qr',
-  DINGTALK_QR = 'dingtalk_qr',
-  FEISHU_OAUTH = 'feishu_oauth',
-  DINGTALK_OAUTH = 'dingtalk_oauth',
-  QQ_OAUTH = 'qq_oauth',
-  GITEE_OAUTH = 'gitee_oauth',
-  GITHUB_OAUTH = 'github_oauth',
-  ALIPAY_OAUTH = 'alipay_oauth',
-  WEIBO_OAUTH = 'weibo_oauth',
-  WECHATWORK_QR = 'wechatwork_oauth',
+  SMS = 'sms',
 }
 
 export enum SESSION_STATUS {

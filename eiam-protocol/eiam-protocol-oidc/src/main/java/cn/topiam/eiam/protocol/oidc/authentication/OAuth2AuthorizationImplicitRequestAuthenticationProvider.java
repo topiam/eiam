@@ -50,6 +50,7 @@ import org.springframework.util.StringUtils;
 import com.google.common.collect.Maps;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.*;
 
+import static cn.topiam.eiam.protocol.oidc.endpoint.OAuth2ParameterNames.RESPONSE_MODE;
 import static cn.topiam.eiam.protocol.oidc.endpoint.authentication.OAuth2AuthorizationImplicitRequestAuthenticationConverter.ID_TOKEN;
 import static cn.topiam.employee.support.security.util.SecurityUtils.isPrincipalAuthenticated;
 
@@ -57,7 +58,7 @@ import static cn.topiam.employee.support.security.util.SecurityUtils.isPrincipal
  * 隐式授权请求认证提供商
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/27 23:53
+ * Created by support@topiam.cn on 2023/6/27 23:53
  */
 @SuppressWarnings("AlibabaClassNamingShouldBeCamel")
 public final class OAuth2AuthorizationImplicitRequestAuthenticationProvider implements
@@ -212,6 +213,7 @@ public final class OAuth2AuthorizationImplicitRequestAuthenticationProvider impl
         Map<String, Object> additionalParameters = Maps.newHashMap();
         additionalParameters.put(REDIRECT_URI, authorizationImplicitRequestAuthenticationToken.getRedirectUri());
         additionalParameters.put(STATE , authorizationImplicitRequestAuthenticationToken.getState());
+        additionalParameters.put(RESPONSE_MODE , authorizationImplicitRequestAuthenticationToken.getResponseMode());
         additionalParameters.put(RESPONSE_TYPE , org.apache.commons.lang3.StringUtils.join(authorizationImplicitRequestAuthenticationToken.getResponseTypes()," "));
         if (idToken != null) {
             additionalParameters.put(OidcParameterNames.ID_TOKEN, idToken.getTokenValue());
@@ -248,6 +250,7 @@ public final class OAuth2AuthorizationImplicitRequestAuthenticationProvider impl
             authorizationCodeRequestAuthentication.getState(),
             authorizationCodeRequestAuthentication.getScopes(),
             authorizationCodeRequestAuthentication.getResponseTypes(),
+            authorizationCodeRequestAuthentication.getResponseMode(),
             authorizationCodeRequestAuthentication.getAdditionalParameters());
 
         throw new OAuth2AuthorizationImplicitRequestAuthenticationException(error,

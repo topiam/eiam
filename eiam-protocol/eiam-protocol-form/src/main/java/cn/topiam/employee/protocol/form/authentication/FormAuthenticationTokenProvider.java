@@ -28,13 +28,13 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
-import cn.topiam.employee.application.AppAccount;
-import cn.topiam.employee.application.ApplicationServiceLoader;
-import cn.topiam.employee.application.form.FormApplicationService;
 import cn.topiam.employee.application.form.model.FormProtocolConfig;
 import cn.topiam.employee.common.enums.app.FormEncryptType;
 import cn.topiam.employee.common.exception.app.AppAccountNotExistException;
 import cn.topiam.employee.common.jackjson.encrypt.EncryptContextHelp;
+import cn.topiam.employee.protocol.code.LoginAccount;
+import cn.topiam.employee.protocol.form.FormAuthorizationService;
+import cn.topiam.employee.protocol.form.client.FormRegisteredClient;
 import cn.topiam.employee.protocol.form.exception.FormAuthenticationException;
 import cn.topiam.employee.protocol.form.exception.FormError;
 import cn.topiam.employee.support.security.userdetails.UserDetails;
@@ -47,7 +47,7 @@ import static cn.topiam.employee.support.security.util.SecurityUtils.isPrincipal
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/8 00:11
+ * Created by support@topiam.cn on 2023/7/8 00:11
  */
 public final class FormAuthenticationTokenProvider implements AuthenticationProvider {
     private final Log logger = LogFactory.getLog(FormAuthenticationTokenProvider.class);
@@ -70,7 +70,6 @@ public final class FormAuthenticationTokenProvider implements AuthenticationProv
         try {
             FormRequestAuthenticationToken requestAuthenticationToken = (FormRequestAuthenticationToken) authentication;
             Authentication principal = (Authentication) requestAuthenticationToken.getPrincipal();
-            FormProtocolConfig config = requestAuthenticationToken.getConfig();
             if (!isPrincipalAuthenticated(principal)) {
                 if (this.logger.isTraceEnabled()) {
                     this.logger.trace(
@@ -78,19 +77,24 @@ public final class FormAuthenticationTokenProvider implements AuthenticationProv
                 }
                 return authentication;
             }
-            FormApplicationService applicationService = (FormApplicationService) applicationServiceLoader
-                .getApplicationService(config.getAppTemplate());
-            AppAccount appAccount = applicationService.getAppAccount(
-                Long.valueOf(config.getAppId()),
-                Long.valueOf(((UserDetails) principal.getPrincipal()).getId()));
+            FormProtocolConfig config = requestAuthenticationToken.getConfig();
+            UserDetails user = ((UserDetails) principal.getPrincipal());
+            //@formatter:off
+            FormRegisteredClient registeredClient = FormRegisteredClient.builder()
+                    .id(config.getAppId())
+                    .code(config.getAppCode())
+                    .clientId(config.getClientId())
+                    .clientName(config.getAppName())
+                    .build();
+            LoginAccount account = authorizationService.getDefaultLoginAccount(registeredClient, user);
+            //@formatter:on
             //密码加密
-            String password = getEncryptionField(
-                EncryptContextHelp.decrypt(appAccount.getPassword()),
+            String password = getEncryptionField(EncryptContextHelp.decrypt(account.getPassword()),
                 config.getPasswordEncryptType(), config.getPasswordEncryptKey());
             // 用户加密
-            String username = getEncryptionField(appAccount.getAccount(),
+            String username = getEncryptionField(account.getUsername(),
                 config.getUsernameEncryptType(), config.getUsernameEncryptKey());
-            return new FormAuthenticationToken(authentication, username, password, config);
+            return new FormAuthenticationToken(principal, username, password, config);
         } catch (AppAccountNotExistException exception) {
             FormError error = new FormError(APP_ACCOUNT_NOT_EXIST, "App account not exist",
                 FORM_ERROR_URI);
@@ -146,9 +150,9 @@ public final class FormAuthenticationTokenProvider implements AuthenticationProv
         return fieldValue;
     }
 
-    private final ApplicationServiceLoader applicationServiceLoader;
+    private final FormAuthorizationService authorizationService;
 
-    public FormAuthenticationTokenProvider(ApplicationServiceLoader applicationServiceLoader) {
-        this.applicationServiceLoader = applicationServiceLoader;
+    public FormAuthenticationTokenProvider(FormAuthorizationService authorizationService) {
+        this.authorizationService = authorizationService;
     }
 }

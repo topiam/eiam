@@ -41,7 +41,7 @@ import static cn.topiam.employee.identitysource.dingtalk.DingTalkConstants.LOGGE
  * AbstractDingTalkDataProcessor
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/28 03:40
+ * Created by support@topiam.cn on 2022/2/28 03:40
  */
 @Slf4j(topic = LOGGER_NAME)
 public abstract class AbstractDingTalkClient extends AbstractIdentitySourceClient<DingTalkConfig> {

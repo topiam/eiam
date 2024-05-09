@@ -25,7 +25,7 @@ import cn.topiam.employee.audit.event.type.EventType;
  * Audit
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/28 21:56
+ * Created by support@topiam.cn on 2021/9/28 21:56
  */
 @Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)

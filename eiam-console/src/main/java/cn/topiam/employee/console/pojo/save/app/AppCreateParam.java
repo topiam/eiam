@@ -30,7 +30,7 @@ import jakarta.validation.constraints.NotNull;
  * 应用保存入参
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/7/18 23:26
+ * Created by support@topiam.cn on 2021/7/18 23:26
  */
 @Data
 @Schema(description = "应用保存入参")

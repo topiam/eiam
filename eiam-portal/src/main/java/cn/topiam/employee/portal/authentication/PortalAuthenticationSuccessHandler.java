@@ -25,9 +25,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AbstractAuthenticationTargetUrlRequestHandler;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 
 import com.google.common.collect.Lists;
 
@@ -36,10 +39,10 @@ import cn.topiam.employee.audit.enums.EventStatus;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.audit.event.AuditEventPublish;
 import cn.topiam.employee.authentication.common.IdentityProviderType;
-import cn.topiam.employee.authentication.common.authentication.IdpAuthentication;
-import cn.topiam.employee.authentication.common.authentication.IdpNotBindAuthentication;
+import cn.topiam.employee.authentication.common.authentication.IdentityProviderAuthentication;
+import cn.topiam.employee.authentication.common.authentication.IdentityProviderNotBindAuthentication;
 import cn.topiam.employee.authentication.common.authentication.OtpAuthentication;
-import cn.topiam.employee.common.constant.AuthorizeConstants;
+import cn.topiam.employee.authentication.common.template.BindIdentityProviderTemplate;
 import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.support.enums.SecretType;
 import cn.topiam.employee.support.result.ApiRestResult;
@@ -53,9 +56,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import static cn.topiam.employee.audit.event.type.EventType.LOGIN_PORTAL;
-import static cn.topiam.employee.core.help.ServerHelp.getPortalPublicBaseUrl;
-import static cn.topiam.employee.support.constant.EiamConstants.*;
-import static cn.topiam.employee.support.context.ServletContextHelp.isHtmlRequest;
+import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.BIND_REDIRECT;
+import static cn.topiam.employee.core.context.ContextService.getPortalPublicBaseUrl;
+import static cn.topiam.employee.support.constant.EiamConstants.CAPTCHA_CODE_SESSION;
+import static cn.topiam.employee.support.context.ServletContextService.isHtmlRequest;
 import static cn.topiam.employee.support.security.authentication.AuthenticationProvider.USERNAME_PASSWORD;
 import static cn.topiam.employee.support.security.savedredirect.JumpController.JUMP_PATH;
 
@@ -94,29 +98,35 @@ public class PortalAuthenticationSuccessHandler extends
         if (response.isCommitted()) {
             return;
         }
+        HttpSession session = request.getSession(false);
         //用户与 IDP 未关联
-        if (authentication instanceof IdpNotBindAuthentication) {
+        if (authentication instanceof IdentityProviderNotBindAuthentication) {
             if (!isHtmlRequest) {
-                HttpResponseUtils.flushResponseJson(response, HttpStatus.BAD_REQUEST.value(),
-                        ApiRestResult.builder().status(REQUIRE_USER_BIND).message(REQUIRE_USER_BIND)
-                                .build());
+                HttpResponseUtils.flushResponseJson(response, HttpStatus.BAD_REQUEST.value(), ApiRestResult.builder().status(REQUIRE_USER_BIND).message(REQUIRE_USER_BIND).build());
                 return;
             }
-            //跳转登录，前端会有接口获取状态，并进行展示绑定页面
-            response.sendRedirect(UrlUtils
-                    .format(getPortalPublicBaseUrl() + AuthorizeConstants.FE_LOGIN));
+            // 跳转登录，前端会有接口获取状态，并进行展示绑定页面
+            bindIdentityProviderTemplate.sendAuthorizationResponse(response, ApiRestResult.ok());
             return;
         }
         //更新 principal
-        fillPrincipal(authentication,request);
+        fillPrincipal(authentication,request,response);
         //更新认证次数
         updateAuthSuccessCount(authentication);
         //记录审计日志
-        List<Target> targets= Lists.newArrayList(Target.builder().type(TargetType.PORTAL).build());
+        UserDetails principal = (UserDetails) authentication.getPrincipal();
+        List<Target> targets = Lists.newArrayList(Target.builder().type(TargetType.PORTAL).id(principal.getId()).name(principal.getUsername()).build());
         auditEventPublish.publish(LOGIN_PORTAL, authentication, EventStatus.SUCCESS,targets);
         //响应
         if (isHtmlRequest){
-            response.sendRedirect(UrlUtils.format(getPortalPublicBaseUrl() + JUMP_PATH));
+            if (Boolean.TRUE.equals(session.getAttribute(BIND_REDIRECT))) {
+                session.removeAttribute(BIND_REDIRECT);
+                // 跳转登录，前端会有接口获取状态，并进行展示绑定页面
+                bindIdentityProviderTemplate.sendAuthorizationResponse(response, ApiRestResult.ok());
+            }
+            else {
+                response.sendRedirect(UrlUtils.format(getPortalPublicBaseUrl() + JUMP_PATH));
+            }
             return;
         }
         HttpResponseUtils.flushResponseJson(response, HttpStatus.OK.value(), ApiRestResult.ok());
@@ -153,11 +163,14 @@ public class PortalAuthenticationSuccessHandler extends
         }
     }
 
-    private void fillPrincipal(Authentication authentication, HttpServletRequest request) {
+    private void fillPrincipal(Authentication authentication, HttpServletRequest request,
+                               HttpServletResponse response) {
         WebAuthenticationDetails details = (WebAuthenticationDetails) authentication.getDetails();
         //认证类型
         details.setAuthenticationProvider(geAuthType(authentication));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        securityContext.setAuthentication(authentication);
+        securityContextRepository.saveContext(securityContext, request, response);
     }
 
     /**
@@ -172,8 +185,9 @@ public class PortalAuthenticationSuccessHandler extends
             return USERNAME_PASSWORD;
         }
         //身份提供商
-        if (authentication instanceof IdpAuthentication) {
-            IdentityProviderType type = ((IdpAuthentication) authentication).getProviderType();
+        if (authentication instanceof IdentityProviderAuthentication) {
+            IdentityProviderType type = ((IdentityProviderAuthentication) authentication)
+                .getProviderType();
             return new AuthenticationProvider(type.value(), type.name());
         }
         //短信/邮箱验证码登录
@@ -184,12 +198,18 @@ public class PortalAuthenticationSuccessHandler extends
         throw new IllegalArgumentException("未知认证对象");
     }
 
-    private final UserRepository    userRepository;
-    private final AuditEventPublish auditEventPublish;
+    private final SecurityContextRepository    securityContextRepository = new HttpSessionSecurityContextRepository();
+
+    private final UserRepository               userRepository;
+
+    private final AuditEventPublish            auditEventPublish;
+
+    private final BindIdentityProviderTemplate bindIdentityProviderTemplate;
 
     public PortalAuthenticationSuccessHandler(UserRepository userRepository,
                                               AuditEventPublish auditEventPublish) {
         this.userRepository = userRepository;
         this.auditEventPublish = auditEventPublish;
+        this.bindIdentityProviderTemplate = new BindIdentityProviderTemplate();
     }
 }

@@ -23,7 +23,7 @@ import static cn.topiam.employee.protocol.jwt.exception.JwtErrorCodes.GENERATE_I
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/10 21:01
+ * Created by support@topiam.cn on 2023/7/10 21:01
  */
 public class IdTokenGenerateException extends JwtAuthenticationException {
 

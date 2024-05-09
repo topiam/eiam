@@ -36,7 +36,7 @@ import jakarta.validation.constraints.NotNull;
  * 身份源配置验证器入参
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/4/13 23:01
+ * Created by support@topiam.cn on 2022/4/13 23:01
  */
 @Data
 @Schema(description = "身份源配置验证器入参")

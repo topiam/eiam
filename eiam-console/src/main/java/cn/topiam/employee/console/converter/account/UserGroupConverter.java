@@ -37,7 +37,7 @@ import cn.topiam.employee.console.pojo.result.account.UserGroupMemberListResult;
 import cn.topiam.employee.console.pojo.result.account.UserGroupResult;
 import cn.topiam.employee.console.pojo.save.account.UserGroupCreateParam;
 import cn.topiam.employee.console.pojo.update.account.UserGroupUpdateParam;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.context.ApplicationContextService;
 import cn.topiam.employee.support.repository.page.domain.Page;
 
 import jakarta.persistence.criteria.Predicate;
@@ -65,7 +65,8 @@ public interface UserGroupConverter {
         if (!CollectionUtils.isEmpty(page.getContent())) {
             List<UserGroupListResult> list = new ArrayList<>();
             for (UserGroupEntity user : page.getContent()) {
-                UserGroupConverter bean = ApplicationContextHelp.getBean(UserGroupConverter.class);
+                UserGroupConverter bean = ApplicationContextService
+                    .getBean(UserGroupConverter.class);
                 list.add(bean.entityConvertToUserGroupPaginationResult(user));
             }
 
@@ -118,7 +119,7 @@ public interface UserGroupConverter {
      * @param param {@link UserGroupCreateParam}
      * @return {@link UserEntity}
      */
-    @Mapping(target = "deleted", ignore = true)
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "updateTime", ignore = true)
     @Mapping(target = "updateBy", ignore = true)
@@ -133,7 +134,6 @@ public interface UserGroupConverter {
      * @return {@link UserEntity} 用户实体
      */
 
-    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "updateTime", ignore = true)
     @Mapping(target = "updateBy", ignore = true)

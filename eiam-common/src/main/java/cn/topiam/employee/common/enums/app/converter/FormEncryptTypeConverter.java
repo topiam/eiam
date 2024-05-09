@@ -27,7 +27,7 @@ import jakarta.persistence.Converter;
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/2/23 23:57
+ * Created by support@topiam.cn on 2023/2/23 23:57
  */
 @Converter(autoApply = true)
 public class FormEncryptTypeConverter implements AttributeConverter<FormEncryptType, String> {

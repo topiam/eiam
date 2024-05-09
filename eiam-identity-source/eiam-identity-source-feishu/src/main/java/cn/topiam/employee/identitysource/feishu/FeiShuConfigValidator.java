@@ -39,7 +39,7 @@ import static cn.topiam.employee.identitysource.feishu.FeiShuConstant.APP_ACCESS
  * 飞书身份源客户端配置验证器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/4/13 23:09
+ * Created by support@topiam.cn on 2022/4/13 23:09
  */
 @Slf4j
 public class FeiShuConfigValidator implements

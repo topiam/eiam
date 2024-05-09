@@ -99,7 +99,7 @@ const Code = (props: ProFormProps) => {
                 if (isPhone) {
                   return;
                 }
-                return Promise.reject<any>(
+                return Promise.reject<Error>(
                   new Error(
                     intl.formatMessage({
                       id: 'pages.login.recipient.invalid',

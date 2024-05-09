@@ -17,13 +17,16 @@
  */
 package cn.topiam.employee.portal.configuration.security;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.lang.Nullable;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -39,29 +42,25 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.google.common.collect.Lists;
 
-import cn.topiam.employee.common.constant.AuthorizeConstants;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
-import cn.topiam.employee.core.setting.constant.SecuritySettingConstants;
-import cn.topiam.employee.portal.authentication.AuthenticationTrustResolverImpl;
-import cn.topiam.employee.portal.authentication.PortalAccessDeniedHandler;
-import cn.topiam.employee.portal.authentication.PortalAuthenticationEntryPoint;
-import cn.topiam.employee.portal.authentication.PortalLogoutSuccessHandler;
-import cn.topiam.employee.portal.authentication.PortalSessionInformationExpiredStrategy;
+import cn.topiam.employee.core.setting.SecuritySettingConstants;
+import cn.topiam.employee.portal.authentication.*;
 import cn.topiam.employee.support.redis.KeyStringRedisSerializer;
 import cn.topiam.employee.support.security.csrf.SpaCsrfTokenRequestHandler;
 import static org.springframework.security.web.header.writers.XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK;
 import static org.springframework.web.cors.CorsConfiguration.ALL;
 
-import static cn.topiam.employee.core.setting.constant.SecuritySettingConstants.*;
+import static cn.topiam.employee.core.setting.SecuritySettingConstants.*;
 import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_CSRF_COOKIE_NAME;
 import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_CSRF_HEADER_NAME;
+import static cn.topiam.employee.support.security.constant.SecurityConstants.LOGOUT_PATH;
 
 /**
  * AbstractConfiguration
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/3 21:08
+ * Created by support@topiam.cn on 2023/7/3 21:08
  */
 public class AbstractSecurityConfiguration {
 
@@ -108,7 +107,7 @@ public class AbstractSecurityConfiguration {
      */
     public Customizer<LogoutConfigurer<HttpSecurity>> withLogoutConfigurerDefaults() {
         return configurer -> {
-            configurer.logoutUrl(AuthorizeConstants.LOGOUT);
+            configurer.logoutUrl(LOGOUT_PATH);
             configurer.logoutSuccessHandler(new PortalLogoutSuccessHandler());
             configurer.permitAll();
         };
@@ -198,25 +197,26 @@ public class AbstractSecurityConfiguration {
         };
     }
 
-    /**
-     *  安全上下文
-     *
-     * @return {@link SecurityContextConfigurer}
-     */
-    public Customizer<SecurityContextConfigurer<HttpSecurity>> securityContext() {
-        return configurer -> configurer.requireExplicitSave(false);
-    }
-
-    public RedisTemplate<String, String> getRedisTemplate(RedisConnectionFactory redisConnectionFactory,
-                                                          CacheProperties cacheProperties) {
+    protected RedisTemplate<String, String> getStringRedisTemplate(@Nullable RedisConnectionFactory connectionFactory,
+                                                                   CacheProperties cacheProperties) {
         RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.setConnectionFactory(connectionFactory);
         KeyStringRedisSerializer keyStringRedisSerializer = new KeyStringRedisSerializer(
             cacheProperties.getRedis().getKeyPrefix());
         redisTemplate.setKeySerializer(keyStringRedisSerializer);
         redisTemplate.setValueSerializer(StringRedisSerializer.UTF_8);
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
+    }
+
+    /**
+     *  安全上下文
+     *
+     * @return {@link SecurityContextConfigurer}
+     */
+    public Customizer<SecurityContextConfigurer<HttpSecurity>> securityContext() {
+        return configurer -> {
+        };
     }
 
     private final SettingRepository settingRepository;

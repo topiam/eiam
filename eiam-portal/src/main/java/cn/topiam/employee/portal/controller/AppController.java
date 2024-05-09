@@ -43,7 +43,7 @@ import static cn.topiam.employee.common.constant.AppConstants.APP_PATH;
  * 应用
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/12 21:39
+ * Created by support@topiam.cn on 2021/9/12 21:39
  */
 @Tag(name = "应用管理")
 @RestController

@@ -20,12 +20,12 @@ package cn.topiam.employee.authentication.common;
 import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import static cn.topiam.employee.common.constant.AuthorizeConstants.AUTHORIZATION_REQUEST_URI;
-import static cn.topiam.employee.common.constant.AuthorizeConstants.LOGIN_PATH;
+import static cn.topiam.employee.common.constant.AuthnConstants.AUTHN_PATH;
+import static cn.topiam.employee.support.security.constant.SecurityConstants.LOGIN_PATH;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2022/12/31 21:18
+ * Created by support@topiam.cn on 2022/12/31 21:18
  */
 public final class IdentityProviderType {
 
@@ -39,30 +39,18 @@ public final class IdentityProviderType {
      * 钉钉
      */
     public static final IdentityProviderType DINGTALK_OAUTH    = new IdentityProviderType(
-        "dingtalk_oauth", "钉钉Oauth认证", "通过钉钉进行身份认证");
-
-    /**
-     * 钉钉扫码
-     */
-    public static final IdentityProviderType DINGTALK_QR       = new IdentityProviderType(
-        "dingtalk_qr", "钉钉扫码认证", "通过钉钉扫码进行身份认证");
+        "dingtalk_oauth", "钉钉认证", "通过钉钉进行身份认证");
 
     /**
      * 微信开放平台
      */
-    public static final IdentityProviderType WECHAT_QR         = new IdentityProviderType(
-        "wechat_qr", "微信扫码登录", "通过微信扫码进行身份认证");
-    /**
-     * 微信网页授权
-     */
-    public static final IdentityProviderType WECHAT_WEB_PAGE   = new IdentityProviderType(
-        "wechat_webpage", "微信公众号网页授权登录", "通过微信公众号网页身份认证");
-
+    public static final IdentityProviderType WECHAT            = new IdentityProviderType(
+        "wechat_oauth", "微信扫码登录", "通过微信扫码进行身份认证");
     /**
      * 企业微信
      */
-    public static final IdentityProviderType WECHAT_WORK_QR    = new IdentityProviderType(
-        "wechatwork_qr", "企业微信扫码认证", "通过企业微信同步的用户可使用企业微信扫码登录进行身份认证");
+    public static final IdentityProviderType WECHAT_WORK_OAUTH = new IdentityProviderType(
+        "wechatwork_oauth", "企业微信认证", "通过企业微信同步的用户可使用企业微信扫码登录进行身份认证");
 
     /**
      * Gitee
@@ -75,12 +63,6 @@ public final class IdentityProviderType {
      */
     public static final IdentityProviderType QQ_OAUTH          = new IdentityProviderType(
         "qq_oauth", "QQ认证", "通过QQ进行身份认证");
-
-    /**
-     * IDAP
-     */
-    public static final IdentityProviderType LDAP              = new IdentityProviderType("ldap",
-        "LDAP认证", "通过 LDAP 进行身份验证");
 
     /**
      * 用户名密码
@@ -137,6 +119,49 @@ public final class IdentityProviderType {
         return this.value;
     }
 
+    /**
+     * getIdentityProviderType
+     *
+     * @param type {@link String}
+     * @return {@link IdentityProviderType}
+     */
+    public static IdentityProviderType getIdentityProviderType(String type) {
+        if (FEISHU_OAUTH.value().equals(type)) {
+            return FEISHU_OAUTH;
+        }
+        if (DINGTALK_OAUTH.value().equals(type)) {
+            return DINGTALK_OAUTH;
+        }
+        if (WECHAT.value().equals(type)) {
+            return WECHAT;
+        }
+        if (WECHAT_WORK_OAUTH.value().equals(type)) {
+            return WECHAT_WORK_OAUTH;
+        }
+        if (QQ_OAUTH.value().equals(type)) {
+            return QQ_OAUTH;
+        }
+        if (GITHUB_OAUTH.value().equals(type)) {
+            return GITHUB_OAUTH;
+        }
+        if (GITEE_OAUTH.value().equals(type)) {
+            return GITEE_OAUTH;
+        }
+        if (ALIPAY_OAUTH.value().equals(type)) {
+            return ALIPAY_OAUTH;
+        }
+        if (USERNAME_PASSWORD.value().equals(type)) {
+            return USERNAME_PASSWORD;
+        }
+        if (MAIL.value().equals(type)) {
+            return MAIL;
+        }
+        if (SMS.value().equals(type)) {
+            return SMS;
+        }
+        throw new IllegalArgumentException("未知身份提供商类型");
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -169,7 +194,7 @@ public final class IdentityProviderType {
 
     @JsonIgnore
     public String getAuthorizationPathPrefix() {
-        return AUTHORIZATION_REQUEST_URI + "/" + value();
+        return AUTHN_PATH + "/" + value();
     }
 
     public static int size() {

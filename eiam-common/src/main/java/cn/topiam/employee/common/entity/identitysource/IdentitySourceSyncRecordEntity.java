@@ -17,13 +17,13 @@
  */
 package cn.topiam.employee.common.entity.identitysource;
 
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SoftDelete;
 
 import cn.topiam.employee.common.enums.SyncStatus;
 import cn.topiam.employee.common.enums.identitysource.IdentitySourceActionType;
 import cn.topiam.employee.common.enums.identitysource.IdentitySourceObjectType;
-import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
+import cn.topiam.employee.support.repository.SoftDeleteConverter;
+import cn.topiam.employee.support.repository.base.BaseEntity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,14 +34,13 @@ import lombok.experimental.Accessors;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
+import static cn.topiam.employee.support.repository.base.BaseEntity.IS_DELETED_COLUMN;
 
 /**
  * 身份源同步详情
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/22 23:51
+ * Created by support@topiam.cn on 2022/2/22 23:51
  */
 @Getter
 @Setter
@@ -49,16 +48,15 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
 @Entity
 @Accessors(chain = true)
 @NoArgsConstructor
-@Table(name = "identity_source_sync_record")
-@SQLDelete(sql = "update identity_source_sync_record set " + SOFT_DELETE_SET + " where id_ = ?")
-@Where(clause = SOFT_DELETE_WHERE)
-public class IdentitySourceSyncRecordEntity extends LogicDeleteEntity<Long> {
+@Table(name = "eiam_identity_source_sync_record")
+@SoftDelete(columnName = IS_DELETED_COLUMN, converter = SoftDeleteConverter.class)
+public class IdentitySourceSyncRecordEntity extends BaseEntity {
 
     /**
      * 同步历史ID
      */
     @Column(name = "sync_history_id")
-    private Long                     syncHistoryId;
+    private String                   syncHistoryId;
 
     /**
      * 动作类型

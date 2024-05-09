@@ -33,7 +33,7 @@ import cn.topiam.employee.support.repository.page.domain.PageModel;
  * 用户组service
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/10/11 21:29
+ * Created by support@topiam.cn on 2021/10/11 21:29
  */
 public interface UserGroupService {
     /**
@@ -75,7 +75,7 @@ public interface UserGroupService {
      * @param id {@link Long}
      * @return {@link UserGroupEntity}
      */
-    UserGroupEntity getUserGroup(Long id);
+    UserGroupEntity getUserGroup(String id);
 
     /**
      * 获取用户组成员

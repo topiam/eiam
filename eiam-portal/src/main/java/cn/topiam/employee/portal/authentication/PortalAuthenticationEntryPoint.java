@@ -18,13 +18,13 @@
 package cn.topiam.employee.portal.authentication;
 
 import java.io.IOException;
+import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
 
-import cn.topiam.employee.core.help.ServerHelp;
+import cn.topiam.employee.core.context.ContextService;
 import cn.topiam.employee.support.result.ApiRestResult;
 import cn.topiam.employee.support.security.web.AbstractAuthenticationEntryPoint;
 import cn.topiam.employee.support.util.HttpResponseUtils;
@@ -34,8 +34,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
-import static cn.topiam.employee.common.constant.AuthorizeConstants.FE_LOGIN;
-import static cn.topiam.employee.support.context.ServletContextHelp.isHtmlRequest;
+import static cn.topiam.employee.support.context.ServletContextService.isHtmlRequest;
 
 /**
  * 认证入口点
@@ -70,18 +69,21 @@ public class PortalAuthenticationEntryPoint extends AbstractAuthenticationEntryP
                          AuthenticationException authException) throws IOException,
                                                                 ServletException {
         super.commence(request, response, authException);
+        //判断请求
+        boolean isHtmlRequest = isHtmlRequest(request);
         //JSON
-        if (!isHtmlRequest(request)) {
+        if (!isHtmlRequest) {
             ApiRestResult<Object> result = ApiRestResult.builder()
-                .status(String.valueOf(UNAUTHORIZED.value())).message(StringUtils
-                    .defaultString(authException.getMessage(), UNAUTHORIZED.getReasonPhrase()))
+                .status(String.valueOf(UNAUTHORIZED.value()))
+                .message(
+                    Objects.toString(authException.getMessage(), UNAUTHORIZED.getReasonPhrase()))
                 .build();
             HttpResponseUtils.flushResponseJson(response, UNAUTHORIZED.value(), result);
         }
         // HTML
         else {
             //跳转前端SESSION过期路由
-            response.sendRedirect(ServerHelp.getPortalPublicBaseUrl() + FE_LOGIN);
+            response.sendRedirect(ContextService.getPortalLoginUrl());
         }
     }
 }

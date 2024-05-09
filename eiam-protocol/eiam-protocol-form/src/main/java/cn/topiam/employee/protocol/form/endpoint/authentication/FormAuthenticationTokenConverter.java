@@ -35,7 +35,7 @@ import static cn.topiam.employee.protocol.form.exception.FormErrorCodes.SERVER_E
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/8 00:14
+ * Created by support@topiam.cn on 2023/7/8 00:14
  */
 public final class FormAuthenticationTokenConverter implements AuthenticationConverter {
 

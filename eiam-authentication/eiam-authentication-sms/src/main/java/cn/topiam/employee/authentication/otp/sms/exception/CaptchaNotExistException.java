@@ -22,7 +22,7 @@ import cn.topiam.employee.support.exception.TopIamException;
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/1/2 23:00
+ * Created by support@topiam.cn on 2023/1/2 23:00
  */
 public class CaptchaNotExistException extends TopIamException {
     public CaptchaNotExistException() {

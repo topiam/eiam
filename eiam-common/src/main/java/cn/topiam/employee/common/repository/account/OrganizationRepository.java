@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -35,8 +36,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.account.OrganizationEntity;
 import cn.topiam.employee.common.entity.app.AppAccountEntity;
-import cn.topiam.employee.common.enums.DataOrigin;
-import cn.topiam.employee.support.repository.LogicDeleteRepository;
 import static cn.topiam.employee.common.constant.AccountConstants.ORG_CACHE_NAME;
 
 /**
@@ -45,11 +44,11 @@ import static cn.topiam.employee.common.constant.AccountConstants.ORG_CACHE_NAME
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-08-09
+ * Created by support@topiam.cn on 2020-08-09
  */
 @Repository
 @CacheConfig(cacheNames = { ORG_CACHE_NAME })
-public interface OrganizationRepository extends LogicDeleteRepository<OrganizationEntity, String>,
+public interface OrganizationRepository extends JpaRepository<OrganizationEntity, String>,
                                         JpaSpecificationExecutor<OrganizationEntity>,
                                         OrganizationRepositoryCustomized {
 
@@ -164,10 +163,22 @@ public interface OrganizationRepository extends LogicDeleteRepository<Organizati
     /**
      * 根据外部用id查询组织
      *
-     * @param deptIdList         {@link String}
+     * @param identitySourceId         {@link String}
+     * @param deptIdList         {@link List}
      * @return {@link OrganizationEntity}
      */
-    List<OrganizationEntity> findByExternalIdIn(List<String> deptIdList);
+    List<OrganizationEntity> findByIdentitySourceIdAndExternalIdIn(String identitySourceId,
+                                                                   List<String> deptIdList);
+
+    /**
+     * 根据外部用id查询组织
+     *
+     * @param identitySourceId         {@link String}
+     * @param orgIdList         {@link List}
+     * @return {@link OrganizationEntity}
+     */
+    List<OrganizationEntity> findByIdentitySourceIdAndIdIn(String identitySourceId,
+                                                           List<String> orgIdList);
 
     /**
      * 根据外部用id查询组织
@@ -181,41 +192,41 @@ public interface OrganizationRepository extends LogicDeleteRepository<Organizati
      * 根据外部用id查询组织
      *
      * @param externalId       {@link String}
-     * @param identitySourceId {@link Long}
+     * @param identitySourceId {@link String}
      * @return {@link OrganizationEntity}
      */
     OrganizationEntity findByExternalIdAndIdentitySourceId(String externalId,
-                                                           Long identitySourceId);
+                                                           String identitySourceId);
 
     /**
      * 根据外部用id查询组织
      *
      * @param externalId       {@link String}
-     * @param identitySourceId {@link Long}
+     * @param identitySourceId {@link String}
      * @return {@link List}
      */
     List<OrganizationEntity> findByExternalIdInAndIdentitySourceId(List<String> externalId,
-                                                                   Long identitySourceId);
+                                                                   String identitySourceId);
 
     /**
      * 查询子组织
      *
      * @param parentId         {@link String}
-     * @param dataOrigin       {@link DataOrigin}
+     * @param dataOrigin       {@link String}
      * @param identitySourceId {@link String}
      * @return {@link OrganizationEntity}
      */
     List<OrganizationEntity> findByParentIdAndDataOriginAndIdentitySourceId(String parentId,
-                                                                            DataOrigin dataOrigin,
-                                                                            Long identitySourceId);
+                                                                            String dataOrigin,
+                                                                            String identitySourceId);
 
     /**
      * 根据身份源ID获取所有数据
      *
-     * @param identitySourceId {@link Long}
+     * @param identitySourceId {@link String}
      * @return  {@link List}
      */
-    List<OrganizationEntity> findByIdentitySourceId(Long identitySourceId);
+    List<OrganizationEntity> findByIdentitySourceId(String identitySourceId);
 
     /**
      *  通过parentId查询
@@ -224,46 +235,6 @@ public interface OrganizationRepository extends LogicDeleteRepository<Organizati
      * @return {@link List}
      */
     List<OrganizationEntity> findByIdInOrderByOrderAsc(Collection<String> parentIds);
-
-    /**
-     * findByIdContainsDeleted
-     *
-     * @param id must not be {@literal null}.
-     * @return {@link OrganizationEntity}
-     */
-    @NotNull
-    @Query(value = "SELECT * FROM organization WHERE id_ = :id", nativeQuery = true)
-    Optional<OrganizationEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") String id);
-
-    /**
-     * 查询子部门id
-     *
-     * @param parentIds {@link List}
-     */
-    @Query(value = """
-            WITH RECURSIVE org ( id_, parent_id ) AS (
-                SELECT
-                    id_,
-                    parent_id
-                FROM
-                    organization
-                WHERE
-                    is_deleted = '0'
-                    AND parent_id IN ( :parentIds ) UNION ALL
-                SELECT
-                    o.id_,
-                    o.parent_id
-                FROM
-                    organization o
-                    JOIN org ON o.is_deleted = '0'
-                    AND o.parent_id = org.id_
-                ) SELECT
-                id_
-            FROM
-                org
-            """, nativeQuery = true)
-    @Cacheable(key = "'childs:'+#p0", unless = "#result==null")
-    List<String> getChildIdList(@Param("parentIds") List<String> parentIds);
 
     /**
      * save

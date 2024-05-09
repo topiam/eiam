@@ -17,6 +17,8 @@
  */
 package cn.topiam.employee.portal.service;
 
+import java.util.List;
+
 import cn.topiam.employee.application.AppAccount;
 import cn.topiam.employee.portal.pojo.request.AppAccountRequest;
 
@@ -24,7 +26,7 @@ import cn.topiam.employee.portal.pojo.request.AppAccountRequest;
  * 应用账户
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/8/25 21:07
+ * Created by support@topiam.cn on 2023/8/25 21:07
  */
 public interface AppAccountService {
 
@@ -45,9 +47,18 @@ public interface AppAccountService {
     Boolean deleteAppAccount(String id);
 
     /**
-     * 获取应用账户
-     * @param appId {@link Long}
-     * @return {@link AppAccount}
+     * 获取当前登陆者应用账户
+     * @param appId {@link String}
+     * @return {@link List <AppAccount>}
      */
-    AppAccount getAppAccount(Long appId);
+    List<AppAccount> getAppAccountList(String appId);
+
+    /**
+     * 设置默认应用账户
+     *
+     * @param id {@link String}
+     * @param defaulted {@link Boolean}
+     * @return {@link Boolean}
+     */
+    Boolean updateAppAccountDefault(String id, Boolean defaulted);
 }

@@ -33,7 +33,7 @@ import cn.topiam.employee.common.repository.app.AppRepository;
  * Form 应用配置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/8/23 21:58
+ * Created by support@topiam.cn on 2022/8/23 21:58
  */
 public abstract class AbstractFormApplicationService extends AbstractApplicationService
                                                      implements FormApplicationService {
@@ -41,11 +41,11 @@ public abstract class AbstractFormApplicationService extends AbstractApplication
     @Override
     public void delete(String appId) {
         //删除应用
-        appRepository.deleteById(Long.valueOf(appId));
+        appRepository.deleteById(appId);
         //删除应用账户
-        appAccountRepository.deleteAllByAppId(Long.valueOf(appId));
+        appAccountRepository.deleteAllByAppId(appId);
         // 删除应用配置
-        appFormConfigRepository.deleteByAppId(Long.valueOf(appId));
+        appFormConfigRepository.deleteByAppId(appId);
     }
 
     @Override
@@ -61,6 +61,7 @@ public abstract class AbstractFormApplicationService extends AbstractApplication
         configBuilder.clientId(configPo.getClientId());
         configBuilder.clientSecret(configPo.getClientSecret());
         configBuilder.appCode(configPo.getAppCode());
+        configBuilder.appName(configPo.getAppName());
         configBuilder.appTemplate(configPo.getAppTemplate());
         configBuilder.loginUrl(configPo.getLoginUrl());
         configBuilder.usernameField(configPo.getUsernameField());
@@ -74,6 +75,7 @@ public abstract class AbstractFormApplicationService extends AbstractApplication
         if (list != null) {
             configBuilder.otherField(new ArrayList<>(list));
         }
+        configBuilder.configured(configPo.getConfigured());
         return configBuilder.build();
     }
 
@@ -83,8 +85,8 @@ public abstract class AbstractFormApplicationService extends AbstractApplication
     protected final AppFormConfigRepository appFormConfigRepository;
 
     protected AbstractFormApplicationService(AppRepository appRepository,
-                                             AppAccountRepository appAccountRepository,
                                              AppGroupAssociationRepository appGroupAssociationRepository,
+                                             AppAccountRepository appAccountRepository,
                                              AppFormConfigRepository appFormConfigRepository) {
         super(appAccountRepository, appGroupAssociationRepository, appRepository);
         this.appFormConfigRepository = appFormConfigRepository;

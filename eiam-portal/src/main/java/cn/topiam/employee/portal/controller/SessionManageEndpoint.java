@@ -64,7 +64,7 @@ import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_DATE_TIM
  * 会话管理
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/8 21:39
+ * Created by support@topiam.cn on 2021/9/8 21:39
  */
 @Tag(name = "会话管理")
 @RestController
@@ -126,7 +126,8 @@ public class SessionManageEndpoint {
         Arrays.stream(ids).forEach((i) -> {
             //如果sessionId等于当前操作用户sessionId不操作
             if (!req.getSession(false).getId().equals(i)) {
-                AuditContext.setTarget(Target.builder().id(i).type(TargetType.SESSION).build());
+                AuditContext
+                    .setTarget(Target.builder().id(i).name("").type(TargetType.SESSION).build());
                 sessionRegistry.getSessionInformation(i).expireNow();
             }
         });
@@ -140,7 +141,7 @@ public class SessionManageEndpoint {
  * 在线用户
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/8 21:42
+ * Created by support@topiam.cn on 2021/9/8 21:42
  */
 @Data
 @Accessors(chain = true)

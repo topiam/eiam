@@ -36,7 +36,7 @@ import static cn.topiam.employee.common.entity.app.AppCertEntity.USING_TYPE_FIEL
  * 应用证书Converter
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/4 23:52
+ * Created by support@topiam.cn on 2022/6/4 23:52
  */
 @Mapper(componentModel = "spring")
 public interface AppCertConverter {
@@ -53,10 +53,10 @@ public interface AppCertConverter {
         if (!StringUtils.isBlank(query.getAppId())) {
             exampleMatcher.withMatcher(APP_ID_FIELD_NAME,
                 ExampleMatcher.GenericPropertyMatchers.exact());
-            entity.setAppId(Long.valueOf(query.getAppId()));
+            entity.setAppId(query.getAppId());
 
         }
-        if (!Objects.isNull(query.getUsingType())) {
+        if (Objects.nonNull(query.getUsingType())) {
             exampleMatcher.withMatcher(USING_TYPE_FIELD_NAME,
                 ExampleMatcher.GenericPropertyMatchers.exact());
             entity.setUsingType(query.getUsingType());

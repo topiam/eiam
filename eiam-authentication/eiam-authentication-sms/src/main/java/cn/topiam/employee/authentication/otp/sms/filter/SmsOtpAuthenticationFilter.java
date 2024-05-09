@@ -48,14 +48,14 @@ import cn.topiam.employee.support.util.HttpResponseUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import static cn.topiam.employee.common.constant.AuthorizeConstants.OTP_LOGIN;
+import static cn.topiam.employee.authentication.otp.sms.constant.SmsOtpAuthenticationConstants.OTP_LOGIN;
 import static cn.topiam.employee.support.exception.enums.ExceptionStatus.EX000102;
 
 /**
  * AbstractOTPAuthenticationFilter
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020/12/16 21:34
+ * Created by support@topiam.cn on 2020/12/16 21:34
  */
 public class SmsOtpAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 

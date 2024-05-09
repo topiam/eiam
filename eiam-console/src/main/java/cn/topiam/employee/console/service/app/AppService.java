@@ -19,7 +19,7 @@ package cn.topiam.employee.console.service.app;
 
 import java.util.Map;
 
-import cn.topiam.employee.common.entity.app.query.AppQuery;
+import cn.topiam.employee.console.pojo.query.app.AppQuery;
 import cn.topiam.employee.console.pojo.result.app.AppCreateResult;
 import cn.topiam.employee.console.pojo.result.app.AppGetResult;
 import cn.topiam.employee.console.pojo.result.app.AppListResult;
@@ -35,7 +35,7 @@ import cn.topiam.employee.support.repository.page.domain.PageModel;
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-07-31
+ * Created by support@topiam.cn on 2020-07-31
  */
 public interface AppService {
 
@@ -46,7 +46,8 @@ public interface AppService {
      * @param query     {@link AppQuery}
      * @return {@link AppListResult}
      */
-    Page<AppListResult> getAppList(PageModel pageModel, AppQuery query);
+    Page<AppListResult> getAppList(PageModel pageModel,
+                                   cn.topiam.employee.console.pojo.query.app.AppQuery query);
 
     /**
      * 创建应用
@@ -70,7 +71,7 @@ public interface AppService {
      * @param id {@link  Long}
      * @return {@link Boolean}
      */
-    boolean deleteApp(Long id);
+    boolean deleteApp(String id);
 
     /**
      * 获取单个应用详情
@@ -78,7 +79,7 @@ public interface AppService {
      * @param id {@link Long}
      * @return {@link AppGetResult}
      */
-    AppGetResult getApp(Long id);
+    AppGetResult getApp(String id);
 
     /**
      * 启用应用

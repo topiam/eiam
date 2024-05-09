@@ -32,23 +32,26 @@ public enum UserStatus implements BaseEnum {
                                             /**
                                              * 已启用
                                              */
-                                            ENABLE("enabled", "启用"),
+                                            ENABLED("enabled", "启用"),
+
                                             /**
-                                             * 已禁用
-                                             */
-                                            DISABLE("disabled", "禁用"),
+                                            * 已禁用
+                                            */
+                                            DISABLED("disabled", "禁用"),
 
                                             /**
                                              * 登录失败锁定
                                              */
                                             LOCKED("locked", "锁定"),
+
                                             /**
                                              * 过期锁定
                                              */
                                             EXPIRED_LOCKED("expired_locked", "过期锁定"),
+
                                             /**
-                                             * 密码过期锁定
-                                             */
+                                            * 密码过期锁定
+                                            */
                                             PASSWORD_EXPIRED_LOCKED("password_expired_locked",
                                                                     "密码过期锁定");
 

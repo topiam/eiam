@@ -19,12 +19,16 @@ package cn.topiam.employee.common.entity.setting;
 
 import java.io.Serial;
 import java.time.LocalDateTime;
+import java.util.Collection;
 
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SoftDelete;
+import org.springframework.security.core.GrantedAuthority;
 
 import cn.topiam.employee.common.enums.UserStatus;
-import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
+import cn.topiam.employee.support.repository.SoftDeleteConverter;
+import cn.topiam.employee.support.repository.base.BaseEntity;
+import cn.topiam.employee.support.security.userdetails.UserDetails;
+import cn.topiam.employee.support.security.userdetails.UserType;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -34,8 +38,7 @@ import lombok.experimental.Accessors;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
+import static cn.topiam.employee.support.repository.base.BaseEntity.IS_DELETED_COLUMN;
 
 /**
  * <p>
@@ -43,17 +46,16 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-07-31
+ * Created by support@topiam.cn on 2020-07-31
  */
 @Getter
 @Setter
 @ToString
 @Accessors(chain = true)
 @Entity
-@Table(name = "administrator")
-@SQLDelete(sql = "update administrator set " + SOFT_DELETE_SET + " where id_ = ?")
-@Where(clause = SOFT_DELETE_WHERE)
-public class AdministratorEntity extends LogicDeleteEntity<Long> {
+@Table(name = "eiam_administrator")
+@SoftDelete(columnName = IS_DELETED_COLUMN, converter = SoftDeleteConverter.class)
+public class AdministratorEntity extends BaseEntity {
 
     @Serial
     private static final long  serialVersionUID    = -2619231849746900857L;
@@ -87,6 +89,12 @@ public class AdministratorEntity extends LogicDeleteEntity<Long> {
      */
     @Column(name = "password_")
     private String             password;
+
+    /**
+     * 需要修改密码
+     */
+    @Column(name = "need_change_password")
+    private Boolean            needChangePassword;
 
     /**
      * 邮箱
@@ -158,4 +166,31 @@ public class AdministratorEntity extends LogicDeleteEntity<Long> {
      */
     @Column(name = "expand_")
     private String             expand;
+
+    public Boolean isLocked() {
+        return UserStatus.LOCKED.equals(this.getStatus())
+               || UserStatus.PASSWORD_EXPIRED_LOCKED.equals(this.getStatus())
+               || UserStatus.EXPIRED_LOCKED.equals(this.getStatus());
+    }
+
+    public Boolean isDisabled() {
+        return UserStatus.DISABLED.equals(this.getStatus());
+    }
+
+    public UserDetails toUserDetails(Collection<GrantedAuthority> authorities) {
+        //@formatter:off
+        UserDetails userDetails = new UserDetails(this.getId(), this.getUsername(), this.getPassword(), UserType.ADMIN, !isDisabled(), true, true, !isLocked(), authorities);
+        userDetails.setAvatar(this.getAvatar());
+        userDetails.setPhone(this.getPhone());
+        userDetails.setPhoneAreaCode(this.getPhoneAreaCode());
+        userDetails.setPhoneVerified(this.getPhoneVerified());
+        userDetails.setEmail(this.getEmail());
+        userDetails.setEmailVerified(this.getEmailVerified());
+        userDetails.setLastUpdatePasswordTime(this.getLastUpdatePasswordTime());
+        userDetails.setFullName(this.getFullName());
+        userDetails.setUpdateTime(this.getUpdateTime());
+        userDetails.setNeedChangePassword(this.getNeedChangePassword());
+        //@formatter:on
+        return userDetails;
+    }
 }

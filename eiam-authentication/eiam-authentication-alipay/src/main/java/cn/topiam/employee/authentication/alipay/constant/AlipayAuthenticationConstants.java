@@ -21,7 +21,7 @@ package cn.topiam.employee.authentication.alipay.constant;
  * 支付宝 认证常量
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/8/19 15:18
+ * Created by support@topiam.cn on 2023/8/19 15:18
  */
 public class AlipayAuthenticationConstants {
 

@@ -17,18 +17,17 @@
  */
 package cn.topiam.employee.common.repository.account;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.account.UserDetailEntity;
-import cn.topiam.employee.support.repository.LogicDeleteRepository;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_HQL_SET;
 
 /**
  * <p>
@@ -36,10 +35,10 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-08-07
+ * Created by support@topiam.cn on 2020-08-07
  */
 @Repository
-public interface UserDetailRepository extends LogicDeleteRepository<UserDetailEntity, Long>,
+public interface UserDetailRepository extends JpaRepository<UserDetailEntity, String>,
                                       UserDetailRepositoryCustomized {
     /**
      * 根据user id查询用户详情
@@ -47,17 +46,16 @@ public interface UserDetailRepository extends LogicDeleteRepository<UserDetailEn
      * @param user {@link String}
      * @return {@link UserDetailEntity}
      */
-    Optional<UserDetailEntity> findByUserId(Long user);
+    Optional<UserDetailEntity> findByUserId(String user);
 
     /**
      * 根据用户ID删除用户
      *
-     * @param userId {@link  Long}
+     * @param userId {@link  String}
      */
     @Modifying
     @Transactional(rollbackFor = Exception.class)
-    @Query(value = "UPDATE UserDetailEntity SET " + SOFT_DELETE_HQL_SET + " WHERE userId = :userId")
-    void deleteByUserId(@Param("userId") Long userId);
+    void deleteByUserId(@Param("userId") String userId);
 
     /**
      * 根据用户ID批量删除用户
@@ -66,9 +64,7 @@ public interface UserDetailRepository extends LogicDeleteRepository<UserDetailEn
      */
     @Modifying
     @Transactional(rollbackFor = Exception.class)
-    @Query(value = "UPDATE UserDetailEntity SET " + SOFT_DELETE_HQL_SET
-                   + " WHERE userId IN (:userIds)")
-    void deleteAllByUserIds(@Param("userIds") Iterable<Long> userIds);
+    void deleteAllByUserIdIn(Collection<String> userIds);
 
     /**
      * 根据用户ID查询用户详情
@@ -76,5 +72,5 @@ public interface UserDetailRepository extends LogicDeleteRepository<UserDetailEn
      * @param userIds  {@link List}
      * @return {@link List}
      */
-    List<UserDetailEntity> findAllByUserIdIn(List<Long> userIds);
+    List<UserDetailEntity> findAllByUserIdIn(List<String> userIds);
 }

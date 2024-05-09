@@ -17,6 +17,8 @@
  */
 package cn.topiam.employee.common.entity.app.po;
 
+import java.time.LocalDateTime;
+
 import cn.topiam.employee.common.entity.app.AppAccountEntity;
 import cn.topiam.employee.common.enums.app.AppProtocol;
 import cn.topiam.employee.common.enums.app.AppType;
@@ -28,7 +30,7 @@ import lombok.EqualsAndHashCode;
  * 应用账户po
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/10 22:46
+ * Created by support@topiam.cn on 2022/2/10 22:46
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -58,4 +60,30 @@ public class AppAccountPO extends AppAccountEntity {
      * 应用类型
      */
     private AppType     appType;
+
+    public AppAccountPO(String id, String appId, String userId, String account,
+                        LocalDateTime createTime, Boolean defaulted, String username,
+                        String appName, AppType appType, String appTemplate,
+                        AppProtocol appProtocol) {
+
+        super.setId(id);
+        super.setAppId(appId);
+        super.setUserId(userId);
+        super.setAccount(account);
+        super.setCreateTime(createTime);
+        super.setDefaulted(defaulted);
+        this.username = username;
+        this.appName = appName;
+        this.appType = appType;
+        this.appTemplate = appTemplate;
+        this.appProtocol = appProtocol;
+    }
+
+    public AppAccountPO(String id, String appId, String userId, String username, String appName) {
+        super.setId(id);
+        super.setAppId(appId);
+        super.setUserId(userId);
+        this.username = username;
+        this.appName = appName;
+    }
 }

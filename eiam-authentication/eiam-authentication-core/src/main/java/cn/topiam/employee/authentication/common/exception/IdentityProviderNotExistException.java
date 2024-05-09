@@ -24,7 +24,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
  * 身份提供商不存在
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/12/20 22:50
+ * Created by support@topiam.cn on 2022/12/20 22:50
  */
 public class IdentityProviderNotExistException extends TopIamException {
 

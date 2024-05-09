@@ -37,7 +37,6 @@ import useStyle from './style';
 import { useIntl } from '@umijs/max';
 import classnames from 'classnames';
 import { ListTemplate } from './data.d';
-import { AppType } from '@/constant';
 import { createApp, getAppTemplateList } from './service';
 import { getAllAppGroupList } from '@/services/app';
 
@@ -238,9 +237,6 @@ const AppCreate = () => {
                   </div>
                   <div className={`${prefixCls}-item-content`}>
                     <span className={`${prefixCls}-item-content-title`}>{row.name}</span>
-                    {row.type === AppType.CUSTOM_MADE && (
-                      <span className={`${prefixCls}-item-content-type`}>{row.protocol}</span>
-                    )}
                     <Paragraph
                       className={`${prefixCls}-item-content-desc`}
                       ellipsis={{ tooltip: row.desc, rows: 2 }}

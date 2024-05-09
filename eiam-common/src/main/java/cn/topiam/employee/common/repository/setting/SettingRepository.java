@@ -24,19 +24,18 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import cn.topiam.employee.common.entity.setting.SettingEntity;
-import cn.topiam.employee.support.repository.LogicDeleteRepository;
+import cn.topiam.employee.support.context.ApplicationContextService;
 import cn.topiam.employee.support.util.BeanUtils;
 import static cn.topiam.employee.common.constant.SettingConstants.SETTING_CACHE_NAME;
-import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
-import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
+import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_BY;
+import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_TIME;
 
 /**
  * 设置表 Repository 接口
@@ -46,7 +45,7 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
  */
 @Repository
 @CacheConfig(cacheNames = { SETTING_CACHE_NAME })
-public interface SettingRepository extends LogicDeleteRepository<SettingEntity, Long> {
+public interface SettingRepository extends JpaRepository<SettingEntity, String> {
     /**
      * 根据KEY查询
      *
@@ -73,21 +72,13 @@ public interface SettingRepository extends LogicDeleteRepository<SettingEntity, 
     List<SettingEntity> findByNameIn(List<String> names);
 
     /**
-     * 根据名称查询是否存在
-     *
-     * @param name {@link String}
-     * @return {@link Boolean}
-     */
-    Boolean existsByName(String name);
-
-    /**
      * 根据ID删除
      *
      * @param id  {@link Long}
      */
     @Override
     @CacheEvict(allEntries = true)
-    void deleteById(@NotNull Long id);
+    void deleteById(@NotNull String id);
 
     /**
      * 删除全部
@@ -104,21 +95,7 @@ public interface SettingRepository extends LogicDeleteRepository<SettingEntity, 
     @Modifying
     @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
-    @Query(value = "UPDATE setting SET " + SOFT_DELETE_SET
-                   + " WHERE name_ = :name", nativeQuery = true)
     void deleteByName(@Param("name") String name);
-
-    /**
-     * 根据名称列表删除
-     *
-     * @param names {@link String}
-     */
-    @Modifying
-    @CacheEvict(allEntries = true)
-    @Transactional(rollbackFor = Exception.class)
-    @Query(value = "UPDATE setting SET " + SOFT_DELETE_SET
-                   + " WHERE name_ IN (:names)", nativeQuery = true)
-    void deleteByNameIn(@Param("names") List<String> names);
 
     /**
      * 保存配置
@@ -128,7 +105,7 @@ public interface SettingRepository extends LogicDeleteRepository<SettingEntity, 
      */
     default Boolean save(List<SettingEntity> list) {
         for (SettingEntity setting : list) {
-            SettingEntity type = findByName(setting.getName());
+            SettingEntity type = getSelf().findByName(setting.getName());
             if (Objects.isNull(type)) {
                 save(setting);
                 continue;
@@ -141,12 +118,17 @@ public interface SettingRepository extends LogicDeleteRepository<SettingEntity, 
 
     /**
      * 保存
+     *
      * @param entity must not be {@literal null}.
      * @return {@link S}
-     * @param <S>
+     * @param <S> SettingEntity
      */
     @NotNull
     @Override
     @CacheEvict(allEntries = true)
     <S extends SettingEntity> S save(@NotNull S entity);
+
+    default SettingRepository getSelf() {
+        return ApplicationContextService.getBean(SettingRepository.class);
+    }
 }

@@ -328,7 +328,7 @@ export default (props: { visible: boolean }) => {
             }}
             submitter={{
               render: (_p, dom) => {
-                return <FooterToolbar>{dom}</FooterToolbar>;
+                return <FooterToolbar>{dom.map((item) => item)}</FooterToolbar>;
               },
               submitButtonProps: {
                 style: {
@@ -348,7 +348,7 @@ export default (props: { visible: boolean }) => {
               const fieldsValue = editorFormRef.current?.getFieldsValue();
               const templates: { type: string; code: string }[] = [];
               editableKeys?.forEach((i, index) => {
-                if (fieldsValue?.[index].code !== undefined) {
+                if (fieldsValue?.[index]?.code !== undefined) {
                   const config: { type: string; code: string } = {
                     type: `${i}`,
                     code: fieldsValue[index].code,

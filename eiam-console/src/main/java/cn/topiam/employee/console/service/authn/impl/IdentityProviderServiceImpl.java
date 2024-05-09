@@ -38,7 +38,7 @@ import cn.topiam.employee.console.pojo.result.authn.IdentityProviderResult;
 import cn.topiam.employee.console.pojo.save.authn.IdentityProviderCreateParam;
 import cn.topiam.employee.console.pojo.update.authn.IdpUpdateParam;
 import cn.topiam.employee.console.service.authn.IdentityProviderService;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.context.ApplicationContextService;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
@@ -54,7 +54,7 @@ import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.DEFAULT
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-08-16
+ * Created by support@topiam.cn on 2020-08-16
  */
 @Slf4j
 @Service
@@ -69,8 +69,7 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
      */
     @Override
     public Boolean identityProviderIsEnable(String id) {
-        Optional<IdentityProviderEntity> optional = identityProviderRepository
-            .findById(Long.valueOf(id));
+        Optional<IdentityProviderEntity> optional = identityProviderRepository.findById(id);
         return optional.isPresent() && optional.get().getEnabled();
     }
 
@@ -111,8 +110,7 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
      */
     @Override
     public IdentityProviderResult getIdentityProvider(String id) {
-        Optional<IdentityProviderEntity> optional = identityProviderRepository
-            .findById(Long.valueOf(id));
+        Optional<IdentityProviderEntity> optional = identityProviderRepository.findById(id);
         if (optional.isPresent()) {
             return identityProviderConverter
                 .entityConverterToIdentityProviderDetailResult(optional.get());
@@ -133,8 +131,8 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
         IdentityProviderEntity data = identityProviderConverter
             .identityProviderCreateParamConverterToEntity(param);
         identityProviderRepository.save(data);
-        ApplicationContextHelp.refresh(DEFAULT_SECURITY_FILTER_CHAIN);
-        AuditContext.setTarget(Target.builder().id(data.getId().toString())
+        ApplicationContextService.refresh(DEFAULT_SECURITY_FILTER_CHAIN);
+        AuditContext.setTarget(Target.builder().id(data.getId()).name(data.getName())
             .type(TargetType.IDENTITY_PROVIDER).build());
         return IdentityProviderCreateResult.builder().id(String.valueOf(data.getId()))
             .type(data.getType()).build();
@@ -149,7 +147,7 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
     @Override
     public Boolean updateIdentityProvider(IdpUpdateParam param) {
         Optional<IdentityProviderEntity> optional = identityProviderRepository
-            .findById(Long.valueOf(param.getId()));
+            .findById(param.getId());
         if (optional.isPresent()) {
             IdentityProviderEntity entity = optional.get();
             //转换对象
@@ -157,10 +155,10 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
                 .identityProviderUpdateParamConverterToEntity(param);
             BeanUtils.merge(data, entity);
             identityProviderRepository.save(entity);
-            ApplicationContextHelp.refresh(DEFAULT_SECURITY_FILTER_CHAIN);
-            AuditContext.setTarget(Target.builder().id(entity.getId().toString())
-                .name(entity.getName()).type(TargetType.IDENTITY_PROVIDER)
-                .typeName(TargetType.IDENTITY_PROVIDER.getDesc()).build());
+            ApplicationContextService.refresh(DEFAULT_SECURITY_FILTER_CHAIN);
+            AuditContext.setTarget(Target.builder().id(entity.getId()).name(entity.getName())
+                .type(TargetType.IDENTITY_PROVIDER).typeName(TargetType.IDENTITY_PROVIDER.getDesc())
+                .build());
             return true;
         }
         throw new NullPointerException("系统不存在该身份源");
@@ -174,17 +172,17 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
      */
     @Override
     public Boolean deleteIdentityProvider(String id) {
-        Optional<IdentityProviderEntity> optional = identityProviderRepository
-            .findById(Long.valueOf(id));
+        Optional<IdentityProviderEntity> optional = identityProviderRepository.findById(id);
         //管理员不存在
         if (optional.isEmpty()) {
             AuditContext.setContent("删除失败，认证源不存在");
             log.warn(AuditContext.getContent());
             throw new TopIamException(AuditContext.getContent());
         }
-        identityProviderRepository.deleteById(Long.valueOf(id));
-        ApplicationContextHelp.refresh(DEFAULT_SECURITY_FILTER_CHAIN);
-        AuditContext.setTarget(Target.builder().id(id).type(TargetType.IDENTITY_PROVIDER).build());
+        identityProviderRepository.deleteById(id);
+        ApplicationContextService.refresh(DEFAULT_SECURITY_FILTER_CHAIN);
+        AuditContext.setTarget(Target.builder().id(id).name(optional.get().getName())
+            .type(TargetType.IDENTITY_PROVIDER).build());
         return Boolean.TRUE;
     }
 
@@ -197,18 +195,17 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
      */
     @Override
     public Boolean updateIdentityProviderStatus(String id, Boolean enabled) {
-        Optional<IdentityProviderEntity> optional = identityProviderRepository
-            .findById(Long.valueOf(id));
+        Optional<IdentityProviderEntity> optional = identityProviderRepository.findById(id);
         //管理员不存在
         if (optional.isEmpty()) {
             AuditContext.setContent("删除失败，认证源不存在");
             log.warn(AuditContext.getContent());
             throw new TopIamException(AuditContext.getContent());
         }
-        boolean result = identityProviderRepository.updateIdentityProviderStatus(Long.valueOf(id),
-            enabled) > 0;
-        ApplicationContextHelp.refresh(DEFAULT_SECURITY_FILTER_CHAIN);
-        AuditContext.setTarget(Target.builder().id(id).type(TargetType.IDENTITY_PROVIDER).build());
+        boolean result = identityProviderRepository.updateIdentityProviderStatus(id, enabled) > 0;
+        ApplicationContextService.refresh(DEFAULT_SECURITY_FILTER_CHAIN);
+        AuditContext.setTarget(Target.builder().id(id).name(optional.get().getName())
+            .type(TargetType.IDENTITY_PROVIDER).build());
         return result;
     }
 

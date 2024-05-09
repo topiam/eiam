@@ -28,7 +28,7 @@ import org.mapstruct.Mapper;
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.console.pojo.result.setting.SecurityBasicConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.SecurityBasicSaveParam;
-import static cn.topiam.employee.core.setting.constant.SecuritySettingConstants.*;
+import static cn.topiam.employee.core.setting.SecuritySettingConstants.*;
 
 /**
  * 安全设置数据转换器

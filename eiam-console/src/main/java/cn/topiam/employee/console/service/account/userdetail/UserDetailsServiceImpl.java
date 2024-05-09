@@ -21,20 +21,15 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.AccountExpiredException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
-
-import com.google.common.collect.Lists;
 
 import cn.topiam.employee.common.entity.setting.AdministratorEntity;
-import cn.topiam.employee.common.enums.UserStatus;
-import cn.topiam.employee.common.repository.setting.AdministratorRepository;
+import cn.topiam.employee.console.service.setting.AdministratorService;
+import cn.topiam.employee.support.security.password.exception.PasswordValidatedFailException;
 import cn.topiam.employee.support.security.userdetails.UserDetails;
 import cn.topiam.employee.support.security.userdetails.UserDetailsService;
-import cn.topiam.employee.support.security.userdetails.UserType;
 
 /**
  * FortressUserDetailsService
@@ -61,53 +56,55 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // 状态相关
-        boolean enabled = true, accountNonLocked = true;
-        // 用户名
-        Optional<AdministratorEntity> optional = administratorRepository.findByUsername(username);
-        if (optional.isEmpty()) {
-            // 手机号
-            optional = administratorRepository.findByPhone(username);
-            if (optional.isEmpty()) {
-                // 邮箱
-                optional = administratorRepository.findByEmail(username);
-            }
-        }
+        Optional<AdministratorEntity> optional = administratorService
+            .findByUsernameOrPhoneOrEmail(username);
         //不存在该用户
         if (optional.isEmpty()) {
             logger.info("根据用户名、手机号、邮箱未查询该管理员【{}】", username);
             throw new UsernameNotFoundException("用户名或密码错误");
         }
         AdministratorEntity administrator = optional.get();
-        if (!ObjectUtils.isEmpty(administrator.getStatus())) {
-            //锁定
-            if (administrator.getStatus().equals(UserStatus.LOCKED)
-                || administrator.getStatus().equals(UserStatus.PASSWORD_EXPIRED_LOCKED)
-                || administrator.getStatus().equals(UserStatus.EXPIRED_LOCKED)) {
-                logger.info("管理员【{}】被锁定", administrator.getUsername());
-                accountNonLocked = false;
-            }
-            //禁用
-            if (administrator.getStatus().equals(UserStatus.DISABLE)) {
-                logger.info("管理员【{}】被禁用", administrator.getUsername());
-                enabled = false;
-            }
-            // 查询封装用户权限
-            return new UserDetails(String.valueOf(administrator.getId()),
-                administrator.getUsername(), administrator.getPassword(), UserType.ADMIN, enabled,
-                true, true, accountNonLocked,
-                Lists.newArrayList(new SimpleGrantedAuthority(UserType.ADMIN.getType())));
+        //锁定
+        if (administrator.isLocked()) {
+            logger.info("管理员【{}】被锁定", administrator.getUsername());
         }
-        logger.info("管理员【{}】状态异常", administrator.getUsername());
-        throw new AccountExpiredException("管理员状态异常");
+        //禁用
+        if (administrator.isDisabled()) {
+            logger.info("管理员【{}】被禁用", administrator.getUsername());
+        }
+        return administratorService.getUserDetails(administrator);
+    }
+
+    @Override
+    public void changePassword(String username, String newPassword) {
+        administratorService.forceResetAdministratorPassword(username, newPassword);
+    }
+
+    @Override
+    public void changePassword(String username, String oldPassword, String newPassword) {
+        AdministratorEntity admin = administratorService.getAdministratorByUsername(username);
+        boolean matches = passwordEncoder.matches(oldPassword, admin.getPassword());
+        if (!matches) {
+            logger.error("用户ID: [{}] 用户名: [{}] 旧密码匹配失败", admin.getId(), admin.getUsername());
+            throw new PasswordValidatedFailException();
+        }
+        // 重置密码
+        administratorService.forceResetAdministratorPassword(admin, newPassword);
     }
 
     /**
-     * AdministratorRepository
+     * AdministratorService
      */
-    private final AdministratorRepository administratorRepository;
+    private final AdministratorService administratorService;
 
-    public UserDetailsServiceImpl(AdministratorRepository administratorRepository) {
-        this.administratorRepository = administratorRepository;
+    /**
+     *  PasswordEncoder
+     */
+    private final PasswordEncoder      passwordEncoder;
+
+    public UserDetailsServiceImpl(AdministratorService administratorService,
+                                  PasswordEncoder passwordEncoder) {
+        this.administratorService = administratorService;
+        this.passwordEncoder = passwordEncoder;
     }
 }

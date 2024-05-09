@@ -20,7 +20,7 @@ package cn.topiam.employee.console.pojo.result.authn;
 import java.io.Serial;
 import java.io.Serializable;
 
-import cn.topiam.employee.authentication.common.config.IdentityProviderConfig;
+import cn.topiam.employee.authentication.common.client.IdentityProviderConfig;
 
 import lombok.Data;
 

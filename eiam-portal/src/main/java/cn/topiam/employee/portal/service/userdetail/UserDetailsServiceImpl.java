@@ -17,26 +17,15 @@
  */
 package cn.topiam.employee.portal.service.userdetail;
 
-import java.util.Collection;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.AccountExpiredException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 
-import com.google.common.collect.Lists;
-
-import cn.topiam.employee.audit.access.AuditAccess;
 import cn.topiam.employee.common.entity.account.UserEntity;
-import cn.topiam.employee.common.enums.UserStatus;
-import cn.topiam.employee.common.repository.account.UserRepository;
+import cn.topiam.employee.portal.service.UserService;
 import cn.topiam.employee.support.security.userdetails.UserDetails;
-import cn.topiam.employee.support.util.PhoneNumberUtils;
-import static cn.topiam.employee.support.security.userdetails.UserType.USER;
+import cn.topiam.employee.support.security.userdetails.UserDetailsService;
 
 /**
  * UserDetailsServiceImpl
@@ -63,69 +52,29 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // 状态相关
-        boolean enabled = true, accountNonLocked = true;
-        // 权限，默认赋予审计查看权限
-        Collection<SimpleGrantedAuthority> authorities = Lists
-            .newArrayList(new SimpleGrantedAuthority(AuditAccess.Audit.audit_list.getCode()));
-        UserEntity user;
-        // 用户名
-        user = userRepository.findByUsername(username);
-        if (ObjectUtils.isEmpty(user)) {
-            // 手机号
-            if (PhoneNumberUtils.isPhoneValidate(username)) {
-                user = userRepository.findByPhone(PhoneNumberUtils.getPhoneNumber(username));
-            }
-            if (ObjectUtils.isEmpty(user)) {
-                // 邮箱
-                user = userRepository.findByEmail(username);
-            }
-        }
-        //不存在该用户
-        if (ObjectUtils.isEmpty(user)) {
+        UserEntity user = userService.findByUsernameOrPhoneOrEmail(username).orElseThrow(() -> {
             logger.info("根据用户名、手机号、邮箱未查询该用户【{}】", username);
-            throw new UsernameNotFoundException("用户名或密码错误");
-        }
-        return getUserDetails(enabled, accountNonLocked, authorities, user);
+            return new UsernameNotFoundException("用户名或密码错误");
+        });
+        return userService.getUserDetails(user);
     }
 
-    public static UserDetails getUserDetails(boolean enabled, boolean accountNonLocked,
-                                             Collection<SimpleGrantedAuthority> authorities,
-                                             UserEntity user) {
-        //TODO 密码是否过期
+    @Override
+    public void changePassword(String username, String newPassword) {
 
-        //TODO 状态
-        if (!ObjectUtils.isEmpty(user.getStatus())) {
-            //锁定
-            if (user.getStatus().equals(UserStatus.LOCKED)
-                || user.getStatus().equals(UserStatus.PASSWORD_EXPIRED_LOCKED)
-                || user.getStatus().equals(UserStatus.EXPIRED_LOCKED)) {
-                logger.info("用户【{}】被锁定", user.getUsername());
-                accountNonLocked = false;
-            }
-            //禁用
-            if (user.getStatus().equals(UserStatus.DISABLE)) {
-                logger.info("用户【{}】被禁用", user.getUsername());
-                enabled = false;
-            }
-            //根据用户类型封装权限
-            SimpleGrantedAuthority authority = new SimpleGrantedAuthority(USER.getType());
-            authorities.add(authority);
+    }
 
-            //封装
-            return new UserDetails(String.valueOf(user.getId()), user.getUsername(),
-                user.getPassword(), USER, enabled, true, true, accountNonLocked, authorities);
-        }
-        logger.info("用户【{}】状态异常", user.getUsername());
-        throw new AccountExpiredException("用户状态异常");
+    @Override
+    public void changePassword(String username, String oldPassword, String newPassword) {
+
     }
 
     /**
-     * UserRepository
+     * UserService
      */
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public UserDetailsServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserDetailsServiceImpl(UserService userService) {
+        this.userService = userService;
     }
 }

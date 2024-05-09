@@ -22,13 +22,13 @@ import java.util.List;
 import cn.topiam.employee.audit.event.ConsoleResource;
 import cn.topiam.employee.audit.event.Type;
 import cn.topiam.employee.support.security.userdetails.UserType;
-import static cn.topiam.employee.audit.event.ConsoleResource.*;
+import static cn.topiam.employee.audit.event.ConsoleResource.IDP_RESOURCE;
 
 /**
  * 认证资源
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/24 22:59
+ * Created by support@topiam.cn on 2021/11/24 22:59
  */
 public class AuthenticationEventType {
 

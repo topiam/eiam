@@ -20,73 +20,54 @@ package cn.topiam.employee.common.entity.account;
 import java.io.Serial;
 import java.time.LocalDateTime;
 
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SoftDelete;
 
-import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
+import cn.topiam.employee.support.repository.SoftDeleteConverter;
+import cn.topiam.employee.support.repository.base.BaseEntity;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
+import jakarta.persistence.*;
+import static cn.topiam.employee.support.repository.base.BaseEntity.IS_DELETED_COLUMN;
 
 /**
  * 用户认证方式绑定表
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020/12/29 21:23
+ * Created by support@topiam.cn on 2020/12/29 21:23
  */
-@Entity
-@Table(name = "user_idp_bind")
-@SQLDelete(sql = "update user_idp_bind set " + SOFT_DELETE_SET + " where id_ = ?")
-@Where(clause = SOFT_DELETE_WHERE)
 @Accessors(chain = true)
 @Getter
 @Setter
 @ToString
-public class UserIdpBindEntity extends LogicDeleteEntity<Long> {
+@Entity
+@Table(name = "eiam_user_idp_bind")
+@SoftDelete(columnName = IS_DELETED_COLUMN, converter = SoftDeleteConverter.class)
+public class UserIdpBindEntity extends BaseEntity {
+
     @Serial
-    private static final long serialVersionUID = -14364708756807242L;
+    private static final long    serialVersionUID = -14364708756807242L;
 
     /**
      * 用户ID
      */
     @Column(name = "user_id")
-    private Long              userId;
+    private String               userId;
 
     /**
-     * OpenId
+     * 三方用户表ID
      */
-    @Column(name = "open_id")
-    private String            openId;
-
-    /**
-     * 身份提供商 ID
-     */
-    @Column(name = "idp_id")
-    private String            idpId;
-
-    /**
-     * 身份提供商 类型
-     */
-    @Column(name = "idp_type")
-    private String            idpType;
+    @ManyToOne
+    @JoinColumn(name = "third_party_user_id")
+    @ToString.Exclude
+    private ThirdPartyUserEntity thirdPartyUser;
 
     /**
      * 绑定时间
      */
     @Column(name = "bind_time")
-    private LocalDateTime     bindTime;
-
-    /**
-     * 附加信息
-     */
-    @Column(name = "addition_info")
-    private String            additionInfo;
+    private LocalDateTime        bindTime;
 }

@@ -23,7 +23,7 @@ import java.io.Serializable;
  * IdentityProviderClientConfig
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/3/8 22:25
+ * Created by support@topiam.cn on 2022/3/8 22:25
  */
 public class IdentitySourceConfig implements Serializable {
 

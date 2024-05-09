@@ -69,6 +69,8 @@ export default (props: CreateOrganizationFormProps<AccountAPI.CreateOrganization
     };
     const result = await onFinish(values);
     if (result) {
+      //重置表单
+      form.resetFields();
     }
     setSubmitLoading(false);
   };

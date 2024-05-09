@@ -42,13 +42,13 @@ export async function getChildOrganization(
 }
 
 /**
- * Get Filter Organization Tree
+ * Get Search Organization Tree
  */
-export async function getFilterOrganizationTree(
+export async function getSearchOrganizationTree(
   keyWord: string,
-): Promise<API.ApiResult<AccountAPI.FilterOrganizationTree[]>> {
-  return request<API.ApiResult<AccountAPI.FilterOrganizationTree[]>>(
-    `/api/v1/organization/filter_tree`,
+): Promise<API.ApiResult<AccountAPI.SearchOrganizationTree[]>> {
+  return request<API.ApiResult<AccountAPI.SearchOrganizationTree[]>>(
+    `/api/v1/organization/search/tree`,
     {
       params: { keyWord: keyWord },
     },
@@ -60,17 +60,6 @@ export async function getFilterOrganizationTree(
  */
 export async function getOrganization(id: Key): Promise<API.ApiResult<AccountAPI.GetOrganization>> {
   return request<API.ApiResult<AccountAPI.GetOrganization>>(`/api/v1/organization/get/${id}`);
-}
-
-/**
- * Batch Get organization Details
- */
-export async function batchGetOrganization(
-  ids: string[],
-): Promise<API.ApiResult<AccountAPI.BatchGetOrganization>> {
-  return request<API.ApiResult<AccountAPI.BatchGetOrganization>>(`/api/v1/organization/batch_get`, {
-    params: { ids: ids.join(',') },
-  });
 }
 
 /**
@@ -213,19 +202,6 @@ export async function unbindIdp(id: string | number): Promise<API.ApiResult<bool
 }
 
 /**
- * User Transfer
- */
-export async function userTransfer(
-  userId: string,
-  orgId: string | number,
-): Promise<API.ApiResult<boolean>> {
-  return request<API.ApiResult<boolean>>(`/api/v1/user/transfer`, {
-    method: 'PUT',
-    params: { userId: userId, orgId: orgId },
-  });
-}
-
-/**
  * User Reset Password
  */
 export async function userResetPassword(
@@ -280,15 +256,6 @@ export async function removeBatchUser(
     paramsSerializer: (params) => {
       return qs.stringify(params, { indices: false });
     },
-  });
-}
-
-/**
- * 用户离职
- */
-export async function userResign(id: string): Promise<API.ApiResult<boolean>> {
-  return request<API.ApiResult<boolean>>(`/api/v1/user/resign/${id}`, {
-    method: 'DELETE',
   });
 }
 
@@ -485,4 +452,11 @@ export async function addMemberToUserGroup(
  */
 export async function passwordGenerate(): Promise<API.ApiResult<boolean>> {
   return request(`/api/v1/password/generate`, { method: 'GET' });
+}
+
+/**
+ * 删除身份源
+ */
+export async function deleteIdentitySource(id: string): Promise<API.ApiResult<boolean>> {
+  return request(`/api/v1/identity_source/delete/${id}`, { method: 'DELETE' });
 }

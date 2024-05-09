@@ -24,7 +24,7 @@ import com.aliyun.tea.*;
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/8/25 22:26
+ * Created by support@topiam.cn on 2023/8/25 22:26
  */
 public class AlipayClient {
 
@@ -42,12 +42,11 @@ public class AlipayClient {
      * @throws Exception Exception
      */
     public AlipaySystemOauthTokenResponse getOauthToken(String code) throws Exception {
-        java.util.Map<String, Object> runtime = getRuntime();
+        Map<String, Object> runtime = getRuntime();
         TeaRequest request = null;
         long now = System.currentTimeMillis();
         int retryTimes = 0;
-        while (Tea.allowRetry((java.util.Map<String, Object>) runtime.get("retry"), retryTimes,
-            now)) {
+        while (Tea.allowRetry((Map<String, Object>) runtime.get("retry"), retryTimes, now)) {
             if (retryTimes > 0) {
                 int backoffTime = Tea.getBackoffTime(runtime.get("backoff"), retryTimes);
                 if (backoffTime > 0) {
@@ -57,7 +56,7 @@ public class AlipayClient {
             retryTimes = retryTimes + 1;
             try {
                 //@formatter:off
-                java.util.Map<String, String> systemParams = TeaConverter.buildMap(
+                Map<String, String> systemParams = TeaConverter.buildMap(
                     new TeaPair("method", "alipay.system.oauth.token"),
                     new TeaPair("app_id", kernel.getConfig("appId")),
                     new TeaPair("timestamp", kernel.getTimestamp()),
@@ -68,13 +67,13 @@ public class AlipayClient {
                     new TeaPair("app_cert_sn", kernel.getMerchantCertSN()),
                     new TeaPair("alipay_root_cert_sn", kernel.getAlipayRootCertSN()));
                 //@formatter:no
-                java.util.Map<String, Object> bizParams = new java.util.HashMap<>();
-                java.util.Map<String, String> textParams = TeaConverter.buildMap(
+                Map<String, Object> bizParams = new java.util.HashMap<>();
+                Map<String, String> textParams = TeaConverter.buildMap(
                     new TeaPair("grant_type", "authorization_code"), new TeaPair("code", code));
                 request = getRequest(systemParams, bizParams, textParams);
                 TeaResponse response = Tea.doAction(request, runtime);
 
-                java.util.Map<String, Object> respMap = kernel.readAsJson(response,
+                Map<String, Object> respMap = kernel.readAsJson(response,
                     "alipay.system.oauth.token");
                 if (kernel.isCertMode()) {
                     if (kernel.verify(respMap,
@@ -122,7 +121,7 @@ public class AlipayClient {
         return request;
     }
 
-    private java.util.Map<String, Object> getRuntime() throws Exception {
+    private Map<String, Object> getRuntime() throws Exception {
         return TeaConverter.buildMap(new TeaPair("ignoreSSL", kernel.getConfig("ignoreSSL")),
             new TeaPair("httpProxy", kernel.getConfig("httpProxy")),
             new TeaPair("connectTimeout", 15000), new TeaPair("readTimeout", 15000),

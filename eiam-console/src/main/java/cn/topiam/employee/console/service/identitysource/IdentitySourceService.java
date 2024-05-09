@@ -36,7 +36,7 @@ import cn.topiam.employee.support.repository.page.domain.PageModel;
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-08-16
+ * Created by support@topiam.cn on 2020-08-16
  */
 public interface IdentitySourceService {
 
@@ -112,7 +112,7 @@ public interface IdentitySourceService {
      * @param id             {@link Long} 主键
      * @param strategyConfig {@link String} 策略
      */
-    void updateStrategyConfig(Long id, String strategyConfig);
+    void updateStrategyConfig(String id, String strategyConfig);
 
     /**
      * 身份源配置验证

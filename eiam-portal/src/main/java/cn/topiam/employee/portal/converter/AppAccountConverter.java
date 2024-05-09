@@ -27,7 +27,7 @@ import cn.topiam.employee.portal.pojo.request.AppAccountRequest;
  * 应用账户映射
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/8/25 21:08
+ * Created by support@topiam.cn on 2023/8/25 21:08
  */
 @Mapper(componentModel = "spring")
 public interface AppAccountConverter {
@@ -39,7 +39,6 @@ public interface AppAccountConverter {
      * @return {@link AppAccountEntity}
      */
     @Mapping(target = "userId", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "remark", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "updateTime", ignore = true)

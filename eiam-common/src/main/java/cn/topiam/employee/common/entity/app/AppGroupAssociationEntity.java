@@ -17,47 +17,44 @@
  */
 package cn.topiam.employee.common.entity.app;
 
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SoftDelete;
 
-import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
+import cn.topiam.employee.support.repository.SoftDeleteConverter;
+import cn.topiam.employee.support.repository.base.BaseEntity;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
+import jakarta.persistence.*;
+import static cn.topiam.employee.support.repository.base.BaseEntity.IS_DELETED_COLUMN;
 
 /**
  * 应用组关联
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023年09月06日22:03:21
+ * Created by support@topiam.cn on 2023年09月06日22:03:21
  */
 @Getter
 @Setter
 @ToString
 @Accessors(chain = true)
 @Entity
-@Table(name = "app_group_association")
-@SQLDelete(sql = "update app_group_association set " + SOFT_DELETE_SET + " where id_ = ?")
-@Where(clause = SOFT_DELETE_WHERE)
-public class AppGroupAssociationEntity extends LogicDeleteEntity<Long> {
+@Table(name = "eiam_app_group_association")
+@SoftDelete(columnName = IS_DELETED_COLUMN, converter = SoftDeleteConverter.class)
+public class AppGroupAssociationEntity extends BaseEntity {
 
     /**
      * 应用组ID
      */
     @Column(name = "group_id")
-    private Long groupId;
+    private String    groupId;
 
     /**
-     * 应用ID
+     * 应用
      */
-    @Column(name = "app_id")
-    private Long appId;
+    @ManyToOne
+    @JoinColumn(name = "app_id")
+    private AppEntity app;
 }

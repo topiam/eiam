@@ -30,12 +30,13 @@ import lombok.Data;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * 查询身份源事件记录列表入参
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/14 01:29
+ * Created by support@topiam.cn on 2022/2/14 01:29
  */
 @Data
 @Schema(description = "查询身份源事件记录列表入参")
@@ -47,6 +48,7 @@ public class IdentitySourceEventRecordListQuery implements Serializable {
     /**
      * 身份源ID
      */
+    @NotBlank(message = "身份源ID不能为空")
     @Parameter(description = "身份源ID")
     private String                   identitySourceId;
 

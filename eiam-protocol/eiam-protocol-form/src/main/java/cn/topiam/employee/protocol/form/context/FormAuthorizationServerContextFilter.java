@@ -19,9 +19,7 @@ package cn.topiam.employee.protocol.form.context;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -35,11 +33,16 @@ import com.alibaba.fastjson2.JSONObject;
 import cn.topiam.employee.application.ApplicationServiceLoader;
 import cn.topiam.employee.application.context.ApplicationContext;
 import cn.topiam.employee.application.context.ApplicationContextHolder;
+import cn.topiam.employee.application.exception.AppNotConfigException;
 import cn.topiam.employee.application.exception.AppNotExistException;
 import cn.topiam.employee.application.form.FormApplicationService;
 import cn.topiam.employee.application.form.model.FormProtocolConfig;
+import cn.topiam.employee.common.exception.app.AppAccessDeniedException;
+import cn.topiam.employee.protocol.code.EndpointMatcher;
+import cn.topiam.employee.support.security.userdetails.Application;
+import cn.topiam.employee.support.security.userdetails.UserDetails;
+import cn.topiam.employee.support.security.util.SecurityUtils;
 import cn.topiam.employee.support.util.IpUtils;
-import cn.topiam.employee.support.web.servlet.RepeatedlyRequestWrapper;
 
 import lombok.Getter;
 
@@ -47,30 +50,30 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import static cn.topiam.employee.common.constant.AppConstants.APP_CODE;
+import static cn.topiam.employee.common.constant.ProtocolConstants.APP_CODE;
 import static cn.topiam.employee.support.util.HttpRequestUtils.getRequestHeaders;
 
 /**
  * 上下文过滤器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/26 23:55
+ * Created by support@topiam.cn on 2023/6/26 23:55
  */
 public final class FormAuthorizationServerContextFilter extends OncePerRequestFilter {
 
     public static final String             SEPARATE = "----------------------------------------------------------";
 
     @Getter
-    private final RequestMatcher           endpointsMatcher;
+    private final List<EndpointMatcher>    endpointMatchers;
 
     private final ApplicationServiceLoader applicationServiceLoader;
 
-    public FormAuthorizationServerContextFilter(RequestMatcher endpointsMatcher,
+    public FormAuthorizationServerContextFilter(List<EndpointMatcher> endpointMatchers,
                                                 ApplicationServiceLoader applicationServiceLoader) {
-        Assert.notNull(endpointsMatcher, "endpointsMatcher cannot be null");
+        Assert.notNull(endpointMatchers, "endpointMatchers cannot be null");
         Assert.notNull(applicationServiceLoader, "applicationServiceLoader cannot be null");
         this.applicationServiceLoader = applicationServiceLoader;
-        this.endpointsMatcher = endpointsMatcher;
+        this.endpointMatchers = endpointMatchers;
     }
 
     @Override
@@ -78,17 +81,36 @@ public final class FormAuthorizationServerContextFilter extends OncePerRequestFi
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException,
                                                                       IOException {
-        RequestMatcher.MatchResult matcher = endpointsMatcher.matcher(request);
-        if (!matcher.isMatch()) {
+        boolean match = false, access = false;
+        Map<String, String> variables = new HashMap<>(16);
+        for (EndpointMatcher endpointMatcher : endpointMatchers) {
+            RequestMatcher requestMatcher = endpointMatcher.getRequestMatcher();
+            if (requestMatcher.matches(request)) {
+                match = true;
+                access = endpointMatcher.getAccess();
+                variables = requestMatcher.matcher(request).getVariables();
+            }
+        }
+        if (!match) {
             filterChain.doFilter(request, response);
             return;
         }
-
+        String appCode = variables.get(APP_CODE);
+        //校验访问权限（未登录不校验访问权限）
+        if (access && SecurityUtils.isAuthenticated()) {
+            UserDetails userDetails = SecurityUtils.getCurrentUser();
+            Collection<Application> applications = userDetails.getApplications();
+            if (applications.stream()
+                .noneMatch(application -> application.getCode().equals(appCode))) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN,
+                    new AppAccessDeniedException().getMessage());
+                return;
+            }
+        }
         try {
             //@formatter:off
-            Map<String, String> variables = matcher.getVariables();
-            String appCode = variables.get(APP_CODE);
             if (this.logger.isTraceEnabled()) {
+                String body = IOUtils.toString(request.getInputStream(),StandardCharsets.UTF_8).replaceAll("\\s+", " ");
                 String logs = "\n" +
                         "┣ " + SEPARATE + "\n" +
                         "┣ App: " + appCode + "\n" +
@@ -96,7 +118,7 @@ public final class FormAuthorizationServerContextFilter extends OncePerRequestFi
                         "┣ Request ip: " + IpUtils.getIpAddr(request) + "\n" +
                         "┣ Request headers: " + JSONObject.toJSONString(getRequestHeaders(request)) + "\n" +
                         "┣ Request parameters: " + JSONObject.toJSONString(request.getParameterMap()) + "\n" +
-                        "┣ Request payload: " + StringUtils.defaultIfBlank(IOUtils.toString(new RepeatedlyRequestWrapper(request, response).getInputStream(),StandardCharsets.UTF_8).replaceAll("\\s+", " "), "-") + "\n" +
+                        "┣ Request payload: " + StringUtils.defaultIfBlank(body, "-") + "\n" +
                         "┣ " + SEPARATE;
                 logger.trace(logs);
             }
@@ -105,6 +127,9 @@ public final class FormAuthorizationServerContextFilter extends OncePerRequestFi
             FormProtocolConfig config = applicationService.getProtocolConfig(appCode);
             if (Objects.isNull(config)) {
                 throw new AppNotExistException();
+            }
+            if (!config.getConfigured()){
+                throw new AppNotConfigException();
             }
             //设置上下文
             ApplicationContextHolder.setContext(new DefaultApplicationContext(config));
@@ -117,19 +142,18 @@ public final class FormAuthorizationServerContextFilter extends OncePerRequestFi
 
     private record DefaultApplicationContext(FormProtocolConfig config) implements ApplicationContext {
 
-    private DefaultApplicationContext(FormProtocolConfig config) {
+        private DefaultApplicationContext {
             Assert.notNull(config, "config cannot be null");
-            this.config = config;
-    }
+        }
 
     /**
      * 获取应用ID
      *
-     * @return {@link Long}
+     * @return {@link String}
      */
     @Override
-    public Long getAppId() {
-        return Long.valueOf(config.getAppId());
+    public String getAppId() {
+        return this.config.getAppId();
     }
 
     /**

@@ -28,7 +28,7 @@ import static cn.topiam.employee.audit.event.ConsoleResource.APP_RESOURCE;
  * 应用资源
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/24 23:00
+ * Created by support@topiam.cn on 2021/11/24 23:00
  */
 public class AppEventType {
 
@@ -70,6 +70,18 @@ public class AppEventType {
         "添加应用访问授权", APP_RESOURCE, List.of(UserType.ADMIN));
 
     /**
+     * 启用应用访问授权
+     */
+    public static Type ENABLE_APP_ACCESS_POLICY        = new Type(
+        "eiam:event:app:enable_access_policy", "启用应用访问授权", APP_RESOURCE, List.of(UserType.ADMIN));
+
+    /**
+     * 禁用应用访问授权
+     */
+    public static Type DISABLE_APP_ACCESS_POLICY       = new Type(
+        "eiam:event:app:disable_access_policy", "禁用应用访问授权", APP_RESOURCE, List.of(UserType.ADMIN));
+
+    /**
      * 删除访问授权
      */
     public static Type APP_CANCEL_ACCESS_POLICY        = new Type(
@@ -81,6 +93,12 @@ public class AppEventType {
     public static Type ADD_APP_ACCOUNT                 = new Type("eiam:event:app:add_app_account",
         "添加应用账户", APP_RESOURCE, List.of(UserType.ADMIN));
 
+    /**
+     * 更新默认应用账户
+     */
+    public static Type UPDATE_DEFAULT_APP_ACCOUNT      = new Type(
+        "eiam:event:app:update_default_app_account", "更新默认应用账户", APP_RESOURCE,
+        List.of(UserType.ADMIN));
     /**
      * 删除应用账户
      */

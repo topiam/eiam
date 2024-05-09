@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 /**
  * UserAgent
  * @author TopIAM
- * Created by support@topiam.cn on  2022/11/5 23:31
+ * Created by support@topiam.cn on 2022/11/5 23:31
  */
 @Data
 @Builder
@@ -35,15 +35,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserAgent implements Serializable {
 
-    private String deviceType;
+    public static final String USER_AGENT_BROWSER = "user_agent.browser.keyword";
 
-    private String platform;
+    private String             deviceType;
 
-    private String platformVersion;
+    private String             platform;
 
-    private String browser;
+    private String             platformVersion;
 
-    private String browserType;
+    private String             browser;
 
-    private String browserMajorVersion;
+    private String             browserType;
+
+    private String             browserMajorVersion;
 }

@@ -17,25 +17,24 @@
  */
 import { ProForm, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import { useAsyncEffect } from 'ahooks';
-import { Collapse, Form, Typography } from 'antd';
+import { App, Form, Typography } from 'antd';
 import { VerticalAlignBottomOutlined } from '@ant-design/icons';
-import { getCertList } from '@/services/app';
+import { getCertList } from '../../../service';
 import { CertUsingType } from '@/pages/app/AppDetail/constant';
 import { useIntl } from '@umijs/max';
-import Alert from '@/components/Alert';
 import { createStyles } from 'antd-style';
 import { ColProps } from 'antd/es/grid/col';
+import copy from 'copy-to-clipboard';
+import { CopyConfig } from 'antd/es/typography/Base';
 
 const IDP_ENCRYPT_CERT = 'idpEncryptCert';
 
-const useStyles = createStyles(({ prefixCls }) => ({
-  alert: {
-    [`.${prefixCls}-alert-content .${prefixCls}-alert-description .${prefixCls}-form-item:last-child`]:
-      {
-        marginBottom: '0 !important',
-      },
+const useStyles = createStyles(({}) => ({
+  config: {
+    backgroundColor: '#f1f1f2',
   },
 }));
+
 /**
  * 配置信息
  *
@@ -52,15 +51,15 @@ export default (props: {
   const {
     protocolEndpoint,
     appId,
-    collapsed = true,
     labelCol = {
       span: 6,
     },
     wrapperCol = {
-      span: 12,
+      span: 14,
     },
   } = props;
   const intl = useIntl();
+  const { message } = App.useApp();
   const { styles } = useStyles();
 
   useAsyncEffect(async () => {
@@ -78,6 +77,17 @@ export default (props: {
       });
     }
   }, [appId]);
+
+  const copySuccess = async () => {
+    message.success(intl.formatMessage({ id: 'custom.copy_success' }));
+  };
+
+  const copyable: CopyConfig = {
+    text: configForm.getFieldValue(IDP_ENCRYPT_CERT),
+    onCopy: () => {
+      copySuccess().then();
+    },
+  };
 
   const downloadEncryptCert = () => {
     const value = configForm.getFieldValue(IDP_ENCRYPT_CERT);
@@ -104,100 +114,60 @@ export default (props: {
       labelWrap
       submitter={false}
       form={configForm}
+      className={styles.config}
     >
-      <Collapse
-        ghost
-        expandIconPosition={'start'}
-        defaultActiveKey={collapsed ? undefined : 'config'}
-        items={[
-          {
-            key: 'config',
-            label: (
-              <a>
-                {intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.config_about',
-                })}
-              </a>
-            ),
-            children: (
-              <Alert
-                type={'grey'}
-                className={styles.alert}
-                description={
-                  <>
-                    <ProFormText
-                      label={intl.formatMessage({
-                        id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.config_about.idp_sso_endpoint',
-                      })}
-                      name={'idpSsoEndpoint'}
-                      extra={intl.formatMessage({
-                        id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.config_about.idp_sso_endpoint.extra',
-                      })}
-                      readonly
-                      proFieldProps={{
-                        render: (value: string) => {
-                          return value && <Typography.Text copyable>{value}</Typography.Text>;
-                        },
-                      }}
-                      fieldProps={{ autoComplete: 'off' }}
-                    />
-                    <ProFormText
-                      label={intl.formatMessage({
-                        id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.config_about.idp_slo_endpoint',
-                      })}
-                      name={'idpSloEndpoint'}
-                      extra={intl.formatMessage({
-                        id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.config_about.idp_slo_endpoint.extra',
-                      })}
-                      readonly
-                      proFieldProps={{
-                        render: (value: string) => {
-                          return value && <Typography.Text copyable>{value}</Typography.Text>;
-                        },
-                      }}
-                      fieldProps={{ autoComplete: 'off' }}
-                    />
-                    <ProFormTextArea
-                      label={intl.formatMessage({
-                        id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.config_about.idp_encrypt_cert',
-                      })}
-                      name={IDP_ENCRYPT_CERT}
-                      disabled
-                      fieldProps={{ autoComplete: 'off', rows: 3 }}
-                      extra={
-                        <div style={{ display: 'inline-block' }}>
-                          <div style={{ display: 'inline-block' }}>
-                            {intl.formatMessage({
-                              id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.config_about.idp_encrypt_cert.extra.0',
-                            })}
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <Typography.Paragraph
-                              style={{ display: 'inline-block' }}
-                              copyable={{ text: configForm.getFieldValue(IDP_ENCRYPT_CERT) }}
-                            >
-                              <a>
-                                {intl.formatMessage({
-                                  id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.config_about.idp_encrypt_cert.extra.1',
-                                })}
-                              </a>
-                            </Typography.Paragraph>
-                            <a onClick={downloadEncryptCert}>
-                              {intl.formatMessage({
-                                id: 'pages.app.config.detail.items.login_access.protocol_config.jwt.config_about.idp_encrypt_cert.extra.2',
-                              })}
-                              <VerticalAlignBottomOutlined />
-                            </a>
-                          </div>
-                        </div>
-                      }
-                    />
-                  </>
-                }
-              />
-            ),
+      <ProFormText
+        label={intl.formatMessage({
+          id: 'pages.app.config.detail.protocol_config.jwt.config_about.idp_sso_endpoint',
+        })}
+        name={'idpSsoEndpoint'}
+        extra={intl.formatMessage({
+          id: 'pages.app.config.detail.protocol_config.jwt.config_about.idp_sso_endpoint.extra',
+        })}
+        readonly
+        proFieldProps={{
+          render: (value: string) => {
+            return value && <Typography.Text copyable>{value}</Typography.Text>;
           },
-        ]}
+        }}
+        fieldProps={{ autoComplete: 'off' }}
+      />
+      <ProFormTextArea
+        label={intl.formatMessage({
+          id: 'pages.app.config.detail.protocol_config.jwt.config_about.idp_encrypt_cert',
+        })}
+        name={IDP_ENCRYPT_CERT}
+        disabled
+        fieldProps={{ autoComplete: 'off', rows: 3 }}
+        extra={
+          <div style={{ display: 'inline-block' }}>
+            <div style={{ display: 'inline-block' }}>
+              {intl.formatMessage({
+                id: 'pages.app.config.detail.protocol_config.jwt.config_about.idp_encrypt_cert.extra.0',
+              })}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Typography.Paragraph style={{ display: 'inline-block' }} copyable={copyable}>
+                <a
+                  onClick={async () => {
+                    copy(configForm.getFieldValue(IDP_ENCRYPT_CERT));
+                    await copySuccess();
+                  }}
+                >
+                  {intl.formatMessage({
+                    id: 'pages.app.config.detail.protocol_config.jwt.config_about.idp_encrypt_cert.extra.1',
+                  })}
+                </a>
+              </Typography.Paragraph>
+              <a onClick={downloadEncryptCert}>
+                {intl.formatMessage({
+                  id: 'pages.app.config.detail.protocol_config.jwt.config_about.idp_encrypt_cert.extra.2',
+                })}
+                <VerticalAlignBottomOutlined />
+              </a>
+            </div>
+          </div>
+        }
       />
     </ProForm>
   );

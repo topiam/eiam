@@ -17,11 +17,15 @@
  */
 package cn.topiam.employee.portal.configuration.security;
 
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -29,17 +33,22 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import cn.topiam.employee.application.ApplicationServiceLoader;
 import cn.topiam.employee.audit.event.AuditEventPublish;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
+import cn.topiam.employee.protocol.form.FormAuthorizationService;
+import cn.topiam.employee.protocol.form.RedisFormAuthorizationService;
 import cn.topiam.employee.protocol.form.authentication.FormAuthenticationFailureEventListener;
 import cn.topiam.employee.protocol.form.authentication.FormAuthenticationSuccessEventListener;
 import cn.topiam.employee.protocol.form.configurers.FormAuthorizationServerConfigurer;
+import static org.springframework.security.config.http.SessionCreationPolicy.NEVER;
+
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.FORM_PROTOCOL_SECURITY_FILTER_CHAIN;
 
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/3 21:15
+ * Created by support@topiam.cn on 2023/7/3 21:15
  */
 @AutoConfigureBefore(PortalSecurityConfiguration.class)
 @Configuration(proxyBeanMethods = false)
@@ -75,8 +84,8 @@ public class FormProtocolSecurityConfiguration extends AbstractSecurityConfigura
                 //cors
                 .cors(withCorsConfigurerDefaults())
                 //会话管理器
-                .sessionManagement(withSessionManagementConfigurerDefaults())
-                .with(serverConfigurer,configurer-> {});
+                .sessionManagement(configurer -> configurer.sessionCreationPolicy(NEVER))
+                .with(serverConfigurer,configurer->{});
         return httpSecurity.build();
         //@formatter:on
     }
@@ -101,6 +110,17 @@ public class FormProtocolSecurityConfiguration extends AbstractSecurityConfigura
     @Bean
     public ApplicationListener<AbstractAuthenticationFailureEvent> formAuthenticationFailureEventListener(AuditEventPublish auditEventPublish) {
         return new FormAuthenticationFailureEventListener(auditEventPublish);
+    }
+
+    @Bean
+    public FormAuthorizationService formAuthorizationService(RedisConnectionFactory redisConnectionFactory,
+                                                             CacheProperties cacheProperties,
+                                                             AutowireCapableBeanFactory beanFactory,
+                                                             ApplicationServiceLoader applicationServiceLoader) {
+        RedisTemplate<String, String> redisTemplate = getStringRedisTemplate(redisConnectionFactory,
+            cacheProperties);
+        return new RedisFormAuthorizationService(redisTemplate, beanFactory,
+            applicationServiceLoader);
     }
 
 }

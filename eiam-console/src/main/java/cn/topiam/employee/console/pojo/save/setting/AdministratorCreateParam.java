@@ -59,12 +59,6 @@ public class AdministratorCreateParam implements Serializable {
     private String password;
 
     /**
-     * 头像URL
-     */
-    @Schema(description = "头像URL")
-    private String avatar;
-
-    /**
      * 备注
      */
     @Schema(description = "备注")

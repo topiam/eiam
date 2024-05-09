@@ -42,27 +42,34 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
+import cn.topiam.eiam.protocol.oidc.OidcOpenApiCustomizer;
 import cn.topiam.eiam.protocol.oidc.authentication.*;
 import cn.topiam.eiam.protocol.oidc.authorization.client.OidcConfigRegisteredClientRepository;
 import cn.topiam.eiam.protocol.oidc.authorization.token.OAuth2TokenCustomizer;
 import cn.topiam.eiam.protocol.oidc.configurers.ClientJwkSource;
 import cn.topiam.eiam.protocol.oidc.configurers.OAuth2AuthorizationServerConfigurer;
+import cn.topiam.eiam.protocol.oidc.jackson.OidcProtocolJackson2Module;
 import cn.topiam.eiam.protocol.oidc.token.OpaqueTokenIntrospector;
 import cn.topiam.employee.audit.event.AuditEventPublish;
-import cn.topiam.employee.common.repository.account.UserRepository;
+import cn.topiam.employee.authentication.common.jackjson.AuthenticationJacksonModule;
 import cn.topiam.employee.common.repository.app.AppOidcConfigRepository;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
+import cn.topiam.employee.support.jackjson.SupportJackson2Module;
 import cn.topiam.employee.support.redis.KeyStringRedisSerializer;
+import static org.springframework.security.config.http.SessionCreationPolicy.NEVER;
+
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.OIDC_PROTOCOL_SECURITY_FILTER_CHAIN;
 
 /**
  * OIDC 协议配置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/2 21:16
+ * Created by support@topiam.cn on 2023/7/2 21:16
  */
 @AutoConfigureBefore(PortalSecurityConfiguration.class)
 @Configuration(proxyBeanMethods = false)
@@ -84,14 +91,12 @@ public class OidcProtocolSecurityConfiguration extends AbstractSecurityConfigura
                                                                AccessTokenAuthenticationManagerResolver authenticationManagerResolver) throws Exception {
         //@formatter:off
         httpSecurity.getSharedObject(AuthenticationManagerBuilder.class).parentAuthenticationManager(null);
-        OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
-        RequestMatcher endpointsMatcher = authorizationServerConfigurer.getEndpointsMatcher();
+        OAuth2AuthorizationServerConfigurer serverConfigurer = new OAuth2AuthorizationServerConfigurer();
+        RequestMatcher endpointsMatcher = serverConfigurer.getEndpointsMatcher();
         OrRequestMatcher requestMatcher = new OrRequestMatcher(endpointsMatcher);
         httpSecurity
                 .securityMatcher(endpointsMatcher)
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
-                .oauth2ResourceServer(
-                        configurer -> configurer.authenticationManagerResolver(authenticationManagerResolver))
                 //安全上下文
                 .securityContext(securityContext())
                 //CSRF
@@ -101,8 +106,10 @@ public class OidcProtocolSecurityConfiguration extends AbstractSecurityConfigura
                 //cors
                 .cors(withCorsConfigurerDefaults())
                 //会话管理器
-                .sessionManagement(withSessionManagementConfigurerDefaults())
-                .with(authorizationServerConfigurer,configurer-> {});
+                .sessionManagement(configurer -> configurer.sessionCreationPolicy(NEVER))
+                .with(serverConfigurer,configurer-> {})
+                //资源服务器配置放到最后
+                .oauth2ResourceServer(configurer -> configurer.authenticationManagerResolver(authenticationManagerResolver));
         return httpSecurity.build();
         //@formatter:on
     }
@@ -113,8 +120,8 @@ public class OidcProtocolSecurityConfiguration extends AbstractSecurityConfigura
      * @return {@link OAuth2TokenCustomizer}
      */
     @Bean
-    public org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer(UserRepository userRepository) {
-        return new OAuth2TokenCustomizer(userRepository);
+    public org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer() {
+        return new OAuth2TokenCustomizer();
     }
 
     /**
@@ -138,17 +145,24 @@ public class OidcProtocolSecurityConfiguration extends AbstractSecurityConfigura
      * @param redisConnectionFactory {@link RedisConnectionFactory}
      * @param cacheProperties {@link CacheProperties}
      * @param clientRepository {@link RedisConnectionFactory}
-     * @param beanFactory {@link RegisteredClientRepository}
      * @return {@link AutowireCapableBeanFactory}
      */
     @Bean
     public OAuth2AuthorizationService authorizationService(RedisConnectionFactory redisConnectionFactory,
                                                            CacheProperties cacheProperties,
-                                                           RegisteredClientRepository clientRepository,
-                                                           AutowireCapableBeanFactory beanFactory) {
-        return new RedisOAuth2AuthorizationServiceWrapper(
-            getRedisTemplate(redisConnectionFactory, cacheProperties), clientRepository,
-            beanFactory);
+                                                           RegisteredClientRepository clientRepository) {
+        RedisTemplate<String, String> redisTemplate = getStringRedisTemplate(redisConnectionFactory,
+            cacheProperties);
+        ClassLoader classLoader = this.getClass().getClassLoader();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModules(SupportJackson2Module.getModules(classLoader));
+        objectMapper.registerModules(OidcProtocolJackson2Module.getModules());
+        objectMapper.registerModules(new AuthenticationJacksonModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        RedisOAuth2AuthorizationServiceWrapper service = new RedisOAuth2AuthorizationServiceWrapper(
+            redisTemplate, clientRepository);
+        service.setObjectMapper(objectMapper);
+        return service;
     }
 
     /**
@@ -220,5 +234,15 @@ public class OidcProtocolSecurityConfiguration extends AbstractSecurityConfigura
     @Bean
     public ApplicationListener<AbstractAuthenticationFailureEvent> oauth2AuthenticationFailureEventListener(AuditEventPublish auditEventPublish) {
         return new OAuth2AuthenticationFailureEventListener(auditEventPublish);
+    }
+
+    /**
+     * OIDC openapi 文档
+     *
+     * @return {@link OidcOpenApiCustomizer}
+     */
+    @Bean
+    public OidcOpenApiCustomizer oidcOpenApiCustomizer() {
+        return new OidcOpenApiCustomizer();
     }
 }

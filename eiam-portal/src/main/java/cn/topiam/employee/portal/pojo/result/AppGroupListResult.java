@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * 获取应用列表
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/9/1 11:58
+ * Created by support@topiam.cn on 2023/9/1 11:58
  */
 @Data
 @Schema(description = "获取分组应用列表")

@@ -33,7 +33,7 @@ import static cn.topiam.employee.support.exception.enums.ExceptionStatus.EX00020
  * session 过期
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/7/25 21:08
+ * Created by support@topiam.cn on 2021/7/25 21:08
  */
 public class ConsoleSessionInformationExpiredStrategy implements SessionInformationExpiredStrategy {
 

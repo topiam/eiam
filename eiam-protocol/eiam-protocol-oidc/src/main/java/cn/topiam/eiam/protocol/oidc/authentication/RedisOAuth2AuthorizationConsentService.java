@@ -27,7 +27,7 @@ import static cn.topiam.employee.support.constant.EiamConstants.COLON;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2022/10/31 21:41
+ * Created by support@topiam.cn on 2022/10/31 21:41
  */
 @SuppressWarnings({ "AlibabaClassNamingShouldBeCamel",
                     "AlibabaServiceOrDaoClassShouldEndWithImpl" })

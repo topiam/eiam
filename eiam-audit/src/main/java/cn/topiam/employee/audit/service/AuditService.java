@@ -19,9 +19,9 @@ package cn.topiam.employee.audit.service;
 
 import java.util.List;
 
-import cn.topiam.employee.audit.controller.pojo.AuditListQuery;
-import cn.topiam.employee.audit.controller.pojo.AuditListResult;
-import cn.topiam.employee.audit.controller.pojo.DictResult;
+import cn.topiam.employee.audit.endpoint.pojo.AuditListQuery;
+import cn.topiam.employee.audit.endpoint.pojo.AuditListResult;
+import cn.topiam.employee.audit.endpoint.pojo.DictResult;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 
@@ -29,7 +29,7 @@ import cn.topiam.employee.support.repository.page.domain.PageModel;
  * 审计service
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/10 23:06
+ * Created by support@topiam.cn on 2021/9/10 23:06
  */
 public interface AuditService {
     /**

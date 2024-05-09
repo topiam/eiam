@@ -17,21 +17,17 @@
  */
 package cn.topiam.employee.protocol.jwt.configurers;
 
-import java.util.Map;
-
-import org.springframework.beans.factory.BeanFactoryUtils;
-import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
-import org.springframework.context.ApplicationContext;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.util.StringUtils;
 
-import cn.topiam.employee.protocol.jwt.authorization.InMemoryJwtAuthorizationService;
-import cn.topiam.employee.protocol.jwt.authorization.JwtAuthorizationService;
+import cn.topiam.employee.application.ApplicationServiceLoader;
+import cn.topiam.employee.protocol.code.configurer.AuthenticationUtils;
+import cn.topiam.employee.protocol.jwt.InMemoryJwtAuthorizationService;
+import cn.topiam.employee.protocol.jwt.JwtAuthorizationService;
 
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/8 23:19
+ * Created by support@topiam.cn on 2023/7/8 23:19
  */
 public class JwtAuthenticationUtils {
 
@@ -39,26 +35,16 @@ public class JwtAuthenticationUtils {
         JwtAuthorizationService authorizationService = httpSecurity
             .getSharedObject(JwtAuthorizationService.class);
         if (authorizationService == null) {
-            authorizationService = getOptionalBean(httpSecurity, JwtAuthorizationService.class);
+            authorizationService = AuthenticationUtils.getOptionalBean(httpSecurity,
+                JwtAuthorizationService.class);
             if (authorizationService == null) {
-                authorizationService = new InMemoryJwtAuthorizationService();
+                ApplicationServiceLoader applicationServiceLoader = AuthenticationUtils
+                    .getOptionalBean(httpSecurity, ApplicationServiceLoader.class);
+                authorizationService = new InMemoryJwtAuthorizationService(
+                    applicationServiceLoader);
             }
             httpSecurity.setSharedObject(JwtAuthorizationService.class, authorizationService);
         }
         return authorizationService;
-    }
-
-    static <T> T getOptionalBean(HttpSecurity httpSecurity, Class<T> type) {
-        Map<String, T> beansMap = BeanFactoryUtils.beansOfTypeIncludingAncestors(
-            httpSecurity.getSharedObject(ApplicationContext.class), type);
-        if (beansMap.size() > 1) {
-            throw new NoUniqueBeanDefinitionException(
-                type, beansMap
-                    .size(),
-                "Expected single matching bean of type '" + type.getName() + "' but found "
-                             + beansMap.size() + ": "
-                             + StringUtils.collectionToCommaDelimitedString(beansMap.keySet()));
-        }
-        return (!beansMap.isEmpty() ? beansMap.values().iterator().next() : null);
     }
 }

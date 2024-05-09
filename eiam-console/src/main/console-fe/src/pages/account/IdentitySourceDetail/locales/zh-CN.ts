@@ -16,12 +16,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 export default {
+  'pages.account.identity_source_detail.extra.delete': '删除身份源',
+  'pages.account.identity_source_detail.extra.delete_confirm_title': '确定要删除该身份源吗？',
+  'pages.account.identity_source_detail.extra.delete_confirm_content':
+    '删除操作无法恢复，请谨慎操作！',
   'pages.account.identity_source_detail.common.action_type': '动作类型',
   'pages.account.identity_source_detail.common.object_id': '对象 ID',
   'pages.account.identity_source_detail.common.object_name': '对象名称',
   'pages.account.identity_source_detail.common.desc': '描述',
   'pages.account.identity_source_detail.common.object_type': '对象类型',
   'pages.account.identity_source_detail.common.app_secret': '应用凭证密钥',
+  'pages.account.identity_source_detail.common.callback_uri': '回调地址',
   'pages.account.identity_source_detail.common.app_secret.placeholder': '请输入应用凭证密钥',
   'pages.account.identity_source_detail.common.app_secret.rule.0.message': '应用凭证密钥为必填项',
   'pages.account.identity_source_detail.common.test_connect': '测试连接',
@@ -30,7 +35,9 @@ export default {
 
   'pages.account.identity_source_detail.warning.message': '身份源不存在',
   'pages.account.identity_source_detail.name': '名称',
+  'pages.account.identity_source_detail.code': '编码',
   'pages.account.identity_source_detail.remark': '备注',
+  'pages.account.identity_source_detail.create_time': '创建时间',
   'pages.account.identity_source_detail.page_container.tab_list.config': '同步配置',
   'pages.account.identity_source_detail.page_container.tab_list.sync_history': '同步历史',
   'pages.account.identity_source_detail.page_container.tab_list.event_record': '事件记录',
@@ -61,11 +68,11 @@ export default {
   'pages.account.identity_source_detail.sync_history.tool_bar_render.title': '一键拉取',
   'pages.account.identity_source_detail.sync_history.tool_bar_render.success.title': '任务触发成功',
   'pages.account.identity_source_detail.sync_history.tool_bar_render.content.title':
-    'TopIAM 将全量拉取身份源授权范围内部门和账户，置于同步目标组织下。',
+    'TOPIAM 将全量拉取身份源授权范围内部门和账户，置于同步目标组织下。',
   'pages.account.identity_source_detail.sync_history.tool_bar_render.content.description':
-    'TopIAM 将全量拉取身份源授权范围内部门和账户，置于同步目标组织下。',
+    'TOPIAM 将全量拉取身份源授权范围内部门和账户，置于同步目标组织下。',
   'pages.account.identity_source_detail.strategy_config.target_extra.0':
-    '身份源组织同步至 TopIAM 后的父级组织。',
+    '身份源组织同步至 TOPIAM 后的父级组织。',
   'pages.account.identity_source_detail.strategy_config.target_extra.1':
     '如果不填，将自动创建顶层组织。配置后不可更改。',
   'pages.account.identity_source_detail.strategy_config.organization_policies': '组织相关策略',
@@ -81,7 +88,7 @@ export default {
     '请输入默认密码',
   'pages.account.identity_source_detail.strategy_config.user_policies.enabled': '是否启用',
   'pages.account.identity_source_detail.strategy_config.user_policies.enabled.extra.0':
-    '默认启用，首次同步用户时，用户是否在 TopIAM 中启用。',
+    '默认启用，首次同步用户时，用户是否在 TOPIAM 中启用。',
   'pages.account.identity_source_detail.strategy_config.user_policies.enabled.extra.1':
     '注意：身份源用户未启用时，将已身份源为准。',
   'pages.account.identity_source_detail.strategy_config.user_policies.email_notify': '邮件通知',
@@ -140,25 +147,4 @@ export default {
     '飞书事件订阅的 EncryptKey，可以在飞书开放平台应用详情的「事件订阅」页面获取。如果你需要开启实时同步，此参数必填。',
   'pages.account.identity_source_detail.basic_config.fei_shu.verification_token.extra':
     '飞书事件订阅的 VerificationToken，可以在飞书开放平台应用详情的「事件订阅」页面获取。如果你需要开启实时同步，此参数必填。',
-  'pages.account.identity_source_detail.basic_config.wechat_work.corp_id': '企业 ID',
-  'pages.account.identity_source_detail.basic_config.wechat_work.corp_id.placeholder':
-    '请输入企业 ID（CorpId）',
-  'pages.account.identity_source_detail.basic_config.wechat_work.corp_id.extra':
-    '你可以在企业微信后台（https://work.weixin.qq.com/）「我的企业」-「企业信息」页面获取企业 ID（CorpId）。',
-  'pages.account.identity_source_detail.basic_config.wechat_work.corp_id.rule.0.message':
-    '企业 ID（CorpId）为必填项',
-  'pages.account.identity_source_detail.basic_config.wechat_work.secret': '密钥 Secret',
-  'pages.account.identity_source_detail.basic_config.wechat_work.secret.placeholder':
-    '请输入企业微信通讯录密钥 Secret',
-  'pages.account.identity_source_detail.basic_config.wechat_work.secret.rule.0.message':
-    '企业微信通讯录密钥 Secret为必填项',
-  'pages.account.identity_source_detail.basic_config.wechat_work.token': '事件回调 Token',
-  'pages.account.identity_source_detail.basic_config.wechat_work.token.placeholder':
-    '请输入企业微信回调 Token',
-  'pages.account.identity_source_detail.basic_config.wechat_work.token.extra':
-    '你可以在企业微信后台（https://work.weixin.qq.com/）「管理工具」-「通讯录同步」页面点击「设置接收事件服务器」按钮，之后可以获取到此 Token。如果你需要开启实时同步，此参数必填。',
-  'pages.account.identity_source_detail.basic_config.wechat_work.encoding_aes_key.placeholder':
-    '请输入通讯录事件同步 EncodingAESKey',
-  'pages.account.identity_source_detail.basic_config.wechat_work.encoding_aes_key.extra':
-    '你可以在企业微信后台（https://work.weixin.qq.com/）「管理工具」-「通讯录同步」页面点击「设置接收事件服务器」按钮，之后可以获取到此 EncodingAESKey。如果你需要开启实时同步，此参数必填。',
 };

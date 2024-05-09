@@ -43,13 +43,12 @@ import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 
 import jakarta.validation.constraints.NotEmpty;
-import static cn.topiam.employee.common.constant.StorageConstants.URL_REGEXP;
 
 /**
  * 阿里云OSS
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/10 21:28
+ * Created by support@topiam.cn on 2021/11/10 21:28
  */
 @Slf4j
 public class AliYunOssStorage extends AbstractStorage {

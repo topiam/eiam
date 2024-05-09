@@ -43,15 +43,16 @@ import cn.topiam.eiam.protocol.oidc.authentication.OAuth2AuthorizationImplicitRe
 import cn.topiam.eiam.protocol.oidc.authentication.OAuth2AuthorizationImplicitRequestAuthenticationToken;
 import cn.topiam.eiam.protocol.oidc.authorization.client.OidcConfigRegisteredClientRepositoryWrapper;
 import cn.topiam.eiam.protocol.oidc.endpoint.OAuth2AuthorizationEndpointFilter;
+import cn.topiam.employee.protocol.code.EndpointMatcher;
 import cn.topiam.employee.protocol.code.configurer.AbstractConfigurer;
 import static cn.topiam.employee.common.constant.ProtocolConstants.OidcEndpointConstants.AUTHORIZATION_ENDPOINT;
-import static cn.topiam.employee.protocol.code.util.ProtocolConfigUtils.getAuthenticationDetailsSource;
+import static cn.topiam.employee.protocol.code.configurer.AuthenticationUtils.getAuthenticationDetailsSource;
 
 /**
  * Configurer for the OAuth 2.0 Authorization Endpoint.
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/27 21:42
+ * Created by support@topiam.cn on 2023/6/27 21:42
  */
 @SuppressWarnings("AlibabaClassNamingShouldBeCamel")
 public final class OAuth2AuthorizationEndpointConfigurer extends AbstractConfigurer {
@@ -122,11 +123,6 @@ public final class OAuth2AuthorizationEndpointConfigurer extends AbstractConfigu
             AbstractPreAuthenticatedProcessingFilter.class);
     }
 
-    @Override
-    public RequestMatcher getRequestMatcher() {
-        return this.requestMatcher;
-    }
-
     private List<AuthenticationProvider> createDefaultAuthenticationProviders(HttpSecurity httpSecurity) {
         List<AuthenticationProvider> authenticationProviders = new ArrayList<>();
         OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator = OAuth2ConfigurerUtils
@@ -149,5 +145,10 @@ public final class OAuth2AuthorizationEndpointConfigurer extends AbstractConfigu
         authenticationProviders.add(authenticationImplicitRequestAuthenticationProvider);
 
         return authenticationProviders;
+    }
+
+    @Override
+    public EndpointMatcher getEndpointMatcher() {
+        return new EndpointMatcher(this.requestMatcher, true);
     }
 }

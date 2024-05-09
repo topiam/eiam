@@ -29,7 +29,7 @@ import org.springframework.util.Assert;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/28 22:43
+ * Created by support@topiam.cn on 2023/6/28 22:43
  */
 @SuppressWarnings("AlibabaClassNamingShouldBeCamel")
 public class OAuth2AuthorizationImplicitAccessTokenAuthenticationToken extends

@@ -25,7 +25,7 @@ import cn.topiam.employee.common.entity.account.query.UserGroupMemberListQuery;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/13 21:27
+ * Created by support@topiam.cn on 2022/2/13 21:27
  */
 public interface UserGroupMemberRepositoryCustomized {
     /**

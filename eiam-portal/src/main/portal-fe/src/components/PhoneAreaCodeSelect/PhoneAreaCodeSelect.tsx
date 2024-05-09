@@ -17,10 +17,10 @@
  */
 import { Select, Spin } from 'antd';
 import { useAsyncEffect } from 'ahooks';
-import { getPhoneAreaCodeList } from './server';
 import { useState } from 'react';
 import { PhoneAreaCode } from './data.d';
 import { BaseOptionType, DefaultOptionType } from 'rc-select/lib/Select';
+
 const { Option } = Select;
 
 export interface PhoneAreaCodeProps<
@@ -35,12 +35,16 @@ export default (props: PhoneAreaCodeProps) => {
   const [list, setList] = useState<PhoneAreaCode[]>();
   const [loading, setLoading] = useState<boolean>(true);
   useAsyncEffect(async () => {
-    const { result, success } = await getPhoneAreaCodeList();
-    if (success) {
-      setLoading(true);
-      setList(result);
-      setLoading(false);
-    }
+    setLoading(true);
+    setList([
+      {
+        englishName: 'China',
+        chineseName: '中国',
+        countryCode: 'CN',
+        phoneCode: '+86',
+      },
+    ]);
+    setLoading(false);
   }, []);
   return (
     <Spin spinning={loading}>

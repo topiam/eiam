@@ -22,7 +22,7 @@ import static cn.topiam.employee.support.constant.EiamConstants.COLON;
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/4 21:19
+ * Created by support@topiam.cn on 2023/7/4 21:19
  */
 public class ProtocolConstants {
 

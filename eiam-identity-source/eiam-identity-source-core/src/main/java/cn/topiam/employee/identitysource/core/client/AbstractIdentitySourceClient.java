@@ -27,7 +27,7 @@ import lombok.Getter;
  * AbstractIdentityDataProcessor
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/28 03:40
+ * Created by support@topiam.cn on 2022/2/28 03:40
  */
 @Getter
 public abstract class AbstractIdentitySourceClient<T extends IdentitySourceConfig>

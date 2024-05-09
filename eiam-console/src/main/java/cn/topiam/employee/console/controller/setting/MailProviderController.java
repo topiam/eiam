@@ -30,7 +30,7 @@ import cn.topiam.employee.common.enums.MailType;
 import cn.topiam.employee.console.pojo.result.setting.EmailProviderConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.MailProviderSaveParam;
 import cn.topiam.employee.console.service.setting.MessageSettingService;
-import cn.topiam.employee.core.help.ServerHelp;
+import cn.topiam.employee.core.context.ContextService;
 import cn.topiam.employee.core.message.MsgVariable;
 import cn.topiam.employee.core.message.mail.MailMsgEventPublish;
 import cn.topiam.employee.support.lock.Lock;
@@ -123,7 +123,7 @@ public class MailProviderController {
         }
         map.put(MsgVariable.TEST, "(TEST)");
         map.put(MsgVariable.EXPIRE_DAYS, "3");
-        map.put("verify_link", ServerHelp.getPortalPublicBaseUrl());
+        map.put("verify_link", ContextService.getPortalPublicBaseUrl());
         mailMsgEventPublish.publish(mailType, receiver, map);
         return ApiRestResult.ok();
     }

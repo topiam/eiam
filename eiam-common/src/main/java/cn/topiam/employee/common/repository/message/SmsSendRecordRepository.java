@@ -17,15 +17,15 @@
  */
 package cn.topiam.employee.common.repository.message;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.common.entity.message.SmsSendRecordEntity;
-import cn.topiam.employee.support.repository.LogicDeleteRepository;
 
 /**
  * @author TopIAM
  */
 @Repository
-public interface SmsSendRecordRepository extends LogicDeleteRepository<SmsSendRecordEntity, Long> {
+public interface SmsSendRecordRepository extends JpaRepository<SmsSendRecordEntity, String> {
 
 }

@@ -20,11 +20,11 @@ package cn.topiam.employee.common.entity.app;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SoftDelete;
 
 import cn.topiam.employee.common.enums.app.AppCertUsingType;
-import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
+import cn.topiam.employee.support.repository.SoftDeleteConverter;
+import cn.topiam.employee.support.repository.base.BaseEntity;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -34,22 +34,20 @@ import lombok.experimental.Accessors;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
+import static cn.topiam.employee.support.repository.base.BaseEntity.IS_DELETED_COLUMN;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2022/5/31 21:51
+ * Created by support@topiam.cn on 2022/5/31 21:51
  */
 @Getter
 @Setter
 @ToString
 @Entity
 @Accessors(chain = true)
-@Table(name = "app_cert")
-@SQLDelete(sql = "update app_cert set " + SOFT_DELETE_SET + " where id_ = ?")
-@Where(clause = SOFT_DELETE_WHERE)
-public class AppCertEntity extends LogicDeleteEntity<Long> {
+@Table(name = "eiam_app_cert")
+@SoftDelete(columnName = IS_DELETED_COLUMN, converter = SoftDeleteConverter.class)
+public class AppCertEntity extends BaseEntity {
 
     public static final String APP_ID_FIELD_NAME     = "appId";
 
@@ -59,7 +57,7 @@ public class AppCertEntity extends LogicDeleteEntity<Long> {
      * 应用ID
      */
     @Column(name = "app_id")
-    private Long               appId;
+    private String             appId;
 
     /**
      * 证书序列号

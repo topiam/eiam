@@ -19,5 +19,6 @@ export type UpdateFormProps = {
   id: string;
   visible: boolean;
   onCancel: () => void;
+  afterClose: () => void;
   onFinish: (success: boolean) => void;
 };

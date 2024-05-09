@@ -28,7 +28,7 @@ import cn.topiam.employee.console.pojo.update.user.UpdateUserInfoRequest;
  * AccountConverter
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/3/25 21:52
+ * Created by support@topiam.cn on 2022/3/25 21:52
  */
 @Mapper(componentModel = "spring")
 public interface UserProfileConverter {
@@ -39,7 +39,7 @@ public interface UserProfileConverter {
      * @param param {@link UpdateUserInfoRequest} 更新参数
      * @return {@link UserEntity} 用户实体
      */
-    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "needChangePassword", ignore = true)
     @Mapping(target = "phoneVerified", ignore = true)
     @Mapping(target = "phoneAreaCode", ignore = true)
     @Mapping(target = "username", ignore = true)

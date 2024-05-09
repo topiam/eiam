@@ -21,12 +21,19 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 
+import cn.topiam.employee.application.context.ApplicationContext;
+import cn.topiam.employee.application.context.ApplicationContextHolder;
+import cn.topiam.employee.application.jwt.model.JwtProtocolConfig;
 import cn.topiam.employee.protocol.jwt.authentication.JwtLogoutAuthenticationToken;
+import cn.topiam.employee.protocol.jwt.exception.JwtError;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import static cn.topiam.employee.protocol.jwt.constant.JwtProtocolConstants.POST_LOGOUT_REDIRECT_URI;
+import static cn.topiam.employee.protocol.jwt.endpoint.JwtAuthenticationEndpointUtils.throwError;
 
 /**
  *
@@ -39,13 +46,27 @@ public final class JwtLogoutAuthenticationConverter implements AuthenticationCon
 
     @Override
     public Authentication convert(HttpServletRequest request) {
+
+        if (request.getParameterValues(POST_LOGOUT_REDIRECT_URI).length != 1) {
+            throwError(new JwtError(OAuth2ErrorCodes.INVALID_REQUEST,
+                "JWT Logout Request Parameter: " + POST_LOGOUT_REDIRECT_URI));
+        }
+        ApplicationContext context = ApplicationContextHolder.getApplicationContext();
+        JwtProtocolConfig config = (JwtProtocolConfig) context.getConfig()
+            .get(JwtProtocolConfig.class.getName());
+        String postLogoutRedirectUri = request.getParameter(POST_LOGOUT_REDIRECT_URI);
+        String sessionId = null;
         HttpSession session = request.getSession(false);
-        String sessionId = session.getId();
+        if (session != null) {
+            sessionId = session.getId();
+        }
+
         Authentication principal = SecurityContextHolder.getContext().getAuthentication();
         if (principal == null) {
             principal = ANONYMOUS_AUTHENTICATION;
         }
-        return new JwtLogoutAuthenticationToken(principal, sessionId, "");
+        return new JwtLogoutAuthenticationToken(principal, config, postLogoutRedirectUri,
+            sessionId);
     }
 
 }

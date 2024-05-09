@@ -32,7 +32,10 @@ import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.AppFormConfigEntity;
 import cn.topiam.employee.common.entity.app.po.AppFormConfigPO;
-import cn.topiam.employee.common.enums.app.*;
+import cn.topiam.employee.common.enums.app.AppProtocol;
+import cn.topiam.employee.common.enums.app.AppType;
+import cn.topiam.employee.common.enums.app.AuthorizationType;
+import cn.topiam.employee.common.enums.app.FormSubmitType;
 import cn.topiam.employee.common.repository.app.AppAccountRepository;
 import cn.topiam.employee.common.repository.app.AppFormConfigRepository;
 import cn.topiam.employee.common.repository.app.AppGroupAssociationRepository;
@@ -49,7 +52,7 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
  * Form 用户应用
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/8/20 23:20
+ * Created by support@topiam.cn on 2022/8/20 23:20
  */
 @Slf4j
 @Component
@@ -80,18 +83,18 @@ public class FormStandardApplicationServiceImpl extends AbstractFormApplicationS
         }
         //@formatter:on
         //1、修改基本信息
-        Optional<AppEntity> optional = appRepository.findById(Long.valueOf(appId));
+        Optional<AppEntity> optional = appRepository.findById(appId);
         if (optional.isEmpty()) {
             AuditContext.setContent("保存配置失败，应用 [" + appId + "] 不存在！");
             log.error(AuditContext.getContent());
             throw new AppNotExistException();
         }
         AppEntity appEntity = optional.get();
-        appEntity.setAuthorizationType(model.getAuthorizationType());
+        appEntity.setConfigured(true);
+        appEntity.setInitLoginUrl(model.getInitLoginUrl());
         appRepository.save(appEntity);
         //2、修改 表单代填 配置
-        Optional<AppFormConfigEntity> form = appFormConfigRepository
-            .findByAppId(Long.valueOf(appId));
+        Optional<AppFormConfigEntity> form = appFormConfigRepository.findByAppId(appId);
         if (form.isEmpty()) {
             AuditContext.setContent("保存配置失败，应用 [" + appId + "] 不存在！");
             log.error(AuditContext.getContent());
@@ -105,7 +108,6 @@ public class FormStandardApplicationServiceImpl extends AbstractFormApplicationS
         formConfig.setRemark(entity.getRemark());
         formConfig.setCreateBy(entity.getCreateBy());
         formConfig.setCreateTime(entity.getCreateTime());
-        formConfig.setDeleted(entity.getDeleted());
         appFormConfigRepository.save(formConfig);
     }
 
@@ -117,7 +119,7 @@ public class FormStandardApplicationServiceImpl extends AbstractFormApplicationS
      */
     @Override
     public Object getConfig(String appId) {
-        AppFormConfigPO po = appFormConfigRepository.getByAppId(Long.valueOf(appId));
+        AppFormConfigPO po = appFormConfigRepository.getByAppId(appId);
         return appFormConfigConverter.entityConverterToFormConfigResult(po);
     }
 
@@ -148,7 +150,7 @@ public class FormStandardApplicationServiceImpl extends AbstractFormApplicationS
      */
     @Override
     public String getDescription() {
-        return "表单代填可以模拟用户在登录页输入用户名和密码，再通过表单提交的一种登录方式。应用的账号密码在 TopIAM 中使用 AES256 加密算法本地加密存储。很多旧系统、不支持标准认证协议的系统或不支持改造的系统可以使用表单代填实现统一身份管理。表单中有图片验证码、CSRF token、动态参数的场景不适用。";
+        return "表单代填可以模拟用户在登录页输入用户名和密码，再通过表单提交的一种登录方式。应用的账号密码在 TOPIAM 中使用 AES256 加密算法本地加密存储。很多旧系统、不支持标准认证协议的系统或不支持改造的系统可以使用表单代填实现统一身份管理。表单中有图片验证码、CSRF token、动态参数的场景不适用。";
     }
 
     /**
@@ -172,16 +174,6 @@ public class FormStandardApplicationServiceImpl extends AbstractFormApplicationS
     }
 
     /**
-     * 获取表单Schema
-     *
-     * @return {@link Map}
-     */
-    @Override
-    public List<Map> getFormSchema() {
-        return null;
-    }
-
-    /**
      * 获取base64图标
      *
      * @return {@link String}
@@ -194,15 +186,15 @@ public class FormStandardApplicationServiceImpl extends AbstractFormApplicationS
     /**
      * 创建应用
      *
-     * @param name   {@link String} 名称
-     * @param icon   {@link String} 图标
-     * @param remark {@link String} 备注
-     * @param groupIds {@link Long} 分组id
+     * @param name     {@link String} 名称
+     * @param icon     {@link String} 图标
+     * @param remark   {@link String} 备注
+     * @param groups {@link String} 应用分组
      */
     @Override
-    public String create(String name, String icon, String remark, List<String> groupIds) {
+    public String create(String name, String icon, String remark, List<String> groups) {
         //1、创建应用
-        AppEntity appEntity = createApp(name, icon, remark, groupIds, InitLoginType.PORTAL_OR_APP,
+        AppEntity appEntity = createApp(name, icon, remark, groups,
             AuthorizationType.AUTHORIZATION);
         AppFormConfigEntity appFormConfig = new AppFormConfigEntity();
         appFormConfig.setAppId(appEntity.getId());
@@ -215,11 +207,11 @@ public class FormStandardApplicationServiceImpl extends AbstractFormApplicationS
     private final AppFormConfigConverter appFormConfigConverter;
 
     protected FormStandardApplicationServiceImpl(AppAccountRepository appAccountRepository,
+                                                 AppGroupAssociationRepository appGroupAssociationRepository,
                                                  AppFormConfigRepository appFormConfigRepository,
                                                  AppRepository appRepository,
-                                                 AppGroupAssociationRepository appGroupAssociationRepository,
                                                  AppFormConfigConverter appFormConfigConverter) {
-        super(appRepository, appAccountRepository, appGroupAssociationRepository,
+        super(appRepository, appGroupAssociationRepository, appAccountRepository,
             appFormConfigRepository);
         this.appFormConfigConverter = appFormConfigConverter;
     }

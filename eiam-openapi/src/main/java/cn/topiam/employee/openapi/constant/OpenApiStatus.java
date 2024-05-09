@@ -23,7 +23,7 @@ import cn.topiam.employee.support.enums.BaseEnum;
  * 开放平台状态码
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/23 22:06
+ * Created by support@topiam.cn on 2023/6/23 22:06
  */
 public enum OpenApiStatus implements BaseEnum {
                                                /**

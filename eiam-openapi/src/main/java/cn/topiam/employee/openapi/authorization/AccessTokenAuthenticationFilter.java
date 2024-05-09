@@ -38,7 +38,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * Token认证过滤器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/4/14 21:22
+ * Created by support@topiam.cn on 2022/4/14 21:22
  */
 public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
     private final Logger                logger = LoggerFactory

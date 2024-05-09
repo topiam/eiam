@@ -39,12 +39,3 @@ export async function accountLogin(params: API.LoginParamsType) {
     return data;
   });
 }
-
-/**
- * 获取当前session状态
- */
-export async function getCurrentStatus(): Promise<API.ApiResult<API.CurrentStatus>> {
-  return request<API.ApiResult<API.CurrentStatus>>('/api/v1/session/current_status', {
-    skipErrorHandler: true,
-  });
-}

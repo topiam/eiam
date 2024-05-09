@@ -20,7 +20,6 @@ package cn.topiam.employee.console.service.account;
 import java.util.List;
 
 import cn.topiam.employee.common.entity.account.OrganizationEntity;
-import cn.topiam.employee.common.enums.DataOrigin;
 import cn.topiam.employee.console.pojo.result.account.*;
 import cn.topiam.employee.console.pojo.save.account.OrganizationCreateParam;
 import cn.topiam.employee.console.pojo.update.account.OrganizationUpdateParam;
@@ -31,7 +30,7 @@ import cn.topiam.employee.console.pojo.update.account.OrganizationUpdateParam;
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-08-09
+ * Created by support@topiam.cn on 2020-08-09
  */
 public interface OrganizationService {
 
@@ -104,12 +103,12 @@ public interface OrganizationService {
      * 查询子组织
      *
      * @param parentId         {@link String}
-     * @param dataOrigin       {@link DataOrigin}
-     * @param identitySourceId {@link Long}
+     * @param dataOrigin       {@link String}
+     * @param identitySourceId {@link String}
      * @return {@link OrganizationEntity}
      */
-    List<OrganizationEntity> getChildOrgList(String parentId, DataOrigin dataOrigin,
-                                             Long identitySourceId);
+    List<OrganizationEntity> getChildOrgList(String parentId, String dataOrigin,
+                                             String identitySourceId);
 
     /**
      * 过滤组织树
@@ -117,7 +116,15 @@ public interface OrganizationService {
      * @param keyWord {@link String} 关键字
      * @return {@link List}
      */
-    List<OrganizationTreeResult> filterOrganizationTree(String keyWord);
+    List<SearchOrganizationTreeResult> searchOrganizationTree(String keyWord);
+
+    /**
+     * 过滤组织
+     *
+     * @param keyWord {@link String} 关键字
+     * @return {@link List}
+     */
+    List<SearchOrganizationResult> searchOrganization(String keyWord);
 
     /**
      * 根据ID查询组织架构
@@ -131,10 +138,10 @@ public interface OrganizationService {
      * 根据外部ID查询组织架构
      *
      * @param id               {@link String}
-     * @param identitySourceId {@link Long}
+     * @param identitySourceId {@link String}
      * @return {@link OrganizationEntity}
      */
-    OrganizationEntity getOrganizationByExternalId(String id, Long identitySourceId);
+    OrganizationEntity getOrganizationByExternalId(String id, String identitySourceId);
 
     /**
      * 批量获取组织

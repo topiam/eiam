@@ -23,7 +23,7 @@ import cn.topiam.employee.support.exception.TopIamException;
  * 无效配置异常
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/4/10 00:22
+ * Created by support@topiam.cn on 2022/4/10 00:22
  */
 public class InvalidClientConfigException extends TopIamException {
     public InvalidClientConfigException(String msg, Throwable t) {

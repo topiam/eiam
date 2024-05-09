@@ -18,7 +18,6 @@
 package cn.topiam.employee.console.service.app.impl;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -50,11 +49,10 @@ public class AppTemplateServiceImpl implements AppTemplateService {
     @Override
     public List<AppTemplateResult> getAppTemplateList(AppType type, String name) {
         List<AppTemplateResult> results = new ArrayList<>();
-        Set<ApplicationService> list = applicationServiceLoader.getApplicationServiceList();
+        List<ApplicationService> list = applicationServiceLoader.getApplicationServiceList();
         if (StringUtils.isNotBlank(name)) {
             list = list.stream()
-                .filter(applicationService -> applicationService.getName().contains(name))
-                .collect(Collectors.toSet());
+                .filter(applicationService -> applicationService.getName().contains(name)).toList();
         }
         for (ApplicationService protocol : list) {
             if (protocol.getType().equals(type)) {
@@ -78,7 +76,7 @@ public class AppTemplateServiceImpl implements AppTemplateService {
      * @return {@link List}
      */
     @Override
-    public List<Map> getAppTemplateFormSchema(String code) {
+    public Object getAppTemplateFormSchema(String code) {
         ApplicationService applicationService = applicationServiceLoader
             .getApplicationService(code);
         if (!Objects.isNull(applicationService)) {

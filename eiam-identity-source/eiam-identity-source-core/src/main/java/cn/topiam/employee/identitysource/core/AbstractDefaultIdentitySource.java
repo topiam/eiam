@@ -42,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
  * 这个只适合目前流行的钉钉、企业微信等，如果是AD,LDAP，不行
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/3/1 21:47
+ * Created by support@topiam.cn on 2022/3/1 21:47
  */
 @Slf4j
 @Getter

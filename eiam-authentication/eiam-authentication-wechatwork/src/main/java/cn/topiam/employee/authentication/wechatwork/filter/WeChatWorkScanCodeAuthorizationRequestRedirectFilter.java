@@ -38,25 +38,23 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.alibaba.fastjson2.JSONObject;
-
-import cn.topiam.employee.authentication.wechatwork.WeChatWorkIdpScanCodeConfig;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClient;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClientRepository;
+import cn.topiam.employee.authentication.wechatwork.WeChatWorkIdentityProviderOAuth2Config;
 import cn.topiam.employee.authentication.wechatwork.constant.WeChatWorkAuthenticationConstants;
-import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
-import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import static cn.topiam.employee.authentication.common.IdentityProviderType.WECHAT_WORK_QR;
+import static cn.topiam.employee.authentication.common.IdentityProviderType.WECHAT_WORK_OAUTH;
 import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.PROVIDER_CODE;
 
 /**
  * 微信扫码登录请求重定向过滤器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/20 21:22
+ * Created by support@topiam.cn on 2022/6/20 21:22
  */
 @SuppressWarnings("DuplicatedCode")
 public class WeChatWorkScanCodeAuthorizationRequestRedirectFilter extends OncePerRequestFilter {
@@ -65,7 +63,7 @@ public class WeChatWorkScanCodeAuthorizationRequestRedirectFilter extends OncePe
         .getLogger(WeChatWorkScanCodeAuthorizationRequestRedirectFilter.class);
 
     public static final AntPathRequestMatcher                                WECHAT_WORK_REQUEST_MATCHER    = new AntPathRequestMatcher(
-        WECHAT_WORK_QR.getAuthorizationPathPrefix() + "/" + "{" + PROVIDER_CODE + "}",
+        WECHAT_WORK_OAUTH.getAuthorizationPathPrefix() + "/" + "{" + PROVIDER_CODE + "}",
         HttpMethod.GET.name());
 
     /**
@@ -80,10 +78,10 @@ public class WeChatWorkScanCodeAuthorizationRequestRedirectFilter extends OncePe
 
     private static final StringKeyGenerator                                  DEFAULT_STATE_GENERATOR        = new Base64StringKeyGenerator(
         Base64.getUrlEncoder());
-    private final IdentityProviderRepository                                 identityProviderRepository;
+    private final RegisteredIdentityProviderClientRepository                 registeredIdentityProviderClientRepository;
 
-    public WeChatWorkScanCodeAuthorizationRequestRedirectFilter(IdentityProviderRepository identityProviderRepository) {
-        this.identityProviderRepository = identityProviderRepository;
+    public WeChatWorkScanCodeAuthorizationRequestRedirectFilter(RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository) {
+        this.registeredIdentityProviderClientRepository = registeredIdentityProviderClientRepository;
     }
 
     @Override
@@ -98,14 +96,14 @@ public class WeChatWorkScanCodeAuthorizationRequestRedirectFilter extends OncePe
         }
         Map<String, String> variables = matcher.getVariables();
         String providerCode = variables.get(PROVIDER_CODE);
-        Optional<IdentityProviderEntity> optional = identityProviderRepository
-            .findByCodeAndEnabledIsTrue(providerCode);
+        Optional<RegisteredIdentityProviderClient<WeChatWorkIdentityProviderOAuth2Config>> optional = registeredIdentityProviderClientRepository
+            .findByCode(providerCode);
         if (optional.isEmpty()) {
             throw new NullPointerException("未查询到身份提供商信息");
         }
-        IdentityProviderEntity entity = optional.get();
-        WeChatWorkIdpScanCodeConfig config = JSONObject.parseObject(entity.getConfig(),
-            WeChatWorkIdpScanCodeConfig.class);
+        RegisteredIdentityProviderClient<WeChatWorkIdentityProviderOAuth2Config> entity = optional
+            .get();
+        WeChatWorkIdentityProviderOAuth2Config config = entity.getConfig();
         Assert.notNull(config, "企业微信扫码登录配置不能为空");
         //构建授权请求
         OAuth2AuthorizationRequest.Builder builder = OAuth2AuthorizationRequest.authorizationCode()
@@ -130,7 +128,6 @@ public class WeChatWorkScanCodeAuthorizationRequestRedirectFilter extends OncePe
             linkedParameters.put(WeChatWorkAuthenticationConstants.LOGIN_TYPE,
                 WeChatWorkAuthenticationConstants.JSSDK);
             linkedParameters.put(WeChatWorkAuthenticationConstants.AGENT_ID, config.getAgentId());
-            linkedParameters.put(WeChatWorkAuthenticationConstants.HREF, STYLE_BASE64);
             parameters.clear();
             parameters.putAll(linkedParameters);
         });
@@ -146,8 +143,7 @@ public class WeChatWorkScanCodeAuthorizationRequestRedirectFilter extends OncePe
             authorizationRequest.getAuthorizationRequestUri());
     }
 
-    private static final String STYLE        = ""
-                                               + ".impowerBox .qrcode {width: 280px;border: none;margin-top:10px;}\n"
+    private static final String STYLE        = ".impowerBox .qrcode {width: 280px;border: none;margin-top:10px;}\n"
                                                + ".impowerBox .title {display: none;}\n"
                                                + ".impowerBox .info {display: none;}\n"
                                                + ".status_icon {display: none}\n"

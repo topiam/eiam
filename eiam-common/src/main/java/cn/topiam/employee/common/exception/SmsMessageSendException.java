@@ -25,7 +25,7 @@ import cn.topiam.employee.support.exception.TopIamException;
  * 短信消息发送失败
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/8/26 18:01
+ * Created by support@topiam.cn on 2023/8/26 18:01
  */
 public class SmsMessageSendException extends TopIamException {
     public SmsMessageSendException() {

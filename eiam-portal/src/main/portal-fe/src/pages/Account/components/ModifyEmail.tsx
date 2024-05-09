@@ -76,8 +76,8 @@ export default (props: {
           const { success } = await changeEmail(omit(formData, FieldNames.PASSWORD));
           if (success) {
             useApp.message.success(intl.formatMessage({ id: 'app.update_success' }));
-            await setVisible(false);
-            await setRefresh(true);
+            setVisible(false);
+            setRefresh(true);
             setHasSendCaptcha(false);
             return Promise.resolve();
           }

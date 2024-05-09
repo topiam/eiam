@@ -29,7 +29,7 @@ import jakarta.validation.constraints.NotBlank;
  * 编辑岗位入参
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/4/13 21:32
+ * Created by support@topiam.cn on 2023/4/13 21:32
  */
 @Data
 @Schema(description = "修改岗位入参")

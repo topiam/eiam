@@ -24,11 +24,23 @@ import cn.topiam.employee.support.web.converter.EnumConvert;
  * 应用默认分组
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/9/9 16:22
+ * Created by support@topiam.cn on 2023/9/9 16:22
  */
 public enum AppDefaultGroup implements BaseEnum {
-                                                 DEVELOPMENT("development", "开发类"), OFFICE("office",
-                                                                                           "办公类");
+                                                 /**
+                                                  * 开发类
+                                                  */
+                                                 DEVELOPMENT("development", "开发类"),
+
+                                                 /**
+                                                  * 运维类
+                                                  */
+                                                 OPS("ops", "运维类"),
+
+                                                 /**
+                                                  * 办公类
+                                                  */
+                                                 OFFICE("office", "办公类");
 
     private final String code;
     private final String desc;

@@ -21,7 +21,7 @@ package cn.topiam.employee.authentication.wechatwork.constant;
  * 企业微信
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/12/9 22:19
+ * Created by support@topiam.cn on 2021/12/9 22:19
  */
 public final class WeChatWorkAuthenticationConstants {
     public final static String APP_ID        = "appid";

@@ -26,7 +26,7 @@ import jakarta.persistence.Converter;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2022/5/22 23:25
+ * Created by support@topiam.cn on 2022/5/22 23:25
  */
 @Converter(autoApply = true)
 public class JwtIdTokenSubjectTypeConverter implements

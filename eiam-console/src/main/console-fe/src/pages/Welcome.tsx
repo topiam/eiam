@@ -127,7 +127,7 @@ const Welcome: React.FC = () => {
           </div>
           <p
             style={{
-              fontSize: '14px',
+              fontSize: '15px',
               color: 'rgba(0,0,0,0.65)',
               lineHeight: '22px',
               marginTop: 16,
@@ -174,7 +174,7 @@ const Welcome: React.FC = () => {
             <InfoCard
               index={4}
               title="实现应用单点登录"
-              href="https://eiam.topiam.cn/docs/application/"
+              href="https://eiam.topiam.cn/docs/portal/"
               desc="创建配置应用，实现应用单点登录。"
             />
             <InfoCard

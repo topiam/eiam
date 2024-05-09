@@ -17,29 +17,30 @@
  */
 package cn.topiam.employee.common.repository.app.impl;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.common.entity.account.query.UserListQuery;
 import cn.topiam.employee.common.entity.app.po.AppAccountPO;
 import cn.topiam.employee.common.entity.app.query.AppAccountQuery;
 import cn.topiam.employee.common.repository.app.AppAccountRepositoryCustomized;
-import cn.topiam.employee.common.repository.app.impl.mapper.AppAccountPoMapper;
 
 import lombok.AllArgsConstructor;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 
 /**
  * AppAccount Repository Customized
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020/12/29 21:27
+ * Created by support@topiam.cn on 2020/12/29 21:27
  */
 @Repository
 @AllArgsConstructor
@@ -54,64 +55,78 @@ public class AppAccountRepositoryCustomizedImpl implements AppAccountRepositoryC
      */
     @Override
     public Page<AppAccountPO> getAppAccountList(AppAccountQuery query, Pageable pageable) {
+        Map<String, Object> args = new HashMap<>();
         //@formatter:off
-        StringBuilder builder = new StringBuilder("""
+        String hql = """
                 SELECT
-                	a.id_,
-                	a.app_id,
-                	a.user_id,
-                	a.account_,
-                	a.create_time,
-                	u.username_,
-                	p.name_ AS app_name,
-                	p.type_ AS app_type,
-                	p.template_ AS app_template,
-                	p.protocol_ AS app_protocol
+                	NEW cn.topiam.employee.common.entity.app.po.AppAccountPO(a.id,
+                	a.appId,
+                	a.userId,
+                	a.account,
+                	a.createTime,
+                	a.defaulted,
+                	u.username,
+                	p.name,
+                	p.type,
+                	p.template,
+                	p.protocol)
                 FROM
-                	app_account a
-                	LEFT JOIN `user` u ON a.user_id = u.id_ AND u.is_deleted = '0'
-                	LEFT JOIN app p ON a.app_id = p.id_ AND p.is_deleted = '0'
-                WHERE
-                	a.is_deleted = '0'
-                """);
+                	AppAccountEntity a
+                	LEFT JOIN UserEntity u ON a.userId = u.id
+                	LEFT JOIN AppEntity p ON a.appId = p.id
+                	WHERE 1=1
+                """;
+        //@formatter:on
+        String whereSql = "";
         //用户名
         if (StringUtils.isNoneBlank(query.getUsername())) {
-            builder.append(" AND u.username_ like '%").append(query.getUsername()).append("%'");
+            whereSql += " AND u.username LIKE :username";
+            args.put("username", "%" + query.getUsername() + "%");
         }
         //用户ID
         if (StringUtils.isNoneBlank(query.getUserId())) {
-            builder.append(" AND u.id_ = '").append(query.getUserId()).append("%'");
+            whereSql += " AND u.id = :userId";
+            args.put("userId", query.getUserId());
         }
         //账户名称
         if (StringUtils.isNoneBlank(query.getAccount())) {
-            builder.append(" AND a.account_ like '%").append(query.getAccount()).append("%'");
+            whereSql += " AND a.account LIKE :account";
+            args.put("account", "%" + query.getAccount() + "%");
         }
 
         //应用id
         if (StringUtils.isNoneBlank(query.getAppId())) {
-            builder.append(" AND a.app_id = '").append(query.getAppId()).append("%'");
+            whereSql += " AND a.appId = :appId";
+            args.put("appId", query.getAppId());
         }
 
         //应用名称
-        if(StringUtils.isNotBlank(query.getAppName())){
-            builder.append(" AND p.name_ like '%").append(query.getAppName()).append("%'");
+        if (StringUtils.isNotBlank(query.getAppName())) {
+            whereSql += " AND p.name LIKE :appName";
+            args.put("appName", "%" + query.getAppName() + "%");
         }
-        //@formatter:on
-        String sql = builder.toString();
-        List<AppAccountPO> list = jdbcTemplate
-            .query(
-                builder.append(" LIMIT ").append(pageable.getPageNumber() * pageable.getPageSize())
-                    .append(",").append(pageable.getPageSize()).toString(),
-                new AppAccountPoMapper());
-        //@formatter:off
-        String countSql = "SELECT count(*) FROM (" + sql + ") app_account_";
-        //@formatter:on
-        Integer count = jdbcTemplate.queryForObject(countSql, Integer.class);
-        return new PageImpl<>(list, pageable, Objects.requireNonNull(count).longValue());
+        //按照创建时间倒序
+        TypedQuery<AppAccountPO> listQuery = entityManager.createQuery(hql + whereSql,
+            AppAccountPO.class);
+        args.forEach(listQuery::setParameter);
+        listQuery.setFirstResult((int) pageable.getOffset());
+        listQuery.setMaxResults(pageable.getPageSize());
+        String countSql = """
+                SELECT
+                	COUNT(DISTINCT a.id)
+                FROM
+                	AppAccountEntity a
+                	LEFT JOIN UserEntity u ON a.userId = u.id
+                	LEFT JOIN AppEntity p ON a.appId = p.id
+                	WHERE 1=1
+                """;
+        TypedQuery<Long> countQuery = entityManager.createQuery(countSql + whereSql, Long.class);
+        args.forEach(countQuery::setParameter);
+        return new PageImpl<>(listQuery.getResultList(), pageable, countQuery.getSingleResult());
     }
 
     /**
-     * JdbcTemplate
+     * EntityManager
      */
-    private final JdbcTemplate jdbcTemplate;
+    private final EntityManager entityManager;
 }

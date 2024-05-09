@@ -22,11 +22,13 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import cn.topiam.employee.support.enums.BaseEnum;
 import cn.topiam.employee.support.web.converter.EnumConvert;
 
+import lombok.Getter;
+
 /**
  * 短信类型
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/25 21:19
+ * Created by support@topiam.cn on 2021/9/25 21:19
  */
 public enum SmsType implements BaseEnum {
                                          /**
@@ -69,11 +71,6 @@ public enum SmsType implements BaseEnum {
                                          LOGIN("login", "登录验证", MessageCategory.CODE),
 
                                          /**
-                                          * 二次验证
-                                          */
-                                         AGAIN_VERIFY("again_verify", "二次验证", MessageCategory.CODE),
-
-                                         /**
                                           * 欢迎短信
                                           */
                                          WELCOME_SMS("welcome_sms", "欢迎短信", MessageCategory.NOTICE),
@@ -83,12 +80,7 @@ public enum SmsType implements BaseEnum {
                                           */
                                          PASSWORD_SOON_EXPIRED_REMIND("password_soon_expired_remind",
                                                                       "密码过期提醒",
-                                                                      MessageCategory.NOTICE),
-
-                                         /**
-                                          * 风险预警 暂不实现
-                                          */
-                                         WARING("warning", "风险预警", MessageCategory.NOTICE);
+                                                                      MessageCategory.NOTICE);
 
     /**
      * code
@@ -103,6 +95,7 @@ public enum SmsType implements BaseEnum {
     /**
      * 短信类型
      */
+    @Getter
     private final MessageCategory category;
 
     SmsType(String code, String desc, MessageCategory category) {
@@ -119,10 +112,6 @@ public enum SmsType implements BaseEnum {
     @Override
     public String getDesc() {
         return desc;
-    }
-
-    public MessageCategory getCategory() {
-        return category;
     }
 
     /**

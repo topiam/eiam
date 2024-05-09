@@ -38,8 +38,10 @@ import com.alibaba.fastjson2.JSON;
 import static org.springframework.security.oauth2.server.authorization.OAuth2TokenType.ACCESS_TOKEN;
 
 /**
+ * 不透明令牌 Introspector
+ *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/10/29 21:27
+ * Created by support@topiam.cn on 2022/10/29 21:27
  */
 public class OpaqueTokenIntrospector implements
                                      org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenIntrospector {

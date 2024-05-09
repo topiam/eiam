@@ -38,13 +38,13 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 
-import cn.topiam.employee.authentication.common.authentication.IdpUserDetails;
-import cn.topiam.employee.authentication.common.filter.AbstractIdpAuthenticationProcessingFilter;
-import cn.topiam.employee.authentication.common.service.UserIdpService;
-import cn.topiam.employee.authentication.qq.QqIdpOauthConfig;
-import cn.topiam.employee.common.entity.authn.IdentityProviderEntity;
-import cn.topiam.employee.common.repository.authentication.IdentityProviderRepository;
-import cn.topiam.employee.core.help.ServerHelp;
+import cn.topiam.employee.authentication.common.IdentityProviderAuthenticationService;
+import cn.topiam.employee.authentication.common.authentication.IdentityProviderUserDetails;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClient;
+import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClientRepository;
+import cn.topiam.employee.authentication.common.filter.AbstractIdentityProviderAuthenticationProcessingFilter;
+import cn.topiam.employee.authentication.qq.QqIdentityProviderOAuth2Config;
+import cn.topiam.employee.core.context.ContextService;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.support.util.HttpClientUtils;
@@ -63,10 +63,11 @@ import static cn.topiam.employee.authentication.qq.constant.QqAuthenticationCons
  * QQ登录
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/12/8 21:11
+ * Created by support@topiam.cn on 2021/12/8 21:11
  */
 @SuppressWarnings({ "AlibabaClassNamingShouldBeCamel", "DuplicatedCode" })
-public class QqOAuth2LoginAuthenticationFilter extends AbstractIdpAuthenticationProcessingFilter {
+public class QqOAuth2LoginAuthenticationFilter extends
+                                               AbstractIdentityProviderAuthenticationProcessingFilter {
     final String                              ERROR_CODE                   = "error";
     public final static String                DEFAULT_FILTER_PROCESSES_URI = QQ_OAUTH
         .getLoginPathPrefix() + "/" + "{" + PROVIDER_CODE + "}";
@@ -76,12 +77,13 @@ public class QqOAuth2LoginAuthenticationFilter extends AbstractIdpAuthentication
     /**
      * Creates a new instance
      *
-     * @param identityProviderRepository the {@link IdentityProviderRepository}
-     * @param userIdpService  {@link  UserIdpService}
+     * @param registeredIdentityProviderClientRepository the {@link RegisteredIdentityProviderClientRepository}
+     * @param identityProviderAuthenticationService  {@link  IdentityProviderAuthenticationService}
      */
-    public QqOAuth2LoginAuthenticationFilter(IdentityProviderRepository identityProviderRepository,
-                                             UserIdpService userIdpService) {
-        super(REQUEST_MATCHER, userIdpService, identityProviderRepository);
+    public QqOAuth2LoginAuthenticationFilter(RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository,
+                                             IdentityProviderAuthenticationService identityProviderAuthenticationService) {
+        super(REQUEST_MATCHER, identityProviderAuthenticationService,
+            registeredIdentityProviderClientRepository);
     }
 
     /**
@@ -120,9 +122,9 @@ public class QqOAuth2LoginAuthenticationFilter extends AbstractIdpAuthentication
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
         }
         //获取身份提供商
-        IdentityProviderEntity provider = getIdentityProviderEntity(providerCode);
-        QqIdpOauthConfig config = JSONObject.parseObject(provider.getConfig(),
-            QqIdpOauthConfig.class);
+        RegisteredIdentityProviderClient<QqIdentityProviderOAuth2Config> provider = getRegisteredIdentityProviderClient(
+            providerCode);
+        QqIdentityProviderOAuth2Config config = provider.getConfig();
         if (Objects.isNull(config)) {
             logger.error("未查询到QQ登录配置");
             //无效身份提供商
@@ -155,15 +157,16 @@ public class QqOAuth2LoginAuthenticationFilter extends AbstractIdpAuthentication
         }
         // 返回
         String openId = result.getString(OidcScopes.OPENID);
-        IdpUserDetails idpUserDetails = IdpUserDetails.builder().openId(openId)
-            .providerType(QQ_OAUTH).providerCode(providerCode).providerId(providerId).build();
-        return attemptAuthentication(request, response, idpUserDetails);
+        IdentityProviderUserDetails identityProviderUserDetails = IdentityProviderUserDetails
+            .builder().openId(openId).providerType(QQ_OAUTH).providerCode(providerCode)
+            .providerId(providerId).build();
+        return attemptAuthentication(request, response, identityProviderUserDetails);
 
     }
 
     public static String getLoginUrl(String providerId) {
-        String url = ServerHelp.getPortalPublicBaseUrl() + "/" + QQ_OAUTH.getLoginPathPrefix() + "/"
-                     + providerId;
+        String url = ContextService.getPortalPublicBaseUrl() + "/" + QQ_OAUTH.getLoginPathPrefix()
+                     + "/" + providerId;
         return UrlUtils.format(url);
     }
 

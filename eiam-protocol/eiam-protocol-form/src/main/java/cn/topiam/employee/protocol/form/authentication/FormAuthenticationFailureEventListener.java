@@ -36,7 +36,7 @@ import static cn.topiam.employee.audit.event.type.EventType.APP_SSO;
  * 认证失败监听
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/8 21:25
+ * Created by support@topiam.cn on 2023/7/8 21:25
  */
 public class FormAuthenticationFailureEventListener implements
                                                     ApplicationListener<AbstractAuthenticationFailureEvent> {
@@ -52,8 +52,9 @@ public class FormAuthenticationFailureEventListener implements
             FormRequestAuthenticationToken authentication = (FormRequestAuthenticationToken) event
                 .getAuthentication();
             FormProtocolConfig config = authentication.getConfig();
-            auditEventPublish.publish(APP_SSO, authentication, EventStatus.FAIL, Lists.newArrayList(
-                Target.builder().id(config.getAppId()).type(TargetType.APPLICATION).build()));
+            auditEventPublish.publish(APP_SSO, authentication, EventStatus.FAIL,
+                Lists.newArrayList(Target.builder().id(config.getAppId())
+                    .type(TargetType.APPLICATION).name(config.getAppName()).build()));
         }
     }
 

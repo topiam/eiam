@@ -34,7 +34,7 @@ import jakarta.validation.constraints.NotNull;
  * 策略配置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/9/24 23:10
+ * Created by support@topiam.cn on 2022/9/24 23:10
  */
 @Data
 @AllArgsConstructor

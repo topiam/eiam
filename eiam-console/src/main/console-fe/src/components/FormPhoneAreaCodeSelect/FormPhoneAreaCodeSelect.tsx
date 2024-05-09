@@ -15,41 +15,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { getPhoneAreaCodeList } from './server';
-import React, { useState } from 'react';
+import React from 'react';
 import { ProFormSelect, ProFormSelectProps } from '@ant-design/pro-components';
 import { PhoneAreaCode } from './data.d';
-import { RequestOptionsType } from '@ant-design/pro-components';
 
 export default (props: Omit<ProFormSelectProps<PhoneAreaCode>, 'request'>) => {
   const { initialValue = '+86' } = props;
-  const [data, setData] = useState<RequestOptionsType[]>();
 
   return (
     <ProFormSelect
       {...props}
       initialValue={initialValue}
-      request={async ({ keyWords }) => {
-        if (data) {
-          if (keyWords) {
-            return data.filter(({ value, label }) => {
-              return (value as string)?.includes(keyWords) || (label as string)?.includes(keyWords);
-            });
-          }
-          return data;
-        }
-        const { result, success } = await getPhoneAreaCodeList();
-        if (success && result) {
-          const data = result?.map((value: PhoneAreaCode) => {
-            return {
-              value: value.phoneCode,
-              label: `${value.phoneCode} ${value.chineseName}`,
-            };
-          });
-          setData(data);
-          return data;
-        }
-        return [];
+      request={async () => {
+        return [{ value: '+86', label: `+86 中国` }];
       }}
     />
   );

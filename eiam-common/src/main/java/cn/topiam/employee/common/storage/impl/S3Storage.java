@@ -46,11 +46,10 @@ import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
-import static cn.topiam.employee.common.constant.StorageConstants.URL_REGEXP;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/10 21:36
+ * Created by support@topiam.cn on 2021/11/10 21:36
  */
 @Slf4j
 public class S3Storage extends AbstractStorage {

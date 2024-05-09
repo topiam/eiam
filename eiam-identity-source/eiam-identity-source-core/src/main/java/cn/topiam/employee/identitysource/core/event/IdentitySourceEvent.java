@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
      * 身份源配置事件
      *
      * @author TopIAM
-     * Created by support@topiam.cn on  2022/3/20 21:58
+     * Created by support@topiam.cn on 2022/3/20 21:58
      */
 @Data
 @RequiredArgsConstructor

@@ -36,7 +36,7 @@ import cn.topiam.employee.authentication.common.authentication.OtpAuthentication
  * TopIamAuthenticationTokenDeserializer
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/10 22:25
+ * Created by support@topiam.cn on 2021/11/10 22:25
  */
 @SuppressWarnings("DuplicatedCode")
 class OtpAuthenticationTokenDeserializer extends JsonDeserializer<OtpAuthentication> {

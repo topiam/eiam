@@ -21,7 +21,7 @@ package cn.topiam.employee.protocol.jwt.exception;
  * 异常CODE
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/19 21:19
+ * Created by support@topiam.cn on 2023/7/19 21:19
  */
 public final class JwtErrorCodes {
 

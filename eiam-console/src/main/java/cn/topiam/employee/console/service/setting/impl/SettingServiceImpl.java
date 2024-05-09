@@ -26,14 +26,14 @@ import cn.topiam.employee.console.service.setting.SettingService;
 import cn.topiam.employee.support.util.BeanUtils;
 
 import lombok.AllArgsConstructor;
-import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_BY;
-import static cn.topiam.employee.support.repository.domain.BaseEntity.LAST_MODIFIED_TIME;
+import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_BY;
+import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_TIME;
 
 /**
  * 设置impl
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/9 22:29
+ * Created by support@topiam.cn on 2021/11/9 22:29
  */
 @AllArgsConstructor
 public class SettingServiceImpl implements SettingService {

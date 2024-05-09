@@ -20,14 +20,14 @@ package cn.topiam.employee.common.entity.identitysource;
 import java.io.Serial;
 
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SoftDelete;
 import org.hibernate.type.SqlTypes;
 
 import cn.topiam.employee.common.entity.identitysource.config.JobConfig;
 import cn.topiam.employee.common.entity.identitysource.config.StrategyConfig;
 import cn.topiam.employee.common.enums.identitysource.IdentitySourceProvider;
-import cn.topiam.employee.support.repository.domain.LogicDeleteEntity;
+import cn.topiam.employee.support.repository.SoftDeleteConverter;
+import cn.topiam.employee.support.repository.base.BaseEntity;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -37,8 +37,7 @@ import lombok.experimental.Accessors;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_SET;
-import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOFT_DELETE_WHERE;
+import static cn.topiam.employee.support.repository.base.BaseEntity.IS_DELETED_COLUMN;
 
 /**
  * <p>
@@ -46,17 +45,16 @@ import static cn.topiam.employee.support.repository.domain.LogicDeleteEntity.SOF
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-08-16
+ * Created by support@topiam.cn on 2020-08-16
  */
 @Getter
 @Setter
 @ToString
 @Entity
 @Accessors(chain = true)
-@Table(name = "identity_source")
-@SQLDelete(sql = "update identity_source set " + SOFT_DELETE_SET + " where id_ = ?")
-@Where(clause = SOFT_DELETE_WHERE)
-public class IdentitySourceEntity extends LogicDeleteEntity<Long> {
+@Table(name = "eiam_identity_source")
+@SoftDelete(columnName = IS_DELETED_COLUMN, converter = SoftDeleteConverter.class)
+public class IdentitySourceEntity extends BaseEntity {
 
     @Serial
     private static final long      serialVersionUID = -7936931011805155568L;

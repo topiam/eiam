@@ -21,7 +21,7 @@ package cn.topiam.employee.authentication.gitee.constant;
  * Gitee 认证常量
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/12/9 22:19
+ * Created by support@topiam.cn on 2021/12/9 22:19
  */
 public final class GiteeAuthenticationConstants {
 

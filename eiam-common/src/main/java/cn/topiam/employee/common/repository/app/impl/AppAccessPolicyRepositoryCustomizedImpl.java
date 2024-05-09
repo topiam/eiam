@@ -17,35 +17,32 @@
  */
 package cn.topiam.employee.common.repository.app.impl;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.common.entity.account.query.UserListQuery;
 import cn.topiam.employee.common.entity.app.po.AppAccessPolicyPO;
 import cn.topiam.employee.common.entity.app.query.AppAccessPolicyQuery;
-import cn.topiam.employee.common.enums.app.AuthorizationType;
 import cn.topiam.employee.common.repository.app.AppAccessPolicyRepositoryCustomized;
-import cn.topiam.employee.common.repository.app.impl.mapper.AppAccessPolicyPoMapper;
 import cn.topiam.employee.support.exception.TopIamException;
 
-import lombok.AllArgsConstructor;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 
 /**
  * AppPolicy Repository Customized
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020/12/29 21:27
+ * Created by support@topiam.cn on 2020/12/29 21:27
  */
 @Repository
-@AllArgsConstructor
 public class AppAccessPolicyRepositoryCustomizedImpl implements
                                                      AppAccessPolicyRepositoryCustomized {
 
@@ -58,122 +55,122 @@ public class AppAccessPolicyRepositoryCustomizedImpl implements
      */
     @Override
     public Page<AppAccessPolicyPO> getAppPolicyList(AppAccessPolicyQuery query, Pageable pageable) {
+        Map<String, Object> args = new HashMap<>();
         //@formatter:off
-        StringBuilder builder = new StringBuilder("""
+        String hql = """
                 SELECT
-                	a.id_,
-                	a.app_id,
-                	a.subject_id,
-                	a.subject_type,
-                	a.create_time,
-                	subject.name_,
-                	app.name_ AS app_name,
-                	app.type_ AS app_type,
-                	app.template_ AS app_template,
-                	app.protocol_ AS app_protocol
+                	NEW cn.topiam.employee.common.entity.app.po.AppAccessPolicyPO(a.id,
+                	a.appId,
+                	a.subjectId,
+                	a.subjectType,
+                	a.enabled,
+                	a.createTime,
+                	subject.name,
+                	app.name,
+                	app.icon,
+                	app.type,
+                	app.template,
+                	app.protocol)
                 FROM
-                	app_access_policy a
-                	INNER JOIN app ON a.app_id = app.id_ AND app.is_deleted = '0'
+                	AppAccessPolicyEntity a
+                	INNER JOIN AppEntity app ON a.appId = app.id
                 INNER JOIN
-                ( SELECT
-                	id_,
-                	name_,
-                	is_deleted
-                FROM
-                	user_group UNION ALL
+                (
                 SELECT
-                	id_,
-                	name_,
-                	is_deleted
+                    id as id,
+                	name as name
                 FROM
-                	organization UNION ALL
+                	UserGroupEntity UNION ALL
                 SELECT
-                	id_,
-                	username_ AS name_,
-                	is_deleted
+                	id as id,
+                	name as name
                 FROM
-                	`user`
-                	) `subject` ON a.subject_id = `subject`.id_ AND `subject`.is_deleted = '0'
-                WHERE
-                	a.is_deleted = '0'
-                """);
+                	OrganizationEntity UNION ALL
+                SELECT
+                	id as id,
+                	username AS name
+                FROM
+                	UserEntity
+                	) subject ON a.subjectId = subject.id
+                WHERE 1=1
+                """;
+        //@formatter:on
+        String whereSql = "";
         if (ObjectUtils.isNotEmpty(query.getSubjectType())) {
-            builder.append(" AND a.subject_type = '").append(query.getSubjectType().getCode()).append("'");
+            whereSql += " AND subjectType = :subjectType";
+            args.put("subjectType", query.getSubjectType());
         }
         //主体名称
         if (StringUtils.isNotEmpty(query.getSubjectName())) {
-            builder.append(" AND subject.name_ like '%").append(query.getSubjectName()).append("%'");
+            whereSql += " AND subject.name LIKE :subjectName";
+            args.put("subjectName", "%" + query.getSubjectName() + "%");
         }
 
         //主体ID
         if (StringUtils.isNotBlank(query.getSubjectId())) {
-            builder.append(" AND a.subject_id = '").append(query.getSubjectId()).append("'");
+            whereSql += " AND a.subjectId = :subjectId";
+            args.put("subjectId", query.getSubjectId());
         } else {
             if (StringUtils.isEmpty(query.getAppId())) {
                 throw new TopIamException("主体ID不能为空");
             }
         }
 
-        if(StringUtils.isNotBlank(query.getAppId())){
-            //应用ID
-            builder.append(" AND a.app_id = '").append(query.getAppId()).append("'");
+        //应用ID
+        if (StringUtils.isNotBlank(query.getAppId())) {
+            whereSql += " AND a.appId = :appId";
+            args.put("appId", query.getAppId());
         }
 
         //应用名称
         if (StringUtils.isNotBlank(query.getAppName())) {
-            builder.append(" AND app.name_ like '%").append(query.getAppName()).append("'");
+            whereSql += " AND app.name LIKE :appName";
+            args.put("appName", "%" + query.getAppName() + "%");
         }
-        //@formatter:on
-        String sql = builder.toString();
-        List<AppAccessPolicyPO> list = jdbcTemplate.query(
-            builder.append(" LIMIT ").append(pageable.getPageNumber() * pageable.getPageSize())
-                .append(",").append(pageable.getPageSize()).toString(),
-            new AppAccessPolicyPoMapper());
-        //@formatter:off
-        String countSql = "SELECT count(*) FROM (" + sql + ") app_access_policy_";
-        //@formatter:on
-        Integer count = jdbcTemplate.queryForObject(countSql, Integer.class);
-        return new PageImpl<>(list, pageable, Objects.requireNonNull(count).longValue());
-    }
 
-    /**
-     * 用户是否允许访问应用
-     *
-     * @param appId  {@link Long}
-     * @param userId {@link Long}
-     * @return {@link Boolean}
-     */
-    @Override
-    public Boolean hasAllowAccess(Long appId, Long userId) {
-        //@formatter:off
-        String builder = """
+        //按照创建时间倒序
+        TypedQuery<AppAccessPolicyPO> listQuery = entityManager.createQuery(hql + whereSql,
+            AppAccessPolicyPO.class);
+        args.forEach(listQuery::setParameter);
+        listQuery.setFirstResult((int) pageable.getOffset());
+        listQuery.setMaxResults(pageable.getPageSize());
+        String countSql = """
                 SELECT
-                	count(*) as count
+                	COUNT(DISTINCT a.id)
                 FROM
-                    app LEFT JOIN
-                	app_access_policy aap ON app.id_ = aap.app_id AND aap.is_deleted = '0'
-                	WHERE app.id_ = '%s' AND app.is_deleted = '0' AND (app.authorization_type = '%s'
-                	 OR (aap.subject_id IN (
-                        SELECT
-                            id_
-                        FROM
-                            user_group_member
-                        WHERE user_id = '%3$s'
-                         UNION ALL
-                        SELECT
-                        	id_
-                        FROM
-                        	organization_member
-                        WHERE user_id = '%3$s')
-                      OR aap.subject_id = '%3$s'))
-                """.formatted(appId, AuthorizationType.ALL_ACCESS.getCode(), userId);
-        //@formatter:on
-        Integer count = jdbcTemplate.queryForObject(builder, Integer.class);
-        return !Objects.isNull(count) && count > 0;
+                	AppAccessPolicyEntity a
+                	INNER JOIN AppEntity app ON a.appId = app.id
+                INNER JOIN
+                (
+                SELECT
+                	id as id,
+                	name as name
+                FROM
+                	UserGroupEntity UNION ALL
+                SELECT
+                	id as id,
+                	name as name
+                FROM
+                	OrganizationEntity UNION ALL
+                SELECT
+                	id as id,
+                	username AS name
+                FROM
+                	UserEntity
+                	) subject ON a.subjectId = subject.id
+                WHERE 1=1
+                """;
+        TypedQuery<Long> countQuery = entityManager.createQuery(countSql + whereSql, Long.class);
+        args.forEach(countQuery::setParameter);
+        return new PageImpl<>(listQuery.getResultList(), pageable, countQuery.getSingleResult());
     }
 
     /**
-     * JdbcTemplate
+     * EntityManager
      */
-    private final JdbcTemplate jdbcTemplate;
+    private final EntityManager entityManager;
+
+    public AppAccessPolicyRepositoryCustomizedImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 }

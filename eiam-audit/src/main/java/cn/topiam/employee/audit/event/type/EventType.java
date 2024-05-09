@@ -32,7 +32,7 @@ import lombok.Getter;
  * 事件类型
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/9/29 21:00
+ * Created by support@topiam.cn on 2021/9/29 21:00
  */
 @Getter
 public enum EventType {
@@ -305,6 +305,15 @@ public enum EventType {
                         */
                        APP_AUTHORIZATION(AppEventType.APP_ACCESS_POLICY),
                        /**
+                        * 启用应用访问授权
+                        */
+                       ENABLE_APP_ACCESS_POLICY(AppEventType.ENABLE_APP_ACCESS_POLICY),
+
+                       /**
+                        * 禁用应用访问授权
+                        */
+                       DISABLE_APP_ACCESS_POLICY(AppEventType.DISABLE_APP_ACCESS_POLICY),
+                       /**
                         * 删除应用授权
                         */
                        APP_CANCEL_ACCESS_POLICY(AppEventType.APP_CANCEL_ACCESS_POLICY),
@@ -312,6 +321,10 @@ public enum EventType {
                         * 添加应用账户
                         */
                        ADD_APP_ACCOUNT(AppEventType.ADD_APP_ACCOUNT),
+                       /**
+                        * 更新默认应用账户
+                        */
+                       UPDATE_DEFAULT_APP_ACCOUNT(AppEventType.UPDATE_DEFAULT_APP_ACCOUNT),
                        /**
                         * 删除应用账户
                         */

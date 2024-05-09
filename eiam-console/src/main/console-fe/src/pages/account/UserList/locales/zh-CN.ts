@@ -17,7 +17,7 @@
  */
 export default {
   'pages.account.user_list.desc':
-    '组织与用户用于解决企业组织、用户等实体的管理问题。这些实体您可以直接在TopIAM中进行维护，也可以通过配置身份源后，同步身份源的数据。',
+    '组织与用户用于解决企业组织、用户等实体的管理问题。这些实体您可以直接在TOPIAM中进行维护，也可以通过配置身份源后，同步身份源的数据。',
   'pages.account.user_list.common.base': '基础字段',
   'pages.account.user_list.common.custom': '扩展字段',
   'pages.account.user_list.common.step_next': '下一步',
@@ -31,7 +31,6 @@ export default {
   'pages.account.user_list.user.columns.data_origin': '数据来源',
   'pages.account.user_list.user.columns.data_origin.value_enum.input': '自建',
   'pages.account.user_list.user.columns.data_origin.value_enum.dingtalk': '钉钉导入',
-  'pages.account.user_list.user.columns.data_origin.value_enum.wechat': '企业微信导入',
   'pages.account.user_list.user.columns.data_origin.value_enum.feishu': '飞书导入',
   'pages.account.user_list.user.columns.org_display_path': '所属组织',
   'pages.account.user_list.user.columns.status': '状态',
@@ -39,17 +38,23 @@ export default {
   'pages.account.user_list.user.columns.status.value_enum.password_expired_locked': '密码过期锁定',
   'pages.account.user_list.user.columns.last_auth_time': '最后登录时间',
   'pages.account.user_list.user.columns.option': '操作',
-  'pages.account.user_list.user.columns.option.disable.popconfirm':
-    '禁用后该用户无法使用，确定禁用此用户？',
-  'pages.account.user_list.user.columns.option.enable.popconfirm': '确定启用该用户吗？',
-  'pages.account.user_list.user.columns.option.delete': '删除用户',
-  'pages.account.user_list.user.columns.option.delete.popconfirm':
-    '删除后该用户无法使用，确定删除此用户？',
-  'pages.account.user_list.user.columns.option.reset_password': '重置密码',
-  'pages.account.user_list.user.table_alert_option_render': '您确定要批量删除选中用户吗？',
+  'pages.account.user_list.user.columns.option.disable': '禁用',
+  'pages.account.user_list.user.columns.option.disable_title': '确定禁用此用户？',
+  'pages.account.user_list.user.columns.option.disable_content':
+    '禁用后该用户无法使用，请谨慎操作！',
+  'pages.account.user_list.user.columns.option.enable_title': '确定启用该用户吗？',
+  'pages.account.user_list.user.columns.option.enable': '启用',
+  'pages.account.user_list.user.columns.option.enable_content': '启用后用户将恢复正常使用',
   'pages.account.user_list.user.columns.option.unlock': '解锁',
   'pages.account.user_list.user.columns.option.unlock_title': '确定解锁该用户吗？',
   'pages.account.user_list.user.columns.option.unlock_content': '解锁后用户将恢复正常使用',
+  'pages.account.user_list.user.columns.option.delete': '删除用户',
+  'pages.account.user_list.user.columns.option.delete_title': '确定要删除该用户吗？',
+  'pages.account.user_list.user.columns.option.delete_content': '删除后将无法恢复，请谨慎操作！',
+  'pages.account.user_list.user.columns.option.move_user_organization': '移动组织',
+  'pages.account.user_list.user.columns.option.reset_password': '重置密码',
+  'pages.account.user_list.user.batch_delete_title': '确定要批量删除选中用户吗？',
+  'pages.account.user_list.user.batch_delete_content': '删除后将无法恢复，请谨慎操作！',
   'pages.account.user_list.user.toolbar.tooltip.title':
     '若不勾选，则只会搜索当前直属节点的账户，不包含下级节点账户。',
   'pages.account.user_list.user.toolbar.tooltip.text': '包含节点下全部账户',
@@ -102,12 +107,13 @@ export default {
   'pages.account.user_list.user.common.form.notice_channels.options.1': '短信',
 
   'pages.account.user_list.organization.search_tree.search.placeholder': '输入组织名称或组织编码',
-  'pages.account.user_list.organization.tree.menu_items.item.0': '新增子组织',
-  'pages.account.user_list.organization.tree.menu_items.item.1': '编辑组织',
-  'pages.account.user_list.organization.tree.menu_items.item.2': '移动组织',
-  'pages.account.user_list.organization.tree.menu_items.item.3': '删除组织',
-  'pages.account.user_list.organization.tree.menu_items.item.3.confirm.content':
-    '删除操作无法恢复，请谨慎删除',
+  'pages.account.user_list.organization.tree.menu_items.add': '新增子组织',
+  'pages.account.user_list.organization.tree.menu_items.update': '编辑组织',
+  'pages.account.user_list.organization.tree.menu_items.move': '移动组织',
+  'pages.account.user_list.organization.tree.menu_items.delete': '删除组织',
+  'pages.account.user_list.organization.tree.menu_items.delete_title': '确定要删除该组织吗？',
+  'pages.account.user_list.organization.tree.menu_items.delete_title_content':
+    '删除操作无法恢复，请谨慎操作！',
   'pages.account.user_list.organization.move_drawer': '移动组织',
   'pages.account.user_list.organization.move_drawer.alert.message':
     '请选择需要移动到的部门或组织, 并点击确认按钮。',

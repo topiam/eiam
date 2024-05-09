@@ -15,13 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { RESULT_STATE } from '@/constant';
-import { accountLogin, getCurrentStatus, getLoginPublicSecret } from './service';
+import { RESULT_STATE, SESSION_STATUS } from '@/constant';
+import { accountLogin, getLoginPublicSecret } from './service';
+import { getCurrentStatus } from '@/services';
 import { aesEcbEncrypt } from '@/utils/aes';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { LoginFormPage, ProFormCheckbox, ProFormText } from '@ant-design/pro-components';
 import { useAsyncEffect, useRequest } from 'ahooks';
-import { Alert, App, Form } from 'antd';
+import { Alert, App, Form, Image, Modal } from 'antd';
 import React, { useState } from 'react';
 import { FormattedMessage, Helmet, history, useIntl, useModel } from '@umijs/max';
 import queryString from 'query-string';
@@ -29,6 +30,7 @@ import { flushSync } from 'react-dom';
 import classnames from 'classnames';
 import useStyle from './style';
 import PageLoading from '@/components/PageLoading';
+import { RESET_PASSWORD } from '@/utils/utils';
 
 const prefixCls = 'login';
 
@@ -42,6 +44,7 @@ const LoginMessage: React.FC<{
   content: string;
 }> = ({ content }) => <Alert message={content} type="error" showIcon />;
 const Login: React.FC = () => {
+  const previewEnv = process.env.PREVIEW_ENV;
   const [userLoginState, setUserLoginState] = useState<{ message: string; status: string }>();
   const { initialState, setInitialState } = useModel('@@initialState');
   const [form] = Form.useForm();
@@ -50,6 +53,9 @@ const Login: React.FC = () => {
   const { styles } = useStyle(prefixCls);
   /** 加载状态 */
   const [statusLoading, setStatusLoading] = useState<boolean>(false);
+  /** 状态 */
+  const [status, setStatus] = useState<SESSION_STATUS | string>();
+  const [previewAccountModalOpen, setPreviewAccountModalOpen] = useState<boolean>(false);
   /**
    * 获取用户信息
    */
@@ -92,9 +98,33 @@ const Login: React.FC = () => {
         goto();
         return;
       }
+      setStatus(result.status);
     }
     setStatusLoading(false);
   }, []);
+
+  useAsyncEffect(async () => {
+    if (status === SESSION_STATUS.REQUIRE_RESET_PASSWORD) {
+      message
+        .loading(
+          intl.formatMessage({
+            id: 'pages.login.reset_password_jumping',
+          }),
+          1,
+        )
+        .then(() => {
+          const query = queryString.parse(history.location.search);
+          const { redirect_uri } = query as { redirect_uri: string };
+          let settings: Record<string, string> = { pathname: RESET_PASSWORD };
+          settings = {
+            ...settings,
+            search: queryString.stringify({ redirect_uri: redirect_uri }),
+          };
+          const href = history.createHref(settings);
+          window.location.replace(href);
+        });
+    }
+  }, [status]);
 
   /**
    * 提交
@@ -116,17 +146,21 @@ const Login: React.FC = () => {
     if (!redirect_uri) {
       redirect_uri = window.location.href;
     }
-    // prettier-ignore
     const result = await accountLogin({ ...values, password, redirect_uri: redirect_uri });
     setUserLoginState({ message: '', status: '' });
     if (result?.success) {
+      // 重置密码
+      if (result.status === SESSION_STATUS.REQUIRE_RESET_PASSWORD) {
+        setStatus(SESSION_STATUS.REQUIRE_RESET_PASSWORD);
+        return Promise.resolve(false);
+      }
       await fetchUserInfo();
       message.loading({
         content: intl.formatMessage({ id: 'pages.login.success-prompt' }),
         key: 'loading',
         duration: 0,
       });
-      await goto();
+      goto();
       message.destroy('loading');
       return Promise.resolve(true);
     }
@@ -144,7 +178,9 @@ const Login: React.FC = () => {
   });
   return (
     <div className={styles.main}>
-      {!statusLoading ? (
+      {statusLoading || status === SESSION_STATUS.REQUIRE_RESET_PASSWORD ? (
+        <PageLoading />
+      ) : (
         <>
           <Helmet>
             <link rel="icon" href={'/favicon.ico'} />
@@ -235,26 +271,41 @@ const Login: React.FC = () => {
                 <ProFormCheckbox noStyle name="remember-me">
                   <FormattedMessage id="pages.login.remember-me" />
                 </ProFormCheckbox>
-                <a
-                  style={{
-                    float: 'right',
-                  }}
-                  onClick={async () => {
-                    message.info(
-                      intl.formatMessage({
-                        id: 'app.not_yet_realized',
-                      }),
-                    );
-                  }}
-                >
-                  <FormattedMessage id="pages.login.forgot-password" />
-                </a>
+                {previewEnv && (
+                  <a
+                    style={{
+                      float: 'right',
+                      color: 'red',
+                    }}
+                    onClick={() => {
+                      setPreviewAccountModalOpen(true);
+                    }}
+                  >
+                    <FormattedMessage id="pages.login.get-preview-account" />
+                  </a>
+                )}
               </div>
             </LoginFormPage>
+            <Modal
+              title="提示"
+              open={previewAccountModalOpen}
+              centered
+              destroyOnClose
+              footer={null}
+              onCancel={() => {
+                setPreviewAccountModalOpen(false);
+              }}
+            >
+              <div style={{ textAlign: 'center' }}>
+                <Image src={'/ade5b70f.jpg'} preview={false} alt="" style={{ height: '250px' }} />
+                <p style={{ fontSize: '16px' }}>
+                  <span style={{ color: '#1890FF' }}>关注公众号</span>，回复
+                  <span style={{ color: '#ff4626' }}>管理端演示</span>，获取账号密码
+                </p>
+              </div>
+            </Modal>
           </div>
         </>
-      ) : (
-        <PageLoading />
       )}
     </div>
   );

@@ -20,17 +20,31 @@ import { Form, Spin } from 'antd';
 import React, { useState } from 'react';
 import { useIntl } from '@@/exports';
 import { getAppGroup } from '@/pages/app/AppGroup/service';
+import { useAsyncEffect } from 'ahooks';
 
 export default (props: {
   id: string;
   open: boolean;
-  onFinish: (formData: Record<string, string>) => Promise<boolean | void>;
+  afterClose: () => void;
+  onFinish: (formData: Record<string, string>) => Promise<void>;
   onCancel: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }) => {
-  const { id, open, onCancel, onFinish } = props;
+  const { id, open, onCancel, onFinish, afterClose } = props;
   const [form] = Form.useForm();
   const intl = useIntl();
   const [loading, setLoading] = useState<boolean>(false);
+
+  useAsyncEffect(async () => {
+    if (open) {
+      setLoading(true);
+      const { result, success } = await getAppGroup(id).finally(() => {
+        setLoading(false);
+      });
+      if (success) {
+        form.setFieldsValue(result);
+      }
+    }
+  }, [open]);
 
   return (
     <ModalForm
@@ -48,17 +62,11 @@ export default (props: {
         maskClosable: true,
         destroyOnClose: true,
         onCancel: onCancel,
-      }}
-      onOpenChange={async (visible) => {
-        if (visible) {
-          setLoading(true);
-          const { result, success } = await getAppGroup(id).finally(() => {
-            setLoading(false);
-          });
-          if (success) {
-            form.setFieldsValue(result);
+        afterClose: () => {
+          if (afterClose) {
+            afterClose();
           }
-        }
+        },
       }}
       onFinish={async (values) => {
         setLoading(true);

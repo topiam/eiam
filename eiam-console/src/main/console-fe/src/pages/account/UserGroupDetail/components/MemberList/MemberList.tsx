@@ -20,11 +20,11 @@ import {
   getUserGroupMemberList,
   removeUserGroupMember,
 } from '@/services/account';
-import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 
-import { App, Avatar, Button, Image, Popconfirm, Space, Table } from 'antd';
+import { App, Avatar, Button, Image, Space, Table } from 'antd';
 import { useRef, useState } from 'react';
 import AddMember from '../AddMember';
 import { useIntl } from '@umijs/max';
@@ -39,7 +39,7 @@ export default (props: { id: string }) => {
   const { id } = props;
   const actionRef = useRef<ActionType>();
   const intl = useIntl();
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   // 添加成员
   const [addMember, setAddMember] = useState<boolean>(false);
 
@@ -114,41 +114,41 @@ export default (props: { id: string }) => {
       fixed: 'right',
       valueType: 'option',
       render: (_, row) => [
-        <Popconfirm
-          title={intl.formatMessage({
-            id: 'pages.account.user_group_detail.member_list.columns.option.popconfirm.title',
-          })}
-          placement="bottomRight"
-          icon={
-            <QuestionCircleOutlined
-              style={{
-                color: 'red',
-              }}
-            />
-          }
-          onConfirm={async () => {
-            const { success } = await removeUserGroupMember(id, [row.id]);
-            if (success) {
-              message.success(intl.formatMessage({ id: 'app.operation_success' }));
-              actionRef.current?.reload();
-            }
+        <a
+          target="_blank"
+          key="remove"
+          style={{
+            color: 'red',
           }}
-          okText={intl.formatMessage({ id: 'app.yes' })}
-          cancelText={intl.formatMessage({ id: 'app.no' })}
-          key="delete"
+          onClick={() => {
+            const confirmed = modal.error({
+              title: intl.formatMessage({
+                id: 'pages.account.user_group_detail.member_list.columns.option.remove_title',
+              }),
+              content: intl.formatMessage({
+                id: 'pages.account.user_group_detail.member_list.columns.option.remove_content',
+              }),
+              okText: intl.formatMessage({ id: 'app.confirm' }),
+              centered: true,
+              okType: 'primary',
+              okCancel: true,
+              cancelText: intl.formatMessage({ id: 'app.cancel' }),
+              onOk: async () => {
+                const { success } = await removeUserGroupMember(id, [row.id]);
+                if (success) {
+                  confirmed.destroy();
+                  message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                  actionRef.current?.reload();
+                  return;
+                }
+              },
+            });
+          }}
         >
-          <a
-            target="_blank"
-            key="remove"
-            style={{
-              color: 'red',
-            }}
-          >
-            {intl.formatMessage({
-              id: 'pages.account.user_group_detail.member_list.columns.option.popconfirm.remove',
-            })}
-          </a>
-        </Popconfirm>,
+          {intl.formatMessage({
+            id: 'pages.account.user_group_detail.member_list.columns.option.remove',
+          })}
+        </a>,
       ],
     },
   ];
@@ -175,37 +175,42 @@ export default (props: { id: string }) => {
         tableAlertOptionRender={(rowSelection) => {
           return (
             <Space size={16}>
-              <Popconfirm
-                title={intl.formatMessage({
-                  id: 'pages.account.user_group_detail.member_list.columns.option.popconfirm.title',
-                })}
-                placement="bottomRight"
-                icon={
-                  <QuestionCircleOutlined
-                    style={{
-                      color: 'red',
-                    }}
-                  />
-                }
-                onConfirm={async () => {
-                  const { success } = await removeUserGroupMember(id, rowSelection.selectedRowKeys);
-                  if (success) {
-                    message.success(intl.formatMessage({ id: 'app.operation_success' }));
-                    rowSelection.onCleanSelected();
-                    actionRef.current?.reload();
-                    return;
-                  }
+              <a
+                target="_blank"
+                key="remove"
+                style={{ color: 'red' }}
+                onClick={() => {
+                  const confirmed = modal.error({
+                    title: intl.formatMessage({
+                      id: 'pages.account.user_group_detail.member_list.columns.option.remove_title',
+                    }),
+                    content: intl.formatMessage({
+                      id: 'pages.account.user_group_detail.member_list.columns.option.remove_content',
+                    }),
+                    okText: intl.formatMessage({ id: 'app.confirm' }),
+                    centered: true,
+                    okType: 'primary',
+                    okCancel: true,
+                    cancelText: intl.formatMessage({ id: 'app.cancel' }),
+                    onOk: async () => {
+                      const { success } = await removeUserGroupMember(
+                        id,
+                        rowSelection.selectedRowKeys,
+                      );
+                      if (success) {
+                        confirmed.destroy();
+                        message.success(intl.formatMessage({ id: 'app.operation_success' }));
+                        actionRef.current?.reload();
+                        return;
+                      }
+                    },
+                  });
                 }}
-                okText={intl.formatMessage({ id: 'app.yes' })}
-                cancelText={intl.formatMessage({ id: 'app.no' })}
-                key="batch_delete"
               >
-                <a target="_blank" key="remove" style={{ color: 'red' }}>
-                  {intl.formatMessage({
-                    id: 'pages.account.user_group_detail.member_list.table_alert_option_render.popconfirm.remove',
-                  })}
-                </a>
-              </Popconfirm>
+                {intl.formatMessage({
+                  id: 'pages.account.user_group_detail.member_list.table_alert_option_render.remove',
+                })}
+              </a>
             </Space>
           );
         }}

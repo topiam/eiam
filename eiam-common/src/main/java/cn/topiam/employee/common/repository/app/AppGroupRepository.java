@@ -17,28 +17,26 @@
  */
 package cn.topiam.employee.common.repository.app;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.common.entity.app.AppGroupEntity;
-import cn.topiam.employee.support.repository.LogicDeleteRepository;
-import static cn.topiam.employee.common.constant.AppGroupConstants.APP_GROUP_CACHE_NAME;
+import static cn.topiam.employee.common.constant.AppConstants.APP_GROUP_CACHE_NAME_PREFIX;
 
 /**
  * @author TopIAM
  */
 @Repository
-@CacheConfig(cacheNames = { APP_GROUP_CACHE_NAME })
-public interface AppGroupRepository extends LogicDeleteRepository<AppGroupEntity, Long>,
+@CacheConfig(cacheNames = { APP_GROUP_CACHE_NAME_PREFIX })
+public interface AppGroupRepository extends JpaRepository<AppGroupEntity, String>,
                                     AppGroupRepositoryCustomized {
 
     /**
@@ -60,7 +58,7 @@ public interface AppGroupRepository extends LogicDeleteRepository<AppGroupEntity
      */
     @Override
     @CacheEvict(allEntries = true)
-    void deleteById(@NotNull Long id);
+    void deleteById(@NotNull String id);
 
     /**
      * find by id
@@ -70,34 +68,15 @@ public interface AppGroupRepository extends LogicDeleteRepository<AppGroupEntity
      */
     @NotNull
     @Override
-    Optional<AppGroupEntity> findById(@NotNull Long id);
-
-    /**
-     * find by id
-     *
-     * @param id must not be {@literal null}.
-     * @return {@link AppGroupEntity}
-     */
-    @NotNull
-    @Cacheable
-    @Query(value = "FROM AppGroupEntity WHERE id = :id")
-    Optional<AppGroupEntity> findByIdContainsDeleted(@NotNull @Param(value = "id") Long id);
+    Optional<AppGroupEntity> findById(@NotNull String id);
 
     /**
      * 获取所有分组列表
      *
      * @return {@link List}
      */
-    @Query(value = "FROM AppGroupEntity WHERE deleted = false ")
+    @Query(value = "FROM AppGroupEntity")
     List<AppGroupEntity> getAppGroupList();
-
-    /**
-     * 根据code列表查询
-     *
-     * @param codes {@link List}
-     * @return {@link List}
-     */
-    List<AppGroupEntity> findAllByCodeIn(@Param("codes") Collection<String> codes);
 
     /**
      * 根据code查询
@@ -106,5 +85,4 @@ public interface AppGroupRepository extends LogicDeleteRepository<AppGroupEntity
      * @return {@link AppGroupEntity}
      */
     Optional<AppGroupEntity> findByCode(@Param("code") String code);
-
 }

@@ -23,7 +23,7 @@ import cn.topiam.employee.support.exception.TopIamException;
  * 应用不存在异常
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/7/8 22:23
+ * Created by support@topiam.cn on 2022/7/8 22:23
  */
 public class AppNotExistException extends TopIamException {
     public AppNotExistException() {

@@ -23,7 +23,7 @@ import cn.topiam.employee.portal.pojo.result.LoginConfigResult;
  * LoginConfigService
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/3/25 21:49
+ * Created by support@topiam.cn on 2022/3/25 21:49
  */
 public interface LoginConfigService {
 

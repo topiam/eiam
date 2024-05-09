@@ -19,9 +19,8 @@ import { getOrganization } from '@/services/account';
 import { ModalForm, ProForm, ProFormSelect, ProFormText } from '@ant-design/pro-components';
 import { useAsyncEffect } from 'ahooks';
 import { Form, Input, InputNumber, Skeleton, Spin } from 'antd';
-import type { Key } from 'rc-tree/lib/interface';
 import * as React from 'react';
-import { useState } from 'react';
+import { Key, useState } from 'react';
 import { useIntl } from '@umijs/max';
 
 type UpdateFormProps<T> = {

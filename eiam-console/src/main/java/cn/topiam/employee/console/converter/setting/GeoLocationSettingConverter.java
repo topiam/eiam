@@ -39,20 +39,20 @@ import cn.topiam.employee.console.pojo.result.setting.EmailProviderConfigResult;
 import cn.topiam.employee.console.pojo.result.setting.GeoIpProviderResult;
 import cn.topiam.employee.console.pojo.save.setting.GeoIpProviderSaveParam;
 import cn.topiam.employee.console.pojo.save.setting.MailProviderSaveParam;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.context.ApplicationContextService;
 import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.validation.ValidationUtils;
 
 import jakarta.validation.ValidationException;
 import static cn.topiam.employee.common.geo.maxmind.MaxmindGeoLocationServiceImpl.MAXMIND;
 import static cn.topiam.employee.common.geo.maxmind.MaxmindGeoLocationServiceImpl.SHA256_URL;
-import static cn.topiam.employee.core.setting.constant.GeoIpProviderConstants.IPADDRESS_SETTING_NAME;
+import static cn.topiam.employee.core.setting.GeoIpProviderConstants.IPADDRESS_SETTING_NAME;
 
 /**
  * 地理位置设置转换器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/10/1 23:18
+ * Created by support@topiam.cn on 2021/10/1 23:18
  */
 @Mapper(componentModel = "spring")
 public interface GeoLocationSettingConverter {
@@ -86,7 +86,7 @@ public interface GeoLocationSettingConverter {
                    throw new ValidationException(validationResult.getMessage());
                }
                try {
-                   ResponseEntity<String> checkConnect = ApplicationContextHelp.getBean(RestTemplate.class).getForEntity(
+                   ResponseEntity<String> checkConnect = ApplicationContextService.getBean(RestTemplate.class).getForEntity(
                            String.format(SHA256_URL,
                                    maxmindProviderConfig.getSessionKey()), String.class);
                    HttpStatusCode statusCode = checkConnect.getStatusCode();

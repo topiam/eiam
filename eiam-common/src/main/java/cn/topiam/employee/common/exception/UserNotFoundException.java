@@ -25,7 +25,7 @@ import cn.topiam.employee.support.exception.TopIamException;
  * 未找到用户异常
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/8/8 22:09
+ * Created by support@topiam.cn on 2022/8/8 22:09
  */
 public class UserNotFoundException extends TopIamException {
     public UserNotFoundException() {

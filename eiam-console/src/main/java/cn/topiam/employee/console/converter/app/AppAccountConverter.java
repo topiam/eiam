@@ -34,7 +34,7 @@ import cn.topiam.employee.support.repository.page.domain.Page;
  * 应用账户映射
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/4 21:08
+ * Created by support@topiam.cn on 2022/6/4 21:08
  */
 @Mapper(componentModel = "spring")
 public interface AppAccountConverter {
@@ -78,7 +78,7 @@ public interface AppAccountConverter {
      * @param param {@link AppAccountCreateParam}
      * @return {@link AppAccountEntity}
      */
-    @Mapping(target = "deleted", ignore = true)
+
     @Mapping(target = "remark", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "updateTime", ignore = true)

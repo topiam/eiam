@@ -33,7 +33,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * 存储配置查询结果
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/1 23:40
+ * Created by support@topiam.cn on 2021/11/1 23:40
  */
 @Data
 @Builder

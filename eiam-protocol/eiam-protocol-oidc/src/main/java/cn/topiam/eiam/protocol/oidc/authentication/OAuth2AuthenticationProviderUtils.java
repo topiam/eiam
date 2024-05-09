@@ -31,7 +31,7 @@ import org.springframework.security.oauth2.server.authorization.authentication.O
  * Utility methods for the OAuth 2.0 {@link AuthenticationProvider}'s.
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/28 22:45
+ * Created by support@topiam.cn on 2023/6/28 22:45
  */
 @SuppressWarnings("AlibabaClassNamingShouldBeCamel")
 final class OAuth2AuthenticationProviderUtils {

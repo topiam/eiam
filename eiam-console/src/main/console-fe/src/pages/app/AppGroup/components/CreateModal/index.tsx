@@ -16,4 +16,5 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import CreateModal from './CreateModal';
+
 export default CreateModal;

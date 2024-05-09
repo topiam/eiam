@@ -26,7 +26,7 @@ import cn.topiam.employee.console.pojo.result.app.AppCertListResult;
  * APP 证书
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/5/31 21:45
+ * Created by support@topiam.cn on 2022/5/31 21:45
  */
 public interface AppCertService {
     /**

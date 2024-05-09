@@ -29,20 +29,22 @@ import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.Order;
-import org.springframework.lang.NonNull;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.AlternativeJdkIdGenerator;
+import org.springframework.util.StringUtils;
 
 import cn.topiam.employee.common.entity.setting.AdministratorEntity;
 import cn.topiam.employee.common.enums.UserStatus;
 import cn.topiam.employee.common.repository.setting.AdministratorRepository;
+import cn.topiam.employee.support.init.Initializer;
 import cn.topiam.employee.support.trace.TraceUtils;
-import static cn.topiam.employee.common.constant.SecurityConstants.DEFAULT_ADMIN_USERNAME;
+import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_ADMIN_USERNAME;
+import static cn.topiam.employee.support.constant.EiamConstants.TOPIAM_INIT_AUTHENTICATION;
 import static cn.topiam.employee.support.lock.LockAspect.getTopiamLockKeyPrefix;
 import static cn.topiam.employee.support.util.CreateFileUtil.createFile;
 
@@ -50,60 +52,81 @@ import static cn.topiam.employee.support.util.CreateFileUtil.createFile;
  * DefaultAdministratorInitialize
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/11/26 21:44
+ * Created by support@topiam.cn on 2022/11/26 21:44
  */
 @Order(2)
 @Component
-public class DefaultAdministratorInitializer implements ApplicationListener<ContextRefreshedEvent> {
+public class DefaultAdministratorInitializer implements Initializer {
 
-    private final Logger        logger    = LoggerFactory
+    private final Logger        logger                      = LoggerFactory
         .getLogger(DefaultAdministratorInitializer.class);
-    private static final String DIR_NAME  = ".topiam";
-    private static final String USER_HOME = "user.home";
+    private static final String DIR_NAME                    = ".topiam";
+    private static final String USER_HOME                   = "user.home";
+    private static final String INITIAL_PASSWORD_VALUE_NAME = "initial.password.value";
+    // generate: 自动生成，setting: 读取[INITIAL_PASSWORD_VALUE]设置的固定值，没有设置使用[INITIAL_PASSWORD_DEFAULT]的默认值
+    private static final String INITIAL_PASSWORD_TYPE_NAME  = "initial.password.type";
+    private static final String INITIAL_PASSWORD_DEFAULT    = "topiam.cn";
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void onApplicationEvent(@NonNull ContextRefreshedEvent contextRefreshedEvent) {
+    public void execute(ApplicationContext applicationContext) {
         //@formatter:off
         String traceId = idGenerator.generateId().toString();
         TraceUtils.put(traceId);
         RLock lock = redissonClient.getLock(getTopiamLockKeyPrefix());
         boolean tryLock = false;
         try {
-             tryLock = lock.tryLock(1, TimeUnit.SECONDS);
+            SecurityContextHolder.getContext().setAuthentication(TOPIAM_INIT_AUTHENTICATION);
+            tryLock = lock.tryLock(1, TimeUnit.SECONDS);
              if (tryLock){
                  Optional<AdministratorEntity> optional = administratorRepository.findByUsername(DEFAULT_ADMIN_USERNAME);
                  if (optional.isEmpty()) {
-                     String initPassword = idGenerator.generateId().toString().replace("-", "").toLowerCase(Locale.ENGLISH);
-                     createFile(getInitialAdminPasswordFilePath());
-                     BufferedWriter stream = new BufferedWriter(new FileWriter(getInitialAdminPasswordFilePath()));
+                     String initPassword;
+                     String initPasswordFileTips  ;
+                     String passwordType = System.getProperty(INITIAL_PASSWORD_TYPE_NAME);
+                     if (StringUtils.hasText(passwordType) && "generate".equals(passwordType)) {
+                         initPassword = idGenerator.generateId().toString().replace("-", "").toLowerCase(Locale.ENGLISH);
+                     }
+                     else {
+                         String passwordInitial = System.getProperty(INITIAL_PASSWORD_VALUE_NAME);
+                         if (StringUtils.hasText(passwordInitial)) {
+                             initPassword = passwordInitial;
+                         }
+                         else {
+                             initPassword = INITIAL_PASSWORD_DEFAULT;
+                         }
+                     }
+                     String initialAdminPasswordFilePath = getInitialAdminPasswordFilePath();createFile(initialAdminPasswordFilePath);
+                     BufferedWriter stream = new BufferedWriter(new FileWriter(initialAdminPasswordFilePath));
+                     initPasswordFileTips = "This may also be found at: " + initialAdminPasswordFilePath;
                      //清空
                      stream.write(initPassword);
                      stream.flush();
                      stream.close();
-                     String ls = System.lineSeparator();
-                     logger.info(ls + ls + "*************************************************************" + ls
-                             + "*************************************************************" + ls
-                             + "*************************************************************" + ls
-                             + ls
-                             + "TopIAM console initial setup is required. An admin user has been created and "
-                             + "a password generated." + ls
-                             + "Please use the following password to proceed to installation:" + ls
-                             + ls
-                             + initPassword + ls
-                             + ls
-                             + "This may also be found at: " + getInitialAdminPasswordFilePath() + ls
-                             + ls
-                             + "*************************************************************" + ls
-                             + "*************************************************************" + ls
-                             + "*************************************************************" + ls);
+                     logger.info("""
+
+                        *************************************************************
+                        *************************************************************
+                        *************************************************************
+
+                        TOPIAM console initial setup is required. An admin user has been created and a initialize password.
+                        Please use the following password to proceed to installation:
+
+                        %s
+
+                        %s\s
+                        *************************************************************
+                        *************************************************************
+                        *************************************************************
+
+                        """.formatted(initPassword, initPasswordFileTips));
                      //保存管理员
                      saveInitAdministrator(DEFAULT_ADMIN_USERNAME, initPassword);
                  }
              }
 
         } catch (Exception exception) {
-            int exitCode = SpringApplication.exit(contextRefreshedEvent.getApplicationContext(),
+            int exitCode = SpringApplication.exit(applicationContext,
                     () -> 0);
             System.exit(exitCode);
         } finally {
@@ -111,6 +134,7 @@ public class DefaultAdministratorInitializer implements ApplicationListener<Cont
                 lock.unlock();
             }
             TraceUtils.remove();
+            SecurityContextHolder.setContext(SecurityContextHolder.createEmptyContext());
         }
         //@formatter:on
     }
@@ -126,7 +150,8 @@ public class DefaultAdministratorInitializer implements ApplicationListener<Cont
         AdministratorEntity administrator = new AdministratorEntity();
         administrator.setUsername(username);
         administrator.setPassword(passwordEncoder.encode(password));
-        administrator.setStatus(UserStatus.ENABLE);
+        administrator.setStatus(UserStatus.ENABLED);
+        administrator.setNeedChangePassword(true);
         administrator.setRemark(
             "This administrator user is automatically created during system initialization.");
         administratorRepository.save(administrator);

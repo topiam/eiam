@@ -25,7 +25,7 @@ import cn.topiam.employee.common.entity.identitysource.IdentitySourceEventRecord
  * 身份源事件记录
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/3/15 21:35
+ * Created by support@topiam.cn on 2022/3/15 21:35
  */
 public interface IdentitySourceEventRecordRepositoryCustomized {
     /**

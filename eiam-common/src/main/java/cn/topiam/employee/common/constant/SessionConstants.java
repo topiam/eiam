@@ -23,7 +23,7 @@ import cn.topiam.employee.support.constant.EiamConstants;
  * SessionConstants
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/8 21:12
+ * Created by support@topiam.cn on 2022/6/8 21:12
  */
 public final class SessionConstants {
     public final static String SESSION_PATH   = EiamConstants.V1_API_PATH + "/session";

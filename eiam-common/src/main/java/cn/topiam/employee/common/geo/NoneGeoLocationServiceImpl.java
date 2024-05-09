@@ -25,7 +25,7 @@ import cn.topiam.employee.support.geo.GeoLocationService;
  * None
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/27 21:20
+ * Created by support@topiam.cn on 2021/11/27 21:20
  */
 public class NoneGeoLocationServiceImpl implements GeoLocationService {
 

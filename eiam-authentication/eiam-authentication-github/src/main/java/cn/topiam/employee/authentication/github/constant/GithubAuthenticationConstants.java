@@ -21,7 +21,7 @@ package cn.topiam.employee.authentication.github.constant;
  * GITHUB
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/8/16 22:19
+ * Created by support@topiam.cn on 2023/8/16 22:19
  */
 public final class GithubAuthenticationConstants {
     /**

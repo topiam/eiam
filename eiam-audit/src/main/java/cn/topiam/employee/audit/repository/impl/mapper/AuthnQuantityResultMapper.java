@@ -27,7 +27,7 @@ import cn.topiam.employee.audit.repository.result.AuthnQuantityResult;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2023/10/04 22:25
+ * Created by support@topiam.cn on 2023/10/04 22:25
  */
 @SuppressWarnings("DuplicatedCode")
 public class AuthnQuantityResultMapper implements RowMapper<AuthnQuantityResult> {

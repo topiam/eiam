@@ -22,10 +22,11 @@ import { useForm } from 'antd/es/form/Form';
 import * as React from 'react';
 import { useState } from 'react';
 import { useIntl } from '@umijs/max';
+import { useAsyncEffect } from 'ahooks';
 
 const layout = {
   labelCol: { span: 4 },
-  wrapperCol: { span: 19 },
+  wrapperCol: { span: 20 },
 };
 export default (props: {
   visible: boolean;
@@ -36,6 +37,12 @@ export default (props: {
   const { visible, onFinish, onCancel } = props;
   const [loading, setLoading] = useState<boolean>(false);
   const intl = useIntl();
+
+  useAsyncEffect(async () => {
+    if (visible) {
+      form.setFieldsValue({ code: random(9) });
+    }
+  }, [visible]);
 
   return (
     <ModalForm<AccountAPI.CreateUserGroup>
@@ -48,11 +55,6 @@ export default (props: {
       preserve={false}
       width="500px"
       open={visible}
-      onOpenChange={(visible) => {
-        if (visible) {
-          form.setFieldsValue({ code: random(9) });
-        }
-      }}
       modalProps={{
         maskClosable: true,
         destroyOnClose: true,

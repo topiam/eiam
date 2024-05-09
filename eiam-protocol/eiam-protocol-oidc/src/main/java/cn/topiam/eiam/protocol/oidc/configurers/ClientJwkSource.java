@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.nimbusds.jose.KeySourceException;
-import com.nimbusds.jose.jwk.*;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.JWKSelector;
+import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
@@ -33,7 +35,7 @@ import cn.topiam.employee.application.oidc.model.OidcProtocolConfig;
  * 客户端JWK
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/27 22:50
+ * Created by support@topiam.cn on 2023/6/27 22:50
  */
 public class ClientJwkSource implements JWKSource<SecurityContext> {
 

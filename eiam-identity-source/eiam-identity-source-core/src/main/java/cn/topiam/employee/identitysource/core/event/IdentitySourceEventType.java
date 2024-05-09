@@ -21,7 +21,7 @@ package cn.topiam.employee.identitysource.core.event;
      * 身份源配置事件类型
      *
      * @author TopIAM
-     * Created by support@topiam.cn on  2022/3/20 21:59
+     * Created by support@topiam.cn on 2022/3/20 21:59
      */
 public enum IdentitySourceEventType {
                                      /**

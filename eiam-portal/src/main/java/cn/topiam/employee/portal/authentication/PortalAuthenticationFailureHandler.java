@@ -27,10 +27,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.WebAttributes;
 
-import cn.topiam.employee.common.repository.account.UserRepository;
-import cn.topiam.employee.support.context.ApplicationContextHelp;
+import cn.topiam.employee.support.context.ApplicationContextService;
 import cn.topiam.employee.support.enums.SecretType;
 import cn.topiam.employee.support.result.ApiRestResult;
+import cn.topiam.employee.support.security.exception.SecretInvalidException;
 import cn.topiam.employee.support.util.HttpResponseUtils;
 
 import jakarta.servlet.ServletException;
@@ -39,8 +39,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import static org.springframework.boot.web.servlet.support.ErrorPageFilter.ERROR_REQUEST_URI;
 
 import static cn.topiam.employee.support.constant.EiamConstants.CAPTCHA_CODE_SESSION;
-import static cn.topiam.employee.support.context.ServletContextHelp.isHtmlRequest;
+import static cn.topiam.employee.support.context.ServletContextService.isHtmlRequest;
 import static cn.topiam.employee.support.exception.enums.ExceptionStatus.EX000101;
+import static cn.topiam.employee.support.exception.enums.ExceptionStatus.EX000105;
 
 import static jakarta.servlet.RequestDispatcher.*;
 
@@ -71,15 +72,16 @@ public class PortalAuthenticationFailureHandler implements
         boolean isHtmlRequest = isHtmlRequest(request);
         if (!isHtmlRequest) {
             //@formatter:off
-            ApiRestResult.RestResultBuilder<String> builder = ApiRestResult.<String> builder()
-                    .status(EX000101.getCode())
-                    .message(Objects.toString(exception.getMessage(),EX000101.getMessage()));
-            //@formatter:on
+            ApiRestResult.RestResultBuilder<String> builder = ApiRestResult.<String> builder().status(EX000101.getCode()).message(Objects.toString(exception.getMessage(),EX000101.getMessage()));
+            if (exception instanceof SecretInvalidException){
+                builder = ApiRestResult.<String> builder().status(EX000105.getCode()).message(Objects.toString(exception.getMessage(),EX000105.getMessage()));
+            }
             ApiRestResult<String> result = builder.build();
             request.getSession().removeAttribute(SecretType.LOGIN.getKey());
             request.getSession().removeAttribute(CAPTCHA_CODE_SESSION);
             request.setAttribute(WebAttributes.AUTHENTICATION_EXCEPTION, exception);
             HttpResponseUtils.flushResponseJson(response, HttpStatus.BAD_REQUEST.value(), result);
+            //@formatter:on
             return;
         }
         forwardToErrorPage(getErrorPath(), request, response, exception);
@@ -112,10 +114,7 @@ public class PortalAuthenticationFailureHandler implements
     }
 
     private String getErrorPath() {
-        return ApplicationContextHelp.getBean(ServerProperties.class).getError().getPath();
+        return ApplicationContextService.getBean(ServerProperties.class).getError().getPath();
     }
 
-    private UserRepository getUserRepository() {
-        return ApplicationContextHelp.getBean(UserRepository.class);
-    }
 }

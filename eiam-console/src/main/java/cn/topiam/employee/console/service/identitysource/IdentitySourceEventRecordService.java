@@ -28,7 +28,7 @@ import cn.topiam.employee.support.repository.page.domain.PageModel;
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-08-16
+ * Created by support@topiam.cn on 2020-08-16
  */
 public interface IdentitySourceEventRecordService {
 

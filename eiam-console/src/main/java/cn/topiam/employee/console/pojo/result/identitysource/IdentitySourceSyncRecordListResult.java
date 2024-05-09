@@ -31,7 +31,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * 身份源同步详情列表
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/25 23:05
+ * Created by support@topiam.cn on 2022/2/25 23:05
  */
 @Data
 @Schema(description = "身份源同步记录列表")

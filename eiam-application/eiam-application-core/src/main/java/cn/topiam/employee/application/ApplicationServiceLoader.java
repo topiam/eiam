@@ -36,7 +36,7 @@ import cn.topiam.employee.common.repository.app.AppRepository;
  * 应用服务加载器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/8/20 21:08
+ * Created by support@topiam.cn on 2022/8/20 21:08
  */
 @Configuration
 public class ApplicationServiceLoader implements ApplicationContextAware {
@@ -78,9 +78,8 @@ public class ApplicationServiceLoader implements ApplicationContextAware {
      *
      * @return {@link List}
      */
-    public Set<ApplicationService> getApplicationServiceList() {
-        List<ApplicationService> values = loadMap.values().stream().toList();
-        return new HashSet<>(values);
+    public List<ApplicationService> getApplicationServiceList() {
+        return loadMap.values().stream().toList();
     }
 
     /**
@@ -111,7 +110,7 @@ public class ApplicationServiceLoader implements ApplicationContextAware {
      */
     public ApplicationService getApplicationServiceByAppId(String appId) {
         AppRepository repository = applicationContext.getBean(AppRepository.class);
-        Optional<AppEntity> optional = repository.findById(Long.valueOf(appId));
+        Optional<AppEntity> optional = repository.findById(appId);
         if (optional.isEmpty()) {
             throw new AppNotExistException();
         }

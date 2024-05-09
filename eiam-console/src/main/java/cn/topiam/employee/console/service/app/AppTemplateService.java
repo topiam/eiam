@@ -18,7 +18,6 @@
 package cn.topiam.employee.console.service.app;
 
 import java.util.List;
-import java.util.Map;
 
 import cn.topiam.employee.common.enums.app.AppType;
 import cn.topiam.employee.console.pojo.result.app.AppTemplateResult;
@@ -43,7 +42,7 @@ public interface AppTemplateService {
      * List
      *
      * @param code {@link AppTemplateResult}
-     * @return {@link List}
+     * @return {@link Object}
      */
-    List<Map> getAppTemplateFormSchema(String code);
+    Object getAppTemplateFormSchema(String code);
 }

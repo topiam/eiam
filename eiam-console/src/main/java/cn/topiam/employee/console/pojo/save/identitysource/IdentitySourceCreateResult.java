@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * 身份源创建返回结果
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/21 21:34
+ * Created by support@topiam.cn on 2022/2/21 21:34
  */
 @Data
 @AllArgsConstructor

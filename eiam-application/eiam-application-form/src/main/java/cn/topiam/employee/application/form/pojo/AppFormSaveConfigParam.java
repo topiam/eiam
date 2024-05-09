@@ -22,7 +22,6 @@ import java.io.Serializable;
 import java.util.List;
 
 import cn.topiam.employee.common.entity.app.AppFormConfigEntity;
-import cn.topiam.employee.common.enums.app.AuthorizationType;
 import cn.topiam.employee.common.enums.app.FormEncryptType;
 import cn.topiam.employee.common.enums.app.FormSubmitType;
 
@@ -34,7 +33,7 @@ import jakarta.validation.constraints.NotNull;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2022/12/13 22:45
+ * Created by support@topiam.cn on 2022/12/13 22:45
  */
 @Data
 @Schema(description = "保存 表单代填 应用配置参数")
@@ -44,11 +43,10 @@ public class AppFormSaveConfigParam implements Serializable {
     private static final long                    serialVersionUID = 7257798528680745281L;
 
     /**
-     * SSO范围
+     * 登录发起登录URL
      */
-    @NotNull(message = "SSO范围不能为空")
-    @Schema(description = "SSO范围")
-    private AuthorizationType                    authorizationType;
+    @Schema(description = "登录发起登录URL")
+    private String                               initLoginUrl;
 
     /**
      * 登录URL

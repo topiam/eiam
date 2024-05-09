@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.poi.sl.usermodel.PictureData;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.MimeTypeUtils;
@@ -31,8 +30,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
 
-import cn.topiam.employee.common.constant.StorageConstants;
 import cn.topiam.employee.common.storage.Storage;
+import cn.topiam.employee.support.constant.EiamConstants;
 import cn.topiam.employee.support.result.ApiRestResult;
 
 import lombok.AllArgsConstructor;
@@ -42,20 +41,27 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.MultipartConfigElement;
+import static cn.topiam.employee.common.enums.ViewContentType.SVG;
+import static cn.topiam.employee.common.storage.controller.StorageFileEndpoint.STORAGE_PATH;
 
 /**
  * 存储配置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/10/30 21:16
+ * Created by support@topiam.cn on 2021/10/30 21:16
  */
 @Validated
 @Tag(name = "存储文件")
 @RestController
-@RequestMapping(value = StorageConstants.STORAGE_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = STORAGE_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 @AllArgsConstructor
 @Slf4j
 public class StorageFileEndpoint {
+
+    /**
+     * 存储API路径
+     */
+    public final static String STORAGE_PATH = EiamConstants.V1_API_PATH + "/storage";
 
     /**
      * 上传文件
@@ -74,8 +80,7 @@ public class StorageFileEndpoint {
                 .getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
             String fileType = file.getContentType();
             List<String> allowedTypes = Arrays.asList(MimeTypeUtils.IMAGE_JPEG_VALUE,
-                MimeTypeUtils.IMAGE_PNG_VALUE, PictureData.PictureType.SVG.contentType,
-                "image/vnd.microsoft.icon");
+                MimeTypeUtils.IMAGE_PNG_VALUE, SVG.getType(), "image/vnd.microsoft.icon");
             if (Objects.isNull(fileType) || !allowedTypes.contains(fileType)) {
                 return ApiRestResult.err().message("文件类型不支持，请上传图片");
             }

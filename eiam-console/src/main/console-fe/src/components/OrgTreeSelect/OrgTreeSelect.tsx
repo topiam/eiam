@@ -21,6 +21,7 @@ import { TreeSelect } from 'antd';
 import type { TreeSelectProps } from 'antd/es/tree-select';
 import { useState } from 'react';
 import { DataNode, updateTreeData } from '@/utils/tree';
+
 const { SHOW_ALL } = TreeSelect;
 
 export type OrganizationTreeSelectProps = Omit<

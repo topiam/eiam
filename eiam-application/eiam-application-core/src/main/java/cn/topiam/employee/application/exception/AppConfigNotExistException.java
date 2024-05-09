@@ -23,7 +23,7 @@ import cn.topiam.employee.support.exception.TopIamException;
  * 应用配置不存在
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/7/8 22:21
+ * Created by support@topiam.cn on 2022/7/8 22:21
  */
 public class AppConfigNotExistException extends TopIamException {
     public AppConfigNotExistException() {

@@ -34,7 +34,7 @@ export enum IdentityProviderType {
   //社交
   qq_oauth = 'qq_oauth',
   gitee_oauth = 'gitee_oauth',
-  wechat_qr = 'wechat_qr',
+  wechat_qr = 'wechat_oauth',
   github_oauth = 'github_oauth',
   alipay_oauth = 'alipay_oauth',
 }

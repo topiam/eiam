@@ -18,8 +18,7 @@
 package cn.topiam.eiam.protocol.oidc.configurers;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -48,6 +47,7 @@ import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import cn.topiam.employee.common.constant.ProtocolConstants;
+import cn.topiam.employee.protocol.code.EndpointMatcher;
 import cn.topiam.employee.protocol.code.configurer.AbstractConfigurer;
 
 import jakarta.servlet.ServletException;
@@ -59,7 +59,7 @@ import static cn.topiam.eiam.protocol.oidc.constant.OidcProtocolConstants.OIDC_E
  * OIDC 用户信息端点配置器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/27 21:07
+ * Created by support@topiam.cn on 2023/6/27 21:07
  */
 public final class OidcUserInfoEndpointConfigurer extends AbstractConfigurer {
 
@@ -157,13 +157,8 @@ public final class OidcUserInfoEndpointConfigurer extends AbstractConfigurer {
         return authenticationProviders;
     }
 
-    /**
-     * 获取请求匹配器
-     *
-     * @return {@link RequestMatcher}
-     */
     @Override
-    public RequestMatcher getRequestMatcher() {
-        return requestMatcher;
+    public EndpointMatcher getEndpointMatcher() {
+        return new EndpointMatcher(this.requestMatcher, false);
     }
 }

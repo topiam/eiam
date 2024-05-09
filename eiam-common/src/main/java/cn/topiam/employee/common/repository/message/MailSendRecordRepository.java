@@ -17,18 +17,17 @@
  */
 package cn.topiam.employee.common.repository.message;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.common.entity.message.MailSendRecordEntity;
-import cn.topiam.employee.support.repository.LogicDeleteRepository;
 
 /**
  * MailSendRecordRepository
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2021/10/3 03:38
+ * Created by support@topiam.cn on 2021/10/3 03:38
  */
 @Repository
-public interface MailSendRecordRepository extends
-                                          LogicDeleteRepository<MailSendRecordEntity, Long> {
+public interface MailSendRecordRepository extends JpaRepository<MailSendRecordEntity, String> {
 }

@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * 身份源列表
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/2/25 23:05
+ * Created by support@topiam.cn on 2022/2/25 23:05
  */
 @Data
 @Schema(description = "身份源列表")

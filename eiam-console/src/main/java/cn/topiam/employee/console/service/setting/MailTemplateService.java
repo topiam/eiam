@@ -31,7 +31,7 @@ import cn.topiam.employee.console.pojo.save.setting.EmailCustomTemplateSaveParam
  * </p>
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020-08-13
+ * Created by support@topiam.cn on 2020-08-13
  */
 public interface MailTemplateService extends SettingService {
     /**

@@ -19,21 +19,18 @@ package cn.topiam.employee.application.jwt.pojo;
 
 import java.io.Serializable;
 
-import cn.topiam.employee.common.enums.app.AuthorizationType;
-import cn.topiam.employee.common.enums.app.InitLoginType;
 import cn.topiam.employee.common.enums.app.JwtBindingType;
 import cn.topiam.employee.common.enums.app.JwtIdTokenSubjectType;
 
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * JWT 配置返回
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/02/12 22:46
+ * Created by support@topiam.cn on 2023/02/12 22:46
  */
 @Data
 @Schema(description = "JWT 配置返回响应")
@@ -45,22 +42,10 @@ public class AppJwtConfigGetResult implements Serializable {
     private String                 appId;
 
     /**
-     * SSO 发起方
-     */
-    @Parameter(description = "SSO 发起方")
-    private InitLoginType          initLoginType;
-
-    /**
      * SSO 登录链接
      */
-    @Parameter(description = "SSO 登录链接")
+    @Schema(description = "SSO 登录链接")
     private String                 initLoginUrl;
-
-    /**
-     * 授权范围
-     */
-    @Parameter(description = "SSO 授权范围")
-    private AuthorizationType      authorizationType;
 
     /**
      * 业务系统中（或PC程序）的JWT SSO地址，在单点登录时本系统将向该地址用[GET]方式发送id_token信息，参数名为id_token，
@@ -88,7 +73,7 @@ public class AppJwtConfigGetResult implements Serializable {
      * ID_token 有效期
      */
     @Schema(description = "Token 过期时间（秒）")
-    private Integer                idTokenTimeToLive;
+    private String                 idTokenTimeToLive;
 
     /**
      * 协议端点

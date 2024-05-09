@@ -25,7 +25,7 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
  * 应用程序启动入口
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2020/7/9
+ * Created by support@topiam.cn on 2020/7/9
  */
 @ServletComponentScan
 @SpringBootApplication

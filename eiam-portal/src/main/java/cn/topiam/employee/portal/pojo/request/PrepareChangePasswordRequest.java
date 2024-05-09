@@ -32,7 +32,7 @@ import jakarta.validation.constraints.NotNull;
  *准备更改密码入参
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/11/13 21:15
+ * Created by support@topiam.cn on 2022/11/13 21:15
  */
 @Data
 @Schema(description = "准备更改密码入参")

@@ -44,6 +44,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import cn.topiam.employee.common.constant.ProtocolConstants;
+import cn.topiam.employee.protocol.code.EndpointMatcher;
 import cn.topiam.employee.protocol.code.configurer.AbstractConfigurer;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,29 +55,13 @@ import static cn.topiam.eiam.protocol.oidc.constant.OidcProtocolConstants.OIDC_E
  * 配置令牌撤销端点
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/27 21:25
+ * Created by support@topiam.cn on 2023/6/27 21:25
  */
 @SuppressWarnings({ "AlibabaClassNamingShouldBeCamel" })
 public final class OAuth2TokenRevocationEndpointConfigurer extends AbstractConfigurer {
     private RequestMatcher                     requestMatcher;
 
-    private final AuthenticationFailureHandler authenticationFailureHandler = new AuthenticationFailureHandler() {
-
-                                                                                private final HttpMessageConverter<OAuth2Error> errorHttpResponseConverter = new OAuth2ErrorHttpMessageConverter();
-
-                                                                                @Override
-                                                                                public void onAuthenticationFailure(HttpServletRequest request,
-                                                                                                                    HttpServletResponse response,
-                                                                                                                    AuthenticationException exception) throws IOException {
-            //@formatter:off
-            OAuth2Error error = ((OAuth2AuthenticationException) exception).getError();
-            ServletServerHttpResponse httpResponse = new ServletServerHttpResponse(response);
-            httpResponse.setStatusCode(HttpStatus.BAD_REQUEST);
-            OAuth2Error responseError=new OAuth2Error(error.getErrorCode(),error.getDescription(),OIDC_ERROR_URI);
-            this.errorHttpResponseConverter.write(responseError, null, httpResponse);
-            //@formatter:on
-                                                                                }
-                                                                            };
+    private final AuthenticationFailureHandler authenticationFailureHandler = this::sendErrorResponse;
 
     OAuth2TokenRevocationEndpointConfigurer(ObjectPostProcessor<Object> objectPostProcessor) {
         super(objectPostProcessor);
@@ -112,8 +97,8 @@ public final class OAuth2TokenRevocationEndpointConfigurer extends AbstractConfi
     }
 
     @Override
-    public RequestMatcher getRequestMatcher() {
-        return this.requestMatcher;
+    public EndpointMatcher getEndpointMatcher() {
+        return new EndpointMatcher(this.requestMatcher, false);
     }
 
     private static List<AuthenticationConverter> createDefaultAuthenticationConverters() {
@@ -133,4 +118,18 @@ public final class OAuth2TokenRevocationEndpointConfigurer extends AbstractConfi
 
         return authenticationProviders;
     }
+
+    private void sendErrorResponse(HttpServletRequest request, HttpServletResponse response,
+                                   AuthenticationException exception) throws IOException {
+        //@formatter:off
+        OAuth2Error error = ((OAuth2AuthenticationException) exception).getError();
+        ServletServerHttpResponse httpResponse = new ServletServerHttpResponse(response);
+        httpResponse.setStatusCode(HttpStatus.BAD_REQUEST);
+        OAuth2Error responseError=new OAuth2Error(error.getErrorCode(),error.getDescription(),OIDC_ERROR_URI);
+        this.errorHttpResponseConverter.write(responseError, null, httpResponse);
+        //@formatter:on
+    }
+
+    private final HttpMessageConverter<OAuth2Error> errorHttpResponseConverter = new OAuth2ErrorHttpMessageConverter();
+
 }

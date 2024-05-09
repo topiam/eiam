@@ -28,7 +28,7 @@ import jakarta.persistence.Converter;
  * SyncStatusConverter
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/10/8 21:11
+ * Created by support@topiam.cn on 2022/10/8 21:11
  */
 @Converter(autoApply = true)
 public class SyncStatusConverter implements AttributeConverter<SyncStatus, String> {

@@ -17,18 +17,14 @@
  */
 import { ProForm, ProFormText } from '@ant-design/pro-components';
 import { useAsyncEffect } from 'ahooks';
-import { Collapse, Form, Typography } from 'antd';
+import { Form, Typography } from 'antd';
 import { useIntl } from '@umijs/max';
-import Alert from '@/components/Alert';
 import { createStyles } from 'antd-style';
 import { ColProps } from 'antd/es/grid/col';
 
-const useStyles = createStyles(({ prefixCls }) => ({
-  alert: {
-    [`.${prefixCls}-alert-content .${prefixCls}-alert-description .${prefixCls}-form-item:last-child`]:
-      {
-        marginBottom: '0 !important',
-      },
+const useStyles = createStyles(({}) => ({
+  config: {
+    backgroundColor: '#f1f1f2',
   },
 }));
 
@@ -48,12 +44,11 @@ export default (props: {
   const {
     protocolEndpoint,
     appId,
-    collapsed = true,
     labelCol = {
       span: 6,
     },
     wrapperCol = {
-      span: 12,
+      span: 14,
     },
   } = props;
   const intl = useIntl();
@@ -72,49 +67,23 @@ export default (props: {
       submitter={false}
       labelWrap
       form={configForm}
+      className={styles.config}
     >
-      <Collapse
-        ghost
-        expandIconPosition={'start'}
-        defaultActiveKey={collapsed ? undefined : 'config'}
-        items={[
-          {
-            key: 'config',
-            label: (
-              <a>
-                {intl.formatMessage({
-                  id: 'pages.app.config.detail.items.login_access.protocol_config.form.config_about',
-                })}
-              </a>
-            ),
-            children: (
-              <Alert
-                type={'grey'}
-                className={styles.alert}
-                description={
-                  <>
-                    <ProFormText
-                      label={intl.formatMessage({
-                        id: 'pages.app.config.detail.items.login_access.protocol_config.form.config_about.idp_sso_endpoint',
-                      })}
-                      name={'idpSsoEndpoint'}
-                      extra={intl.formatMessage({
-                        id: 'pages.app.config.detail.items.login_access.protocol_config.form.config_about.idp_sso_endpoint.extra',
-                      })}
-                      readonly
-                      proFieldProps={{
-                        render: (value: string) => {
-                          return value && <Typography.Text copyable>{value}</Typography.Text>;
-                        },
-                      }}
-                      fieldProps={{ autoComplete: 'off' }}
-                    />
-                  </>
-                }
-              />
-            ),
+      <ProFormText
+        label={intl.formatMessage({
+          id: 'pages.app.config.detail.protocol_config.form.config_about.idp_sso_endpoint',
+        })}
+        name={'idpSsoEndpoint'}
+        extra={intl.formatMessage({
+          id: 'pages.app.config.detail.protocol_config.form.config_about.idp_sso_endpoint.extra',
+        })}
+        readonly
+        proFieldProps={{
+          render: (value: string) => {
+            return value && <Typography.Text copyable>{value}</Typography.Text>;
           },
-        ]}
+        }}
+        fieldProps={{ autoComplete: 'off' }}
       />
     </ProForm>
   );

@@ -38,9 +38,7 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.core.http.converter.OAuth2ErrorHttpMessageConverter;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
-import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2DeviceCodeAuthenticationProvider;
-import org.springframework.security.oauth2.server.authorization.authentication.OAuth2RefreshTokenAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 import org.springframework.security.oauth2.server.authorization.web.OAuth2TokenEndpointFilter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.DelegatingAuthenticationConverter;
@@ -53,16 +51,18 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import cn.topiam.eiam.protocol.oidc.authentication.OAuth2AuthorizationCodeAuthenticationProvider;
 import cn.topiam.eiam.protocol.oidc.authentication.OAuth2AuthorizationResourceOwnerPasswordAuthenticationProvider;
+import cn.topiam.eiam.protocol.oidc.authentication.OAuth2RefreshTokenAuthenticationProvider;
 import cn.topiam.eiam.protocol.oidc.endpoint.authentication.OAuth2AuthorizationResourceOwnerPasswordAuthenticationConverter;
 import cn.topiam.employee.common.constant.ProtocolConstants;
+import cn.topiam.employee.protocol.code.EndpointMatcher;
 import cn.topiam.employee.protocol.code.configurer.AbstractConfigurer;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import static cn.topiam.eiam.protocol.oidc.constant.OidcProtocolConstants.OIDC_ERROR_URI;
-import static cn.topiam.employee.protocol.code.util.ProtocolConfigUtils.getAuthenticationDetailsSource;
+import static cn.topiam.employee.protocol.code.configurer.AuthenticationUtils.getAuthenticationDetailsSource;
 import static cn.topiam.employee.support.security.util.HttpSecurityConfigUtils.getPasswordEncoder;
 import static cn.topiam.employee.support.security.util.HttpSecurityConfigUtils.getUserDetailsService;
 
@@ -70,31 +70,14 @@ import static cn.topiam.employee.support.security.util.HttpSecurityConfigUtils.g
  * Token 端点配置器
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/6/27 21:08
+ * Created by support@topiam.cn on 2023/6/27 21:08
  */
 @SuppressWarnings("AlibabaClassNamingShouldBeCamel")
 public final class OAuth2TokenEndpointConfigurer extends AbstractConfigurer {
 
     private RequestMatcher                     requestMatcher;
 
-    private final AuthenticationFailureHandler authenticationFailureHandler = new AuthenticationFailureHandler() {
-
-                                                                                private final HttpMessageConverter<OAuth2Error> errorHttpResponseConverter = new OAuth2ErrorHttpMessageConverter();
-
-                                                                                @Override
-                                                                                public void onAuthenticationFailure(HttpServletRequest request,
-                                                                                                                    HttpServletResponse response,
-                                                                                                                    AuthenticationException exception) throws IOException,
-                                                                                                                                                       ServletException {
-            //@formatter:off
-            OAuth2Error error = ((OAuth2AuthenticationException) exception).getError();
-            ServletServerHttpResponse httpResponse = new ServletServerHttpResponse(response);
-            httpResponse.setStatusCode(HttpStatus.BAD_REQUEST);
-            OAuth2Error responseError=new OAuth2Error(error.getErrorCode(),error.getDescription(),OIDC_ERROR_URI);
-            this.errorHttpResponseConverter.write(responseError, null, httpResponse);
-            //@formatter:on
-                                                                                }
-                                                                            };
+    private final AuthenticationFailureHandler authenticationFailureHandler = this::sendErrorResponse;
 
     OAuth2TokenEndpointConfigurer(ObjectPostProcessor<Object> objectPostProcessor) {
         super(objectPostProcessor);
@@ -128,8 +111,8 @@ public final class OAuth2TokenEndpointConfigurer extends AbstractConfigurer {
     }
 
     @Override
-    public RequestMatcher getRequestMatcher() {
-        return this.requestMatcher;
+    public EndpointMatcher getEndpointMatcher() {
+        return new EndpointMatcher(this.requestMatcher, false);
     }
 
     private static List<AuthenticationConverter> createDefaultAuthenticationConverters() {
@@ -185,4 +168,18 @@ public final class OAuth2TokenEndpointConfigurer extends AbstractConfigurer {
 
         return authenticationProviders;
     }
+
+    private void sendErrorResponse(HttpServletRequest request, HttpServletResponse response,
+                                   AuthenticationException exception) throws IOException {
+        //@formatter:off
+        OAuth2Error error = ((OAuth2AuthenticationException) exception).getError();
+        ServletServerHttpResponse httpResponse = new ServletServerHttpResponse(response);
+        httpResponse.setStatusCode(HttpStatus.BAD_REQUEST);
+        OAuth2Error responseError=new OAuth2Error(error.getErrorCode(),error.getDescription(),OIDC_ERROR_URI);
+        errorHttpResponseConverter.write(responseError, null, httpResponse);
+        //@formatter:on
+    }
+
+    private final HttpMessageConverter<OAuth2Error> errorHttpResponseConverter = new OAuth2ErrorHttpMessageConverter();
+
 }

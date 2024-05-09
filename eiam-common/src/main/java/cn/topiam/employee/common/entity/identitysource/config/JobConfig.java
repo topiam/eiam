@@ -19,7 +19,6 @@ package cn.topiam.employee.common.entity.identitysource.config;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.text.ParseException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -55,7 +54,7 @@ import static com.cronutils.model.field.expression.FieldExpressionFactory.*;
  * 任务配置
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/9/24 23:09
+ * Created by support@topiam.cn on 2022/9/24 23:09
  */
 @Slf4j
 @Data
@@ -192,20 +191,6 @@ public class JobConfig implements Serializable {
             second = on(0);
         }
         /*
-         *     Java(Quartz)
-         *     *    *    *    *    *    *    *
-         *     -    -    -    -    -    -    -
-         *     |    |    |    |    |    |    |
-         *     |    |    |    |    |    |    + year [optional]
-         *     |    |    |    |    |    +----- day of week (1 - 7) sun,mon,tue,wed,thu,fri,sat
-         *     |    |    |    |    +---------- month (1 - 12) OR jan,feb,mar,apr ...
-         *     |    |    |    +--------------- day of month (1 - 31)
-         *     |    |    +-------------------- hour (0 - 23)
-         *     |    +------------------------- min (0 - 59)
-         *     +------------------------------ second (0 - 59)
-         */
-
-        /*
          *     Java(Spring)
          *      *    *    *    *    *    *    *
          *      -    -    -    -    -    -    -
@@ -232,24 +217,9 @@ public class JobConfig implements Serializable {
             .withMonth(always())
             //星期几
             .withDoW(dayOfWeek);
-        //年
-        if (cronType.equals(CronType.QUARTZ)) {
-            cronBuilder.withYear(always());
-        }
         Cron cron = cronBuilder.instance();
         // Obtain the string expression
         String cronAsString = cron.asString();
-        //QUARTZ
-        if (cronType.equals(CronType.QUARTZ)) {
-            try {
-                org.quartz.CronExpression cronExpression = new org.quartz.CronExpression(
-                    cronAsString);
-                log.debug("Quartz Cron Expression: \n{} ", cronExpression.getExpressionSummary());
-                return cronExpression.toString();
-            } catch (ParseException exception) {
-                throw new RuntimeException(exception);
-            }
-        }
         //SPRING
         CronExpression parse = CronExpression.parse(cronAsString);
         log.debug("Spring Cron Expression: {} ", parse);

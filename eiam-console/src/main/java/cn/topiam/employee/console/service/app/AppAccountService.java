@@ -27,7 +27,7 @@ import cn.topiam.employee.support.repository.page.domain.PageModel;
  * 应用账户
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2022/6/4 21:07
+ * Created by support@topiam.cn on 2022/6/4 21:07
  */
 public interface AppAccountService {
 
@@ -55,4 +55,13 @@ public interface AppAccountService {
      * @return {@link Boolean}
      */
     Boolean deleteAppAccount(String id);
+
+    /**
+     * 设置默认应用账户
+     *
+     * @param id {@link String}
+     * @param defaulted {@link Boolean}
+     * @return {@link Boolean}
+     */
+    Boolean updateAppAccountDefault(String id, Boolean defaulted);
 }

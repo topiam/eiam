@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { LogoutOutlined, SettingOutlined } from '@ant-design/icons';
-import { history, useModel, useIntl } from '@umijs/max';
+import { history, useIntl, useModel } from '@umijs/max';
 import { Spin } from 'antd';
 import type { MenuInfo } from 'rc-menu/lib/interface';
 import React, { useCallback } from 'react';

@@ -26,7 +26,7 @@ import jakarta.persistence.Converter;
 
 /**
  * @author TopIAM
- * Created by support@topiam.cn on  2021/11/10 23:02
+ * Created by support@topiam.cn on 2021/11/10 23:02
  */
 @Converter(autoApply = true)
 public class AuditTypeConverter implements AttributeConverter<EventType, String> {

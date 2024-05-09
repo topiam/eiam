@@ -20,7 +20,7 @@ package cn.topiam.employee.protocol.jwt.endpoint;
 /**
  *
  * @author TopIAM
- * Created by support@topiam.cn on  2023/7/19 22:09
+ * Created by support@topiam.cn on 2023/7/19 22:09
  */
 public final class JwtParameterNames {
     /**
