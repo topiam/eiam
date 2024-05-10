@@ -156,7 +156,7 @@ public interface UserRepository extends JpaRepository<UserEntity, String>,
     @Transactional(rollbackFor = Exception.class)
     @Modifying
     @CacheEvict(allEntries = true)
-    @Query(value = "UPDATE UserEntity SET id=:id WHERE email=:email")
+    @Query(value = "UPDATE UserEntity SET email=:email WHERE id=:id")
     Integer updateByIdAndEmail(@Param(value = "id") String id,
                                @Param(value = "email") String email);
 
@@ -170,7 +170,7 @@ public interface UserRepository extends JpaRepository<UserEntity, String>,
     @Transactional(rollbackFor = Exception.class)
     @Modifying
     @CacheEvict(allEntries = true)
-    @Query(value = "UPDATE UserEntity SET id=:id WHERE phone=:phone")
+    @Query(value = "UPDATE UserEntity SET phone=:phone WHERE id=:id")
     Integer updateByIdAndPhone(@Param(value = "id") String id,
                                @Param(value = "phone") String phone);
 
