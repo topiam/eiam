@@ -1,8 +1,19 @@
 /*
- * Copyright (c) 2022-Present. Jinan Yuanchuang Network Technology Co., Ltd.
- * All rights reserved.
- * 项目名称：TOPIAM 企业数字身份管控平台
- * 版权说明：本软件属济南源创网络科技有限公司所有，受著作权法和国际版权条约的保护。在未获得济南源创网络科技有限公司正式授权情况下，任何企业和个人，未经授权擅自复制、修改、分发本程序的全部或任何部分，将要承担一切由此导致的民事或刑事责任。
+ * eiam-common - Employee Identity and Access Management
+ * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package cn.topiam.employee.common.repository.app.impl;
 
@@ -51,11 +62,10 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
                     app.template,app.protocol,app.type,app.icon,app.initLoginUrl,app.authorizationType,app.enabled,LISTAGG(DISTINCT ass.groupId,","))
                 FROM
                 	AppEntity app
-                	LEFT JOIN AppAccessPolicyEntity appAcce ON app.id = appAcce.appId
+                	LEFT JOIN AppAccessPolicyEntity appAcce ON app.id = appAcce.appId AND appAcce.enabled = true
                 	LEFT JOIN AppGroupAssociationEntity ass ON app.id = ass.app.id
                 WHERE
                 	app.enabled = true
-                	AND appAcce.enabled = true
                 	AND (appAcce.subjectId IN (:subjectIds) OR app.authorizationType = :type)
                 GROUP BY app.id
                 """;
