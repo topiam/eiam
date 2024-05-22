@@ -345,13 +345,13 @@ export default (props: { visible: boolean }) => {
               },
             }}
             onFinish={async (values) => {
-              const fieldsValue = editorFormRef.current?.getFieldsValue();
               const templates: { type: string; code: string }[] = [];
-              editableKeys?.forEach((i, index) => {
-                if (fieldsValue?.[index]?.code !== undefined) {
+              editableKeys?.forEach((key) => {
+                const fieldValue = editorFormRef.current?.getFieldValue(key);
+                if (fieldValue !== undefined) {
                   const config: { type: string; code: string } = {
-                    type: `${i}`,
-                    code: fieldsValue[index].code,
+                    type: `${key}`,
+                    code: fieldValue?.code,
                   };
                   templates.push(config);
                 }
