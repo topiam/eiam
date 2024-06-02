@@ -23,6 +23,16 @@
 用于管理企业内员工账号、权限、身份认证、应用访问，帮助整合部署在本地或云端的内部办公系统、业务系统及三方 SaaS
 系统的所有身份，实现一个账号打通所有应用的服务。
 
+官网：https://eiam-console.topiam.cn
+
+管理端演示：https://eiam-console.topiam.cn
+
+用户端演示：https://eiam-portal.topiam.cn
+
+付费服务支持或商务合作：
+
+<img src="images/contact-qr-code.png" alt="logo" width="200px"/>
+
 ## 核心特性
 
 + 提供统一组织信息管理，多维度建立对应关系，实现在一个平台对企业人员、组织架构、应用信息的高效统一管理。
@@ -32,11 +42,6 @@
 + 支持 `SAML2`，`OAuth2`，`OIDC`，`CAS`，`JWT`,`表单代填`等认证协议及机制，实现单点登录功能，预配置大量 SaaS 应用及传统应用模板，开箱即用。
 + 完善的安全审计，详尽记录每一次用户行为，使每一步操作有据可循，实时记录企业信息安全状况，精准识别企业异常访问和潜在威胁的源头。
 + 提供标准`RESTAPI`、`SCIM2.0`接口轻松完成机构用户同步，提供`HTTP`、`MQ`事件通知，实现企业对于账号生命周期的精细化管理。
-
-## 在线演示
-
-+ 管理端：https://eiam-console.topiam.cn
-+ 用户端：https://eiam-portal.topiam.cn
 
 ## 系统架构
 
