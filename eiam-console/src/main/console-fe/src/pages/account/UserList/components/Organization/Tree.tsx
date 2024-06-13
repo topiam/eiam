@@ -420,7 +420,7 @@ export const OrganizationTree = (props: {
                 await getRootOrganizationData();
                 return Promise.resolve(true);
               }
-              return Promise.resolvyarne(false);
+              return Promise.resolve(false);
             }}
             id={currentSelectedNode.id}
             visible={moveNodeVisible}
