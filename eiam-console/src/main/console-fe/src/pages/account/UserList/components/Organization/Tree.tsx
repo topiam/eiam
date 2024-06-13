@@ -318,7 +318,7 @@ export const OrganizationTree = (props: {
   return (
     <div className={styles}>
       <Card
-        style={{ height: 'calc(100vh - 200px)', overflow: 'auto' }}
+        style={{ height: 'calc(100vh - 220px)', overflow: 'auto' }}
         bordered={false}
         className={classnames(`${prefixCls}`)}
       >
@@ -420,7 +420,7 @@ export const OrganizationTree = (props: {
                 await getRootOrganizationData();
                 return Promise.resolve(true);
               }
-              return Promise.resolve(false);
+              return Promise.resolvyarne(false);
             }}
             id={currentSelectedNode.id}
             visible={moveNodeVisible}
