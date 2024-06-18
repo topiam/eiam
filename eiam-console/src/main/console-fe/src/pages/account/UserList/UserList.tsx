@@ -15,8 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import { DraggablePanel } from '@ant-design/pro-editor';
 import { PageContainer } from '@ant-design/pro-components';
-import { Col, Row } from 'antd';
+import { Col, Flex, Row } from 'antd';
 import { useState } from 'react';
 import OrgTree from './components/Organization';
 import UserList from './components/User';
@@ -48,16 +50,19 @@ export const User = () => {
 
   return (
     <PageContainer content={intl.formatMessage({ id: 'pages.account.user_list.desc' })}>
-      <Row gutter={[16, 16]}>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         {/* 左侧 */}
-        <Col {...leftLayout} style={{ minHeight: '100%', overflow: 'auto' }}>
+        <DraggablePanel
+          placement="left"
+          maxWidth={800}
+          style={{ flex: 1, padding: 0, borderRadius: 12 }}
+        >
           <OrgTree onSelect={treeOnSelect} />
-        </Col>
+        </DraggablePanel>
+        <div style={{ width: 'auto', flex: 1, padding: '0px 6px' }}></div>
         {/* 表格 */}
-        <Col {...rightLayout} style={{ minHeight: '100%', overflow: 'auto' }}>
-          <UserList organization={organization} />
-        </Col>
-      </Row>
+        <UserList organization={organization} />
+      </div>
     </PageContainer>
   );
 };

@@ -387,7 +387,7 @@ export default (props: UserListProps) => {
   return (
     <>
       {!organization ? (
-        <Card style={{ height: 'calc(100vh - 200px)' }} bordered={false}>
+        <Card style={{ height: 'calc(100vh - 220px)' }} bordered={false}>
           <Skeleton paragraph={{ rows: 10 }} active={true} />
         </Card>
       ) : (
@@ -396,10 +396,10 @@ export default (props: UserListProps) => {
           scroll={{ x: 1200 }}
           params={{ organizationId: organization?.id, inclSubOrganization }}
           style={{
-            height: 'calc(100vh - 200px)',
+            height: 'calc(100vh - 220px)',
             overflow: 'auto',
           }}
-          cardProps={{ style: { minHeight: 'calc(100vh - 200px)' } }}
+          cardProps={{ style: { minHeight: 'calc(100vh - 220px)' } }}
           search={{
             defaultCollapsed: true,
           }}

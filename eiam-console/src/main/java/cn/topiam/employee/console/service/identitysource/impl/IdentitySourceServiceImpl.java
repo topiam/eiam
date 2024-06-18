@@ -26,7 +26,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alibaba.fastjson2.JSONObject;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import cn.topiam.employee.audit.context.AuditContext;
 import cn.topiam.employee.audit.entity.Target;
@@ -245,20 +249,28 @@ public class IdentitySourceServiceImpl implements IdentitySourceService {
      */
     @Override
     public Boolean identitySourceConfigValidator(IdentitySourceConfigValidatorParam param) {
-        return switch (param.getProvider()) {
-            //钉钉
-            case DINGTALK -> {
-                DingTalkConfig config = JSONObject.parseObject(param.getConfig().toJSONString(),
-                        DingTalkConfig.class);
-                yield new DingTalkConfigValidator().validate(config);
-            }
-            case FEISHU -> {
-                FeiShuConfig config = JSONObject.parseObject(param.getConfig().toJSONString(),
-                        FeiShuConfig.class);
-                yield new FeiShuConfigValidator().validate(config);
-            }
-            default -> throw new TopIamException("暂未支持此提供商连接验证");
-        };
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        try {
+            return switch (param.getProvider()) {
+                //钉钉
+                case DINGTALK -> {
+                    DingTalkConfig config = objectMapper
+                            .readValue(param.getConfig().toJSONString(), DingTalkConfig.class);;
+                    yield new DingTalkConfigValidator().validate(config);
+                }
+                case FEISHU -> {
+                    FeiShuConfig config = objectMapper
+                            .readValue(param.getConfig().toJSONString(), FeiShuConfig.class);
+                    yield new FeiShuConfigValidator().validate(config);
+                }
+                default -> throw new TopIamException("暂未支持此提供商连接验证");
+            };
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

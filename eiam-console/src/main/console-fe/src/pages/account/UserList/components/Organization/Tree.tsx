@@ -318,7 +318,7 @@ export const OrganizationTree = (props: {
   return (
     <div className={styles}>
       <Card
-        style={{ height: 'calc(100vh - 200px)', overflow: 'auto' }}
+        style={{ height: 'calc(100vh - 220px)', overflow: 'auto' }}
         bordered={false}
         className={classnames(`${prefixCls}`)}
       >

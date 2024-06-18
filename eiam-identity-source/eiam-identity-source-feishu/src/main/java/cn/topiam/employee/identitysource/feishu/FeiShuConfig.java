@@ -63,4 +63,7 @@ public class FeiShuConfig extends IdentitySourceConfig {
      */
     @JsonPropertyEncrypt
     private String            verificationToken;
+
+    public FeiShuConfig() {
+    }
 }

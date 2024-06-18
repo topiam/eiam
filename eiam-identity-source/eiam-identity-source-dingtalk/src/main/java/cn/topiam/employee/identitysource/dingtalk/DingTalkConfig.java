@@ -67,4 +67,7 @@ public class DingTalkConfig extends IdentitySourceConfig {
      */
     @JsonPropertyEncrypt
     private String            token;
+
+    public DingTalkConfig() {
+    }
 }
