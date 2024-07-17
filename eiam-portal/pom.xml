@@ -130,6 +130,7 @@
                                 </goals>
                                 <phase>generate-resources</phase>
                                 <configuration>
+                                    <nodeDownloadRoot>https://mirrors.aliyun.com/nodejs-release/</nodeDownloadRoot>
                                     <nodeVersion>v20.10.0</nodeVersion>
                                     <pnpmVersion>v9.1.0</pnpmVersion>
                                 </configuration>
@@ -182,6 +183,7 @@
                                 </goals>
                                 <phase>generate-resources</phase>
                                 <configuration>
+                                    <nodeDownloadRoot>https://mirrors.aliyun.com/nodejs-release/</nodeDownloadRoot>
                                     <nodeVersion>v20.10.0</nodeVersion>
                                     <pnpmVersion>v9.1.0</pnpmVersion>
                                 </configuration>
@@ -234,6 +236,7 @@
                                 </goals>
                                 <phase>generate-resources</phase>
                                 <configuration>
+                                    <nodeDownloadRoot>https://mirrors.aliyun.com/nodejs-release/</nodeDownloadRoot>
                                     <nodeVersion>v20.10.0</nodeVersion>
                                     <pnpmVersion>v9.1.0</pnpmVersion>
                                 </configuration>
