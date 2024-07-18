@@ -81,13 +81,9 @@ const FeiShuConfig = (props: {
     }
   }, [formRef, onConfigValidator]);
 
-  useImperativeHandle(
-    basicConfigRef,
-    () => {
-      return { configValidator: configValidator };
-    },
-    [configValidator],
-  );
+  useImperativeHandle(basicConfigRef, () => {
+    return { configValidator: configValidator };
+  }, [configValidator]);
 
   return (
     <>
