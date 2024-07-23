@@ -39,7 +39,6 @@ import {
   updateOrganization,
 } from '@/services/account';
 import { useMount } from 'ahooks';
-import type { ItemType } from 'antd/es/menu/hooks/useItems';
 import CreateOrganization from '../CreateOrganization';
 import MoveOrganization from './MoveDrawer';
 import SearchTree from './SearchTree';
@@ -47,6 +46,7 @@ import UpdateOrganization from '../UpdateOrganization';
 import type { DataNode } from '@/utils/tree';
 import { updateTreeData } from '@/utils/tree';
 import { useIntl } from '@umijs/max';
+import { ItemType } from 'antd/es/menu/interface';
 
 const prefixCls = 'account-organization';
 
@@ -318,7 +318,7 @@ export const OrganizationTree = (props: {
   return (
     <div className={styles}>
       <Card
-        style={{ height: 'calc(100vh - 220px)', overflow: 'auto' }}
+        style={{ height: 'calc(100vh - 200px)', overflow: 'auto' }}
         bordered={false}
         className={classnames(`${prefixCls}`)}
       >

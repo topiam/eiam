@@ -290,16 +290,16 @@ export default (props: { app: GetApp | Record<string, any> }) => {
           >
             {(fields, { add, remove }, { errors }) => (
               <>
-                {fields.map((field, index) => (
+                {fields.map(({ key, name, ...restField }, index) => (
                   <Form.Item
                     {...(index === 0 ? layout : formItemLayoutWithOutLabel)}
                     required={true}
-                    key={field.key}
+                    key={key}
                     label={
                       index === 0
                         ? intl.formatMessage({
-                            id: 'pages.app.config.detail.protocol_config.oidc.redirect_uris',
-                          })
+                          id: 'pages.app.config.detail.protocol_config.oidc.redirect_uris',
+                        })
                         : ''
                     }
                   >
@@ -311,7 +311,8 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                       }}
                     >
                       <Form.Item
-                        {...field}
+                        {...restField}
+                        name={[name]}
                         validateTrigger={['onChange', 'onBlur']}
                         rules={[
                           {
@@ -335,7 +336,7 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                           })}
                         />
                       </Form.Item>
-                      <DeleteOutlined onClick={() => remove(field.name)} />
+                      <DeleteOutlined onClick={() => remove(name)} />
                     </div>
                   </Form.Item>
                 ))}
@@ -345,8 +346,8 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                   label={
                     fields.length === 0
                       ? intl.formatMessage({
-                          id: 'pages.app.config.detail.protocol_config.oidc.redirect_uris',
-                        })
+                        id: 'pages.app.config.detail.protocol_config.oidc.redirect_uris',
+                      })
                       : ''
                   }
                   extra={intl.formatMessage({
@@ -369,16 +370,16 @@ export default (props: { app: GetApp | Record<string, any> }) => {
           <Form.List name="postLogoutRedirectUris">
             {(fields, { add, remove }, {}) => (
               <>
-                {fields.map((field, index) => {
+                {fields.map(({ key, name, ...restField }, index) => {
                   return (
                     <Form.Item
                       {...(index === 0 ? layout : formItemLayoutWithOutLabel)}
-                      key={field.key}
+                      key={key}
                       label={
                         index === 0
                           ? intl.formatMessage({
-                              id: 'pages.app.config.detail.protocol_config.oidc.post_logout_redirect_uris',
-                            })
+                            id: 'pages.app.config.detail.protocol_config.oidc.post_logout_redirect_uris',
+                          })
                           : ''
                       }
                     >
@@ -390,7 +391,8 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                         }}
                       >
                         <Form.Item
-                          {...field}
+                          {...restField}
+                          name={[name]}
                           validateTrigger={['onChange', 'onBlur']}
                           rules={[
                             {
@@ -414,7 +416,7 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                             })}
                           />
                         </Form.Item>
-                        <DeleteOutlined onClick={() => remove(field.name)} />
+                        <DeleteOutlined onClick={() => remove(name)} />
                       </div>
                     </Form.Item>
                   );
@@ -424,8 +426,8 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                   label={
                     fields.length === 0
                       ? intl.formatMessage({
-                          id: 'pages.app.config.detail.protocol_config.oidc.post_logout_redirect_uris',
-                        })
+                        id: 'pages.app.config.detail.protocol_config.oidc.post_logout_redirect_uris',
+                      })
                       : ''
                   }
                   extra={intl.formatMessage({
