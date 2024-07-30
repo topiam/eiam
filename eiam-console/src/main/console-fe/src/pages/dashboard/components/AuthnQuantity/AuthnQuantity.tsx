@@ -59,7 +59,7 @@ export default () => {
     seriesField: 'status',
     marginRatio: 0.1,
     color: ({ status }) => {
-      if (status === '成功') {
+      if (status === 'success') {
         return '#5B8FF9';
       }
       return '#F4664A';
