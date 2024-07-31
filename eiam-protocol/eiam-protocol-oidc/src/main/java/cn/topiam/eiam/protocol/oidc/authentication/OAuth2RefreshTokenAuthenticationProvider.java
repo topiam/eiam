@@ -222,7 +222,8 @@ public final class OAuth2RefreshTokenAuthenticationProvider implements Authentic
             // @formatter:off
 			tokenContext = tokenContextBuilder
 					.tokenType(ID_TOKEN_TOKEN_TYPE)
-					.authorization(authorizationBuilder.build())	// ID token customizer may need access to the access token and/or refresh token
+                    // ID token customizer may need access to the access token and/or refresh token
+					.authorization(authorizationBuilder.build())
 					.build();
 			// @formatter:on
             OAuth2Token generatedIdToken = this.tokenGenerator.generate(tokenContext);
