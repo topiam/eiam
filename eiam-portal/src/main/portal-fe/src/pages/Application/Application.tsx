@@ -15,17 +15,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import type {ActionType} from '@ant-design/pro-components';
-import {PageContainer, ProCard, ProFormText, ProList, QueryFilter,} from '@ant-design/pro-components';
-import {Avatar, Badge, Card, Typography} from 'antd';
-import React, {useRef, useState} from 'react';
-import {AppGroupList, AppList} from './data.d';
-import {getAppGroupList, queryAppList} from './service';
+import type { ActionType } from '@ant-design/pro-components';
+import {
+  PageContainer,
+  ProCard,
+  ProFormText,
+  ProList,
+  QueryFilter,
+} from '@ant-design/pro-components';
+import { Avatar, Badge, Card, Typography } from 'antd';
+import React, { useRef, useState } from 'react';
+import { AppGroupList, AppList } from './data.d';
+import { getAppGroupList, queryAppList } from './service';
 import useStyle from './style';
 import classnames from 'classnames';
-import {useAsyncEffect} from 'ahooks';
-import {SpinProps} from 'antd/es/spin';
-import {useIntl} from '@umijs/max';
+import { useAsyncEffect } from 'ahooks';
+import { SpinProps } from 'antd/es/spin';
+import { useIntl } from '@umijs/max';
 
 const { Paragraph } = Typography;
 const prefixCls = 'topiam-app-list';
@@ -55,7 +61,7 @@ const CardList = () => {
   const [loading, setLoading] = useState<boolean | SpinProps | undefined>(false);
 
   const getItems = () => {
-    let data: { key: string; label: React.React.JSX.Element }[] = [
+    let data: { key: string; label: React.JSX.Element }[] = [
       {
         key: all,
         label: (
@@ -82,15 +88,25 @@ const CardList = () => {
 
   const initSso = (idpInitUrl: string) => {
     const div = window.document.createElement('div');
-    div.innerHTML =
-      "<form action='" +
-      idpInitUrl +
-      "' method='POST' name='auto_submit_form' style='display:none'>";
+    const a = document.createElement('a');
+    a.href = idpInitUrl;
+    const form = document.createElement('form');
+    form.method = 'GET';
+    form.action = a.origin + a.pathname; // 使用URL的origin和pathname部分作为action
+    form.name = 'auto_submit_form';
+    form.style.display = 'none';
+    form.target = '_blank';
+    const queryParams = new URLSearchParams(a.search);
+    queryParams.forEach((value, key) => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = value;
+      form.appendChild(input);
+    });
+    div.appendChild(form);
     document.body.appendChild(div);
-    // eslint-disable-next-line @typescript-eslint/dot-notation
-    document.forms['auto_submit_form'].setAttribute('target', '_blank');
-    // eslint-disable-next-line @typescript-eslint/dot-notation
-    document.forms['auto_submit_form'].submit();
+    form.submit();
     document.body.removeChild(div);
   };
 
