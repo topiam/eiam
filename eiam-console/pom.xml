@@ -149,7 +149,7 @@
                                 <configuration>
                                     <nodeDownloadRoot>https://mirrors.aliyun.com/nodejs-release/</nodeDownloadRoot>
                                     <nodeVersion>v20.10.0</nodeVersion>
-                                    <pnpmVersion>v9.1.0</pnpmVersion>
+                                    <pnpmVersion>v9.7.1</pnpmVersion>
                                 </configuration>
                             </execution>
                             <execution>
@@ -202,7 +202,7 @@
                                 <configuration>
                                     <nodeDownloadRoot>https://mirrors.aliyun.com/nodejs-release/</nodeDownloadRoot>
                                     <nodeVersion>v20.10.0</nodeVersion>
-                                    <pnpmVersion>v9.1.0</pnpmVersion>
+                                    <pnpmVersion>v9.7.1</pnpmVersion>
                                 </configuration>
                             </execution>
                             <execution>
@@ -255,7 +255,7 @@
                                 <configuration>
                                     <nodeDownloadRoot>https://mirrors.aliyun.com/nodejs-release/</nodeDownloadRoot>
                                     <nodeVersion>v20.10.0</nodeVersion>
-                                    <pnpmVersion>v9.1.0</pnpmVersion>
+                                    <pnpmVersion>v9.7.1</pnpmVersion>
                                 </configuration>
                             </execution>
                             <execution>
