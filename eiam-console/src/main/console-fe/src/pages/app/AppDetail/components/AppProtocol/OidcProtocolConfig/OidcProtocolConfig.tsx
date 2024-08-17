@@ -75,7 +75,6 @@ export default (props: { app: GetApp | Record<string, any> }) => {
   const { id, template } = app;
   const [form] = Form.useForm();
   const [protocolEndpoint, setProtocolEndpoint] = useState<Record<string, string>>({});
-  const [idTokenCustomClaimsTableForm] = Form.useForm();
   const [loading, setLoading] = useState<boolean>(true);
 
   useMount(async () => {
@@ -127,8 +126,6 @@ export default (props: { app: GetApp | Record<string, any> }) => {
         form={form}
         scrollToFirstError
         onFinish={async (values) => {
-          //校验扩展字段
-          await idTokenCustomClaimsTableForm.validateFields();
           setLoading(true);
           const { success } = await saveAppConfig({
             id,
@@ -269,104 +266,127 @@ export default (props: { app: GetApp | Record<string, any> }) => {
               );
             }}
           </ProFormDependency>
-          <Form.List
-            name="redirectUris"
-            rules={[
-              {
-                validator: async (_, value) => {
-                  if (value && value.length > 0) {
-                    return null;
-                  }
-                  return Promise.reject(
-                    new Error(
-                      intl.formatMessage({
-                        id: 'pages.app.config.detail.protocol_config.oidc.redirect_uris.rule.0.message',
-                      }),
-                    ),
-                  );
-                },
-              },
-            ]}
-          >
-            {(fields, { add, remove }, { errors }) => (
-              <>
-                {fields.map(({ key, name, ...restField }, index) => (
-                  <Form.Item
-                    {...(index === 0 ? layout : formItemLayoutWithOutLabel)}
-                    required={true}
-                    key={key}
-                    label={
-                      index === 0
-                        ? intl.formatMessage({
-                          id: 'pages.app.config.detail.protocol_config.oidc.redirect_uris',
-                        })
-                        : ''
-                    }
-                  >
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                      }}
-                    >
-                      <Form.Item
-                        {...restField}
-                        name={[name]}
-                        validateTrigger={['onChange', 'onBlur']}
-                        rules={[
+          <ProFormDependency name={['authGrantTypes']}>
+            {({ authGrantTypes }) => {
+              const required =
+                authGrantTypes?.includes('implicit') ||
+                authGrantTypes?.includes('authorization_code');
+              return (
+                <Form.List
+                  name="redirectUris"
+                  rules={
+                    required
+                      ? [
                           {
-                            required: true,
-                            message: intl.formatMessage({
-                              id: 'pages.app.config.detail.protocol_config.oidc.redirect_uris.rule.0.message',
-                            }),
+                            validator: async (_, value) => {
+                              if (value && value.length > 0) {
+                                return null;
+                              }
+                              return Promise.reject(
+                                new Error(
+                                  intl.formatMessage({
+                                    id: 'pages.app.config.detail.protocol_config.oidc.redirect_uris.rule.0.message',
+                                  }),
+                                ),
+                              );
+                            },
                           },
-                          {
-                            type: 'url',
-                            message: intl.formatMessage({
-                              id: 'pages.app.config.detail.protocol_config.oidc.redirect_uris.rule.1.message',
-                            }),
-                          },
-                        ]}
-                        noStyle
-                      >
-                        <Input
-                          placeholder={intl.formatMessage({
-                            id: 'pages.app.config.detail.protocol_config.oidc.redirect_uris.placeholder',
-                          })}
-                        />
-                      </Form.Item>
-                      <DeleteOutlined onClick={() => remove(name)} />
-                    </div>
-                  </Form.Item>
-                ))}
-                <Form.Item
-                  {...(fields.length === 0 ? layout : formItemLayoutWithOutLabel)}
-                  required={true}
-                  label={
-                    fields.length === 0
-                      ? intl.formatMessage({
-                        id: 'pages.app.config.detail.protocol_config.oidc.redirect_uris',
-                      })
-                      : ''
+                        ]
+                      : []
                   }
-                  extra={intl.formatMessage({
-                    id: 'pages.app.config.detail.protocol_config.oidc.redirect_uris.extra',
-                  })}
                 >
-                  <Button
-                    type="dashed"
-                    onClick={() => add()}
-                    icon={<PlusOutlined />}
-                    style={{ width: '100%' }}
-                  >
-                    {intl.formatMessage({ id: 'app.add' })}
-                  </Button>
-                  <Form.ErrorList errors={errors} />
-                </Form.Item>
-              </>
-            )}
-          </Form.List>
+                  {(fields, { add, remove }, { errors }) => (
+                    <>
+                      {fields.map(({ key, name, ...restField }, index) => (
+                        <Form.Item
+                          {...(index === 0 ? layout : formItemLayoutWithOutLabel)}
+                          key={key}
+                          label={
+                            index === 0
+                              ? intl.formatMessage({
+                                  id: 'pages.app.config.detail.protocol_config.oidc.redirect_uris',
+                                })
+                              : ''
+                          }
+                        >
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                            }}
+                          >
+                            <Form.Item
+                              {...restField}
+                              name={[name]}
+                              validateTrigger={['onChange', 'onBlur']}
+                              rules={
+                                required
+                                  ? [
+                                      {
+                                        required: true,
+                                        message: intl.formatMessage({
+                                          id: 'pages.app.config.detail.protocol_config.oidc.redirect_uris.rule.0.message',
+                                        }),
+                                      },
+                                      {
+                                        type: 'url',
+                                        message: intl.formatMessage({
+                                          id: 'pages.app.config.detail.protocol_config.oidc.redirect_uris.rule.1.message',
+                                        }),
+                                      },
+                                    ]
+                                  : [
+                                      {
+                                        type: 'url',
+                                        message: intl.formatMessage({
+                                          id: 'pages.app.config.detail.protocol_config.oidc.redirect_uris.rule.1.message',
+                                        }),
+                                      },
+                                    ]
+                              }
+                              noStyle
+                            >
+                              <Input
+                                placeholder={intl.formatMessage({
+                                  id: 'pages.app.config.detail.protocol_config.oidc.redirect_uris.placeholder',
+                                })}
+                              />
+                            </Form.Item>
+                            <DeleteOutlined onClick={() => remove(name)} />
+                          </div>
+                        </Form.Item>
+                      ))}
+                      <Form.Item
+                        {...(fields.length === 0 ? layout : formItemLayoutWithOutLabel)}
+                        required={required}
+                        label={
+                          fields.length === 0
+                            ? intl.formatMessage({
+                                id: 'pages.app.config.detail.protocol_config.oidc.redirect_uris',
+                              })
+                            : ''
+                        }
+                        extra={intl.formatMessage({
+                          id: 'pages.app.config.detail.protocol_config.oidc.redirect_uris.extra',
+                        })}
+                      >
+                        <Button
+                          type="dashed"
+                          onClick={() => add()}
+                          icon={<PlusOutlined />}
+                          style={{ width: '100%' }}
+                        >
+                          {intl.formatMessage({ id: 'app.add' })}
+                        </Button>
+                        <Form.ErrorList errors={errors} />
+                      </Form.Item>
+                    </>
+                  )}
+                </Form.List>
+              );
+            }}
+          </ProFormDependency>
           <Form.List name="postLogoutRedirectUris">
             {(fields, { add, remove }, {}) => (
               <>
@@ -378,8 +398,8 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                       label={
                         index === 0
                           ? intl.formatMessage({
-                            id: 'pages.app.config.detail.protocol_config.oidc.post_logout_redirect_uris',
-                          })
+                              id: 'pages.app.config.detail.protocol_config.oidc.post_logout_redirect_uris',
+                            })
                           : ''
                       }
                     >
@@ -426,8 +446,8 @@ export default (props: { app: GetApp | Record<string, any> }) => {
                   label={
                     fields.length === 0
                       ? intl.formatMessage({
-                        id: 'pages.app.config.detail.protocol_config.oidc.post_logout_redirect_uris',
-                      })
+                          id: 'pages.app.config.detail.protocol_config.oidc.post_logout_redirect_uris',
+                        })
                       : ''
                   }
                   extra={intl.formatMessage({
