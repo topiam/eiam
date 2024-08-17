@@ -136,7 +136,7 @@ public class AuditAspect {
             }
             //上下文内容，自动拼接事件类型描述
             if (Objects.isNull(content) && StringUtils.isNoneBlank(AuditContext.getContent())) {
-                content = audit.type().getDesc() +COLON + AuditContext.getContent();
+                content = audit.type().getDesc() + COLON + AuditContext.getContent();
             }
             if (Objects.isNull(content) && StringUtils.isBlank(AuditContext.getContent())) {
                 content = audit.type().getDesc();
