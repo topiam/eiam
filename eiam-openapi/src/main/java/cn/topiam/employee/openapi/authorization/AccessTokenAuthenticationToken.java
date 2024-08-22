@@ -85,7 +85,7 @@ public class AccessTokenAuthenticationToken extends AbstractAuthenticationToken 
 
     @Override
     public Object getPrincipal() {
-        return this.getToken();
+        return this.getClientId();
     }
 
 }
