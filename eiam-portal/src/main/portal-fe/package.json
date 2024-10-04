@@ -76,12 +76,10 @@
   },
   "devDependencies": {
     "@ant-design/antd-theme-variable": "^1.0.0",
-    "@types/classnames": "^2.3.1",
     "@types/crypto-js": "^4.2.2",
     "@types/google-libphonenumber": "^7.4.30",
-    "@types/history": "^5.0.0",
     "@types/js-yaml": "^4.0.9",
-    "@types/lodash": "^4.17.9",
+    "@types/lodash": "^4.17.10",
     "@types/numeral": "^2.0.5",
     "@types/qs": "^6.9.16",
     "@types/react": "^18.3.11",
