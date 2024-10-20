@@ -18,12 +18,12 @@
 package cn.topiam.employee.protocol.form.endpoint;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.compress.utils.CharsetNames;
 import org.apache.http.entity.ContentType;
 import org.springframework.core.log.LogMessage;
 import org.springframework.http.HttpStatus;
@@ -207,7 +207,7 @@ public final class FormAuthenticationEndpointFilter extends OncePerRequestFilter
         FormAuthenticationToken authenticationToken = (FormAuthenticationToken) authentication;
         FormProtocolConfig config = authenticationToken.getConfig();
         try {
-            response.setCharacterEncoding(CharsetNames.UTF_8);
+            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
             response.setContentType(ContentType.TEXT_HTML.getMimeType());
             Template template = freemarkerTemplateConfiguration.getTemplate("form_redirect.ftlh");
             Map<String, Object> data = new HashMap<>(16);
@@ -257,7 +257,7 @@ public final class FormAuthenticationEndpointFilter extends OncePerRequestFilter
             freemarkerTemplateConfiguration
                 .setTemplateLoader(new ClassTemplateLoader(this.getClass(), "/template/"));
             //编码
-            freemarkerTemplateConfiguration.setDefaultEncoding(CharsetNames.UTF_8);
+            freemarkerTemplateConfiguration.setDefaultEncoding(StandardCharsets.UTF_8.name());
             //国际化
             freemarkerTemplateConfiguration.setLocale(new Locale("zh_CN"));
         } catch (Exception exception) {

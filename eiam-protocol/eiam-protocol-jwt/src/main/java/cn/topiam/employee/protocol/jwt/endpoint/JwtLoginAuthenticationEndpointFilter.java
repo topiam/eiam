@@ -18,12 +18,12 @@
 package cn.topiam.employee.protocol.jwt.endpoint;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.commons.compress.utils.CharsetNames;
 import org.apache.http.entity.ContentType;
 import org.springframework.core.log.LogMessage;
 import org.springframework.lang.NonNull;
@@ -200,7 +200,7 @@ public final class JwtLoginAuthenticationEndpointFilter extends OncePerRequestFi
         JwtProtocolConfig config = authenticationToken.getConfig();
         IdToken idToken = authenticationToken.getIdToken();
         String targetUri = Objects.toString(authenticationToken.getTargetUrl(), config.getTargetLinkUrl());
-        response.setCharacterEncoding(CharsetNames.UTF_8);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setContentType(ContentType.TEXT_HTML.getMimeType());
         try {
             Template template = freemarkerTemplateConfiguration.getTemplate("jwt_redirect.ftlh");
@@ -225,7 +225,7 @@ public final class JwtLoginAuthenticationEndpointFilter extends OncePerRequestFi
             freemarkerTemplateConfiguration
                 .setTemplateLoader(new ClassTemplateLoader(this.getClass(), "/template/"));
             //编码
-            freemarkerTemplateConfiguration.setDefaultEncoding(CharsetNames.UTF_8);
+            freemarkerTemplateConfiguration.setDefaultEncoding(StandardCharsets.UTF_8.name());
             //国际化
             freemarkerTemplateConfiguration.setLocale(new Locale("zh_CN"));
         } catch (Exception exception) {
