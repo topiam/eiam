@@ -19,15 +19,11 @@
 
 ## 项目介绍
 
-**TOPIAM** 数字身份管控平台，简称：EIAM（Employee Identity and Access Management），
-用于管理企业内员工账号、权限、身份认证、应用访问，帮助整合部署在本地或云端的内部办公系统、业务系统及三方 SaaS
-系统的所有身份，实现一个账号打通所有应用的服务。
+TOPIAM（Top Identity and Access Management），是一款开源的身份管理与访问控制系统，广泛应用于政府、企业内部、教育机构等身份认证场景。作为一款专注于身份管理与访问控制场景的软件产品，TOPIAM 支持 OIDC、OAuth2、SAML2、JWT、CAS 等主流认证协议，并能够集成钉钉、企业微信、飞书、LDAP、AD 等多种身份源，轻松实现用户全生命周期管理与数据同步。在认证方面，TOPIAM 支持用户名密码、短信/邮箱验证码等常规认证方式，并能集成钉钉、飞书、微信、企业微信、QQ 等社交平台登录，让用户能够通过常见平台便捷登录，从而显著提升用户体验。在安全性方面，TOPIAM 提供多因素认证、防暴力破解、会话管理、密码策略等能力，提升系统安全性。在审计方面，TOPIAM 提供全面的行为审计功能，详尽记录用户行为，发现潜在安全风险并及时采取防范措施，确保合规性和安全性。在信创方面，TOPIAM 全面支持从 CPU、操作系统、中间件、数据库、浏览器、国密算法的兼容适配，满足自主可控的技术需求。通过 TOPIAM，企业和团队能够快速实现统一的内外部身份认证，并集成各类应用，实现“一个账号、一次认证、多点通行”的效果，强化企业安全体系，提高组织管理效率，提升用户体验，助力企业数字化升级转型。
 
 官网：https://topiam.cn
 
-管理端演示：https://eiam-console.topiam.cn
-
-用户端演示：https://eiam-portal.topiam.cn
+演示：https://demo.topiam.cn
 
 付费服务支持或商务合作：
 
@@ -78,9 +74,9 @@
 
 ## 安装部署
 
-+ [本地部署](https://eiam.topiam.cn/docs/deployment/deployment-local/)
-+ [Docker部署](https://eiam.topiam.cn/docs/deployment/deployment-local/)
-+ [K8S部署](https://eiam.topiam.cn/docs/deployment/deployment-k8s/)
++ [一键部署](https://topiam.cn/docs/deployment/deployment-online/)
++ [宝塔部署](https://topiam.cn/docs/deployment/deployment-baota/)
++ [阿里云计算巢部署](https://topiam.cn/docs/deployment/deployment-alibaba-cloud-computenest/)
 + [更多方式](https://eiam.topiam.cn/docs/deployment/)
 
 ## 微信公众号
