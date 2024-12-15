@@ -19,26 +19,17 @@ package cn.topiam.employee.console.initializer;
 
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.AlternativeJdkIdGenerator;
 
 import cn.topiam.employee.common.entity.app.AppGroupEntity;
 import cn.topiam.employee.common.enums.app.AppDefaultGroup;
 import cn.topiam.employee.common.enums.app.AppGroupType;
 import cn.topiam.employee.common.repository.app.AppGroupRepository;
-import cn.topiam.employee.support.init.Initializer;
-import cn.topiam.employee.support.trace.TraceUtils;
-import static cn.topiam.employee.support.constant.EiamConstants.TOPIAM_INIT_AUTHENTICATION;
-import static cn.topiam.employee.support.lock.LockAspect.getTopiamLockKeyPrefix;
+import cn.topiam.employee.support.config.AbstractSystemInitializer;
+import cn.topiam.employee.support.config.InitializationException;
 
 /**
  * DefaultAppGroupInitialize
@@ -48,59 +39,34 @@ import static cn.topiam.employee.support.lock.LockAspect.getTopiamLockKeyPrefix;
  */
 @Order(2)
 @Component
-public class DefaultAppGroupInitializer implements Initializer {
+public class DefaultAppGroupInitializer extends AbstractSystemInitializer {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void execute(ApplicationContext applicationContext) {
+    public void init() throws InitializationException {
         //@formatter:off
-        String traceId = idGenerator.generateId().toString();
-        TraceUtils.put(traceId);
-        RLock lock = redissonClient.getLock(getTopiamLockKeyPrefix());
-        boolean tryLock = false;
-        try {
-            SecurityContextHolder.getContext().setAuthentication(TOPIAM_INIT_AUTHENTICATION);
-            tryLock = lock.tryLock(1, TimeUnit.SECONDS);
-            if (tryLock) {
-                Arrays.stream(AppDefaultGroup.values()).toList().forEach(i -> {
-                    Optional<AppGroupEntity> optional = appGroupRepository.findByCode(i.getCode());
-                    if (optional.isEmpty()) {
-                        AppGroupEntity appGroup = new AppGroupEntity();
-                        appGroup.setCode(i.getCode());
-                        appGroup.setName(i.getDesc());
-                        appGroup.setType(AppGroupType.DEFAULT);
-                        appGroup.setRemark(
-                            "This app group is automatically created during system initialization.");
-                        appGroupRepository.save(appGroup);
-                    }
-                });
-
+        Arrays.stream(AppDefaultGroup.values()).toList().forEach(i -> {
+            Optional<AppGroupEntity> optional = appGroupRepository.findByCode(i.getCode());
+            if (optional.isEmpty()) {
+                AppGroupEntity appGroup = new AppGroupEntity();
+                appGroup.setCode(i.getCode());
+                appGroup.setName(i.getDesc());
+                appGroup.setType(AppGroupType.DEFAULT);
+                appGroup.setRemark(
+                        "This app group is automatically created during system initialization.");
+                appGroupRepository.save(appGroup);
             }
-
-        } catch (Exception exception) {
-            int exitCode = SpringApplication.exit(applicationContext,
-                () -> 0);
-            System.exit(exitCode);
-        } finally {
-            if (tryLock && lock.isLocked()) {
-                lock.unlock();
-            }
-            TraceUtils.remove();
-            SecurityContextHolder.setContext(SecurityContextHolder.createEmptyContext());
-        }
-        //@formatter:on
+        });
     }
-
-    private final AlternativeJdkIdGenerator idGenerator = new AlternativeJdkIdGenerator();
+    @Override
+    public int getOrder() {
+        return 4;
+    }
 
     private final AppGroupRepository        appGroupRepository;
 
-    private final RedissonClient            redissonClient;
 
-    public DefaultAppGroupInitializer(AppGroupRepository appGroupRepository,
-                                      RedissonClient redissonClient) {
+    public DefaultAppGroupInitializer(AppGroupRepository appGroupRepository) {
         this.appGroupRepository = appGroupRepository;
-        this.redissonClient = redissonClient;
     }
-
 }
