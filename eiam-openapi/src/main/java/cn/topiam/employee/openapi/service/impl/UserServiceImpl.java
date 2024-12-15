@@ -59,8 +59,7 @@ import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.security.password.PasswordPolicyManager;
 import cn.topiam.employee.support.util.BeanUtils;
-import cn.topiam.employee.support.util.PhoneNumberUtils;
-import cn.topiam.employee.support.validation.annotation.ValidationPhone;
+import cn.topiam.employee.support.util.PhoneUtils;
 
 import lombok.extern.slf4j.Slf4j;
 import static cn.topiam.employee.audit.enums.TargetType.USER;
@@ -68,7 +67,8 @@ import static cn.topiam.employee.audit.enums.TargetType.USER_DETAIL;
 import static cn.topiam.employee.core.message.sms.SmsMsgEventPublish.USERNAME;
 import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_BY;
 import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_TIME;
-import static cn.topiam.employee.support.util.PhoneNumberUtils.getPhoneNumber;
+import static cn.topiam.employee.support.util.PhoneUtils.PHONE_REGEXP;
+import static cn.topiam.employee.support.util.PhoneUtils.getPhoneNumber;
 
 /**
  * <p>
@@ -128,7 +128,7 @@ public class UserServiceImpl implements UserService {
         }
         //手机号
         if (StringUtils.isNotEmpty(param.getPhone())) {
-            if (!getPhoneNumber(param.getPhone()).matches(ValidationPhone.PHONE_REGEXP)) {
+            if (!getPhoneNumber(param.getPhone()).matches(PHONE_REGEXP)) {
                 throw new OpenApiException(OpenApiStatus.MOBILE_NOT_VALID);
             }
             Boolean validityPhone = userParamCheck(CheckValidityType.PHONE, param.getPhone(), null);
@@ -206,8 +206,8 @@ public class UserServiceImpl implements UserService {
             detail.orElse(null));
         if (Objects.nonNull(userEntity) && StringUtils.isNotEmpty(userEntity.getPhone())) {
             StringBuilder phoneAreaCode = new StringBuilder(
-                userEntity.getPhoneAreaCode().replace(PhoneNumberUtils.PLUS_SIGN, ""));
-            phoneAreaCode.insert(0, PhoneNumberUtils.PLUS_SIGN);
+                userEntity.getPhoneAreaCode().replace(PhoneUtils.PLUS_SIGN, ""));
+            phoneAreaCode.insert(0, PhoneUtils.PLUS_SIGN);
             userResult.setPhone(phoneAreaCode + userEntity.getPhone());
         }
         return userResult;
@@ -223,7 +223,7 @@ public class UserServiceImpl implements UserService {
     public void updateUser(UserUpdateParam param) {
         if (StringUtils.isNotBlank(param.getPhone())) {
             String phoneNumber = getPhoneNumber(param.getPhone());
-            if (!phoneNumber.matches(ValidationPhone.PHONE_REGEXP)) {
+            if (!phoneNumber.matches(PHONE_REGEXP)) {
                 throw new OpenApiException(OpenApiStatus.MOBILE_NOT_VALID);
             }
             Boolean validityPhone = userParamCheck(CheckValidityType.PHONE, param.getPhone(),
@@ -342,7 +342,7 @@ public class UserServiceImpl implements UserService {
         if (CheckValidityType.PHONE.equals(type)) {
             try {
                 //手机号未修改
-                if (StringUtils.equals(value.replace(PhoneNumberUtils.PLUS_SIGN, ""),
+                if (StringUtils.equals(value.replace(PhoneUtils.PLUS_SIGN, ""),
                     entity.getPhoneAreaCode() + entity.getPhone())) {
                     return true;
                 }
@@ -377,42 +377,42 @@ public class UserServiceImpl implements UserService {
     /**
      * 用户数据映射器
      */
-    private final UserConverter                     userConverter;
+    private final UserConverter                userConverter;
 
     /**
      * UserRepository
      */
-    private final UserRepository                    userRepository;
+    private final UserRepository               userRepository;
 
     /**
      * 组织成员
      */
-    private final OrganizationMemberRepository      organizationMemberRepository;
+    private final OrganizationMemberRepository organizationMemberRepository;
 
     /**
      * 部门成员
      */
-    private final UserGroupMemberRepository         userGroupMemberRepository;
+    private final UserGroupMemberRepository    userGroupMemberRepository;
 
     /**
      * 用户详情Repository
      */
-    private final UserDetailRepository              userDetailsRepository;
+    private final UserDetailRepository         userDetailsRepository;
 
     /**
      * 邮件消息发布
      */
-    private final MailMsgEventPublish               mailMsgEventPublish;
+    private final MailMsgEventPublish          mailMsgEventPublish;
 
     /**
      * 短信消息发送
      */
-    private final SmsMsgEventPublish                smsMsgEventPublish;
+    private final SmsMsgEventPublish           smsMsgEventPublish;
 
     /**
      * PasswordPolicyManager
      */
-    private final PasswordPolicyManager<UserEntity> passwordPolicyManager;
+    private final PasswordPolicyManager        passwordPolicyManager;
 
     public UserServiceImpl(UserConverter userConverter, UserRepository userRepository,
                            OrganizationMemberRepository organizationMemberRepository,
@@ -420,7 +420,7 @@ public class UserServiceImpl implements UserService {
                            UserDetailRepository userDetailsRepository,
                            MailMsgEventPublish mailMsgEventPublish,
                            SmsMsgEventPublish smsMsgEventPublish,
-                           PasswordPolicyManager<UserEntity> passwordPolicyManager) {
+                           PasswordPolicyManager passwordPolicyManager) {
         this.userConverter = userConverter;
         this.userRepository = userRepository;
         this.organizationMemberRepository = organizationMemberRepository;

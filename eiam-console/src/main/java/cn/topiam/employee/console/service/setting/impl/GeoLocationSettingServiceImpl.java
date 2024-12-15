@@ -28,7 +28,7 @@ import cn.topiam.employee.console.pojo.save.setting.GeoIpProviderSaveParam;
 import cn.topiam.employee.console.service.setting.GeoLocationSettingService;
 import cn.topiam.employee.support.context.ApplicationContextService;
 import cn.topiam.employee.support.geo.GeoLocation;
-import cn.topiam.employee.support.geo.GeoLocationService;
+import cn.topiam.employee.support.geo.GeoLocationParser;
 
 import lombok.extern.slf4j.Slf4j;
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.GEO_LOCATION;
@@ -80,17 +80,17 @@ public class GeoLocationSettingServiceImpl extends SettingServiceImpl
      */
     @Override
     public GeoLocation getGeoLocation(String ip) {
-        return geoLocationService.getGeoLocation(ip);
+        return geoLocationParser.getGeoLocation(ip);
     }
 
-    private final GeoLocationService          geoLocationService;
+    private final GeoLocationParser           geoLocationParser;
     private final GeoLocationSettingConverter geoLocationSettingsConverter;
 
     public GeoLocationSettingServiceImpl(SettingRepository settingsRepository,
-                                         GeoLocationService geoLocationService,
+                                         GeoLocationParser geoLocationParser,
                                          GeoLocationSettingConverter geoLocationSettingsConverter) {
         super(settingsRepository);
-        this.geoLocationService = geoLocationService;
+        this.geoLocationParser = geoLocationParser;
         this.geoLocationSettingsConverter = geoLocationSettingsConverter;
     }
 }

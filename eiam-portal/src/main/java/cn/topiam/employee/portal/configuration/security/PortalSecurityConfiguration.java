@@ -73,10 +73,11 @@ import cn.topiam.employee.core.security.password.task.impl.PasswordExpireWarnTas
 import cn.topiam.employee.core.security.task.UserExpireLockTask;
 import cn.topiam.employee.core.security.task.UserUnlockTask;
 import cn.topiam.employee.portal.authentication.*;
-import cn.topiam.employee.support.geo.GeoLocationService;
+import cn.topiam.employee.support.geo.GeoLocationParser;
 import cn.topiam.employee.support.jackjson.SupportJackson2Module;
 import cn.topiam.employee.support.security.authentication.WebAuthenticationDetailsSource;
 import cn.topiam.employee.support.security.configurer.FormLoginConfigurer;
+import cn.topiam.employee.support.web.useragent.UserAgentParser;
 import static org.springframework.http.HttpMethod.*;
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -435,12 +436,13 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
     /**
      * WebAuthenticationDetailsSource
      *
-     * @param geoLocationService {@link GeoLocationService}
+     * @param geoLocationParser {@link GeoLocationParser}
      * @return {@link WebAuthenticationDetailsSource}
      */
     @Bean
-    public WebAuthenticationDetailsSource authenticationDetailsSource(GeoLocationService geoLocationService) {
-        return new WebAuthenticationDetailsSource(geoLocationService);
+    public WebAuthenticationDetailsSource authenticationDetailsSource(GeoLocationParser geoLocationParser,
+                                                                      UserAgentParser userAgentParser) {
+        return new WebAuthenticationDetailsSource(geoLocationParser, userAgentParser);
     }
 
     /**
@@ -478,7 +480,8 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
         this.loader = classLoader;
     }
 
-    public PortalSecurityConfiguration(UserRepository userRepository,
+    public PortalSecurityConfiguration(UserAgentParser userAgentParser,
+                                       UserRepository userRepository,
                                        UserDetailsService userDetailsService,
                                        OtpContextHelp otpContextHelp,
                                        PasswordEncoder passwordEncoder,
@@ -486,7 +489,7 @@ public class PortalSecurityConfiguration extends AbstractSecurityConfiguration
                                        SettingRepository settingRepository,
                                        RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository,
                                        IdentityProviderAuthenticationService identityProviderAuthenticationService) {
-        super(settingRepository);
+        super(userAgentParser, settingRepository);
         this.userRepository = userRepository;
         this.userDetailsService = userDetailsService;
         this.otpContextHelp = otpContextHelp;

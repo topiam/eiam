@@ -18,11 +18,11 @@
 package cn.topiam.employee.authentication.common.template;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.compress.utils.CharsetNames;
 import org.apache.http.entity.ContentType;
 import org.springframework.http.HttpStatus;
 
@@ -60,7 +60,7 @@ public class BindIdentityProviderTemplate {
                                           ApiRestResult<Void> result) throws IOException {
         //@formatter:off
         try {
-            response.setCharacterEncoding(CharsetNames.UTF_8);
+            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
             response.setContentType(ContentType.TEXT_HTML.getMimeType());
             Template template = freemarkerTemplateConfiguration.getTemplate("bind_redirect.ftlh");
             Map<String, Object> data = new HashMap<>(16);
@@ -82,7 +82,7 @@ public class BindIdentityProviderTemplate {
             freemarkerTemplateConfiguration
                 .setTemplateLoader(new ClassTemplateLoader(this.getClass(), "/template/"));
             //编码
-            freemarkerTemplateConfiguration.setDefaultEncoding(CharsetNames.UTF_8);
+            freemarkerTemplateConfiguration.setDefaultEncoding(StandardCharsets.UTF_8.name());
             //国际化
             freemarkerTemplateConfiguration.setLocale(new Locale("zh_CN"));
         } catch (Exception exception) {

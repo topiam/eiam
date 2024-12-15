@@ -35,15 +35,15 @@ import cn.topiam.employee.console.pojo.save.setting.AdministratorCreateParam;
 import cn.topiam.employee.console.pojo.update.setting.AdministratorUpdateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.util.BeanUtils;
-import cn.topiam.employee.support.util.ImageAvatarUtils;
 
 import jakarta.persistence.criteria.Predicate;
 import static cn.topiam.employee.common.entity.setting.AdministratorEntity.*;
 import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_BY;
 import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_TIME;
-import static cn.topiam.employee.support.util.ImageAvatarUtils.generateAvatarImg;
-import static cn.topiam.employee.support.util.PhoneNumberUtils.getPhoneAreaCode;
-import static cn.topiam.employee.support.util.PhoneNumberUtils.getPhoneNumber;
+import static cn.topiam.employee.support.util.AvatarUtils.bufferedImageToBase64;
+import static cn.topiam.employee.support.util.AvatarUtils.generateAvatarImg;
+import static cn.topiam.employee.support.util.PhoneUtils.getPhoneAreaCode;
+import static cn.topiam.employee.support.util.PhoneUtils.getPhoneNumber;
 
 /**
  * 管理员映射
@@ -69,8 +69,7 @@ public interface AdministratorConverter {
                     user);
                 //头像
                 if (StringUtils.isEmpty(user.getAvatar())) {
-                    convert.setAvatar(ImageAvatarUtils
-                        .bufferedImageToBase64(generateAvatarImg(user.getUsername())));
+                    convert.setAvatar(bufferedImageToBase64(generateAvatarImg(user.getUsername())));
                 } else {
                     convert.setAvatar(user.getAvatar());
                 }

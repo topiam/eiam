@@ -31,8 +31,8 @@ import cn.topiam.employee.console.pojo.result.account.*;
 import cn.topiam.employee.console.pojo.save.account.OrganizationCreateParam;
 import cn.topiam.employee.console.pojo.update.account.OrganizationUpdateParam;
 import cn.topiam.employee.console.service.account.OrganizationService;
+import cn.topiam.employee.support.demo.Preview;
 import cn.topiam.employee.support.lock.Lock;
-import cn.topiam.employee.support.preview.Preview;
 import cn.topiam.employee.support.result.ApiRestResult;
 
 import io.swagger.v3.oas.annotations.Operation;

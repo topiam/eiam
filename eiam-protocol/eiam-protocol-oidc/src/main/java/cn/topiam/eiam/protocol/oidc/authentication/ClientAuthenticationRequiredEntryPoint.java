@@ -27,6 +27,7 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.http.converter.OAuth2ErrorHttpMessageConverter;
 
 import cn.topiam.employee.support.security.web.AbstractAuthenticationEntryPoint;
+import cn.topiam.employee.support.web.useragent.UserAgentParser;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,6 +43,10 @@ import static cn.topiam.eiam.protocol.oidc.constant.OidcProtocolConstants.OIDC_E
  * Created by support@topiam.cn on 2023/12/9 18:18
  */
 public class ClientAuthenticationRequiredEntryPoint extends AbstractAuthenticationEntryPoint {
+
+    public ClientAuthenticationRequiredEntryPoint(UserAgentParser userAgentParser) {
+        super(userAgentParser);
+    }
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,

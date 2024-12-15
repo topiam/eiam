@@ -61,7 +61,7 @@ import static cn.topiam.employee.core.context.ContextService.getPortalPublicBase
 import static cn.topiam.employee.support.constant.EiamConstants.CAPTCHA_CODE_SESSION;
 import static cn.topiam.employee.support.context.ServletContextService.isHtmlRequest;
 import static cn.topiam.employee.support.security.authentication.AuthenticationProvider.USERNAME_PASSWORD;
-import static cn.topiam.employee.support.security.savedredirect.JumpController.JUMP_PATH;
+import static cn.topiam.employee.support.security.savedredirect.JumpConstants.JUMP_PATH;
 
 /**
  * 认证成功处理程序

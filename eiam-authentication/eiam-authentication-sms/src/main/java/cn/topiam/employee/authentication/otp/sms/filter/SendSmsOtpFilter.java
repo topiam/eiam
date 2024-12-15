@@ -36,7 +36,7 @@ import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.core.security.otp.OtpContextHelp;
 import cn.topiam.employee.support.result.ApiRestResult;
 import cn.topiam.employee.support.util.HttpResponseUtils;
-import cn.topiam.employee.support.util.PhoneNumberUtils;
+import cn.topiam.employee.support.util.PhoneUtils;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -44,7 +44,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import static cn.topiam.employee.common.enums.MessageNoticeChannel.SMS;
 import static cn.topiam.employee.support.security.constant.SecurityConstants.LOGIN_PATH;
-import static cn.topiam.employee.support.util.PhoneNumberUtils.isPhoneValidate;
+import static cn.topiam.employee.support.util.PhoneUtils.isPhoneValidate;
 
 /**
  * 发送OTP
@@ -85,7 +85,7 @@ public class SendSmsOtpFilter extends OncePerRequestFilter {
         if (isPhoneValidate(recipient)) {
             //判断是否存在用户
             Optional<UserEntity> user = userRepository
-                .findByPhone(PhoneNumberUtils.getPhoneNumber(recipient));
+                .findByPhone(PhoneUtils.getPhoneNumber(recipient));
             if (user.isPresent()) {
                 otpContextHelp.sendOtp(recipient, SmsType.LOGIN.getCode(), SMS);
                 HttpResponseUtils.flushResponseJson(response, HttpStatus.OK.value(),

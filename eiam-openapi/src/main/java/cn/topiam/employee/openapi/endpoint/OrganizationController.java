@@ -31,8 +31,8 @@ import cn.topiam.employee.openapi.pojo.result.OrganizationResult;
 import cn.topiam.employee.openapi.pojo.save.OrganizationCreateParam;
 import cn.topiam.employee.openapi.pojo.update.OrganizationUpdateParam;
 import cn.topiam.employee.openapi.service.OrganizationService;
+import cn.topiam.employee.support.demo.Preview;
 import cn.topiam.employee.support.lock.Lock;
-import cn.topiam.employee.support.preview.Preview;
 
 import lombok.RequiredArgsConstructor;
 

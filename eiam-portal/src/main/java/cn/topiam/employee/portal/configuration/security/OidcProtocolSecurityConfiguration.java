@@ -61,6 +61,7 @@ import cn.topiam.employee.common.repository.app.AppOidcConfigRepository;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
 import cn.topiam.employee.support.jackjson.SupportJackson2Module;
 import cn.topiam.employee.support.redis.KeyStringRedisSerializer;
+import cn.topiam.employee.support.web.useragent.UserAgentParser;
 import static org.springframework.security.config.http.SessionCreationPolicy.NEVER;
 
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.OIDC_PROTOCOL_SECURITY_FILTER_CHAIN;
@@ -75,10 +76,6 @@ import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.OIDC_PR
 @Configuration(proxyBeanMethods = false)
 public class OidcProtocolSecurityConfiguration extends AbstractSecurityConfiguration {
 
-    public OidcProtocolSecurityConfiguration(SettingRepository settingRepository) {
-        super(settingRepository);
-    }
-
     /**
      * OIDC 协议
      *
@@ -91,7 +88,7 @@ public class OidcProtocolSecurityConfiguration extends AbstractSecurityConfigura
                                                                AccessTokenAuthenticationManagerResolver authenticationManagerResolver) throws Exception {
         //@formatter:off
         httpSecurity.getSharedObject(AuthenticationManagerBuilder.class).parentAuthenticationManager(null);
-        OAuth2AuthorizationServerConfigurer serverConfigurer = new OAuth2AuthorizationServerConfigurer();
+        OAuth2AuthorizationServerConfigurer serverConfigurer = new OAuth2AuthorizationServerConfigurer(userAgentParser);
         RequestMatcher endpointsMatcher = serverConfigurer.getEndpointsMatcher();
         OrRequestMatcher requestMatcher = new OrRequestMatcher(endpointsMatcher);
         httpSecurity
@@ -245,4 +242,12 @@ public class OidcProtocolSecurityConfiguration extends AbstractSecurityConfigura
     public OidcOpenApiCustomizer oidcOpenApiCustomizer() {
         return new OidcOpenApiCustomizer();
     }
+
+    public OidcProtocolSecurityConfiguration(SettingRepository settingRepository,
+                                             UserAgentParser userAgentParser) {
+        super(userAgentParser, settingRepository);
+        this.userAgentParser = userAgentParser;
+    }
+
+    private final UserAgentParser userAgentParser;
 }

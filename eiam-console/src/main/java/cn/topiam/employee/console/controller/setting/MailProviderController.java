@@ -33,8 +33,8 @@ import cn.topiam.employee.console.service.setting.MessageSettingService;
 import cn.topiam.employee.core.context.ContextService;
 import cn.topiam.employee.core.message.MsgVariable;
 import cn.topiam.employee.core.message.mail.MailMsgEventPublish;
+import cn.topiam.employee.support.demo.Preview;
 import cn.topiam.employee.support.lock.Lock;
-import cn.topiam.employee.support.preview.Preview;
 import cn.topiam.employee.support.result.ApiRestResult;
 
 import lombok.AllArgsConstructor;

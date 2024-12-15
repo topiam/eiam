@@ -28,6 +28,7 @@ import cn.topiam.employee.core.context.ContextService;
 import cn.topiam.employee.support.result.ApiRestResult;
 import cn.topiam.employee.support.security.web.AbstractAuthenticationEntryPoint;
 import cn.topiam.employee.support.util.HttpResponseUtils;
+import cn.topiam.employee.support.web.useragent.UserAgentParser;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -85,5 +86,9 @@ public class PortalAuthenticationEntryPoint extends AbstractAuthenticationEntryP
             //跳转前端SESSION过期路由
             response.sendRedirect(ContextService.getPortalLoginUrl());
         }
+    }
+
+    public PortalAuthenticationEntryPoint(UserAgentParser userAgentParser) {
+        super(userAgentParser);
     }
 }

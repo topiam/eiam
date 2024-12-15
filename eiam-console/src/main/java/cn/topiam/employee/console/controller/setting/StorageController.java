@@ -27,8 +27,8 @@ import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.console.pojo.result.setting.StorageProviderConfigResult;
 import cn.topiam.employee.console.pojo.save.setting.StorageConfigSaveParam;
 import cn.topiam.employee.console.service.setting.StorageSettingService;
+import cn.topiam.employee.support.demo.Preview;
 import cn.topiam.employee.support.lock.Lock;
-import cn.topiam.employee.support.preview.Preview;
 import cn.topiam.employee.support.result.ApiRestResult;
 
 import lombok.AllArgsConstructor;

@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cn.topiam.employee.openapi.constant.OpenApiStatus;
 import cn.topiam.employee.support.security.web.AbstractAuthenticationEntryPoint;
 import cn.topiam.employee.support.util.HttpResponseUtils;
+import cn.topiam.employee.support.web.useragent.UserAgentParser;
 
 import lombok.Data;
 
@@ -42,6 +43,10 @@ import jakarta.servlet.http.HttpServletResponse;
  * Created by support@topiam.cn on 2023/6/25 21:55
  */
 public final class AccessTokenAuthenticationEntryPoint extends AbstractAuthenticationEntryPoint {
+
+    public AccessTokenAuthenticationEntryPoint(UserAgentParser userAgentParser) {
+        super(userAgentParser);
+    }
 
     /**
      * Collect error details from the provided parameters and format according to RFC

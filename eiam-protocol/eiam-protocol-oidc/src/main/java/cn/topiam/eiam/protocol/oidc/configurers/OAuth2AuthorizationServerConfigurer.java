@@ -52,6 +52,7 @@ import cn.topiam.employee.common.constant.ProtocolConstants;
 import cn.topiam.employee.protocol.code.EndpointMatcher;
 import cn.topiam.employee.protocol.code.UnauthorizedAuthenticationEntryPoint;
 import cn.topiam.employee.protocol.code.configurer.AbstractConfigurer;
+import cn.topiam.employee.support.web.useragent.UserAgentParser;
 import static cn.topiam.employee.protocol.code.configurer.AuthenticationUtils.getApplicationServiceLoader;
 import static cn.topiam.employee.support.security.util.HttpSecurityConfigUtils.getOptionalBean;
 
@@ -97,10 +98,10 @@ public final class OAuth2AuthorizationServerConfigurer extends
             if (exceptionHandling != null) {
                 //认证端点异常
                 exceptionHandling.defaultAuthenticationEntryPointFor(
-                    new UnauthorizedAuthenticationEntryPoint(), new OrRequestMatcher(
+                    new UnauthorizedAuthenticationEntryPoint(userAgentParser), new OrRequestMatcher(
                         getRequestMatcher(OAuth2AuthorizationEndpointConfigurer.class)));
                 exceptionHandling.defaultAuthenticationEntryPointFor(
-                    new ClientAuthenticationRequiredEntryPoint(),
+                    new ClientAuthenticationRequiredEntryPoint(userAgentParser),
                     new OrRequestMatcher(getRequestMatcher(OAuth2TokenEndpointConfigurer.class),
                         getRequestMatcher(OAuth2TokenIntrospectionEndpointConfigurer.class),
                         getRequestMatcher(OAuth2TokenRevocationEndpointConfigurer.class),
@@ -200,4 +201,9 @@ public final class OAuth2AuthorizationServerConfigurer extends
         return configurers;
     }
 
+    private final UserAgentParser userAgentParser;
+
+    public OAuth2AuthorizationServerConfigurer(UserAgentParser userAgentParser) {
+        this.userAgentParser = userAgentParser;
+    }
 }

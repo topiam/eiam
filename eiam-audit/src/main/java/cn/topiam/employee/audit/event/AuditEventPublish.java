@@ -36,7 +36,7 @@ import cn.topiam.employee.audit.entity.*;
 import cn.topiam.employee.audit.enums.EventStatus;
 import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.support.context.ServletContextService;
-import cn.topiam.employee.support.geo.GeoLocationService;
+import cn.topiam.employee.support.geo.GeoLocationParser;
 import cn.topiam.employee.support.security.authentication.WebAuthenticationDetails;
 import cn.topiam.employee.support.security.userdetails.UserDetails;
 import cn.topiam.employee.support.security.userdetails.UserType;
@@ -272,7 +272,7 @@ public class AuditEventPublish {
     private UserAgent getUserAgent() {
         //@formatter:off
         HttpServletRequest request = ServletContextService.getRequest();
-        cn.topiam.employee.support.web.useragent.UserAgent ua = UserAgentParser.getUserAgent(request);
+        cn.topiam.employee.support.web.useragent.UserAgent ua = userAgentParser.getUserAgent(request);
         return UserAgent.builder()
                 .browser(ua.getBrowser())
                 .browserType(ua.getBrowserType())
@@ -293,7 +293,7 @@ public class AuditEventPublish {
         //@formatter:off
         HttpServletRequest request = ServletContextService.getRequest();
         String ip = IpUtils.getIpAddr(request);
-        cn.topiam.employee.support.geo.GeoLocation geoLocation = geoLocationService.getGeoLocation(ip);
+        cn.topiam.employee.support.geo.GeoLocation geoLocation = geoLocationParser.getGeoLocation(ip);
         if (Objects.isNull(geoLocation)){
             return null;
         }
@@ -386,11 +386,17 @@ public class AuditEventPublish {
     /**
      * 地理位置
      */
-    private final GeoLocationService        geoLocationService;
+    private final GeoLocationParser         geoLocationParser;
+
+    /**
+     * UserAgentParser
+     */
+    private final UserAgentParser           userAgentParser;
 
     public AuditEventPublish(ApplicationEventPublisher applicationEventPublisher,
-                             GeoLocationService geoLocationService) {
+                             GeoLocationParser geoLocationParser, UserAgentParser userAgentParser) {
         this.applicationEventPublisher = applicationEventPublisher;
-        this.geoLocationService = geoLocationService;
+        this.geoLocationParser = geoLocationParser;
+        this.userAgentParser = userAgentParser;
     }
 }

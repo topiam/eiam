@@ -30,6 +30,7 @@ import cn.topiam.employee.support.security.savedredirect.HttpSessionRedirectCach
 import cn.topiam.employee.support.security.savedredirect.RedirectCache;
 import cn.topiam.employee.support.security.web.AbstractAuthenticationEntryPoint;
 import cn.topiam.employee.support.util.HttpResponseUtils;
+import cn.topiam.employee.support.web.useragent.UserAgentParser;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -45,6 +46,10 @@ import static cn.topiam.employee.support.context.ServletContextService.isHtmlReq
 public class UnauthorizedAuthenticationEntryPoint extends AbstractAuthenticationEntryPoint {
     private final Logger        logger        = LoggerFactory.getLogger(this.getClass());
     private final RedirectCache redirectCache = new HttpSessionRedirectCache();
+
+    public UnauthorizedAuthenticationEntryPoint(UserAgentParser userAgentParser) {
+        super(userAgentParser);
+    }
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,

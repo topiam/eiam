@@ -41,6 +41,7 @@ import cn.topiam.employee.protocol.jwt.RedisJwtAuthorizationService;
 import cn.topiam.employee.protocol.jwt.authentication.JwtAuthenticationFailureEventListener;
 import cn.topiam.employee.protocol.jwt.authentication.JwtAuthenticationSuccessEventListener;
 import cn.topiam.employee.protocol.jwt.configurers.JwtAuthorizationServerConfigurer;
+import cn.topiam.employee.support.web.useragent.UserAgentParser;
 import static org.springframework.security.config.http.SessionCreationPolicy.NEVER;
 
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.JWT_PROTOCOL_SECURITY_FILTER_CHAIN;
@@ -53,10 +54,6 @@ import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.JWT_PRO
 @AutoConfigureBefore(PortalSecurityConfiguration.class)
 @Configuration(proxyBeanMethods = false)
 public class JwtProtocolSecurityConfiguration extends AbstractSecurityConfiguration {
-
-    public JwtProtocolSecurityConfiguration(SettingRepository settingRepository) {
-        super(settingRepository);
-    }
 
     /**
      * JwtProtocolSecurityFilterChain
@@ -71,7 +68,7 @@ public class JwtProtocolSecurityConfiguration extends AbstractSecurityConfigurat
         //@formatter:off
         httpSecurity.getSharedObject(AuthenticationManagerBuilder.class).parentAuthenticationManager(null);
         //Jwt IDP 配置
-        JwtAuthorizationServerConfigurer serverConfigurer = new JwtAuthorizationServerConfigurer();
+        JwtAuthorizationServerConfigurer serverConfigurer = new JwtAuthorizationServerConfigurer(userAgentParser);
         RequestMatcher endpointsMatcher = serverConfigurer.getEndpointsMatcher();
         httpSecurity.securityMatcher(endpointsMatcher)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
@@ -121,6 +118,14 @@ public class JwtProtocolSecurityConfiguration extends AbstractSecurityConfigurat
             cacheProperties);
         return new RedisJwtAuthorizationService(redisTemplate, beanFactory,
             applicationServiceLoader);
+    }
+
+    private final UserAgentParser userAgentParser;
+
+    public JwtProtocolSecurityConfiguration(SettingRepository settingRepository,
+                                            UserAgentParser userAgentParser) {
+        super(userAgentParser, settingRepository);
+        this.userAgentParser = userAgentParser;
     }
 
 }

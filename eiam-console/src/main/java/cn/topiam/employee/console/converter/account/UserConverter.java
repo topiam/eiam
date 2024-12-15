@@ -56,9 +56,9 @@ import static cn.topiam.employee.audit.enums.TargetType.PORTAL;
 import static cn.topiam.employee.audit.event.type.EventType.APP_SSO;
 import static cn.topiam.employee.audit.event.type.EventType.LOGIN_PORTAL;
 import static cn.topiam.employee.audit.service.converter.AuditDataConverter.SORT_EVENT_TIME;
-import static cn.topiam.employee.support.util.ImageAvatarUtils.*;
-import static cn.topiam.employee.support.util.PhoneNumberUtils.getPhoneAreaCode;
-import static cn.topiam.employee.support.util.PhoneNumberUtils.getPhoneNumber;
+import static cn.topiam.employee.support.util.AvatarUtils.*;
+import static cn.topiam.employee.support.util.PhoneUtils.getPhoneAreaCode;
+import static cn.topiam.employee.support.util.PhoneUtils.getPhoneNumber;
 
 /**
  * 用户映射

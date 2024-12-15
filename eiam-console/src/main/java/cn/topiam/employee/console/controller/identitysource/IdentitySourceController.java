@@ -37,8 +37,8 @@ import cn.topiam.employee.console.pojo.save.identitysource.IdentitySourceCreateR
 import cn.topiam.employee.console.pojo.update.identity.IdentitySourceUpdateParam;
 import cn.topiam.employee.console.service.identitysource.IdentitySourceService;
 import cn.topiam.employee.identitysource.core.event.IdentitySourceEventUtils;
+import cn.topiam.employee.support.demo.Preview;
 import cn.topiam.employee.support.lock.Lock;
-import cn.topiam.employee.support.preview.Preview;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.result.ApiRestResult;

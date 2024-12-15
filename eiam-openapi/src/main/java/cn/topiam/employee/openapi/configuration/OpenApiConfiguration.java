@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 import cn.topiam.employee.EiamOpenApiApplication;
-import cn.topiam.employee.support.util.AppVersionUtils;
+import cn.topiam.employee.support.util.VersionUtils;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
@@ -71,7 +71,7 @@ public class OpenApiConfiguration {
             //内容
             .contact(contact)
             //版本
-            .version(AppVersionUtils.getVersion(EiamOpenApiApplication.class));
+            .version(VersionUtils.getVersion(EiamOpenApiApplication.class));
     }
 
     @Bean

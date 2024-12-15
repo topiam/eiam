@@ -65,7 +65,7 @@ import cn.topiam.employee.support.security.password.exception.PasswordValidatedF
 import cn.topiam.employee.support.security.userdetails.UserDetails;
 import cn.topiam.employee.support.security.util.SecurityUtils;
 import cn.topiam.employee.support.util.BeanUtils;
-import cn.topiam.employee.support.util.PhoneNumberUtils;
+import cn.topiam.employee.support.util.PhoneUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -77,7 +77,7 @@ import static cn.topiam.employee.support.exception.enums.ExceptionStatus.EX00010
 import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_BY;
 import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_TIME;
 import static cn.topiam.employee.support.util.EmailUtils.isEmailValidate;
-import static cn.topiam.employee.support.util.PhoneNumberUtils.isPhoneValidate;
+import static cn.topiam.employee.support.util.PhoneUtils.isPhoneValidate;
 
 /**
  * @author TopIAM
@@ -263,7 +263,7 @@ public class AccountServiceImpl implements AccountService {
         } else if (isPhoneValidate(recipient)) {
             // 验证在库中是否有手机号
             Optional<UserEntity> optional = userRepository
-                .findByPhone(PhoneNumberUtils.getPhoneNumber(recipient));
+                .findByPhone(PhoneUtils.getPhoneNumber(recipient));
             if (optional.isPresent()) {
                 otpContextHelp.sendOtp(recipient, SmsType.FORGET_PASSWORD.getCode(),
                     MessageNoticeChannel.SMS);
@@ -287,7 +287,7 @@ public class AccountServiceImpl implements AccountService {
                     MessageNoticeChannel.MAIL, recipient, code);
             }
         } else if (isPhoneValidate(recipient)) {
-            optional = userRepository.findByPhone(PhoneNumberUtils.getPhoneNumber(recipient));
+            optional = userRepository.findByPhone(PhoneUtils.getPhoneNumber(recipient));
             if (optional.isPresent()) {
                 checkOtp = otpContextHelp.checkOtp(SmsType.FORGET_PASSWORD.getCode(),
                     MessageNoticeChannel.SMS, recipient, code);
@@ -410,62 +410,62 @@ public class AccountServiceImpl implements AccountService {
     /**
      * Executor
      */
-    private final Executor                          executor;
+    private final Executor                   executor;
 
     /**
      *  AccountConverter
      */
-    private final AccountConverter                  accountConverter;
+    private final AccountConverter           accountConverter;
 
     /**
      *  PasswordEncoder
      */
-    private final PasswordEncoder                   passwordEncoder;
+    private final PasswordEncoder            passwordEncoder;
 
     /**
      * UserRepository
      */
-    private final UserRepository                    userRepository;
+    private final UserRepository             userRepository;
 
     /**
      * 用户详情Repository
      */
-    private final UserDetailRepository              userDetailsRepository;
+    private final UserDetailRepository       userDetailsRepository;
 
     /**
      * SessionRegistry
      */
-    private final SessionRegistry                   sessionRegistry;
+    private final SessionRegistry            sessionRegistry;
 
     /**
      * OtpContextHelp
      */
-    private final OtpContextHelp                    otpContextHelp;
+    private final OtpContextHelp             otpContextHelp;
 
     /**
      * SmsMsgEventPublish
      */
-    private final SmsMsgEventPublish                smsMsgEventPublish;
+    private final SmsMsgEventPublish         smsMsgEventPublish;
 
     /**
      * StringRedisTemplate
      */
-    private final StringRedisTemplate               stringRedisTemplate;
+    private final StringRedisTemplate        stringRedisTemplate;
 
     /**
      * PasswordPolicyManager
      */
-    private final PasswordPolicyManager<UserEntity> passwordPolicyManager;
+    private final PasswordPolicyManager      passwordPolicyManager;
 
     /**
      * IdentityProviderRepository
      */
-    private final IdentityProviderRepository        identityProviderRepository;
+    private final IdentityProviderRepository identityProviderRepository;
 
     /**
      * UserAuthnBindRepository
      */
-    private final UserIdpRepository                 userIdpRepository;
+    private final UserIdpRepository          userIdpRepository;
 
     public AccountServiceImpl(AsyncConfigurer asyncConfigurer, AccountConverter accountConverter,
                               PasswordEncoder passwordEncoder, UserRepository userRepository,
@@ -473,7 +473,7 @@ public class AccountServiceImpl implements AccountService {
                               SessionRegistry sessionRegistry, OtpContextHelp otpContextHelp,
                               SmsMsgEventPublish smsMsgEventPublish,
                               StringRedisTemplate stringRedisTemplate,
-                              PasswordPolicyManager<UserEntity> passwordPolicyManager,
+                              PasswordPolicyManager passwordPolicyManager,
                               IdentityProviderRepository identityProviderRepository,
                               UserIdpRepository userIdpRepository) {
         this.executor = asyncConfigurer.getAsyncExecutor();

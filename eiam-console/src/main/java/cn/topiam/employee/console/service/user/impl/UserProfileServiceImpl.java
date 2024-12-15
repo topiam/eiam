@@ -55,7 +55,7 @@ import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.security.password.exception.PasswordValidatedFailException;
 import cn.topiam.employee.support.security.util.SecurityUtils;
 import cn.topiam.employee.support.util.BeanUtils;
-import cn.topiam.employee.support.util.PhoneNumberUtils;
+import cn.topiam.employee.support.util.PhoneUtils;
 
 import jakarta.servlet.http.HttpSession;
 import static cn.topiam.employee.core.message.sms.SmsMsgEventPublish.USERNAME;
@@ -64,7 +64,7 @@ import static cn.topiam.employee.support.exception.enums.ExceptionStatus.EX00010
 import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_BY;
 import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIED_TIME;
 import static cn.topiam.employee.support.util.EmailUtils.isEmailValidate;
-import static cn.topiam.employee.support.util.PhoneNumberUtils.isPhoneValidate;
+import static cn.topiam.employee.support.util.PhoneUtils.isPhoneValidate;
 
 /**
  *
@@ -229,7 +229,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         } else if (isPhoneValidate(recipient)) {
             // 验证在库中是否有手机号
             Optional<AdministratorEntity> byPhone = administratorRepository
-                .findByPhone(PhoneNumberUtils.getPhoneNumber(recipient));
+                .findByPhone(PhoneUtils.getPhoneNumber(recipient));
             if (byPhone.isPresent()) {
                 otpContextHelp.sendOtp(recipient, SmsType.FORGET_PASSWORD.getCode(),
                     MessageNoticeChannel.SMS);
@@ -253,7 +253,7 @@ public class UserProfileServiceImpl implements UserProfileService {
                     MessageNoticeChannel.MAIL, recipient, code);
             }
         } else if (isPhoneValidate(recipient)) {
-            user = administratorRepository.findByPhone(PhoneNumberUtils.getPhoneNumber(recipient));
+            user = administratorRepository.findByPhone(PhoneUtils.getPhoneNumber(recipient));
             if (user.isPresent()) {
                 checkOtp = otpContextHelp.checkOtp(SmsType.FORGET_PASSWORD.getCode(),
                     MessageNoticeChannel.SMS, recipient, code);

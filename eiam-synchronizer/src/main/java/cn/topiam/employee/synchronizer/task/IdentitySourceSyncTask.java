@@ -32,7 +32,8 @@ import cn.topiam.employee.identitysource.core.IdentitySourceConfig;
 import cn.topiam.employee.support.trace.TraceUtils;
 
 import lombok.RequiredArgsConstructor;
-import static cn.topiam.employee.support.lock.LockAspect.getTopiamLockKeyPrefix;
+import static cn.topiam.employee.support.constant.EiamConstants.CACHE_LOCK_KEY_PREFIX;
+import static cn.topiam.employee.support.constant.EiamConstants.COLON;
 
 /**
  * 身份源同步任务
@@ -64,7 +65,7 @@ public class IdentitySourceSyncTask implements Runnable {
         logger.info("[任务触发]-同步身份源[{}]数据开始", name);
         String traceId = idGenerator.generateId().toString();
         TraceUtils.put(traceId);
-        RLock lock = redissonClient.getLock(getTopiamLockKeyPrefix() + id);
+        RLock lock = redissonClient.getLock(CACHE_LOCK_KEY_PREFIX + COLON + id);
         boolean tryLock = false;
         try {
             tryLock = lock.tryLock(1, TimeUnit.SECONDS);

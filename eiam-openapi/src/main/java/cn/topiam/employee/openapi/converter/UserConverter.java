@@ -37,9 +37,9 @@ import cn.topiam.employee.openapi.pojo.update.UserUpdateParam;
 import cn.topiam.employee.support.context.ApplicationContextService;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.security.userdetails.DataOrigin;
-import static cn.topiam.employee.support.util.ImageAvatarUtils.getRandomAvatar;
-import static cn.topiam.employee.support.util.PhoneNumberUtils.getPhoneAreaCode;
-import static cn.topiam.employee.support.util.PhoneNumberUtils.getPhoneNumber;
+import static cn.topiam.employee.support.util.AvatarUtils.getRandomAvatar;
+import static cn.topiam.employee.support.util.PhoneUtils.getPhoneAreaCode;
+import static cn.topiam.employee.support.util.PhoneUtils.getPhoneNumber;
 
 /**
  * 用户映射

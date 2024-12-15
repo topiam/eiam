@@ -41,6 +41,7 @@ import cn.topiam.employee.protocol.form.RedisFormAuthorizationService;
 import cn.topiam.employee.protocol.form.authentication.FormAuthenticationFailureEventListener;
 import cn.topiam.employee.protocol.form.authentication.FormAuthenticationSuccessEventListener;
 import cn.topiam.employee.protocol.form.configurers.FormAuthorizationServerConfigurer;
+import cn.topiam.employee.support.web.useragent.UserAgentParser;
 import static org.springframework.security.config.http.SessionCreationPolicy.NEVER;
 
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.FORM_PROTOCOL_SECURITY_FILTER_CHAIN;
@@ -53,10 +54,6 @@ import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.FORM_PR
 @AutoConfigureBefore(PortalSecurityConfiguration.class)
 @Configuration(proxyBeanMethods = false)
 public class FormProtocolSecurityConfiguration extends AbstractSecurityConfiguration {
-
-    public FormProtocolSecurityConfiguration(SettingRepository settingRepository) {
-        super(settingRepository);
-    }
 
     /**
      * FormProtocolSecurityFilterChain
@@ -71,7 +68,7 @@ public class FormProtocolSecurityConfiguration extends AbstractSecurityConfigura
         //@formatter:off
         httpSecurity.getSharedObject(AuthenticationManagerBuilder.class).parentAuthenticationManager(null);
         //Form IDP 配置
-        FormAuthorizationServerConfigurer serverConfigurer = new FormAuthorizationServerConfigurer();
+        FormAuthorizationServerConfigurer serverConfigurer = new FormAuthorizationServerConfigurer(userAgentParser);
         RequestMatcher endpointsMatcher = serverConfigurer.getEndpointsMatcher();
         httpSecurity.securityMatcher(endpointsMatcher)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
@@ -122,5 +119,13 @@ public class FormProtocolSecurityConfiguration extends AbstractSecurityConfigura
         return new RedisFormAuthorizationService(redisTemplate, beanFactory,
             applicationServiceLoader);
     }
+
+    public FormProtocolSecurityConfiguration(SettingRepository settingRepository,
+                                             UserAgentParser userAgentParser) {
+        super(userAgentParser, settingRepository);
+        this.userAgentParser = userAgentParser;
+    }
+
+    private final UserAgentParser userAgentParser;
 
 }

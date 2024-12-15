@@ -33,6 +33,7 @@ import cn.topiam.employee.protocol.code.EndpointMatcher;
 import cn.topiam.employee.protocol.code.UnauthorizedAuthenticationEntryPoint;
 import cn.topiam.employee.protocol.code.configurer.AbstractConfigurer;
 import cn.topiam.employee.protocol.jwt.context.JwtAuthorizationServerContextFilter;
+import cn.topiam.employee.support.web.useragent.UserAgentParser;
 import static cn.topiam.employee.protocol.code.configurer.AuthenticationUtils.getApplicationServiceLoader;
 
 /**
@@ -67,8 +68,8 @@ public final class JwtAuthorizationServerConfigurer extends
         httpSecurity.exceptionHandling(exceptionHandling -> {
             if (exceptionHandling != null) {
                 //身份验证入口点
-                exceptionHandling
-                    .authenticationEntryPoint(new UnauthorizedAuthenticationEntryPoint());
+                exceptionHandling.authenticationEntryPoint(
+                    new UnauthorizedAuthenticationEntryPoint(userAgentParser));
             }
         });
 
@@ -99,4 +100,9 @@ public final class JwtAuthorizationServerConfigurer extends
         return configurers;
     }
 
+    private final UserAgentParser userAgentParser;
+
+    public JwtAuthorizationServerConfigurer(UserAgentParser userAgentParser) {
+        this.userAgentParser = userAgentParser;
+    }
 }

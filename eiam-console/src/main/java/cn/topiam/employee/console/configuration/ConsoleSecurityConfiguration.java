@@ -58,11 +58,12 @@ import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.repository.setting.AdministratorRepository;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
 import cn.topiam.employee.console.authentication.*;
-import cn.topiam.employee.support.geo.GeoLocationService;
+import cn.topiam.employee.support.geo.GeoLocationParser;
 import cn.topiam.employee.support.jackjson.SupportJackson2Module;
 import cn.topiam.employee.support.security.authentication.WebAuthenticationDetailsSource;
 import cn.topiam.employee.support.security.configurer.FormLoginConfigurer;
 import cn.topiam.employee.support.security.csrf.SpaCsrfTokenRequestHandler;
+import cn.topiam.employee.support.web.useragent.UserAgentParser;
 
 import lombok.RequiredArgsConstructor;
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -247,7 +248,8 @@ public class ConsoleSecurityConfiguration implements BeanClassLoaderAware {
      */
     public Customizer<ExceptionHandlingConfigurer<HttpSecurity>> withExceptionConfigurerDefaults() {
         return configurer -> {
-            configurer.authenticationEntryPoint(new ConsoleAuthenticationEntryPoint());
+            configurer
+                .authenticationEntryPoint(new ConsoleAuthenticationEntryPoint(userAgentParser));
             configurer.accessDeniedHandler(new ConsoleAccessDeniedHandler());
             configurer
                 .withObjectPostProcessor(new ObjectPostProcessor<ExceptionTranslationFilter>() {
@@ -353,12 +355,13 @@ public class ConsoleSecurityConfiguration implements BeanClassLoaderAware {
     /**
      * WebAuthenticationDetailsSource
      *
-     * @param geoLocationService {@link GeoLocationService}
+     * @param geoLocationParser {@link GeoLocationParser}
      * @return {@link WebAuthenticationDetailsSource}
      */
     @Bean
-    public WebAuthenticationDetailsSource authenticationDetailsSource(GeoLocationService geoLocationService) {
-        return new WebAuthenticationDetailsSource(geoLocationService);
+    public WebAuthenticationDetailsSource authenticationDetailsSource(GeoLocationParser geoLocationParser,
+                                                                      UserAgentParser userAgentParser) {
+        return new WebAuthenticationDetailsSource(geoLocationParser, userAgentParser);
     }
 
     private ClassLoader loader;
@@ -382,5 +385,10 @@ public class ConsoleSecurityConfiguration implements BeanClassLoaderAware {
      * AuditEventPublish
      */
     private final AuditEventPublish       auditEventPublish;
+
+    /**
+     * UserAgentParser
+     */
+    private final UserAgentParser         userAgentParser;
 
 }

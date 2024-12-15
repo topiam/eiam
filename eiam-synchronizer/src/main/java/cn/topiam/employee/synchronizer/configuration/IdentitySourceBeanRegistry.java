@@ -68,7 +68,8 @@ import cn.topiam.employee.support.trace.TraceUtils;
 import cn.topiam.employee.synchronizer.task.IdentitySourceSyncTask;
 
 import lombok.extern.slf4j.Slf4j;
-import static cn.topiam.employee.support.lock.LockAspect.getTopiamLockKeyPrefix;
+import static cn.topiam.employee.support.constant.EiamConstants.CACHE_LOCK_KEY_PREFIX;
+import static cn.topiam.employee.support.constant.EiamConstants.COLON;
 import static cn.topiam.employee.synchronizer.configuration.IdentitySourceBeanUtils.getSourceBeanName;
 
 /**
@@ -305,7 +306,7 @@ public class IdentitySourceBeanRegistry implements IdentitySourceEventListener {
         stopWatch.start();
         log.info("[手动任务]-同步身份源[{}]数据开始", identitySource.getName());
         TraceUtils.put(new JdkIdGenerator().generateId().toString());
-        RLock lock = redissonClient.getLock(getTopiamLockKeyPrefix() + id);
+        RLock lock = redissonClient.getLock(CACHE_LOCK_KEY_PREFIX + COLON + id);
         boolean tryLock = false;
         try {
             tryLock = lock.tryLock(1, TimeUnit.SECONDS);

@@ -29,8 +29,8 @@ import cn.topiam.employee.audit.annotation.Audit;
 import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.portal.pojo.request.AppAccountRequest;
 import cn.topiam.employee.portal.service.AppAccountService;
+import cn.topiam.employee.support.demo.Preview;
 import cn.topiam.employee.support.lock.Lock;
-import cn.topiam.employee.support.preview.Preview;
 import cn.topiam.employee.support.result.ApiRestResult;
 
 import lombok.AllArgsConstructor;

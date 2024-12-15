@@ -27,6 +27,7 @@ import org.springframework.security.core.AuthenticationException;
 import cn.topiam.employee.support.result.ApiRestResult;
 import cn.topiam.employee.support.security.web.AbstractAuthenticationEntryPoint;
 import cn.topiam.employee.support.util.HttpResponseUtils;
+import cn.topiam.employee.support.web.useragent.UserAgentParser;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -70,5 +71,9 @@ public class ConsoleAuthenticationEntryPoint extends AbstractAuthenticationEntry
             .message(Objects.toString(authException.getMessage(), UNAUTHORIZED.getReasonPhrase()))
             .build();
         HttpResponseUtils.flushResponseJson(response, UNAUTHORIZED.value(), result);
+    }
+
+    public ConsoleAuthenticationEntryPoint(UserAgentParser userAgentParser) {
+        super(userAgentParser);
     }
 }

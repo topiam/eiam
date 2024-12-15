@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 import cn.topiam.employee.EiamPortalApplication;
-import cn.topiam.employee.support.util.AppVersionUtils;
+import cn.topiam.employee.support.util.VersionUtils;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -59,7 +59,7 @@ public class PortalApiConfiguration {
             //内容
             .contact(contact)
             //版本
-            .version(AppVersionUtils.getVersion(EiamPortalApplication.class));
+            .version(VersionUtils.getVersion(EiamPortalApplication.class));
     }
 
     /**

@@ -44,8 +44,8 @@ import cn.topiam.employee.support.exception.TopIamException;
 import cn.topiam.employee.support.validation.ValidationUtils;
 
 import jakarta.validation.ValidationException;
-import static cn.topiam.employee.common.geo.maxmind.MaxmindGeoLocationServiceImpl.MAXMIND;
-import static cn.topiam.employee.common.geo.maxmind.MaxmindGeoLocationServiceImpl.SHA256_URL;
+import static cn.topiam.employee.common.geo.maxmind.MaxmindGeoLocationParserImpl.MAXMIND;
+import static cn.topiam.employee.common.geo.maxmind.MaxmindGeoLocationParserImpl.SHA256_URL;
 import static cn.topiam.employee.core.setting.GeoIpProviderConstants.IPADDRESS_SETTING_NAME;
 
 /**

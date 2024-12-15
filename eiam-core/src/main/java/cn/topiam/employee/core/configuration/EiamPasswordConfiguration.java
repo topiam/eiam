@@ -23,7 +23,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import cn.topiam.employee.common.constant.ConfigBeanNameConstants;
-import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.repository.account.UserHistoryPasswordRepository;
 import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
@@ -54,11 +53,11 @@ public class EiamPasswordConfiguration {
      */
     @Bean(ConfigBeanNameConstants.DEFAULT_PASSWORD_POLICY_MANAGER)
     @RefreshScope
-    public PasswordPolicyManager<UserEntity> passwordPolicyManager(UserRepository userRepository,
-                                                                   UserHistoryPasswordRepository userHistoryPasswordRepository,
-                                                                   SettingRepository settingRepository,
-                                                                   PasswordWeakLib passwordWeakLib,
-                                                                   PasswordEncoder passwordEncoder) {
+    public PasswordPolicyManager passwordPolicyManager(UserRepository userRepository,
+                                                       UserHistoryPasswordRepository userHistoryPasswordRepository,
+                                                       SettingRepository settingRepository,
+                                                       PasswordWeakLib passwordWeakLib,
+                                                       PasswordEncoder passwordEncoder) {
         return new DefaultPasswordPolicyManager(userRepository, userHistoryPasswordRepository,
             settingRepository, passwordWeakLib, passwordEncoder);
     }

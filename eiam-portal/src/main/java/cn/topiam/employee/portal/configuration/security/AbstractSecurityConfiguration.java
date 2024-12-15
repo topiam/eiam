@@ -48,6 +48,7 @@ import cn.topiam.employee.core.setting.SecuritySettingConstants;
 import cn.topiam.employee.portal.authentication.*;
 import cn.topiam.employee.support.redis.KeyStringRedisSerializer;
 import cn.topiam.employee.support.security.csrf.SpaCsrfTokenRequestHandler;
+import cn.topiam.employee.support.web.useragent.UserAgentParser;
 import static org.springframework.security.web.header.writers.XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK;
 import static org.springframework.web.cors.CorsConfiguration.ALL;
 
@@ -150,7 +151,8 @@ public class AbstractSecurityConfiguration {
      */
     public Customizer<ExceptionHandlingConfigurer<HttpSecurity>> withExceptionConfigurerDefaults() {
         return configurer -> {
-            configurer.authenticationEntryPoint(new PortalAuthenticationEntryPoint());
+            configurer
+                .authenticationEntryPoint(new PortalAuthenticationEntryPoint(userAgentParser));
             configurer.accessDeniedHandler(new PortalAccessDeniedHandler());
             configurer
                 .withObjectPostProcessor(new ObjectPostProcessor<ExceptionTranslationFilter>() {
@@ -219,11 +221,15 @@ public class AbstractSecurityConfiguration {
         };
     }
 
+    private final UserAgentParser   userAgentParser;
     private final SettingRepository settingRepository;
 
-    public AbstractSecurityConfiguration(SettingRepository settingRepository) {
+    public AbstractSecurityConfiguration(UserAgentParser userAgentParser,
+                                         SettingRepository settingRepository) {
+        Assert.notNull(settingRepository, "The userAgentParser cannot be null");
         Assert.notNull(settingRepository, "The settingRepository cannot be null");
         this.settingRepository = settingRepository;
+        this.userAgentParser = userAgentParser;
     }
 
 }

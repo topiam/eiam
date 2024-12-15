@@ -69,10 +69,9 @@ import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.security.password.exception.PasswordValidatedFailException;
 import cn.topiam.employee.support.security.userdetails.UserDetails;
 import cn.topiam.employee.support.security.userdetails.UserType;
-import cn.topiam.employee.support.util.PhoneNumberUtils;
-import cn.topiam.employee.support.validation.annotation.ValidationPhone;
+import cn.topiam.employee.support.util.PhoneUtils;
 import static cn.topiam.employee.support.constant.EiamConstants.DEFAULT_ADMIN_USERNAME;
-import static cn.topiam.employee.support.util.PhoneNumberUtils.getPhoneNumber;
+import static cn.topiam.employee.support.util.PhoneUtils.*;
 
 /**
  * @author TopIAM
@@ -115,7 +114,7 @@ public class AdministratorServiceImpl implements AdministratorService {
         }
         //手机号
         if (StringUtils.isNotEmpty(param.getPhone())) {
-            if (!getPhoneNumber(param.getPhone()).matches(ValidationPhone.PHONE_REGEXP)) {
+            if (!getPhoneNumber(param.getPhone()).matches(PHONE_REGEXP)) {
                 throw new InfoValidityFailException("手机号格式错误");
             }
             Boolean validityPhone = administratorParamCheck(CheckValidityType.PHONE, param.getPhone(), null);
@@ -331,7 +330,7 @@ public class AdministratorServiceImpl implements AdministratorService {
         if (CheckValidityType.PHONE.equals(type)) {
             try {
                 //手机号未修改
-                if (StringUtils.equals(value.replace(PhoneNumberUtils.PLUS_SIGN, ""),
+                if (StringUtils.equals(value.replace(PLUS_SIGN, ""),
                     entity.getPhoneAreaCode() + entity.getPhone())) {
                     return true;
                 }
@@ -443,8 +442,8 @@ public class AdministratorServiceImpl implements AdministratorService {
             .entityConvertToAdministratorDetailsResult(administrator);
         if (Objects.nonNull(administrator) && StringUtils.isNotEmpty(administrator.getPhone())) {
             StringBuilder phoneAreaCode = new StringBuilder(
-                administrator.getPhoneAreaCode().replace(PhoneNumberUtils.PLUS_SIGN, ""));
-            phoneAreaCode.insert(0, PhoneNumberUtils.PLUS_SIGN);
+                administrator.getPhoneAreaCode().replace(PhoneUtils.PLUS_SIGN, ""));
+            phoneAreaCode.insert(0, PhoneUtils.PLUS_SIGN);
             result.setPhone(phoneAreaCode + administrator.getPhone());
         }
         return result;

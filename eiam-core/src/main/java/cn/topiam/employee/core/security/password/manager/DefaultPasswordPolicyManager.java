@@ -23,6 +23,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import cn.topiam.employee.common.entity.account.UserEntity;
@@ -46,7 +47,7 @@ import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIE
  * @author TopIAM
  * Created by support@topiam.cn on 2022/4/17 22:21
  */
-public class DefaultPasswordPolicyManager implements PasswordPolicyManager<UserEntity> {
+public class DefaultPasswordPolicyManager implements PasswordPolicyManager {
 
     public DefaultPasswordPolicyManager(UserRepository userRepository,
                                         UserHistoryPasswordRepository userHistoryPasswordRepository,
@@ -71,19 +72,20 @@ public class DefaultPasswordPolicyManager implements PasswordPolicyManager<UserE
     /**
      * 校验密码
      *
-     * @param userId   {@link  Long} 用户ID
+     * @param principal   {@link  Long} 用户
      * @param password {@link  String} 密码
      */
     @Override
-    public void validate(UserEntity userId, String password) {
-        List<PasswordValidator> validators = new ArrayList<>(providers);
-        if (userId.getId() != null) {
+    public void validate(@NonNull Object principal, String password) {
+        if (principal instanceof UserEntity) {
+            String userId = ((UserEntity) principal).getId();
+            List<PasswordValidator> validators = new ArrayList<>(providers);
             //@formatter:off
-            validators.add(getPasswordIncludeUserInfoValidator(userId.getId()));
-            validators.add(getHistoryPasswordValidator(String.valueOf(userId.getId())));
+            validators.add(getPasswordIncludeUserInfoValidator(userId));
+            validators.add(getHistoryPasswordValidator(userId));
             //@formatter:on
+            validators.forEach(passwordValidator -> passwordValidator.validate(password));
         }
-        validators.forEach(passwordValidator -> passwordValidator.validate(password));
     }
 
     /**
@@ -104,6 +106,7 @@ public class DefaultPasswordPolicyManager implements PasswordPolicyManager<UserE
                 //@formatter:off
                 UserEntity user = optionalUser.get();
                 return new PasswordIncludeUserInfoValidator(user.getFullName(), user.getNickName(), user.getUsername(), user.getPhone(), user.getEmail());
+                //@formatter:on
             }
         }
         return new PasswordIncludeUserInfoValidator(false);
@@ -115,24 +118,29 @@ public class DefaultPasswordPolicyManager implements PasswordPolicyManager<UserE
      * @return {@link  HistoryPasswordValidator}
      */
     private HistoryPasswordValidator getHistoryPasswordValidator(String userId) {
-        SettingEntity historyCipherCheck = settingRepository.findByName(PasswordPolicySettingConstants.PASSWORD_POLICY_HISTORY_PASSWORD_CHECK);
+        SettingEntity historyCipherCheck = settingRepository
+            .findByName(PasswordPolicySettingConstants.PASSWORD_POLICY_HISTORY_PASSWORD_CHECK);
         boolean enabled = Objects.isNull(historyCipherCheck)
-                ? Boolean.parseBoolean(PasswordPolicySettingConstants.PASSWORD_POLICY_DEFAULT_SETTINGS.get(PASSWORD_POLICY_HISTORY_PASSWORD_CHECK))
-                : Boolean.parseBoolean(historyCipherCheck.getValue());
+            ? Boolean.parseBoolean(PasswordPolicySettingConstants.PASSWORD_POLICY_DEFAULT_SETTINGS
+                .get(PASSWORD_POLICY_HISTORY_PASSWORD_CHECK))
+            : Boolean.parseBoolean(historyCipherCheck.getValue());
         if (enabled) {
-            SettingEntity historyCipherCheckCount = settingRepository.findByName(PasswordPolicySettingConstants.PASSWORD_POLICY_HISTORY_PASSWORD_CHECK_COUNT);
+            SettingEntity historyCipherCheckCount = settingRepository.findByName(
+                PasswordPolicySettingConstants.PASSWORD_POLICY_HISTORY_PASSWORD_CHECK_COUNT);
             Integer count = Objects.isNull(historyCipherCheckCount)
-                    ? Integer.valueOf(PasswordPolicySettingConstants.PASSWORD_POLICY_DEFAULT_SETTINGS.get(PASSWORD_POLICY_HISTORY_PASSWORD_CHECK_COUNT))
-                    : Integer.valueOf(historyCipherCheckCount.getValue());
+                ? Integer.valueOf(PasswordPolicySettingConstants.PASSWORD_POLICY_DEFAULT_SETTINGS
+                    .get(PASSWORD_POLICY_HISTORY_PASSWORD_CHECK_COUNT))
+                : Integer.valueOf(historyCipherCheckCount.getValue());
             Page<UserHistoryPasswordEntity> entities = userHistoryPasswordRepository.findAll(
-                    Example.of(new UserHistoryPasswordEntity().setUserId(userId)),
-                    PageRequest.of(0, count, Sort.by(Sort.Direction.DESC, LAST_MODIFIED_TIME)));
+                Example.of(new UserHistoryPasswordEntity().setUserId(userId)),
+                PageRequest.of(0, count, Sort.by(Sort.Direction.DESC, LAST_MODIFIED_TIME)));
             //构建历史密码验证器
-            new HistoryPasswordValidator(entities.getContent().stream().map(UserHistoryPasswordEntity::getPassword).toList(), passwordEncoder);
+            return new HistoryPasswordValidator(
+                entities.getContent().stream().map(UserHistoryPasswordEntity::getPassword).toList(),
+                passwordEncoder);
         }
         return new HistoryPasswordValidator(false);
     }
-
 
     /**
      * 获取密码长度规则验证器
@@ -142,16 +150,18 @@ public class DefaultPasswordPolicyManager implements PasswordPolicyManager<UserE
     private PasswordLengthValidator getPasswordLengthValidator() {
         //最小长度
         SettingEntity leastLengthEntity = settingRepository
-                .findByName(PasswordPolicySettingConstants.PASSWORD_POLICY_LEAST_LENGTH);
+            .findByName(PasswordPolicySettingConstants.PASSWORD_POLICY_LEAST_LENGTH);
         Integer leastLength = Objects.isNull(leastLengthEntity)
-                ? Integer.valueOf(PasswordPolicySettingConstants.PASSWORD_POLICY_DEFAULT_SETTINGS.get(PASSWORD_POLICY_LEAST_LENGTH))
-                : Integer.valueOf(leastLengthEntity.getValue());
+            ? Integer.valueOf(PasswordPolicySettingConstants.PASSWORD_POLICY_DEFAULT_SETTINGS
+                .get(PASSWORD_POLICY_LEAST_LENGTH))
+            : Integer.valueOf(leastLengthEntity.getValue());
         //最大长度
         SettingEntity biggestLengthEntity = settingRepository
-                .findByName(PasswordPolicySettingConstants.PASSWORD_POLICY_BIGGEST_LENGTH);
+            .findByName(PasswordPolicySettingConstants.PASSWORD_POLICY_BIGGEST_LENGTH);
         Integer biggestLength = Objects.isNull(biggestLengthEntity)
-                ? Integer.valueOf(PasswordPolicySettingConstants.PASSWORD_POLICY_DEFAULT_SETTINGS.get(PASSWORD_POLICY_BIGGEST_LENGTH))
-                : Integer.valueOf(biggestLengthEntity.getValue());
+            ? Integer.valueOf(PasswordPolicySettingConstants.PASSWORD_POLICY_DEFAULT_SETTINGS
+                .get(PASSWORD_POLICY_BIGGEST_LENGTH))
+            : Integer.valueOf(biggestLengthEntity.getValue());
         return new PasswordLengthValidator(leastLength, biggestLength);
     }
 
@@ -163,8 +173,8 @@ public class DefaultPasswordPolicyManager implements PasswordPolicyManager<UserE
     private PasswordComplexityRuleValidator getPasswordComplexityRuleValidator() {
         SettingEntity setting = settingRepository.findByName(PASSWORD_POLICY_COMPLEXITY);
         String complexityRule = Objects.isNull(setting)
-                ? PASSWORD_POLICY_DEFAULT_SETTINGS.get(PASSWORD_POLICY_COMPLEXITY)
-                : setting.getValue();
+            ? PASSWORD_POLICY_DEFAULT_SETTINGS.get(PASSWORD_POLICY_COMPLEXITY)
+            : setting.getValue();
         PasswordComplexityRule rule = PasswordComplexityRule.getType(complexityRule);
         return new PasswordComplexityRuleValidator(rule);
     }
@@ -175,14 +185,17 @@ public class DefaultPasswordPolicyManager implements PasswordPolicyManager<UserE
      * @return {@link  WeakPasswordValidator}
      */
     private WeakPasswordValidator getWeakPasswordValidator() {
-        SettingEntity setting = settingRepository.findByName(PasswordPolicySettingConstants.PASSWORD_POLICY_WEAK_PASSWORD_CHECK);
+        SettingEntity setting = settingRepository
+            .findByName(PasswordPolicySettingConstants.PASSWORD_POLICY_WEAK_PASSWORD_CHECK);
         String enable = Objects.isNull(setting)
-                ? PasswordPolicySettingConstants.PASSWORD_POLICY_DEFAULT_SETTINGS.get(PASSWORD_POLICY_WEAK_PASSWORD_CHECK)
-                : setting.getValue();
+            ? PasswordPolicySettingConstants.PASSWORD_POLICY_DEFAULT_SETTINGS
+                .get(PASSWORD_POLICY_WEAK_PASSWORD_CHECK)
+            : setting.getValue();
         if (Boolean.parseBoolean(enable)) {
             ArrayList<String> list = new ArrayList<>();
             //自定义弱密码
-            SettingEntity customWeakCipher = settingRepository.findByName(PASSWORD_POLICY_CUSTOM_WEAK_PASSWORD);
+            SettingEntity customWeakCipher = settingRepository
+                .findByName(PASSWORD_POLICY_CUSTOM_WEAK_PASSWORD);
             if (!Objects.isNull(customWeakCipher)) {
                 list.addAll(Arrays.asList(customWeakCipher.getValue().split("\n")));
             }
@@ -195,6 +208,22 @@ public class DefaultPasswordPolicyManager implements PasswordPolicyManager<UserE
     }
 
     /**
+     * 校验密码
+     *
+     * @param userId   {@link  Long} 用户ID
+     * @param password {@link  String} 密码
+     */
+    @Override
+    public void validate(@NonNull String userId, String password) {
+        List<PasswordValidator> validators = new ArrayList<>(providers);
+        //@formatter:off
+        validators.add(getPasswordIncludeUserInfoValidator(userId));
+        validators.add(getHistoryPasswordValidator(userId));
+        //@formatter:on
+        validators.forEach(passwordValidator -> passwordValidator.validate(password));
+    }
+
+    /**
      * 获取密码连续相同字符验证器
      *
      * @return {@link  PasswordContinuousSameCharValidator}
@@ -202,8 +231,9 @@ public class DefaultPasswordPolicyManager implements PasswordPolicyManager<UserE
     private PasswordContinuousSameCharValidator getPasswordContinuousSameCharValidator() {
         SettingEntity setting = settingRepository.findByName(PASSWORD_POLICY_NOT_SAME_CHARS);
         String rule = Objects.isNull(setting)
-                ? PasswordPolicySettingConstants.PASSWORD_POLICY_DEFAULT_SETTINGS.get(PASSWORD_POLICY_NOT_SAME_CHARS)
-                : setting.getValue();
+            ? PasswordPolicySettingConstants.PASSWORD_POLICY_DEFAULT_SETTINGS
+                .get(PASSWORD_POLICY_NOT_SAME_CHARS)
+            : setting.getValue();
         return new PasswordContinuousSameCharValidator(Integer.valueOf(rule));
     }
 
@@ -213,21 +243,22 @@ public class DefaultPasswordPolicyManager implements PasswordPolicyManager<UserE
      * @return {@link  PasswordIllegalSequenceValidator}
      */
     private PasswordIllegalSequenceValidator getPasswordIllegalSequenceValidator() {
-        SettingEntity setting = settingRepository.findByName(PASSWORD_POLICY_ILLEGAL_SEQUENCE_CHECK);
+        SettingEntity setting = settingRepository
+            .findByName(PASSWORD_POLICY_ILLEGAL_SEQUENCE_CHECK);
         String enable = Objects.isNull(setting)
-                ? PASSWORD_POLICY_DEFAULT_SETTINGS.get(PASSWORD_POLICY_ILLEGAL_SEQUENCE_CHECK)
-                : setting.getValue();
+            ? PASSWORD_POLICY_DEFAULT_SETTINGS.get(PASSWORD_POLICY_ILLEGAL_SEQUENCE_CHECK)
+            : setting.getValue();
         return new PasswordIllegalSequenceValidator(Boolean.parseBoolean(enable));
     }
 
     /**
      * 提供商
      */
-    private final List<PasswordValidator> providers;
+    private final List<PasswordValidator>       providers;
     /**
      * 用户
      */
-    private final UserRepository userRepository;
+    private final UserRepository                userRepository;
     /**
      * 历史密码
      */
@@ -235,13 +266,13 @@ public class DefaultPasswordPolicyManager implements PasswordPolicyManager<UserE
     /**
      * 设置
      */
-    private final SettingRepository settingRepository;
+    private final SettingRepository             settingRepository;
     /**
      * 弱密码库
      */
-    private final PasswordWeakLib passwordWeakLib;
+    private final PasswordWeakLib               passwordWeakLib;
     /**
      * PasswordEncoder
      */
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder               passwordEncoder;
 }

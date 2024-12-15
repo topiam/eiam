@@ -34,6 +34,7 @@ import cn.topiam.employee.openapi.authorization.AccessTokenAuthenticationFilter;
 import cn.topiam.employee.openapi.authorization.AccessTokenAuthenticationProvider;
 import cn.topiam.employee.openapi.authorization.store.AccessTokenStore;
 import cn.topiam.employee.openapi.authorization.store.RedisAccessTokenStore;
+import cn.topiam.employee.support.web.useragent.UserAgentParser;
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.DEFAULT_SECURITY_FILTER_CHAIN;
 import static cn.topiam.employee.openapi.constant.OpenApiV1Constants.AUTH_PATH;
 import static cn.topiam.employee.openapi.constant.OpenApiV1Constants.OPEN_API_V1_PATH;
@@ -74,7 +75,7 @@ public class OpenApiSecurityConfiguration {
         //关闭 session
         http.sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         //异常处理器
-        http.exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(new AccessTokenAuthenticationEntryPoint()));
+        http.exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(new AccessTokenAuthenticationEntryPoint(userAgentParser)));
         http.addFilterBefore(new AccessTokenAuthenticationFilter(providerManager),BasicAuthenticationFilter.class);
         return http.build();
         //@formatter:on
@@ -90,4 +91,11 @@ public class OpenApiSecurityConfiguration {
     public AccessTokenStore tokenStore(RedisTemplate<Object, Object> redisTemplate) {
         return new RedisAccessTokenStore(redisTemplate);
     }
+
+    private final UserAgentParser userAgentParser;
+
+    public OpenApiSecurityConfiguration(UserAgentParser userAgentParser) {
+        this.userAgentParser = userAgentParser;
+    }
+
 }

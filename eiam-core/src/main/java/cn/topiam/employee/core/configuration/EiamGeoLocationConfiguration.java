@@ -33,17 +33,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cn.topiam.employee.common.entity.setting.SettingEntity;
 import cn.topiam.employee.common.geo.GeoLocationProviderConfig;
-import cn.topiam.employee.common.geo.NoneGeoLocationServiceImpl;
-import cn.topiam.employee.common.geo.ip2region.Ip2regionGeoLocationServiceImpl;
-import cn.topiam.employee.common.geo.maxmind.MaxmindGeoLocationServiceImpl;
+import cn.topiam.employee.common.geo.NoneGeoLocationParserImpl;
+import cn.topiam.employee.common.geo.ip2region.Ip2regionGeoLocationParserImpl;
+import cn.topiam.employee.common.geo.maxmind.MaxmindGeoLocationParserImpl;
 import cn.topiam.employee.common.geo.maxmind.MaxmindProviderConfig;
 import cn.topiam.employee.common.jackjson.encrypt.EncryptionModule;
 import cn.topiam.employee.common.repository.setting.SettingRepository;
 import cn.topiam.employee.core.setting.GeoIpProviderConstants;
-import cn.topiam.employee.support.geo.GeoLocationService;
+import cn.topiam.employee.support.geo.GeoLocationParser;
 import static cn.topiam.employee.common.constant.ConfigBeanNameConstants.GEO_LOCATION;
-import static cn.topiam.employee.common.geo.ip2region.Ip2regionGeoLocationServiceImpl.IP2REGION;
-import static cn.topiam.employee.common.geo.maxmind.MaxmindGeoLocationServiceImpl.MAXMIND;
+import static cn.topiam.employee.common.geo.ip2region.Ip2regionGeoLocationParserImpl.IP2REGION;
+import static cn.topiam.employee.common.geo.maxmind.MaxmindGeoLocationParserImpl.MAXMIND;
 
 /**
  * 地理位置库
@@ -57,8 +57,8 @@ public class EiamGeoLocationConfiguration {
 
     @RefreshScope
     @Bean(value = GEO_LOCATION)
-    public GeoLocationService geoLocation(SettingRepository settingRepository,
-                                          RestTemplate restTemplate) {
+    public GeoLocationParser geoLocation(SettingRepository settingRepository,
+                                         RestTemplate restTemplate) {
         try {
             ObjectMapper objectMapper = EncryptionModule.deserializerDecrypt();
             // 指定序列化输入的类型
@@ -72,19 +72,19 @@ public class EiamGeoLocationConfiguration {
                     GeoLocationProviderConfig.class);
                 // maxmind
                 if (MAXMIND.equals(provider.getProvider())) {
-                    return new MaxmindGeoLocationServiceImpl(
+                    return new MaxmindGeoLocationParserImpl(
                         (MaxmindProviderConfig) provider.getConfig(), restTemplate);
                 }
                 // ip2region
                 if (IP2REGION.equals(provider.getProvider())) {
-                    return new Ip2regionGeoLocationServiceImpl();
+                    return new Ip2regionGeoLocationParserImpl();
                 }
             }
             //没有数据默认使用 ip2region
-            return new Ip2regionGeoLocationServiceImpl();
+            return new Ip2regionGeoLocationParserImpl();
         } catch (IOException e) {
             logger.error("Create geo location Exception: {}", e.getMessage(), e);
         }
-        return new NoneGeoLocationServiceImpl();
+        return new NoneGeoLocationParserImpl();
     }
 }

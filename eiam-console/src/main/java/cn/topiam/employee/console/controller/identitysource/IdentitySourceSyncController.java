@@ -29,8 +29,8 @@ import cn.topiam.employee.console.pojo.query.identity.IdentitySourceSyncRecordLi
 import cn.topiam.employee.console.pojo.result.identitysource.IdentitySourceSyncHistoryListResult;
 import cn.topiam.employee.console.pojo.result.identitysource.IdentitySourceSyncRecordListResult;
 import cn.topiam.employee.console.service.identitysource.IdentitySourceSyncService;
+import cn.topiam.employee.support.demo.Preview;
 import cn.topiam.employee.support.lock.Lock;
-import cn.topiam.employee.support.preview.Preview;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 import cn.topiam.employee.support.result.ApiRestResult;

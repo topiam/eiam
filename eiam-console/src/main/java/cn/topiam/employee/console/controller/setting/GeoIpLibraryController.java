@@ -28,9 +28,9 @@ import cn.topiam.employee.console.pojo.result.setting.GeoIpProviderResult;
 import cn.topiam.employee.console.pojo.save.setting.GeoIpProviderSaveParam;
 import cn.topiam.employee.console.service.setting.GeoLocationSettingService;
 import cn.topiam.employee.support.context.ApplicationContextService;
+import cn.topiam.employee.support.demo.Preview;
 import cn.topiam.employee.support.geo.GeoLocation;
 import cn.topiam.employee.support.lock.Lock;
-import cn.topiam.employee.support.preview.Preview;
 import cn.topiam.employee.support.result.ApiRestResult;
 
 import lombok.AllArgsConstructor;

@@ -30,8 +30,8 @@ import cn.topiam.employee.console.pojo.result.setting.PasswordPolicyConfigResult
 import cn.topiam.employee.console.pojo.result.setting.WeakPasswordLibListResult;
 import cn.topiam.employee.console.pojo.save.setting.PasswordPolicySaveParam;
 import cn.topiam.employee.console.service.setting.PasswordPolicyService;
+import cn.topiam.employee.support.demo.Preview;
 import cn.topiam.employee.support.lock.Lock;
-import cn.topiam.employee.support.preview.Preview;
 import cn.topiam.employee.support.result.ApiRestResult;
 
 import lombok.RequiredArgsConstructor;

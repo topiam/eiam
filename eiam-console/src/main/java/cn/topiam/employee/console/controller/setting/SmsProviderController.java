@@ -33,8 +33,8 @@ import cn.topiam.employee.console.pojo.save.setting.SmsProviderSaveParam;
 import cn.topiam.employee.console.service.setting.MessageSettingService;
 import cn.topiam.employee.core.message.MsgVariable;
 import cn.topiam.employee.core.message.sms.SmsMsgEventPublish;
+import cn.topiam.employee.support.demo.Preview;
 import cn.topiam.employee.support.lock.Lock;
-import cn.topiam.employee.support.preview.Preview;
 import cn.topiam.employee.support.result.ApiRestResult;
 import cn.topiam.employee.support.security.password.PasswordGenerator;
 

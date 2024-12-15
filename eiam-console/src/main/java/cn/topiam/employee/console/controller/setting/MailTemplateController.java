@@ -32,8 +32,8 @@ import cn.topiam.employee.console.pojo.result.setting.EmailTemplateListResult;
 import cn.topiam.employee.console.pojo.result.setting.EmailTemplateResult;
 import cn.topiam.employee.console.pojo.save.setting.EmailCustomTemplateSaveParam;
 import cn.topiam.employee.console.service.setting.MailTemplateService;
+import cn.topiam.employee.support.demo.Preview;
 import cn.topiam.employee.support.lock.Lock;
-import cn.topiam.employee.support.preview.Preview;
 import cn.topiam.employee.support.result.ApiRestResult;
 
 import lombok.AllArgsConstructor;

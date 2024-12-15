@@ -31,8 +31,8 @@ import cn.topiam.employee.openapi.pojo.result.UserResult;
 import cn.topiam.employee.openapi.pojo.save.UserCreateParam;
 import cn.topiam.employee.openapi.pojo.update.UserUpdateParam;
 import cn.topiam.employee.openapi.service.UserService;
+import cn.topiam.employee.support.demo.Preview;
 import cn.topiam.employee.support.lock.Lock;
-import cn.topiam.employee.support.preview.Preview;
 import cn.topiam.employee.support.repository.page.domain.Page;
 import cn.topiam.employee.support.repository.page.domain.PageModel;
 
