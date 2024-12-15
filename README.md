@@ -1,22 +1,16 @@
-<div align="center">
+<img src="images/full-logo.svg" alt="logo" height="100" width="426"/>
 
-<img src="images/full-logo.svg" alt="logo" width="45%"/>
-<br>
+# TOPIAM: 以开源为核心的 IAM/IDaaS 身份管理平台
 
-[![](https://img.shields.io/badge/JDK-17+-orange)](https://www.oracle.com/au/java/technologies/javase/jdk17-archive-downloads.html)
-[![](https://img.shields.io/badge/MySQL-8.0%2B-brightgreen)](https://www.mysql.com/downloads/)
-[![](https://img.shields.io/badge/License-AGPL%203.0-orange)](https://github.com/topaim/eiam/blob/master/LICENSE)
-[![](https://img.shields.io/badge/Maven-3.5.0+-brightgreen.svg)](https://maven.apache.org)
+[![](https://img.shields.io/badge/JDK-17+-orange?style=flat-square)](https://www.oracle.com/au/java/technologies/javase/jdk17-archive-downloads.html)
+[![](https://img.shields.io/badge/MySQL-8.0%2B-brightgreen?style=flat-square)](https://www.mysql.com/downloads/)
+[![](https://img.shields.io/badge/License-AGPL%203.0-orange?style=flat-square)](https://github.com/topaim/eiam/blob/master/LICENSE)
+[![](https://img.shields.io/badge/Maven-3.5.0+-brightgreen.svg?style=flat-square)](https://maven.apache.org)
+[![](https://img.shields.io/badge/link-官方文档-green.svg?style=flat-square)](https://topiam.cn)
+[![](https://img.shields.io/badge/link-需求收集-brightgreen.svg?style=flat-square)](https://github.com/topiam/eiam/issues/new)
+[![](https://img.shields.io/badge/link-问题反馈-red.svg?style=flat-square)](https://github.com/topiam/eiam/issues/new)
 
-[官方网站](https://eiam.topiam.cn) | [需求收集](https://github.com/topiam/eiam/issues/new) | [问题反馈](https://github.com/topiam/eiam/issues/new)
-
-</div>
-
---------------------------
-
-<div align="center">⭐️ 如果你喜欢 TOPIAM，请给它一个 Star，您的支持将是我们前行的动力。</div>
-
---------------------------
+⭐️ 如果你喜欢 TOPIAM，请给它一个 Star，您的支持将是我们前行的动力。
 
 ## 项目介绍
 
