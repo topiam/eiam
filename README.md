@@ -1,6 +1,8 @@
+<div align="center">
+
 <img src="images/full-logo.svg" alt="logo" height="100" width="426"/>
 
-# TOPIAM: 以开源为核心的 IAM/IDaaS 身份管理平台
+## 以开源为核心的 IAM / IDaaS 身份管理平台
 
 [![](https://img.shields.io/badge/JDK-17+-orange?style=flat-square)](https://www.oracle.com/au/java/technologies/javase/jdk17-archive-downloads.html)
 [![](https://img.shields.io/badge/MySQL-8.0%2B-brightgreen?style=flat-square)](https://www.mysql.com/downloads/)
@@ -10,7 +12,7 @@
 [![](https://img.shields.io/badge/link-需求收集-brightgreen.svg?style=flat-square)](https://github.com/topiam/eiam/issues/new)
 [![](https://img.shields.io/badge/link-问题反馈-red.svg?style=flat-square)](https://github.com/topiam/eiam/issues/new)
 
-⭐️ 如果你喜欢 TOPIAM，请给它一个 Star，您的支持将是我们前行的动力。
+</div>
 
 ## 项目介绍
 
