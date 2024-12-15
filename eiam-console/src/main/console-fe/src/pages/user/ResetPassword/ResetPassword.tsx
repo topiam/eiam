@@ -33,6 +33,7 @@ import { aesEcbEncrypt } from '@/utils/aes';
 const prefixCls = 'topiam-login';
 
 enum Status {
+  password_invalid_error = 'password_invalid_error',
   unknown_authentication_type = 'unknown_authentication_type',
   password_validated_fail_error = 'password_validated_fail_error',
 }
@@ -122,6 +123,14 @@ export default () => {
                               status: Status.password_validated_fail_error,
                               message: message,
                             });
+                            return;
+                          }
+                          if (status === Status.password_invalid_error) {
+                            setStatus({
+                              status: Status.password_invalid_error,
+                              message: message,
+                            });
+                            return;
                           }
                           if (status === Status.unknown_authentication_type) {
                             setStatus({
@@ -163,13 +172,12 @@ export default () => {
                       }}
                       layout="vertical"
                     >
-                      {status?.status === Status.password_validated_fail_error &&
-                        status?.message && (
-                          <>
-                            <Message content={status?.message} />
-                            <br />
-                          </>
-                        )}
+                      {status?.message && (
+                        <>
+                          <Message content={status?.message} />
+                          <br />
+                        </>
+                      )}
                       <Form.Item
                         label={intl.formatMessage({
                           id: 'pages.user.reset_password_modal.password.password',
