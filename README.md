@@ -1,6 +1,7 @@
 <div align="center">
 
-<img src="images/logo-banner.jpg" alt="logo" width="60%"/>
+<img src="images/full-logo.svg" alt="logo" width="45%"/>
+<br>
 
 [![](https://img.shields.io/badge/JDK-17+-orange)](https://www.oracle.com/au/java/technologies/javase/jdk17-archive-downloads.html)
 [![](https://img.shields.io/badge/MySQL-8.0%2B-brightgreen)](https://www.mysql.com/downloads/)
