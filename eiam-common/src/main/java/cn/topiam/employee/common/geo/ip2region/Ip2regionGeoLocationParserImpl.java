@@ -27,8 +27,8 @@ import org.springframework.util.Assert;
 
 import cn.topiam.employee.common.enums.Country;
 import cn.topiam.employee.support.geo.GeoLocation;
+import cn.topiam.employee.support.geo.GeoLocationParser;
 import cn.topiam.employee.support.geo.GeoLocationProvider;
-import cn.topiam.employee.support.geo.GeoLocationService;
 
 import lombok.extern.slf4j.Slf4j;
 import static cn.topiam.employee.common.geo.District.CITY_DISTRICT;
@@ -41,7 +41,7 @@ import static cn.topiam.employee.common.geo.District.PROVINCE_DISTRICT;
  * Created by support@topiam.cn on 2023/10/30 19:11
  */
 @Slf4j
-public class Ip2regionGeoLocationServiceImpl implements GeoLocationService, DisposableBean {
+public class Ip2regionGeoLocationParserImpl implements GeoLocationParser, DisposableBean {
 
     public static GeoLocationProvider IP2REGION        = new GeoLocationProvider("default",
         "ip2region");
@@ -50,7 +50,7 @@ public class Ip2regionGeoLocationServiceImpl implements GeoLocationService, Disp
 
     private final Searcher            searcher;
 
-    public Ip2regionGeoLocationServiceImpl() throws IOException {
+    public Ip2regionGeoLocationParserImpl() throws IOException {
         // 加载整个xdb到内存。
         try (InputStream in = this.getClass().getResourceAsStream(DEFAULT_XDB_PATH)) {
             Assert.notNull(in, "XDB must not be null");

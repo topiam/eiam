@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import cn.topiam.employee.support.geo.GeoLocationService;
+import cn.topiam.employee.support.geo.GeoLocationParser;
 
 import lombok.RequiredArgsConstructor;
 
@@ -43,7 +43,7 @@ public class UpdateMaxmindTaskConfiguration {
     @Scheduled(cron = "0 0 1 * * ?")
     public void update() {
         try {
-            if (geoLocationService instanceof MaxmindGeoLocationServiceImpl maxmindGeoLocation) {
+            if (geoLocationParser instanceof MaxmindGeoLocationParserImpl maxmindGeoLocation) {
                 logger.info("执行IP库文件更新定时任务开始");
                 if (maxmindGeoLocation.checkDbFileIsUpdate()) {
                     maxmindGeoLocation.download();
@@ -55,6 +55,6 @@ public class UpdateMaxmindTaskConfiguration {
         }
     }
 
-    private final GeoLocationService geoLocationService;
+    private final GeoLocationParser geoLocationParser;
 
 }

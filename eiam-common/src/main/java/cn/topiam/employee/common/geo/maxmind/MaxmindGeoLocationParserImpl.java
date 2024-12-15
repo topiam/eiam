@@ -46,8 +46,8 @@ import com.maxmind.geoip2.record.*;
 
 import cn.topiam.employee.support.constant.EiamConstants;
 import cn.topiam.employee.support.geo.GeoLocation;
+import cn.topiam.employee.support.geo.GeoLocationParser;
 import cn.topiam.employee.support.geo.GeoLocationProvider;
-import cn.topiam.employee.support.geo.GeoLocationService;
 import cn.topiam.employee.support.util.IpUtils;
 
 import lombok.Getter;
@@ -66,7 +66,7 @@ import static cn.topiam.employee.common.geo.District.PROVINCE_DISTRICT;
  */
 @Slf4j
 @Getter
-public class MaxmindGeoLocationServiceImpl implements GeoLocationService {
+public class MaxmindGeoLocationParserImpl implements GeoLocationParser {
 
     private final DatabaseReader            reader;
     private final MaxmindProviderConfig     maxmindProviderConfig;
@@ -86,8 +86,8 @@ public class MaxmindGeoLocationServiceImpl implements GeoLocationService {
      */
     public static final String              SHA256_URL   = "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=%s&suffix=tar.gz.sha256";
 
-    public MaxmindGeoLocationServiceImpl(MaxmindProviderConfig maxmindProviderConfig,
-                                         RestTemplate restTemplate) throws IOException {
+    public MaxmindGeoLocationParserImpl(MaxmindProviderConfig maxmindProviderConfig,
+                                        RestTemplate restTemplate) throws IOException {
         this.maxmindProviderConfig = maxmindProviderConfig;
         this.restTemplate = restTemplate;
         download();
