@@ -40,4 +40,3 @@ screenshot
 .DS_Store
 */.DS_Store
 /build/
-pnpm-lock.yaml
