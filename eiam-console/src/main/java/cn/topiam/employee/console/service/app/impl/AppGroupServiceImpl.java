@@ -34,14 +34,16 @@ import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.AppGroupEntity;
 import cn.topiam.employee.common.entity.app.po.AppGroupPO;
-import cn.topiam.employee.common.entity.app.query.AppGroupAssociationListQuery;
-import cn.topiam.employee.common.entity.app.query.AppGroupQuery;
+import cn.topiam.employee.common.entity.app.query.AppGroupAssociationListQueryParam;
+import cn.topiam.employee.common.entity.app.query.AppGroupQueryParam;
 import cn.topiam.employee.common.enums.CheckValidityType;
 import cn.topiam.employee.common.enums.app.AppGroupType;
 import cn.topiam.employee.common.repository.app.AppGroupAssociationRepository;
 import cn.topiam.employee.common.repository.app.AppGroupRepository;
 import cn.topiam.employee.console.converter.app.AppConverter;
 import cn.topiam.employee.console.converter.app.AppGroupConverter;
+import cn.topiam.employee.console.pojo.query.app.AppGroupAssociationListQuery;
+import cn.topiam.employee.console.pojo.query.app.AppGroupListQuery;
 import cn.topiam.employee.console.pojo.result.app.AppGroupGetResult;
 import cn.topiam.employee.console.pojo.result.app.AppGroupListResult;
 import cn.topiam.employee.console.pojo.result.app.AppListResult;
@@ -74,14 +76,15 @@ public class AppGroupServiceImpl implements AppGroupService {
      * 获取应用分组（分页）
      *
      * @param pageModel {@link PageModel}
-     * @param query     {@link AppGroupQuery}
+     * @param query     {@link AppGroupListQuery}
      * @return {@link AppGroupListResult}
      */
     @Override
-    public Page<AppGroupListResult> getAppGroupList(PageModel pageModel, AppGroupQuery query) {
+    public Page<AppGroupListResult> getAppGroupList(PageModel pageModel, AppGroupListQuery query) {
+        AppGroupQueryParam param = appGroupConverter.appGroupQueryToQueryParam(query);
         //查询映射
         org.springframework.data.domain.Page<AppGroupPO> list = appGroupRepository.getAppGroupList(
-            query, PageRequest.of(pageModel.getCurrent(), pageModel.getPageSize()));
+            param, PageRequest.of(pageModel.getCurrent(), pageModel.getPageSize()));
         return appGroupConverter.entityConvertToAppGroupListResult(list);
     }
 
@@ -217,8 +220,11 @@ public class AppGroupServiceImpl implements AppGroupService {
     @Override
     public Page<AppListResult> getAppGroupAssociationList(PageModel model,
                                                           AppGroupAssociationListQuery query) {
+        //@formatter:off
+        AppGroupAssociationListQueryParam param = appConverter.appGroupAssociationListQueryToQueryParam(query);
+        //@formatter:on
         org.springframework.data.domain.Page<AppEntity> page = appGroupAssociationRepository
-            .getAppGroupAssociationList(query,
+            .getAppGroupAssociationList(param,
                 PageRequest.of(model.getCurrent(), model.getPageSize()));
         return appConverter.entityConvertToAppListResult(page);
     }

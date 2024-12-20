@@ -19,8 +19,7 @@ package cn.topiam.employee.portal.service;
 
 import java.util.List;
 
-import cn.topiam.employee.common.entity.app.query.AppGroupQuery;
-import cn.topiam.employee.common.entity.app.query.GetAppListQuery;
+import cn.topiam.employee.portal.pojo.query.GetAppGroupListQuery;
 import cn.topiam.employee.portal.pojo.result.AppGroupListResult;
 import cn.topiam.employee.portal.pojo.result.GetAppListResult;
 import cn.topiam.employee.support.repository.page.domain.Page;
@@ -36,19 +35,20 @@ public interface AppService {
     /**
      * 获取应用列表
      *
-     * @param query     {@link GetAppListQuery}
+     * @param query     {@link cn.topiam.employee.portal.pojo.query.GetAppListQuery}
      * @param pageModel {@link PageModel}
      * @return {@link Page}
      */
-    Page<GetAppListResult> getAppList(GetAppListQuery query, PageModel pageModel);
+    Page<GetAppListResult> getAppList(cn.topiam.employee.portal.pojo.query.GetAppListQuery query,
+                                      PageModel pageModel);
 
     /**
      * 查询应用分组
      *
-     * @param appGroupQuery {@link AppGroupQuery}
+     * @param appGroupQuery {@link GetAppGroupListQuery}
      * @return {@link AppGroupListResult}
      */
-    List<AppGroupListResult> getAppGroupList(AppGroupQuery appGroupQuery);
+    List<AppGroupListResult> getAppGroupList(GetAppGroupListQuery appGroupQuery);
 
     /**
      * 获取应用数量

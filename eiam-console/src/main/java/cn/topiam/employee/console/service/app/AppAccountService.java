@@ -17,7 +17,8 @@
  */
 package cn.topiam.employee.console.service.app;
 
-import cn.topiam.employee.common.entity.app.query.AppAccountQuery;
+import cn.topiam.employee.common.entity.app.query.AppAccountQueryParam;
+import cn.topiam.employee.console.pojo.query.app.AppAccountQuery;
 import cn.topiam.employee.console.pojo.result.app.AppAccountListResult;
 import cn.topiam.employee.console.pojo.save.app.AppAccountCreateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
@@ -35,7 +36,7 @@ public interface AppAccountService {
      * 查询应用账户
      *
      * @param pageModel {@link PageModel}
-     * @param query     {@link  AppAccountQuery}
+     * @param query     {@link  AppAccountQueryParam}
      * @return {@link Page}
      */
     Page<AppAccountListResult> getAppAccountList(PageModel pageModel, AppAccountQuery query);

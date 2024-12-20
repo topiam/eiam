@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import cn.topiam.employee.audit.annotation.Audit;
 import cn.topiam.employee.audit.event.type.EventType;
-import cn.topiam.employee.common.entity.app.query.AppAccountQuery;
+import cn.topiam.employee.console.pojo.query.app.AppAccountQuery;
 import cn.topiam.employee.console.pojo.result.app.AppAccountListResult;
 import cn.topiam.employee.console.pojo.save.app.AppAccountCreateParam;
 import cn.topiam.employee.console.service.app.AppAccountService;

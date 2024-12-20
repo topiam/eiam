@@ -17,48 +17,41 @@
  */
 package cn.topiam.employee.common.entity.app.query;
 
-import org.springdoc.core.annotations.ParameterObject;
+import cn.topiam.employee.common.enums.app.AppPolicySubjectType;
 
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
-
 /**
- * AppAccountCreateParam 应用账户查询入参
+ * 应用授权策略查询参数
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2022/5/24 22:13
+ * Created by support@topiam.cn on 2020/9/27 21:29
  */
 @Data
-@Schema(description = "应用账户查询入参")
-@ParameterObject
-public class AppAccountQuery {
+public class AppAccessPolicyQueryParam {
 
     /**
-     * appId
+     * 应用id
      */
-    @Parameter(description = "appId")
-    private String appId;
+    private String               appId;
+
     /**
-     * 用户ID
+     * 授权主体
      */
-    @Parameter(description = "用户ID")
-    private String userId;
+    private String               subjectName;
+
     /**
-     * 用户名
+     * 授权主体ID
      */
-    @Parameter(description = "用户名")
-    private String username;
+    private String               subjectId;
+
     /**
-     * 账户名称
+     * 主体类型（用户、分组、组织机构）
      */
-    @Parameter(description = "账户名称")
-    private String account;
+    private AppPolicySubjectType subjectType;
 
     /**
      * 应用名称
      */
-    @Parameter(description = "应用名称")
-    private String appName;
+    private String               appName;
 }

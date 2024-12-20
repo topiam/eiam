@@ -28,9 +28,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import cn.topiam.employee.common.entity.account.query.UserGroupMemberListQuery;
 import cn.topiam.employee.common.entity.app.po.AppGroupPO;
-import cn.topiam.employee.common.entity.app.query.AppGroupQuery;
+import cn.topiam.employee.common.entity.app.query.AppGroupQueryParam;
 import cn.topiam.employee.common.repository.app.AppGroupRepositoryCustomized;
 import cn.topiam.employee.support.repository.aspect.query.QuerySingleResult;
 
@@ -51,13 +50,13 @@ public class AppGroupRepositoryCustomizedImpl implements AppGroupRepositoryCusto
     /**
      * 获取应用组应用列表
      *
-     * @param query    {@link UserGroupMemberListQuery}
+     * @param query    {@link AppGroupQueryParam}
      * @param pageable {@link Pageable}
      * @return {@link Page}
      */
     @SuppressWarnings("DuplicatedCode")
     @Override
-    public Page<AppGroupPO> getAppGroupList(AppGroupQuery query, Pageable pageable) {
+    public Page<AppGroupPO> getAppGroupList(AppGroupQueryParam query, Pageable pageable) {
         Map<String, Object> args = new HashMap<>();
         //@formatter:off
         String hql = """
@@ -121,7 +120,7 @@ public class AppGroupRepositoryCustomizedImpl implements AppGroupRepositoryCusto
                  	GROUP BY
                  		aga.groupId
                  	) ass ON group.id = ass.groupId
-                 """;
+                """;
         TypedQuery<Long> countQuery = entityManager.createQuery(countSql + whereSql, Long.class);
         args.forEach(countQuery::setParameter);
         return new PageImpl<>(listQuery.getResultList(), pageable, countQuery.getSingleResult());
@@ -131,11 +130,11 @@ public class AppGroupRepositoryCustomizedImpl implements AppGroupRepositoryCusto
      * 查询应用组列表
      *
      * @param subjectIds {@link List}
-     * @param query  {@link AppGroupQuery}
+     * @param query  {@link AppGroupQueryParam}
      * @return {@link List}
      */
     @Override
-    public List<AppGroupPO> getAppGroupList(List<String> subjectIds, AppGroupQuery query) {
+    public List<AppGroupPO> getAppGroupList(List<String> subjectIds, AppGroupQueryParam query) {
         Map<String, Object> args = new HashMap<>();
         //@formatter:off
         String hql = """
@@ -156,12 +155,12 @@ public class AppGroupRepositoryCustomizedImpl implements AppGroupRepositoryCusto
                 	FROM
                 		AppGroupAssociationEntity aga
                 		LEFT JOIN AppEntity app ON aga.app.id = app.id
-                		LEFT JOIN AppAccessPolicyEntity app_acce ON app.id = app_acce.appId
-                		WHERE (app_acce.subjectId IN (:subjectIds) OR app.authorizationType = :type)
+                		LEFT JOIN AppAccessPolicyEntity app_acce ON app.id = app_acce.appId AND app_acce.enabled = true
+                		WHERE (app_acce.subjectId IN (:subjectIds) OR app.authorizationType = :type) %s
                 	GROUP BY
                 		aga.groupId
                 	) ass ON group.id = ass.groupId
-                """;
+                """.formatted(StringUtils.isNoneBlank(query.getAppName()) ? " AND app.name LIKE :appName " : "");
         //@formatter:on
         String whereSql = " WHERE 1 = 1 ";
         //分组名称
@@ -178,6 +177,10 @@ public class AppGroupRepositoryCustomizedImpl implements AppGroupRepositoryCusto
         if (ObjectUtils.isNotEmpty(query.getType())) {
             whereSql += "AND group.type =:type";
             args.put("type", query);
+        }
+        //应用名称
+        if (StringUtils.isNoneBlank(query.getAppName())) {
+            args.put("appName", "%" + query.getAppName() + "%");
         }
         TypedQuery<AppGroupPO> listQuery = entityManager.createQuery(hql + whereSql,
             AppGroupPO.class);

@@ -26,9 +26,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import cn.topiam.employee.common.entity.account.query.UserListQuery;
 import cn.topiam.employee.common.entity.app.po.AppAccountPO;
-import cn.topiam.employee.common.entity.app.query.AppAccountQuery;
+import cn.topiam.employee.common.entity.app.query.AppAccountQueryParam;
 import cn.topiam.employee.common.repository.app.AppAccountRepositoryCustomized;
 
 import lombok.AllArgsConstructor;
@@ -50,11 +49,11 @@ public class AppAccountRepositoryCustomizedImpl implements AppAccountRepositoryC
      * 获取应用账户列表
      *
      * @param pageable {@link  Pageable}
-     * @param query    {@link  UserListQuery}
+     * @param query    {@link  AppAccountQueryParam}
      * @return {@link Page}
      */
     @Override
-    public Page<AppAccountPO> getAppAccountList(AppAccountQuery query, Pageable pageable) {
+    public Page<AppAccountPO> getAppAccountList(AppAccountQueryParam query, Pageable pageable) {
         Map<String, Object> args = new HashMap<>();
         //@formatter:off
         String hql = """

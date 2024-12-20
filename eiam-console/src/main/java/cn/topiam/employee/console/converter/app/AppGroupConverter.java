@@ -27,6 +27,8 @@ import com.google.common.collect.Lists;
 import cn.topiam.employee.common.entity.app.AppAccountEntity;
 import cn.topiam.employee.common.entity.app.AppGroupEntity;
 import cn.topiam.employee.common.entity.app.po.AppGroupPO;
+import cn.topiam.employee.common.entity.app.query.AppGroupQueryParam;
+import cn.topiam.employee.console.pojo.query.app.AppGroupListQuery;
 import cn.topiam.employee.console.pojo.result.app.AppGroupGetResult;
 import cn.topiam.employee.console.pojo.result.app.AppGroupListResult;
 import cn.topiam.employee.console.pojo.save.app.AppAccountCreateParam;
@@ -112,4 +114,11 @@ public interface AppGroupConverter {
     @Mapping(target = "createBy", ignore = true)
     AppGroupEntity appGroupCreateParamConvertToEntity(AppGroupCreateParam param);
 
+    /**
+     * 转查询参数
+     *
+     * @param query {@link AppGroupListQuery}
+     * @return {@link AppGroupQueryParam}
+     */
+    AppGroupQueryParam appGroupQueryToQueryParam(AppGroupListQuery query);
 }

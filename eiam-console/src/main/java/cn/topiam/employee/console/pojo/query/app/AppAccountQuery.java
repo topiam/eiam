@@ -1,5 +1,5 @@
 /*
- * eiam-common - Employee Identity and Access Management
+ * eiam-console - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,10 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.common.entity.app.query;
-
-import java.io.Serial;
-import java.io.Serializable;
+package cn.topiam.employee.console.pojo.query.app;
 
 import org.springdoc.core.annotations.ParameterObject;
 
@@ -26,30 +23,42 @@ import lombok.Data;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
 
 /**
- * 查询应用列表入参
+ * AppAccountCreateParam 应用账户查询入参
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2020/8/11 23:08
+ * Created by support@topiam.cn on 2022/5/24 22:13
  */
 @Data
-@Schema(description = "查询应用组应用列表入参")
+@Schema(description = "应用账户查询入参")
 @ParameterObject
-public class AppGroupAssociationListQuery implements Serializable {
-    @Serial
-    private static final long serialVersionUID = -7110595216804896858L;
+public class AppAccountQuery {
+
     /**
-     * 组ID
+     * appId
      */
-    @NotEmpty(message = "组ID不能为空")
-    @Parameter(description = "组ID")
-    private String            id;
+    @Parameter(description = "appId")
+    private String appId;
+    /**
+     * 用户ID
+     */
+    @Parameter(description = "用户ID")
+    private String userId;
+    /**
+     * 用户名
+     */
+    @Parameter(description = "用户名")
+    private String username;
+    /**
+     * 账户名称
+     */
+    @Parameter(description = "账户名称")
+    private String account;
 
     /**
      * 应用名称
      */
     @Parameter(description = "应用名称")
-    private String            appName;
+    private String appName;
 }

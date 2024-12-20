@@ -24,8 +24,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cn.topiam.employee.common.entity.app.query.AppGroupQuery;
-import cn.topiam.employee.common.entity.app.query.GetAppListQuery;
+import cn.topiam.employee.portal.pojo.query.GetAppGroupListQuery;
+import cn.topiam.employee.portal.pojo.query.GetAppListQuery;
 import cn.topiam.employee.portal.pojo.result.AppGroupListResult;
 import cn.topiam.employee.portal.pojo.result.GetAppListResult;
 import cn.topiam.employee.portal.service.AppService;
@@ -88,7 +88,7 @@ public class AppController {
      */
     @Operation(summary = "获取分组应用列表")
     @GetMapping(value = "/group_list")
-    public ApiRestResult<List<AppGroupListResult>> getAppGroupList(AppGroupQuery appGroupQuery) {
+    public ApiRestResult<List<AppGroupListResult>> getAppGroupList(GetAppGroupListQuery appGroupQuery) {
         List<AppGroupListResult> list = appService.getAppGroupList(appGroupQuery);
         return ApiRestResult.ok(list);
     }

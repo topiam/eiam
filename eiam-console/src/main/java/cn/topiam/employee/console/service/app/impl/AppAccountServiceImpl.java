@@ -35,7 +35,7 @@ import cn.topiam.employee.common.entity.account.UserEntity;
 import cn.topiam.employee.common.entity.app.AppAccountEntity;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.po.AppAccountPO;
-import cn.topiam.employee.common.entity.app.query.AppAccountQuery;
+import cn.topiam.employee.common.entity.app.query.AppAccountQueryParam;
 import cn.topiam.employee.common.exception.app.AppAccountExistException;
 import cn.topiam.employee.common.exception.app.AppAccountNotExistException;
 import cn.topiam.employee.common.exception.app.AppDefaultAccountExistException;
@@ -44,6 +44,7 @@ import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.common.repository.app.AppAccountRepository;
 import cn.topiam.employee.common.repository.app.AppRepository;
 import cn.topiam.employee.console.converter.app.AppAccountConverter;
+import cn.topiam.employee.console.pojo.query.app.AppAccountQuery;
 import cn.topiam.employee.console.pojo.result.app.AppAccountListResult;
 import cn.topiam.employee.console.pojo.save.app.AppAccountCreateParam;
 import cn.topiam.employee.console.service.app.AppAccountService;
@@ -75,11 +76,12 @@ public class AppAccountServiceImpl implements AppAccountService {
     @Override
     public Page<AppAccountListResult> getAppAccountList(PageModel pageModel,
                                                         AppAccountQuery query) {
+        AppAccountQueryParam param = appAccountConverter.appAccountQueryToQueryParam(query);
         //分页条件
         PageRequest request = PageRequest.of(pageModel.getCurrent(), pageModel.getPageSize());
         //查询映射
         org.springframework.data.domain.Page<AppAccountPO> list = appAccountRepository
-            .getAppAccountList(query, request);
+            .getAppAccountList(param, request);
         return appAccountConverter.appAccountEntityConvertToAppAccountResult(list);
     }
 

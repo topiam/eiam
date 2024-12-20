@@ -27,9 +27,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import cn.topiam.employee.common.entity.account.query.UserListQuery;
 import cn.topiam.employee.common.entity.app.po.AppAccessPolicyPO;
-import cn.topiam.employee.common.entity.app.query.AppAccessPolicyQuery;
+import cn.topiam.employee.common.entity.app.query.AppAccessPolicyQueryParam;
 import cn.topiam.employee.common.repository.app.AppAccessPolicyRepositoryCustomized;
 import cn.topiam.employee.support.exception.TopIamException;
 
@@ -50,11 +49,12 @@ public class AppAccessPolicyRepositoryCustomizedImpl implements
      * 获取应用授权策略列表
      *
      * @param pageable {@link  Pageable}
-     * @param query    {@link  UserListQuery}
+     * @param query    {@link  AppAccessPolicyQueryParam}
      * @return {@link Page}
      */
     @Override
-    public Page<AppAccessPolicyPO> getAppPolicyList(AppAccessPolicyQuery query, Pageable pageable) {
+    public Page<AppAccessPolicyPO> getAppPolicyList(AppAccessPolicyQueryParam query,
+                                                    Pageable pageable) {
         Map<String, Object> args = new HashMap<>();
         //@formatter:off
         String hql = """

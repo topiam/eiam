@@ -28,6 +28,8 @@ import cn.topiam.employee.application.ApplicationService;
 import cn.topiam.employee.application.ApplicationServiceLoader;
 import cn.topiam.employee.common.entity.app.AppAccessPolicyEntity;
 import cn.topiam.employee.common.entity.app.po.AppAccessPolicyPO;
+import cn.topiam.employee.common.entity.app.query.AppAccessPolicyQueryParam;
+import cn.topiam.employee.console.pojo.query.app.AppAccessPolicyQuery;
 import cn.topiam.employee.console.pojo.result.app.AppAccessPolicyResult;
 import cn.topiam.employee.console.pojo.save.app.AppAccessPolicyCreateParam;
 import cn.topiam.employee.support.context.ApplicationContextService;
@@ -112,4 +114,13 @@ public interface AppAccessPolicyConverter {
     private ApplicationServiceLoader getApplicationServiceLoader() {
         return ApplicationContextService.getBean(ApplicationServiceLoader.class);
     }
+
+    /**
+     * 转查询参数
+     *
+     * @param query {@link AppAccessPolicyQuery}
+     * @return {@link AppAccessPolicyQueryParam}
+     */
+    AppAccessPolicyQueryParam appAccessPolicyQueryToQueryParam(AppAccessPolicyQuery query);
+
 }

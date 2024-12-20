@@ -30,11 +30,12 @@ import cn.topiam.employee.audit.entity.Target;
 import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.common.entity.app.AppAccountEntity;
 import cn.topiam.employee.common.entity.app.po.AppAccountPO;
-import cn.topiam.employee.common.entity.app.query.AppAccountQuery;
+import cn.topiam.employee.common.entity.app.query.AppAccountQueryParam;
 import cn.topiam.employee.common.exception.app.AppAccountExistException;
 import cn.topiam.employee.common.exception.app.AppDefaultAccountExistException;
 import cn.topiam.employee.common.repository.app.AppAccountRepository;
 import cn.topiam.employee.openapi.converter.AppAccountConverter;
+import cn.topiam.employee.openapi.pojo.query.OapiV1AppAccountQuery;
 import cn.topiam.employee.openapi.pojo.result.AppAccountListResult;
 import cn.topiam.employee.openapi.pojo.save.AppAccountCreateParam;
 import cn.topiam.employee.openapi.service.AppAccountService;
@@ -60,17 +61,20 @@ public class AppAccountServiceImpl implements AppAccountService {
      * 查询应用账户
      *
      * @param pageModel {@link PageModel}
-     * @param query     {@link  AppAccountQuery}
+     * @param query     {@link  OapiV1AppAccountQuery}
      * @return {@link Page}
      */
     @Override
     public Page<AppAccountListResult> getAppAccountList(PageModel pageModel,
-                                                        AppAccountQuery query) {
+                                                        OapiV1AppAccountQuery query) {
+        //@formatter:off
+        AppAccountQueryParam param = appAccountConverter.appAccountQueryToQueryParam(query);
+        //@formatter:on
         //分页条件
         PageRequest request = PageRequest.of(pageModel.getCurrent(), pageModel.getPageSize());
         //查询映射
         org.springframework.data.domain.Page<AppAccountPO> list = appAccountRepository
-            .getAppAccountList(query, request);
+            .getAppAccountList(param, request);
         return appAccountConverter.appAccountEntityConvertToAppAccountResult(list);
     }
 

@@ -26,6 +26,8 @@ import org.springframework.util.CollectionUtils;
 
 import cn.topiam.employee.common.entity.app.AppAccountEntity;
 import cn.topiam.employee.common.entity.app.po.AppAccountPO;
+import cn.topiam.employee.common.entity.app.query.AppAccountQueryParam;
+import cn.topiam.employee.console.pojo.query.app.AppAccountQuery;
 import cn.topiam.employee.console.pojo.result.app.AppAccountListResult;
 import cn.topiam.employee.console.pojo.save.app.AppAccountCreateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
@@ -46,14 +48,14 @@ public interface AppAccountConverter {
      * @return {@link Page}
      */
     default Page<AppAccountListResult> appAccountEntityConvertToAppAccountResult(org.springframework.data.domain.Page<AppAccountPO> page) {
-        cn.topiam.employee.support.repository.page.domain.Page<AppAccountListResult> result = new cn.topiam.employee.support.repository.page.domain.Page<>();
+        Page<AppAccountListResult> result = new Page<>();
         if (!CollectionUtils.isEmpty(page.getContent())) {
             List<AppAccountListResult> list = new ArrayList<>();
             for (AppAccountPO po : page.getContent()) {
                 list.add(entityConvertToAppAccountResult(po));
             }
             //@formatter:off
-            result.setPagination(cn.topiam.employee.support.repository.page.domain.Page.Pagination.builder()
+            result.setPagination(Page.Pagination.builder()
                     .total(page.getTotalElements())
                     .totalPages(page.getTotalPages())
                     .current(page.getPageable().getPageNumber() + 1)
@@ -87,4 +89,11 @@ public interface AppAccountConverter {
     @Mapping(target = "createBy", ignore = true)
     AppAccountEntity appAccountCreateParamConvertToEntity(AppAccountCreateParam param);
 
+    /**
+     * 查询参数转换
+     *
+     * @param query {@link AppAccountQuery}
+     * @return {@link AppAccountQueryParam}
+     */
+    AppAccountQueryParam appAccountQueryToQueryParam(AppAccountQuery query);
 }

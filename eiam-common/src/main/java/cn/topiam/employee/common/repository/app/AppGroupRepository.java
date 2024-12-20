@@ -85,4 +85,12 @@ public interface AppGroupRepository extends JpaRepository<AppGroupEntity, String
      * @return {@link AppGroupEntity}
      */
     Optional<AppGroupEntity> findByCode(@Param("code") String code);
+
+    /**
+     * 编码存在校验
+     *
+     * @param code {@link String}
+     * @return {@link boolean}
+     */
+    boolean existsByCode(String code);
 }

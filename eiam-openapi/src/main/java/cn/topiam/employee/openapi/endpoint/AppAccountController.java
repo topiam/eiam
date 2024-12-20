@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.*;
 
 import cn.topiam.employee.audit.annotation.Audit;
 import cn.topiam.employee.audit.event.type.EventType;
-import cn.topiam.employee.common.entity.app.query.AppAccountQuery;
 import cn.topiam.employee.openapi.common.OpenApiResponse;
+import cn.topiam.employee.openapi.pojo.query.OapiV1AppAccountQuery;
 import cn.topiam.employee.openapi.pojo.result.AppAccountListResult;
 import cn.topiam.employee.openapi.pojo.save.AppAccountCreateParam;
 import cn.topiam.employee.openapi.service.AppAccountService;
@@ -56,13 +56,13 @@ public class AppAccountController {
      * 获取应用账户列表
      *
      * @param page  {@link PageModel}
-     * @param query {@link AppAccountQuery}
+     * @param query {@link OapiV1AppAccountQuery}
      * @return {@link AppAccountListResult}
      */
     @Operation(summary = "获取应用账户列表")
     @GetMapping(value = "/list")
     public OpenApiResponse<Page<AppAccountListResult>> getAppAccountList(PageModel page,
-                                                                         @Validated AppAccountQuery query) {
+                                                                         @Validated OapiV1AppAccountQuery query) {
         return OpenApiResponse.success((appAccountService.getAppAccountList(page, query)));
     }
 

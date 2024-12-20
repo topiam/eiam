@@ -17,7 +17,7 @@
  */
 package cn.topiam.employee.console.service.app;
 
-import cn.topiam.employee.common.entity.app.query.AppAccessPolicyQuery;
+import cn.topiam.employee.console.pojo.query.app.AppAccessPolicyQuery;
 import cn.topiam.employee.console.pojo.result.app.AppAccessPolicyResult;
 import cn.topiam.employee.console.pojo.save.app.AppAccessPolicyCreateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;

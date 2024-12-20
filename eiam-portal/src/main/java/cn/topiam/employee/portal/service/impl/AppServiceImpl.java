@@ -30,14 +30,15 @@ import cn.topiam.employee.common.entity.account.UserGroupMemberEntity;
 import cn.topiam.employee.common.entity.account.po.OrganizationMemberPO;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.po.AppGroupPO;
-import cn.topiam.employee.common.entity.app.query.AppGroupQuery;
-import cn.topiam.employee.common.entity.app.query.GetAppListQuery;
+import cn.topiam.employee.common.entity.app.query.AppGroupQueryParam;
 import cn.topiam.employee.common.repository.account.OrganizationMemberRepository;
 import cn.topiam.employee.common.repository.account.UserGroupMemberRepository;
 import cn.topiam.employee.common.repository.app.AppGroupRepository;
 import cn.topiam.employee.common.repository.app.AppRepository;
 import cn.topiam.employee.portal.converter.AppConverter;
 import cn.topiam.employee.portal.converter.AppGroupConverter;
+import cn.topiam.employee.portal.pojo.query.GetAppGroupListQuery;
+import cn.topiam.employee.portal.pojo.query.GetAppListQuery;
 import cn.topiam.employee.portal.pojo.result.AppGroupListResult;
 import cn.topiam.employee.portal.pojo.result.GetAppListResult;
 import cn.topiam.employee.portal.service.AppService;
@@ -87,15 +88,17 @@ public class AppServiceImpl implements AppService {
     /**
      * 查询应用分组
      *
-     * @param appGroupQuery {@link AppGroupQuery}
+     * @param query {@link GetAppGroupListQuery}
      * @return {@link AppGroupListResult}
      */
     @Override
-    public List<AppGroupListResult> getAppGroupList(AppGroupQuery appGroupQuery) {
+    public List<AppGroupListResult> getAppGroupList(GetAppGroupListQuery query) {
         //查询映射
+        //@formatter:off
+        AppGroupQueryParam param = appGroupConverter.appGroupQueryToQueryParam(query);
+        //@formatter:on
         String userId = SecurityUtils.getCurrentUserId();
-        List<AppGroupPO> list = appGroupRepository.getAppGroupList(getSubjectIds(userId),
-            appGroupQuery);
+        List<AppGroupPO> list = appGroupRepository.getAppGroupList(getSubjectIds(userId), param);
         return appGroupConverter.entityConvertToAppGroupListResult(list);
     }
 

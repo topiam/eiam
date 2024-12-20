@@ -26,9 +26,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import cn.topiam.employee.common.entity.account.query.UserGroupMemberListQuery;
 import cn.topiam.employee.common.entity.app.AppEntity;
-import cn.topiam.employee.common.entity.app.query.AppGroupAssociationListQuery;
+import cn.topiam.employee.common.entity.app.query.AppGroupAssociationListQueryParam;
 import cn.topiam.employee.common.repository.app.AppGroupAssociationRepositoryCustomized;
 
 import lombok.AllArgsConstructor;
@@ -48,13 +47,13 @@ public class AppGroupAssociationRepositoryCustomizedImpl implements
     /**
      * 获取应用组应用列表
      *
-     * @param query    {@link UserGroupMemberListQuery}
+     * @param query    {@link AppGroupAssociationListQueryParam}
      * @param pageable {@link Pageable}
      * @return {@link Page}
      */
     @SuppressWarnings("DuplicatedCode")
     @Override
-    public Page<AppEntity> getAppGroupAssociationList(AppGroupAssociationListQuery query,
+    public Page<AppEntity> getAppGroupAssociationList(AppGroupAssociationListQueryParam query,
                                                       Pageable pageable) {
         Map<String, Object> args = new HashMap<>();
         //@formatter:off

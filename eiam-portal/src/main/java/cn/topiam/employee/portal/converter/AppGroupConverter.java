@@ -24,6 +24,8 @@ import org.mapstruct.Mapper;
 import com.google.common.collect.Lists;
 
 import cn.topiam.employee.common.entity.app.po.AppGroupPO;
+import cn.topiam.employee.common.entity.app.query.AppGroupQueryParam;
+import cn.topiam.employee.portal.pojo.query.GetAppGroupListQuery;
 import cn.topiam.employee.portal.pojo.result.AppGroupListResult;
 
 /**
@@ -58,4 +60,11 @@ public interface AppGroupConverter {
      */
     AppGroupListResult entityConvertToAppGroupListResult(AppGroupPO appGroupPo);
 
+    /**
+     * 查询参数转换
+     *
+     * @param query {@link GetAppGroupListQuery}
+     * @return {@link AppGroupQueryParam}
+     */
+    AppGroupQueryParam appGroupQueryToQueryParam(GetAppGroupListQuery query);
 }

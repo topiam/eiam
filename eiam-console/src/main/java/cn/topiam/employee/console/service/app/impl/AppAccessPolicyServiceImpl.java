@@ -30,13 +30,14 @@ import cn.topiam.employee.audit.enums.TargetType;
 import cn.topiam.employee.common.entity.app.AppAccessPolicyEntity;
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.po.AppAccessPolicyPO;
-import cn.topiam.employee.common.entity.app.query.AppAccessPolicyQuery;
+import cn.topiam.employee.common.entity.app.query.AppAccessPolicyQueryParam;
 import cn.topiam.employee.common.repository.account.OrganizationRepository;
 import cn.topiam.employee.common.repository.account.UserGroupRepository;
 import cn.topiam.employee.common.repository.account.UserRepository;
 import cn.topiam.employee.common.repository.app.AppAccessPolicyRepository;
 import cn.topiam.employee.common.repository.app.AppRepository;
 import cn.topiam.employee.console.converter.app.AppAccessPolicyConverter;
+import cn.topiam.employee.console.pojo.query.app.AppAccessPolicyQuery;
 import cn.topiam.employee.console.pojo.result.app.AppAccessPolicyResult;
 import cn.topiam.employee.console.pojo.save.app.AppAccessPolicyCreateParam;
 import cn.topiam.employee.console.service.app.AppAccessPolicyService;
@@ -60,7 +61,6 @@ import static cn.topiam.employee.support.repository.base.BaseEntity.LAST_MODIFIE
 @Slf4j
 @AllArgsConstructor
 public class AppAccessPolicyServiceImpl implements AppAccessPolicyService {
-
     /**
      * 查询应用授权策略列表
      *
@@ -71,11 +71,14 @@ public class AppAccessPolicyServiceImpl implements AppAccessPolicyService {
     @Override
     public Page<AppAccessPolicyResult> getAppAccessPolicyList(PageModel pageModel,
                                                               AppAccessPolicyQuery query) {
+        //@formatter:off
+        AppAccessPolicyQueryParam param = appAccessPolicyConverter.appAccessPolicyQueryToQueryParam(query);
+        //@formatter:on
         //分页条件
         PageRequest request = PageRequest.of(pageModel.getCurrent(), pageModel.getPageSize());
         //查询映射
         org.springframework.data.domain.Page<AppAccessPolicyPO> list = appAccessPolicyRepository
-            .getAppPolicyList(query, request);
+            .getAppPolicyList(param, request);
         return appAccessPolicyConverter.appPolicyEntityListConvertToAppPolicyResult(list);
     }
 

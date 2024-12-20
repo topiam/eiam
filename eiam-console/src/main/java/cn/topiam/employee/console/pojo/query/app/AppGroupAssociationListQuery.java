@@ -1,5 +1,5 @@
 /*
- * eiam-common - Employee Identity and Access Management
+ * eiam-console - Employee Identity and Access Management
  * Copyright © 2022-Present Jinan Yuanchuang Network Technology Co., Ltd. (support@topiam.cn)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,55 +15,41 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.common.entity.app.query;
+package cn.topiam.employee.console.pojo.query.app;
+
+import java.io.Serial;
+import java.io.Serializable;
 
 import org.springdoc.core.annotations.ParameterObject;
-
-import cn.topiam.employee.common.enums.app.AppPolicySubjectType;
 
 import lombok.Data;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 
 /**
- * 应用授权策略查询参数
+ * 查询应用列表入参
  *
  * @author TopIAM
- * Created by support@topiam.cn on 2020/9/27 21:29
+ * Created by support@topiam.cn on 2020/8/11 23:08
  */
 @Data
-@Schema(description = "应用授权策略查询参数")
+@Schema(description = "查询应用组应用列表入参")
 @ParameterObject
-public class AppAccessPolicyQuery {
-
+public class AppGroupAssociationListQuery implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -7110595216804896858L;
     /**
-     * 应用id
+     * 组ID
      */
-    @Parameter(description = "应用ID")
-    private String               appId;
-
-    /**
-     * 授权主体
-     */
-    @Parameter(description = "授权主体名称")
-    private String               subjectName;
-
-    /**
-     * 授权主体ID
-     */
-    @Parameter(description = "授权主体ID")
-    private String               subjectId;
-
-    /**
-     * 主体类型（用户、分组、组织机构）
-     */
-    @Parameter(description = "主体类型")
-    private AppPolicySubjectType subjectType;
+    @NotEmpty(message = "组ID不能为空")
+    @Parameter(description = "组ID")
+    private String            id;
 
     /**
      * 应用名称
      */
     @Parameter(description = "应用名称")
-    private String               appName;
+    private String            appName;
 }

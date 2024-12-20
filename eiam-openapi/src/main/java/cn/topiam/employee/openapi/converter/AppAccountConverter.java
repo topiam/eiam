@@ -26,6 +26,8 @@ import org.springframework.util.CollectionUtils;
 
 import cn.topiam.employee.common.entity.app.AppAccountEntity;
 import cn.topiam.employee.common.entity.app.po.AppAccountPO;
+import cn.topiam.employee.common.entity.app.query.AppAccountQueryParam;
+import cn.topiam.employee.openapi.pojo.query.OapiV1AppAccountQuery;
 import cn.topiam.employee.openapi.pojo.result.AppAccountListResult;
 import cn.topiam.employee.openapi.pojo.save.AppAccountCreateParam;
 import cn.topiam.employee.support.repository.page.domain.Page;
@@ -87,4 +89,11 @@ public interface AppAccountConverter {
     @Mapping(target = "createBy", ignore = true)
     AppAccountEntity appAccountCreateParamConvertToEntity(AppAccountCreateParam param);
 
+    /**
+     * 查询参数转换
+     *
+     * @param query {@link OapiV1AppAccountQuery}
+     * @return {@link AppAccountQueryParam}
+     */
+    AppAccountQueryParam appAccountQueryToQueryParam(OapiV1AppAccountQuery query);
 }

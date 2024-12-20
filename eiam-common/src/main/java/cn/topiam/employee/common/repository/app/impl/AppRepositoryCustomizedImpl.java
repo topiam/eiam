@@ -17,7 +17,10 @@
  */
 package cn.topiam.employee.common.repository.app.impl;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -26,7 +29,7 @@ import org.springframework.stereotype.Repository;
 
 import cn.topiam.employee.common.entity.app.AppEntity;
 import cn.topiam.employee.common.entity.app.po.AppPO;
-import cn.topiam.employee.common.entity.app.query.GetAppListQuery;
+import cn.topiam.employee.common.entity.app.query.GetAppListQueryParam;
 import cn.topiam.employee.common.repository.app.AppRepositoryCustomized;
 import cn.topiam.employee.support.repository.aspect.query.QuerySingleResult;
 
@@ -81,12 +84,12 @@ public class AppRepositoryCustomizedImpl implements AppRepositoryCustomized {
      * 根据主体ID，查询参数、分页条件获取应用列表
      *
      * @param subjectIds {@link  List}
-     * @param query {@link GetAppListQuery}
+     * @param query {@link GetAppListQueryParam}
      * @param pageable {@link  String}
      * @return {@link List}
      */
     @Override
-    public Page<AppEntity> getAppList(List<String> subjectIds, GetAppListQuery query,
+    public Page<AppEntity> getAppList(List<String> subjectIds, GetAppListQueryParam query,
                                       Pageable pageable) {
         Map<String, Object> args = new HashMap<>();
         //@formatter:off

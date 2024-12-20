@@ -20,37 +20,25 @@ package cn.topiam.employee.common.entity.app.query;
 import java.io.Serial;
 import java.io.Serializable;
 
-import org.springdoc.core.annotations.ParameterObject;
-
 import lombok.Data;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
-
 /**
- * 查询应用列表
+ * 查询应用列表入参
  *
- * @author TopIAM
- * Created by support@topiam.cn on 2022/7/6 22:38
+ * @author TOPIAM
+ * Created by support@topiam.cn on 2024/11/4 14:24
  */
 @Data
-@Schema(description = "查询应用列表")
-@ParameterObject
-public class GetAppListQuery implements Serializable {
-
+public class AppGroupAssociationListQueryParam implements Serializable {
     @Serial
-    private static final long serialVersionUID = -4981513177967939516L;
+    private static final long serialVersionUID = -7110595216804896858L;
+    /**
+     * 组ID
+     */
+    private String            id;
 
     /**
      * 应用名称
      */
-    @Parameter(description = "应用名称")
-    private String            name;
-
-    /**
-     * 应用分组ID
-     */
-    @Parameter(description = "应用分组ID")
-    private String            groupId;
-
+    private String            appName;
 }

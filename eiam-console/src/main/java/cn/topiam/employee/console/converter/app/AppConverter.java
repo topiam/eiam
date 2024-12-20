@@ -29,6 +29,8 @@ import com.google.common.collect.Lists;
 import cn.topiam.employee.application.ApplicationService;
 import cn.topiam.employee.application.ApplicationServiceLoader;
 import cn.topiam.employee.common.entity.app.AppEntity;
+import cn.topiam.employee.common.entity.app.query.AppGroupAssociationListQueryParam;
+import cn.topiam.employee.console.pojo.query.app.AppGroupAssociationListQuery;
 import cn.topiam.employee.console.pojo.query.app.AppQuery;
 import cn.topiam.employee.console.pojo.result.app.AppGetResult;
 import cn.topiam.employee.console.pojo.result.app.AppListResult;
@@ -208,4 +210,12 @@ public interface AppConverter {
     private ApplicationServiceLoader getApplicationServiceLoader() {
         return ApplicationContextService.getBean(ApplicationServiceLoader.class);
     }
+
+    /**
+     * 转查询参数
+     *
+     * @param query {@link AppGroupAssociationListQuery}
+     * @return {@link AppGroupAssociationListQueryParam}
+     */
+    AppGroupAssociationListQueryParam appGroupAssociationListQueryToQueryParam(AppGroupAssociationListQuery query);
 }

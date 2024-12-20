@@ -71,7 +71,7 @@ public interface AppAccountRepository extends JpaRepository<AppAccountEntity, St
      * @param userId {@link String}
      * @return {@link Optional}
      */
-    @Cacheable(key = "#p0+':'+#p1", unless = "#result==null || #result.isEmpty()")
+    @Cacheable(key = "#p0+':'+#p1", unless = "#result == null || #result.isEmpty()")
     List<AppAccountEntity> findByAppIdAndUserId(String appId, String userId);
 
     /**
@@ -81,7 +81,7 @@ public interface AppAccountRepository extends JpaRepository<AppAccountEntity, St
      * @param userId {@link String}
      * @return {@link Optional}
      */
-    @Cacheable(key = "'default:'+#p0+':'+#p1", unless = "#result == null")
+    @Cacheable(key = "'default:'+#p0+':'+#p1", unless = "#result==null")
     Optional<AppAccountEntity> findByAppIdAndUserIdAndDefaultedIsTrue(String appId, String userId);
 
     /**
@@ -92,7 +92,7 @@ public interface AppAccountRepository extends JpaRepository<AppAccountEntity, St
      * @param account {@link String}
      * @return {@link Optional}
      */
-    @Cacheable(key = "#p0+':'+#p1+':'+#p2", unless = "#result == null")
+    @Cacheable(key = "#p0+':'+#p1+':'+#p2", unless = "#result==null")
     Optional<AppAccountEntity> findByAppIdAndUserIdAndAccount(String appId, String userId,
                                                               String account);
 

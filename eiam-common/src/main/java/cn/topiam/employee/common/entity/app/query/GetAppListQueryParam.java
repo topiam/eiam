@@ -15,28 +15,33 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package cn.topiam.employee.common.repository.app;
+package cn.topiam.employee.common.entity.app.query;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import java.io.Serial;
+import java.io.Serializable;
 
-import cn.topiam.employee.common.entity.app.po.AppAccountPO;
-import cn.topiam.employee.common.entity.app.query.AppAccountQueryParam;
+import lombok.Data;
 
 /**
- * 应用账户 Repository Customized
+ * 查询应用列表
  *
- * @author TopIAM
- * Created by support@topiam.cn on 2022/5/26 23:40
+ * @author TOPIAM
+ * Created by support@topiam.cn on 2024/11/4 14:22
  */
-public interface AppAccountRepositoryCustomized {
+@Data
+public class GetAppListQueryParam implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = -4981513177967939516L;
 
     /**
-     * 获取应用账户列表
-     *
-     * @param pageable {@link  Pageable}
-     * @param query    {@link  AppAccountQueryParam}
-     * @return {@link Page}
+     * 应用名称
      */
-    Page<AppAccountPO> getAppAccountList(AppAccountQueryParam query, Pageable pageable);
+    private String            name;
+
+    /**
+     * 应用分组ID
+     */
+    private String            groupId;
+
 }

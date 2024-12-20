@@ -27,8 +27,8 @@ import com.google.common.collect.Lists;
 import cn.topiam.employee.audit.annotation.Audit;
 import cn.topiam.employee.audit.event.type.EventType;
 import cn.topiam.employee.common.entity.account.query.UserGroupMemberListQuery;
-import cn.topiam.employee.common.entity.app.query.AppGroupAssociationListQuery;
-import cn.topiam.employee.common.entity.app.query.AppGroupQuery;
+import cn.topiam.employee.console.pojo.query.app.AppGroupAssociationListQuery;
+import cn.topiam.employee.console.pojo.query.app.AppGroupListQuery;
 import cn.topiam.employee.console.pojo.result.app.AppGroupGetResult;
 import cn.topiam.employee.console.pojo.result.app.AppGroupListResult;
 import cn.topiam.employee.console.pojo.result.app.AppListResult;
@@ -66,13 +66,13 @@ public class AppGroupController {
      * 获取应用分组列表
      *
      * @param page {@link PageModel}
-     * @return {@link AppGroupQuery}
+     * @return {@link AppGroupListQuery}
      */
     @Operation(summary = "获取分组列表")
     @GetMapping(value = "/list")
     @PreAuthorize(value = "authenticated and @sae.hasAuthority(T(cn.topiam.employee.support.security.userdetails.UserType).ADMIN)")
     public ApiRestResult<Page<AppGroupListResult>> getAppGroupList(PageModel page,
-                                                                   AppGroupQuery query) {
+                                                                   AppGroupListQuery query) {
         Page<AppGroupListResult> list = appGroupService.getAppGroupList(page, query);
         return ApiRestResult.<Page<AppGroupListResult>> builder().result(list).build();
     }

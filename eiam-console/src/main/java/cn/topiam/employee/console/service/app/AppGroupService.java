@@ -19,8 +19,8 @@ package cn.topiam.employee.console.service.app;
 
 import java.util.List;
 
-import cn.topiam.employee.common.entity.app.query.AppGroupAssociationListQuery;
-import cn.topiam.employee.common.entity.app.query.AppGroupQuery;
+import cn.topiam.employee.console.pojo.query.app.AppGroupAssociationListQuery;
+import cn.topiam.employee.console.pojo.query.app.AppGroupListQuery;
 import cn.topiam.employee.console.pojo.result.app.AppGroupGetResult;
 import cn.topiam.employee.console.pojo.result.app.AppGroupListResult;
 import cn.topiam.employee.console.pojo.result.app.AppListResult;
@@ -43,10 +43,10 @@ public interface AppGroupService {
      * 获取应用分组（分页）
      *
      * @param pageModel {@link PageModel}
-     * @param query     {@link AppGroupQuery}
+     * @param query     {@link AppGroupListQuery}
      * @return {@link AppGroupListResult}
      */
-    Page<AppGroupListResult> getAppGroupList(PageModel pageModel, AppGroupQuery query);
+    Page<AppGroupListResult> getAppGroupList(PageModel pageModel, AppGroupListQuery query);
 
     /**
      * 创建应用分组

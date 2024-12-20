@@ -158,13 +158,13 @@ public class IdentitySourceBeanRegistry implements IdentitySourceEventListener {
         try{
             switch (entity.getProvider()) {
                 case DINGTALK -> {
-                    DingTalkConfig config=objectMapper.readValue(entity.getBasicConfig(), DingTalkConfig.class);
+                    DingTalkConfig config = objectMapper.readValue(entity.getBasicConfig(), DingTalkConfig.class);
                     identitySourceClient = new DingTalkClient(config);
                     definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(DingTalkIdentitySource.class);
                     return getDefinitionHolder(entity, identitySourceSyncUserPostProcessor, identitySourceSyncDeptPostProcessor, identitySourceEventPostProcessor, identitySourceClient, definitionBuilder, config);
                 }
                 case FEISHU -> {
-                    FeiShuConfig config=objectMapper.readValue(entity.getBasicConfig(), FeiShuConfig.class);
+                    FeiShuConfig config = objectMapper.readValue(entity.getBasicConfig(), FeiShuConfig.class);
                     identitySourceClient = new FeiShuClient(config);
                     definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(FieShuIdentitySource.class);
                     return getDefinitionHolder(entity, identitySourceSyncUserPostProcessor, identitySourceSyncDeptPostProcessor, identitySourceEventPostProcessor, identitySourceClient, definitionBuilder, config);
