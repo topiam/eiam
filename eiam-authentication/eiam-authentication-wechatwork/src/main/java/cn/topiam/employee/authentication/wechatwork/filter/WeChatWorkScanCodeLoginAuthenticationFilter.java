@@ -162,7 +162,7 @@ public class WeChatWorkScanCodeLoginAuthenticationFilter extends
      */
     public String getToken(WeChatWorkIdentityProviderOAuth2Config config) {
         if (!Objects.isNull(cache)) {
-            cache.getIfPresent(OAuth2ParameterNames.ACCESS_TOKEN);
+            return cache.getIfPresent(OAuth2ParameterNames.ACCESS_TOKEN);
         }
         //获取access token
         HashMap<String, String> param = new HashMap<>(16);

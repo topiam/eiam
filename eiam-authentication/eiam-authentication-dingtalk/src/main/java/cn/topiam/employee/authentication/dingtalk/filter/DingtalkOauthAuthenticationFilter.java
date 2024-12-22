@@ -178,7 +178,7 @@ public class DingtalkOauthAuthenticationFilter extends
      */
     public String getToken(String authCode, DingTalkIdentityProviderOAuth2Config config) {
         if (!Objects.isNull(cache)) {
-            cache.getIfPresent(OAuth2ParameterNames.ACCESS_TOKEN);
+            return cache.getIfPresent(OAuth2ParameterNames.ACCESS_TOKEN);
         }
         Config clientConfig = new Config();
         clientConfig.protocol = "https";
