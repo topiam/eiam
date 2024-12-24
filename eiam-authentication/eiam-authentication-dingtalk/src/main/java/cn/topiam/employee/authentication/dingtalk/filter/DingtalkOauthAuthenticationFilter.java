@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
@@ -145,10 +146,10 @@ public class DingtalkOauthAuthenticationFilter extends
         }
         String accessToken = getToken(code, idpOauthConfig);
         Config config = new Config();
-        config.protocol = "https";
-        config.regionId = "central";
+        config.setProtocol("https");
+        config.setRegionId("central");
         GetUserHeaders getUserHeaders = new GetUserHeaders();
-        getUserHeaders.xAcsDingtalkAccessToken = accessToken;
+        getUserHeaders.setXAcsDingtalkAccessToken(accessToken);
         //获取用户个人信息，如需获取当前授权人的信息，unionId参数必须传me
         GetUserResponse user;
         try {
@@ -181,8 +182,8 @@ public class DingtalkOauthAuthenticationFilter extends
             return cache.getIfPresent(OAuth2ParameterNames.ACCESS_TOKEN);
         }
         Config clientConfig = new Config();
-        clientConfig.protocol = "https";
-        clientConfig.regionId = "central";
+        clientConfig.setProtocol("https");
+        clientConfig.setRegionId("central");
         try {
             Client client = new Client(clientConfig);
             GetUserTokenRequest getUserTokenRequest = new GetUserTokenRequest()
@@ -190,7 +191,7 @@ public class DingtalkOauthAuthenticationFilter extends
                 .setClientId(config.getAppKey())
                 //应用基础信息-应用信息的AppSecret
                 .setClientSecret(config.getAppSecret()).setCode(authCode)
-                .setGrantType("authorization_code");
+                .setGrantType(AuthorizationGrantType.AUTHORIZATION_CODE.getValue());
             //获取用户个人token
             GetUserTokenResponse getUserTokenResponse = client.getUserToken(getUserTokenRequest);
             GetUserTokenResponseBody body = getUserTokenResponse.getBody();

@@ -19,7 +19,10 @@ package cn.topiam.employee.authentication.alipay.client;
 
 import java.util.Map;
 
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+
 import com.aliyun.tea.*;
+import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.GRANT_TYPE;
 
 /**
  *
@@ -69,7 +72,7 @@ public class AlipayClient {
                 //@formatter:no
                 Map<String, Object> bizParams = new java.util.HashMap<>();
                 Map<String, String> textParams = TeaConverter.buildMap(
-                    new TeaPair("grant_type", "authorization_code"), new TeaPair("code", code));
+                    new TeaPair(GRANT_TYPE, AuthorizationGrantType.AUTHORIZATION_CODE.getValue()), new TeaPair("code", code));
                 request = getRequest(systemParams, bizParams, textParams);
                 TeaResponse response = Tea.doAction(request, runtime);
 
