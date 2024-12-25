@@ -23,6 +23,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.core.Authentication;
@@ -73,8 +74,8 @@ import static cn.topiam.employee.authentication.dingtalk.constant.DingTalkAuthen
  * Created by support@topiam.cn on 2021/12/8 21:11
  */
 @SuppressWarnings("DuplicatedCode")
-public class DingtalkOauthAuthenticationFilter extends
-                                               AbstractIdentityProviderAuthenticationProcessingFilter {
+public class DingtalkOAuth2AuthenticationFilter extends
+                                                AbstractIdentityProviderAuthenticationProcessingFilter {
     public final static String                DEFAULT_FILTER_PROCESSES_URI = DINGTALK_OAUTH
         .getLoginPathPrefix() + "/" + "{" + PROVIDER_CODE + "}";
     /**
@@ -89,8 +90,8 @@ public class DingtalkOauthAuthenticationFilter extends
      * @param registeredIdentityProviderClientRepository the {@link RegisteredIdentityProviderClientRepository}
      * @param identityProviderAuthenticationService  {@link  IdentityProviderAuthenticationService}
      */
-    public DingtalkOauthAuthenticationFilter(RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository,
-                                             IdentityProviderAuthenticationService identityProviderAuthenticationService) {
+    public DingtalkOAuth2AuthenticationFilter(RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository,
+                                              IdentityProviderAuthenticationService identityProviderAuthenticationService) {
         super(REQUEST_MATCHER, identityProviderAuthenticationService,
             registeredIdentityProviderClientRepository);
     }
@@ -178,8 +179,9 @@ public class DingtalkOauthAuthenticationFilter extends
      * @return {@link String}
      */
     public String getToken(String authCode, DingTalkIdentityProviderOAuth2Config config) {
+        String cacheKey = OAuth2ParameterNames.ACCESS_TOKEN + DigestUtils.md5Hex(config.toString());
         if (!Objects.isNull(cache)) {
-            return cache.getIfPresent(OAuth2ParameterNames.ACCESS_TOKEN);
+            return cache.getIfPresent(cacheKey);
         }
         Config clientConfig = new Config();
         clientConfig.setProtocol("https");
@@ -198,8 +200,8 @@ public class DingtalkOauthAuthenticationFilter extends
             //放入缓存
             cache = Caffeine.newBuilder().expireAfterWrite(body.getExpireIn(), TimeUnit.SECONDS)
                 .build();
-            cache.put(OAuth2ParameterNames.ACCESS_TOKEN, body.getAccessToken());
-            return cache.getIfPresent(OAuth2ParameterNames.ACCESS_TOKEN);
+            cache.put(cacheKey, body.getAccessToken());
+            return cache.getIfPresent(cacheKey);
         } catch (Exception exception) {
             throw new RuntimeException(exception.getMessage());
         }

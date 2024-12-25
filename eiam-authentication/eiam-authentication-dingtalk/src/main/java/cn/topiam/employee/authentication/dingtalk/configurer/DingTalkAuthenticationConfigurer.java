@@ -29,8 +29,8 @@ import org.springframework.util.Assert;
 
 import cn.topiam.employee.authentication.common.IdentityProviderAuthenticationService;
 import cn.topiam.employee.authentication.common.client.RegisteredIdentityProviderClientRepository;
+import cn.topiam.employee.authentication.dingtalk.filter.DingtalkOAuth2AuthenticationFilter;
 import cn.topiam.employee.authentication.dingtalk.filter.DingtalkOAuth2AuthorizationRequestRedirectFilter;
-import cn.topiam.employee.authentication.dingtalk.filter.DingtalkOauthAuthenticationFilter;
 
 import lombok.NonNull;
 import lombok.Setter;
@@ -44,10 +44,10 @@ import static cn.topiam.employee.support.security.util.HttpSecurityFilterOrderRe
  */
 @SuppressWarnings("AlibabaClassNamingShouldBeCamel")
 public final class DingTalkAuthenticationConfigurer extends
-                                                    AbstractAuthenticationFilterConfigurer<HttpSecurity, DingTalkAuthenticationConfigurer, DingtalkOauthAuthenticationFilter> {
+                                                    AbstractAuthenticationFilterConfigurer<HttpSecurity, DingTalkAuthenticationConfigurer, DingtalkOAuth2AuthenticationFilter> {
     @Setter
     @NonNull
-    private String                                           loginProcessingUrl = DingtalkOauthAuthenticationFilter.DEFAULT_FILTER_PROCESSES_URI;
+    private String                                           loginProcessingUrl = DingtalkOAuth2AuthenticationFilter.DEFAULT_FILTER_PROCESSES_URI;
 
     private final RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository;
     private final IdentityProviderAuthenticationService      identityProviderAuthenticationService;
@@ -76,7 +76,7 @@ public final class DingTalkAuthenticationConfigurer extends
     @Override
     public void init(HttpSecurity http) throws Exception {
         //钉钉登录认证
-        this.setAuthenticationFilter(new DingtalkOauthAuthenticationFilter(
+        this.setAuthenticationFilter(new DingtalkOAuth2AuthenticationFilter(
             registeredIdentityProviderClientRepository, identityProviderAuthenticationService));
         putFilterBefore(http, this.getAuthenticationFilter(),
             OAuth2LoginAuthenticationFilter.class);
@@ -95,7 +95,7 @@ public final class DingTalkAuthenticationConfigurer extends
     public RequestMatcher getRequestMatcher() {
         return new OrRequestMatcher(
             DingtalkOAuth2AuthorizationRequestRedirectFilter.getRequestMatcher(),
-            DingtalkOauthAuthenticationFilter.getRequestMatcher());
+            DingtalkOAuth2AuthenticationFilter.getRequestMatcher());
     }
 
     public static DingTalkAuthenticationConfigurer dingTalkOAuth2(RegisteredIdentityProviderClientRepository registeredIdentityProviderClientRepository,

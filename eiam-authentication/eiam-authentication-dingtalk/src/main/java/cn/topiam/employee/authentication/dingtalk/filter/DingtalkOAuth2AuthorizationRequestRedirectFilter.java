@@ -55,7 +55,7 @@ import static cn.topiam.employee.authentication.common.IdentityProviderType.DING
 import static cn.topiam.employee.authentication.common.constant.AuthenticationConstants.PROVIDER_CODE;
 import static cn.topiam.employee.authentication.dingtalk.constant.DingTalkAuthenticationConstants.CORP_ID;
 import static cn.topiam.employee.authentication.dingtalk.constant.DingTalkAuthenticationConstants.URL_AUTHORIZE;
-import static cn.topiam.employee.authentication.dingtalk.filter.DingtalkOauthAuthenticationFilter.getLoginUrl;
+import static cn.topiam.employee.authentication.dingtalk.filter.DingtalkOAuth2AuthenticationFilter.getLoginUrl;
 
 /**
  * 微信扫码登录请求重定向过滤器
