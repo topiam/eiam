@@ -263,7 +263,7 @@ public class DingTalkEventCryptoUtils {
 
         public static String getRandomStr(int count) {
             String base = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            Random random = new Random();
+            Random random = new SecureRandom();
             StringBuffer sb = new StringBuffer();
 
             for (int i = 0; i < count; ++i) {
